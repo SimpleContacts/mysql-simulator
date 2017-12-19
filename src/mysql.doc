@@ -1,0 +1,102 @@
+table_option:
+    AUTO_INCREMENT [=] value
+  | AVG_ROW_LENGTH [=] value
+  | [DEFAULT] CHARSET [=] charset_name
+  | CHECKSUM [=] {0 | 1}
+  | [DEFAULT] COLLATE [=] collation_name
+  | COMMENT [=] 'string'
+  | COMPRESSION [=] {'ZLIB'|'LZ4'|'NONE'}
+  | CONNECTION [=] 'connect_string'
+  | {DATA|INDEX} DIRECTORY [=] 'absolute path to directory'
+  | DELAY_KEY_WRITE [=] {0 | 1}
+  | ENCRYPTION [=] {'Y' | 'N'}
+  | ENGINE [=] engine_name
+  | INSERT_METHOD [=] { NO | FIRST | LAST }
+  | KEY_BLOCK_SIZE [=] value
+  | MAX_ROWS [=] value
+  | MIN_ROWS [=] value
+  | PACK_KEYS [=] {0 | 1 | DEFAULT}
+  | PASSWORD [=] 'string'
+  | ROW_FORMAT [=] {DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}
+  | STATS_AUTO_RECALC [=] {DEFAULT|0|1}
+  | STATS_PERSISTENT [=] {DEFAULT|0|1}
+  | STATS_SAMPLE_PAGES [=] value
+  | TABLESPACE tablespace_name [STORAGE {DISK|MEMORY|DEFAULT}]
+  | UNION [=] (tbl_name, ...)
+
+table_options:
+    [table_option ...]
+
+reference_definition:
+    REFERENCES tbl_name (index_col_name)
+      [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE]
+      [ON DELETE reference_option]
+      [ON UPDATE reference_option]
+
+reference_option:
+    RESTRICT | CASCADE | SET NULL | NO ACTION | SET DEFAULT
+
+data_type:
+      BIT[(length)]
+    | TINYINT[(length)] [UNSIGNED] [ZEROFILL]
+    | SMALLINT[(length)] [UNSIGNED] [ZEROFILL]
+    | MEDIUMINT[(length)] [UNSIGNED] [ZEROFILL]
+    | INT[(length)] [UNSIGNED] [ZEROFILL]
+    | INTEGER[(length)] [UNSIGNED] [ZEROFILL]
+    | BIGINT[(length)] [UNSIGNED] [ZEROFILL]
+    | REAL[(length,decimals)] [UNSIGNED] [ZEROFILL]
+    | DOUBLE[(length,decimals)] [UNSIGNED] [ZEROFILL]
+    | FLOAT[(length,decimals)] [UNSIGNED] [ZEROFILL]
+    | DECIMAL[(length[,decimals])] [UNSIGNED] [ZEROFILL]
+    | NUMERIC[(length[,decimals])] [UNSIGNED] [ZEROFILL]
+    | DATE
+    | TIMESTAMP[(fsp)]
+    | TIME[(fsp)]
+    | DATETIME[(fsp)]
+    | YEAR
+    | CHAR[(length)]
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | VARCHAR(length)
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | BINARY[(length)]
+    | BOOLEAN
+    | VARBINARY(length)
+    | TINYBLOB
+    | BLOB[(length)]
+    | MEDIUMBLOB
+    | LONGBLOB
+    | TINYTEXT
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | TEXT[(length)]
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | MEDIUMTEXT
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | LONGTEXT
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | ENUM(value,...)
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | SET(value,...)
+        [CHARACTER SET charset_name] [COLLATE collation_name]
+    | JSON
+
+column_definition:
+    data_type [NOT NULL | NULL] [DEFAULT default_value]
+      [AUTO_INCREMENT] [UNIQUE [KEY]] [[PRIMARY] KEY] [AUTO_INCREMENT]
+      [COMMENT 'string']
+      [COLUMN_FORMAT {FIXED|DYNAMIC|DEFAULT}]
+      [STORAGE {DISK|MEMORY|DEFAULT}]
+      [reference_definition]
+
+constraint_def:
+    PRIMARY KEY [index_type] (index_col_name)
+  | UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name)
+  | FOREIGN KEY [index_name] (index_col_name) reference_definition
+
+create_definition:
+      [CONSTRAINT [symbol]] constraint_def
+    | {INDEX|KEY} [index_name] [index_type] (index_col_name,...)
+    | {FULLTEXT|SPATIAL} [INDEX|KEY] [index_name] (index_col_name,...)
+    | col_name column_definition
+
+CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+    (create_definition, ...) [table_options]
