@@ -1,6 +1,9 @@
 /* eslint-disable no-use-before-define */
-
 const read = require('fs').readFileSync;
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 const isArray = s => s && s.constructor === Array;
 
@@ -76,9 +79,9 @@ ${optionsSplit
     `;
   } else if (isList) {
     const identifierInList = def.find(d => d.type === 'identifier');
-    return `${name} = r:${name}_rule rest:${name}_rest+ { return { ${
+    return `${name} = r:${name}_rule rest:${name}_rest* { return { ${
       identifierInList ? identifierInList.name : listName
-    }_list: [r].concat(rest) } }
+    }List: [r].concat(rest) } }
 ${name}_rule = ${rule} { return { ${result} } }
 ${name}_rest = ${isList.comma ? '"," w*' : ''} r:${name}_rule { return r }
     `;
@@ -107,10 +110,12 @@ const toPegHelper = (
       const str = JSON.stringify(def.string);
       const key =
         def.name ||
+        // camelcase
         def.string
           .toLowerCase()
           .split(' ')
-          .join('_');
+          .map((s, index) => (index > 0 ? capitalizeFirstLetter(s) : s))
+          .join('');
       return `${name} = ${str}i { return { ${key}: true } }`;
     }
     case 'identifier': {
@@ -146,7 +151,12 @@ const toPeg = body => {
   /**
    * Take out any definitions so they are available
    */
-  const definitions = [];
+  const definitions = [
+    'selectExpr',
+    'whereCondition',
+    'groupByExpr',
+    'orderByExpr',
+  ];
   body
     .filter(block => isArray(block) && block[0].type === 'definition')
     .forEach(def => {
@@ -200,7 +210,7 @@ const toPeg = body => {
   });
 
   return `
-start = a:anyExpr rest:startRest* ";"? w* { return rest.concat(a) }
+start = a:anyExpr rest:startRest* ";"? w* { return [a].concat(rest) }
 startRest = ";" w* a:anyExpr { return a }
 anyExpr = ${bodyWithoutDefinitions.map(def => nameFromDef(def)).join(' / ')}
 

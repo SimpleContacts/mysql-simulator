@@ -1,10 +1,11 @@
 {
-  "name": "@simple-contacts/mysql-tools",
+  "name": "@simple-contacts/mysql-js",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "eslint src && jest src",
-    "tdd": "jest src --watch"
+    "tdd": "jest src --watch",
+    "prepublish": "./build"
   },
   "jest": {
     "moduleFileExtensions": ["js", "pegjs", "doc"]

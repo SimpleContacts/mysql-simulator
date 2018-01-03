@@ -1,3 +1,5 @@
+/* CREATE Syntax */
+
 table_option:
     AUTO_INCREMENT [=] value
   | AVG_ROW_LENGTH [=] value
@@ -100,3 +102,12 @@ create_definition:
 
 CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
     (create_definition, ...) [table_options]
+
+/* SELECT Syntax */
+SELECT
+  {selectExpr, ...}
+  [FROM {tableReferences, ...}]
+  [WHERE whereCondition]
+  [GROUP BY {groupByExpr [ASC | DESC], ...} ]
+  [ORDER BY {orderByExpr [ASC | DESC], ...} ]
+  [LIMIT {rowCount OFFSET offset | rowCount}]

@@ -46,7 +46,7 @@ optionalDefItem = "[" w* d:expression w* "]" { return {  type: "optional", expre
 
 definition = s:[a-z_]+":" { return { type: 'definition', name: s.join('') } }
 
-identifier = s:(s1:[a-z_]s2:[a-zA-Z0-9_]* { return s1 + s2.join('') }) { return { type: 'identifier', name: s } }
+identifier = s:(s1:[a-z_]s2:[a-zA-Z0-9_\.]* { return s1 + s2.join('') }) { return { type: 'identifier', name: s } }
 
 list = comma:","? w* "..." w* { return { comma: !!comma, type: "list" } }
 
