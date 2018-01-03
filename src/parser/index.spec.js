@@ -44,7 +44,7 @@ describe('Read documentation', () => {
     WHERE
 	    orders.exam_id = exams.id AND
     	orders.has_dx = true AND
-    	orders.user_id = users.id AND
+    	orders.user_id = ? AND
     	orders.dx_shipping_option_id = shipping_options.id AND
     	dx_left_lens_distributor_order_id is NULL AND
       dx_right_lens_distributor_order_id is NULL AND
@@ -58,21 +58,8 @@ describe('Read documentation', () => {
       GROUP BY foo, foo.bar
       ORDER BY asd, as.asd ASC
       LIMIT 100 OFFSET 1000;
-
-      SELECT
-        foo.bar
-      FROM
-        bar2
-      WHERE
-        foo.bar = 'STRING' AND
-        NOT foo.bar2 is NULL
-      GROUP BY foo.bar, foo.bar3
-      ORDER BY foo.bar, foo.bar2 DESC
-      LIMIT 10 OFFSET 100
     `,
     );
-
-    console.log(JSON.stringify(result[1]));
 
     expect(result[0].select).toBe(true);
     expect(result[0].whereCondition.length).toBe(8); // total root level conditions

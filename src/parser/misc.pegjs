@@ -48,6 +48,6 @@ whereExprOptions = whereExprParens / whereExprEqual / whereExprIsNull
 whereExprParens = "(" w* s1:whereExprOne s2:whereExprRest* w* ")" { return { condition: 'PARENS', expr: [s1].concat(s2) }}
 whereExprIsNull = expr:someExpr w* "is"i w* "null"i { return { condition: 'ISNULL', expr }}
 whereExprEqual = expr1:someExpr w* "=" w* expr2:exprPredicate { return { condition: 'EQUAL', expr1, expr2 } }
-exprPredicate = someExpr / quotedString
+exprPredicate = "?" / someExpr / quotedString
 whereExprRest = w* c:whereAndOr w* w:whereExprOne { return { connector: c, ...w } }
 whereAndOr = "AND" / "OR"
