@@ -325,13 +325,13 @@ columnAttrsEnum =
   'NULL'i /
   'PRIMARY KEY'i /
   'AUTO_INCREMENT'i /
-  'UNIQUE'i ' KEY'i? /
+  'UNIQUE'i ' KEY'i? { return { UNIQUE: true }} /
   'UNSIGNED'i /
-  'DEFAULT'i _ i:defaultValues _ { return { default: i} } /
-  'ON UPDATE'i _ i:defaultValues _ { return { onUpdate: i} } /
-  'COLLATE'i _ i:identifier _ { return { collate: i } } /
-  'COMMENT'i _ comment:literal { return { comment } } /
-  'AFTER'i _ after:identifier { return { after } }
+  'DEFAULT'i _ DEFAULT:defaultValues _ { return { DEFAULT } } /
+  'ON UPDATE'i _ ONUPDATE:defaultValues _ { return { ONUPDATE } } /
+  'COLLATE'i _ COLLATE:identifier _ { return { COLLATE } } /
+  'COMMENT'i _ COMMENT:literal { return { COMMENT } } /
+  'AFTER'i _ AFTER:identifier { return { AFTER } }
 
 tableOptions = tableOptionsEnum*
 tableOptionsEnum= tableOptionAssignment / tableOptionValue

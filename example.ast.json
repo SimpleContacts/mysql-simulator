@@ -26,7 +26,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -99,7 +99,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -116,10 +116,9 @@
           ]
         },
         "attrs": [
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       }
     ],
@@ -180,7 +179,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -260,7 +259,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -344,7 +343,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -361,7 +360,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       },
@@ -376,7 +375,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -391,7 +390,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -406,7 +405,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -488,7 +487,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -504,7 +503,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -520,7 +519,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": ""
             }
@@ -536,7 +535,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -550,7 +549,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -564,7 +563,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -634,7 +633,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -652,7 +651,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -667,7 +666,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -682,7 +681,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -697,7 +696,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -712,7 +711,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -727,7 +726,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -742,7 +741,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -757,7 +756,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -772,7 +771,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -787,7 +786,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -802,7 +801,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -817,7 +816,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -867,7 +866,7 @@
         },
         "attrs": [
           {
-            "collate": "utf8_bin"
+            "COLLATE": "utf8_bin"
           },
           "NOT NULL"
         ]
@@ -895,7 +894,7 @@
         },
         "attrs": [
           {
-            "collate": "utf8_bin"
+            "COLLATE": "utf8_bin"
           }
         ]
       },
@@ -959,7 +958,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -1010,7 +1009,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -1027,7 +1026,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       },
@@ -1042,7 +1041,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1057,7 +1056,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1072,7 +1071,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1151,7 +1150,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1165,7 +1164,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -1178,7 +1177,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -1302,7 +1301,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -1319,7 +1318,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       },
@@ -1505,7 +1504,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1558,7 +1557,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -1638,7 +1637,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -1654,7 +1653,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1769,7 +1768,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -1813,7 +1812,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -1828,7 +1827,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -1929,7 +1928,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -1957,10 +1956,9 @@
           ]
         },
         "attrs": [
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       }
     ],
@@ -2021,7 +2019,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -2134,7 +2132,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2169,7 +2167,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2237,7 +2235,7 @@
         },
         "attrs": [
           {
-            "default": "False"
+            "DEFAULT": "False"
           }
         ]
       }
@@ -2255,7 +2253,7 @@
         },
         "attrs": [
           {
-            "default": "False"
+            "DEFAULT": "False"
           }
         ]
       }
@@ -2273,7 +2271,7 @@
         },
         "attrs": [
           {
-            "default": "False"
+            "DEFAULT": "False"
           }
         ]
       }
@@ -2306,7 +2304,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -2322,7 +2320,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2337,7 +2335,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2352,7 +2350,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2394,7 +2392,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -2412,7 +2410,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -2467,7 +2465,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -2486,7 +2484,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -2522,7 +2520,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -2580,7 +2578,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -2596,7 +2594,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -2629,7 +2627,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -2645,7 +2643,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2660,7 +2658,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2675,7 +2673,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2690,7 +2688,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2705,7 +2703,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2720,7 +2718,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2735,7 +2733,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2750,7 +2748,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2765,7 +2763,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2780,7 +2778,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2795,7 +2793,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2810,10 +2808,9 @@
         },
         "attrs": [
           "NOT NULL",
-          [
-            "UNIQUE",
-            " KEY"
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       },
       {
@@ -2827,7 +2824,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2842,7 +2839,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2857,7 +2854,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2872,7 +2869,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2887,7 +2884,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2902,7 +2899,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2917,7 +2914,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2930,7 +2927,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2945,7 +2942,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2960,7 +2957,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2975,7 +2972,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -2990,7 +2987,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3005,7 +3002,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3018,7 +3015,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3033,7 +3030,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3046,7 +3043,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3061,7 +3058,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3077,7 +3074,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -3093,7 +3090,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -3181,7 +3178,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3202,7 +3199,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3222,7 +3219,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -3269,7 +3266,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -3328,7 +3325,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3348,7 +3345,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -3368,7 +3365,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -3389,7 +3386,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3409,7 +3406,7 @@
         },
         "attrs": [
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "prod"
             }
@@ -3432,7 +3429,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -3568,7 +3565,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -3586,7 +3583,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3599,7 +3596,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -3625,7 +3622,7 @@
         },
         "attrs": [
           {
-            "default": "1"
+            "DEFAULT": "1"
           }
         ]
       },
@@ -3641,7 +3638,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -3726,7 +3723,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3767,7 +3764,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3786,7 +3783,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3806,7 +3803,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -3848,7 +3845,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -3881,7 +3878,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -3909,10 +3906,9 @@
           ]
         },
         "attrs": [
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       }
     ],
@@ -3972,7 +3968,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -3992,7 +3988,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -4075,7 +4071,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -4156,7 +4152,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -4174,7 +4170,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -4337,10 +4333,10 @@
         },
         "attrs": [
           {
-            "default": "now()"
+            "DEFAULT": "now()"
           },
           {
-            "onUpdate": "now()"
+            "ONUPDATE": "now()"
           }
         ]
       }
@@ -4385,7 +4381,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -4543,7 +4539,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -4583,7 +4579,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -4693,7 +4689,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -4744,7 +4740,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -4786,7 +4782,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -4828,7 +4824,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -4848,7 +4844,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -4868,7 +4864,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -4920,7 +4916,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -4936,10 +4932,10 @@
         },
         "attrs": [
           {
-            "default": "NOW()"
+            "DEFAULT": "NOW()"
           },
           {
-            "onUpdate": "NOW()"
+            "ONUPDATE": "NOW()"
           }
         ]
       },
@@ -5021,7 +5017,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -5075,7 +5071,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5088,7 +5084,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5101,7 +5097,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5114,7 +5110,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5127,7 +5123,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -5148,7 +5144,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -5168,7 +5164,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -5315,7 +5311,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5332,7 +5328,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -5349,7 +5345,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -5366,7 +5362,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -5383,7 +5379,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -5400,7 +5396,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -5417,7 +5413,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -5535,7 +5531,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -5581,7 +5577,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -5626,7 +5622,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -5643,7 +5639,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -5742,7 +5738,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -5790,7 +5786,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -5808,7 +5804,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5823,7 +5819,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5836,7 +5832,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5923,7 +5919,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -5941,7 +5937,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5956,7 +5952,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5971,7 +5967,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5986,7 +5982,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -5999,7 +5995,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6147,7 +6143,7 @@
         "attrs": [
           "NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "OPEN"
             }
@@ -6170,7 +6166,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -6244,7 +6240,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -6319,7 +6315,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6334,7 +6330,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6349,7 +6345,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6364,7 +6360,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6379,7 +6375,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6394,7 +6390,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6409,7 +6405,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6424,7 +6420,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6440,7 +6436,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -6455,7 +6451,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -6503,7 +6499,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -6530,7 +6526,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6555,7 +6551,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0"
             }
@@ -6573,7 +6569,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6588,7 +6584,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -6604,7 +6600,7 @@
         "attrs": [
           "unsigned",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0"
             }
@@ -6623,7 +6619,7 @@
         "attrs": [
           "unsigned",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0"
             }
@@ -6642,7 +6638,7 @@
         },
         "attrs": [
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0.00"
             }
@@ -6658,7 +6654,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -6691,7 +6687,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -6709,7 +6705,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -6810,7 +6806,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -6829,7 +6825,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -6843,7 +6839,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7014,7 +7010,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7035,7 +7031,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7092,7 +7088,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7113,7 +7109,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7134,7 +7130,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -7152,7 +7148,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -7170,7 +7166,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -7250,7 +7246,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -7267,7 +7263,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -7310,7 +7306,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7332,7 +7328,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7386,7 +7382,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7401,7 +7397,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7416,7 +7412,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7431,7 +7427,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7446,7 +7442,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7461,7 +7457,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7476,7 +7472,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7491,7 +7487,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7547,7 +7543,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -7594,7 +7590,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7607,7 +7603,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7620,7 +7616,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7634,7 +7630,7 @@
         "attrs": [
           "UNSIGNED",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -7702,7 +7698,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7717,7 +7713,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7732,7 +7728,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -7775,7 +7771,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7796,7 +7792,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7817,7 +7813,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7838,7 +7834,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7859,7 +7855,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -7925,7 +7921,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -8226,7 +8222,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -8244,7 +8240,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -8265,7 +8261,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -8299,7 +8295,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -8333,7 +8329,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -8351,10 +8347,10 @@
         },
         "attrs": [
           {
-            "default": "NOW()"
+            "DEFAULT": "NOW()"
           },
           {
-            "onUpdate": "NOW()"
+            "ONUPDATE": "NOW()"
           }
         ]
       }
@@ -8375,7 +8371,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -8533,7 +8529,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -8563,7 +8559,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -8650,7 +8646,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -8681,7 +8677,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -8714,7 +8710,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -8756,7 +8752,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -8772,7 +8768,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -8797,7 +8793,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -8810,7 +8806,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -8823,7 +8819,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -8903,7 +8899,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -8944,7 +8940,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -8985,7 +8981,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -9001,7 +8997,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -9017,7 +9013,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -9041,7 +9037,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -9098,7 +9094,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -9148,7 +9144,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -9161,7 +9157,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -9232,7 +9228,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -9340,7 +9336,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -9473,7 +9469,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -9510,7 +9506,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -9541,7 +9537,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -9560,7 +9556,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -9748,7 +9744,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -9793,7 +9789,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -9806,7 +9802,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -9930,7 +9926,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -9990,7 +9986,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "1"
+            "DEFAULT": "1"
           }
         ]
       },
@@ -10053,7 +10049,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -10069,7 +10065,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -10385,7 +10381,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -10585,7 +10581,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -10602,13 +10598,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -10624,7 +10620,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -10638,7 +10634,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       },
@@ -10735,7 +10731,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -10750,7 +10746,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -10765,7 +10761,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -10831,7 +10827,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -10868,7 +10864,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -10905,7 +10901,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11010,7 +11006,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -11041,7 +11037,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -11228,7 +11224,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -11301,10 +11297,10 @@
         },
         "attrs": [
           {
-            "default": "NOW()"
+            "DEFAULT": "NOW()"
           },
           {
-            "onUpdate": "NOW()"
+            "ONUPDATE": "NOW()"
           }
         ]
       },
@@ -11370,7 +11366,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -11387,7 +11383,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -11419,7 +11415,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -11483,7 +11479,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -11502,7 +11498,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -11530,7 +11526,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -11563,7 +11559,7 @@
         },
         "attrs": [
           {
-            "default": "1"
+            "DEFAULT": "1"
           }
         ]
       },
@@ -11588,7 +11584,7 @@
         },
         "attrs": [
           {
-            "default": "1"
+            "DEFAULT": "1"
           }
         ]
       },
@@ -11613,7 +11609,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11679,7 +11675,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -11723,7 +11719,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -11803,7 +11799,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -11822,7 +11818,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -11842,7 +11838,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11857,7 +11853,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -11901,7 +11897,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -11919,7 +11915,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11934,7 +11930,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11949,7 +11945,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11964,7 +11960,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -11979,7 +11975,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -12028,7 +12024,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12060,7 +12056,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -12292,7 +12288,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12310,7 +12306,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12352,7 +12348,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -12372,7 +12368,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12393,7 +12389,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -12465,7 +12461,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12561,7 +12557,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12579,7 +12575,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12597,7 +12593,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12622,7 +12618,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -12644,7 +12640,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0.00"
             }
@@ -12662,7 +12658,7 @@
           "UNSIGNED",
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -12679,7 +12675,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0.00"
             }
@@ -12697,7 +12693,7 @@
           "UNSIGNED",
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -12719,10 +12715,9 @@
         "attrs": [
           "NOT NULL",
           "PRIMARY KEY",
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       },
       {
@@ -12735,7 +12730,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -12751,10 +12746,10 @@
         },
         "attrs": [
           {
-            "default": "now()"
+            "DEFAULT": "now()"
           },
           {
-            "onUpdate": "now()"
+            "ONUPDATE": "now()"
           }
         ]
       },
@@ -12821,7 +12816,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -12836,7 +12831,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -12851,7 +12846,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -12866,7 +12861,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -12961,7 +12956,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -13051,7 +13046,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -13067,10 +13062,10 @@
         },
         "attrs": [
           {
-            "default": "now()"
+            "DEFAULT": "now()"
           },
           {
-            "onUpdate": "now()"
+            "ONUPDATE": "now()"
           }
         ]
       },
@@ -13087,7 +13082,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0.00"
             }
@@ -13105,7 +13100,7 @@
           "UNSIGNED",
           "NOT NULL",
           {
-            "default": "1"
+            "DEFAULT": "1"
           }
         ]
       },
@@ -13120,7 +13115,7 @@
           "UNSIGNED",
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -13200,7 +13195,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13220,7 +13215,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13242,7 +13237,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13264,7 +13259,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13286,7 +13281,7 @@
           "UNSIGNED",
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -13301,7 +13296,7 @@
           "UNSIGNED",
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -13489,7 +13484,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -13552,7 +13547,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -13600,7 +13595,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -13621,7 +13616,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -13642,7 +13637,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -13791,7 +13786,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13816,7 +13811,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -13829,7 +13824,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13842,7 +13837,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13855,7 +13850,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13868,7 +13863,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13881,7 +13876,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13894,7 +13889,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -13913,7 +13908,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -13934,7 +13929,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -13951,7 +13946,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -13966,7 +13961,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -13988,7 +13983,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -14003,7 +13998,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -14019,7 +14014,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -14052,7 +14047,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -14097,7 +14092,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -14190,7 +14185,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -14366,7 +14361,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -14524,7 +14519,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -14554,7 +14549,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -14707,7 +14702,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -14720,7 +14715,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -14755,7 +14750,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -14789,7 +14784,7 @@
         },
         "attrs": [
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       }
@@ -14807,7 +14802,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -14853,7 +14848,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -14868,7 +14863,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -14934,7 +14929,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -14951,7 +14946,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -14995,7 +14990,7 @@
         },
         "attrs": [
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       }
@@ -15013,7 +15008,7 @@
         },
         "attrs": [
           {
-            "default": "FALSE"
+            "DEFAULT": "FALSE"
           }
         ]
       }
@@ -15064,7 +15059,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15086,7 +15081,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -15116,7 +15111,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15134,7 +15129,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15223,7 +15218,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -15275,7 +15270,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15293,7 +15288,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15418,7 +15413,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15439,7 +15434,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15472,7 +15467,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -15530,7 +15525,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -15609,7 +15604,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -15718,7 +15713,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "ACTIVE"
             }
@@ -15905,7 +15900,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -15953,7 +15948,7 @@
         },
         "attrs": [
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "MD_NOTE"
             }
@@ -15975,7 +15970,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -16005,7 +16000,7 @@
         },
         "attrs": [
           {
-            "default": "now()"
+            "DEFAULT": "now()"
           }
         ]
       }
@@ -16023,7 +16018,7 @@
         },
         "attrs": [
           {
-            "default": "now()"
+            "DEFAULT": "now()"
           }
         ]
       }
@@ -16056,7 +16051,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -16221,7 +16216,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -16236,7 +16231,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -16287,7 +16282,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -16303,13 +16298,13 @@
         },
         "attrs": [
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -16592,7 +16587,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -16608,10 +16603,10 @@
         },
         "attrs": [
           {
-            "default": "NOW()"
+            "DEFAULT": "NOW()"
           },
           {
-            "onUpdate": "NOW()"
+            "ONUPDATE": "NOW()"
           }
         ]
       }
@@ -16764,7 +16759,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -16860,7 +16855,7 @@
         },
         "attrs": [
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": "6"
             }
@@ -16943,7 +16938,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -16956,7 +16951,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -16969,7 +16964,7 @@
         },
         "attrs": [
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -17127,7 +17122,7 @@
         },
         "attrs": [
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -17149,7 +17144,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -17164,7 +17159,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -17177,7 +17172,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -17209,7 +17204,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -17224,7 +17219,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -17273,7 +17268,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -17293,7 +17288,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -17469,7 +17464,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -17488,7 +17483,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": ""
             }
@@ -17546,7 +17541,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -17644,7 +17639,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -17676,13 +17671,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "test"
             }
           },
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "test / live"
             }
@@ -17701,13 +17696,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": ""
             }
           },
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "Random value"
             }
@@ -17726,13 +17721,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0"
             }
           },
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "Set to 1 to effectively revoke the secret and all associated tokens"
             }
@@ -17794,7 +17789,7 @@
           "unsigned",
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "The secret that generated this token"
             }
@@ -17824,7 +17819,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": ""
             }
@@ -17908,7 +17903,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "Random value"
             }
@@ -18086,7 +18081,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18150,7 +18145,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18263,7 +18258,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18361,7 +18356,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18378,13 +18373,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18416,7 +18411,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "The ID of the user in the partners DB"
             }
@@ -18460,7 +18455,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -18495,7 +18490,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "LITERAL",
               "string": "0"
             }
@@ -18517,7 +18512,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -18530,7 +18525,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -18543,7 +18538,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -18585,7 +18580,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18602,13 +18597,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18625,7 +18620,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -18640,7 +18635,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -18695,7 +18690,7 @@
         },
         "attrs": [
           {
-            "default": "1"
+            "DEFAULT": "1"
           }
         ]
       },
@@ -18711,7 +18706,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -18727,7 +18722,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -18743,7 +18738,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -18759,7 +18754,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       }
@@ -18824,7 +18819,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -18841,7 +18836,7 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -18884,7 +18879,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -18900,7 +18895,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -18916,7 +18911,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -18932,7 +18927,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -19018,7 +19013,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19077,7 +19072,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -19093,7 +19088,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -19174,7 +19169,7 @@
         },
         "attrs": [
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "in format 123-123-1234, this \"could\" be missing from incoming faxes."
             }
@@ -19193,7 +19188,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "in format 123-123-1234"
             }
@@ -19212,7 +19207,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "s3 bucket key to file."
             }
@@ -19244,7 +19239,7 @@
         },
         "attrs": [
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "faxage api, only applicable for outgoing."
             }
@@ -19270,7 +19265,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "In faxage ... outgoing faxes this a \"jobid\", but for incoming its called a \"receiveid\""
             }
@@ -19287,7 +19282,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": "0"
+            "DEFAULT": "0"
           }
         ]
       },
@@ -19301,7 +19296,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "from faxage api"
             }
@@ -19317,7 +19312,7 @@
         },
         "attrs": [
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "from faxage api .. only used on outgoing faxes."
             }
@@ -19334,7 +19329,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19351,13 +19346,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19402,12 +19397,11 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           },
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       }
     ]
@@ -19506,7 +19500,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19523,13 +19517,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19637,7 +19631,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -19665,10 +19659,10 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           },
           {
-            "after": "name"
+            "AFTER": "name"
           }
         ]
       }
@@ -19720,7 +19714,7 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19737,13 +19731,13 @@
         "attrs": [
           "NOT NULL",
           {
-            "default": {
+            "DEFAULT": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
           },
           {
-            "onUpdate": {
+            "ONUPDATE": {
               "type": "CURRENT_TIMESTAMP",
               "length": null
             }
@@ -19788,7 +19782,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -19803,10 +19797,10 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           },
           {
-            "comment": {
+            "COMMENT": {
               "type": "LITERAL",
               "string": "YYYY-MM-DD"
             }
@@ -19833,7 +19827,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -19846,7 +19840,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       },
@@ -19886,7 +19880,7 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           }
         ]
       }
@@ -19906,12 +19900,11 @@
         },
         "attrs": [
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           },
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       }
     ]
@@ -19931,10 +19924,9 @@
         },
         "attrs": [
           "NOT NULL",
-          [
-            "UNIQUE",
-            null
-          ]
+          {
+            "UNIQUE": true
+          }
         ]
       }
     ]
@@ -19961,10 +19953,10 @@
         "attrs": [
           "NULL",
           {
-            "default": "NULL"
+            "DEFAULT": "NULL"
           },
           {
-            "after": "scratchpad"
+            "AFTER": "scratchpad"
           }
         ]
       }
