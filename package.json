@@ -4,16 +4,15 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "eslint src && jest src",
-    "tdd": "jest src --watch",
-    "prepublish": "./build"
+    "tdd": "jest src --watch"
   },
   "jest": {
     "moduleFileExtensions": ["js", "pegjs", "doc"]
   },
   "devDependencies": {
-    "@simple-contacts/babel-preset-sc": "^0.0.10",
-    "@simple-contacts/eslint-config": "^0.0.11",
-    "@simple-contacts/sc-scripts": "^0.3.4",
+    "@simple-contacts/babel-preset-sc": "^1.0.0",
+    "@simple-contacts/eslint-config": "^0.1.6",
+    "@simple-contacts/sc-scripts": "^0.4.11",
     "pegjs": "^0.10.0"
   },
   "dependencies": {}

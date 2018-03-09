@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# Remove our dist directory
-rm -Rf ./dist
-mkdir dist
-
-# Create new parser
-babel-node -e 'console.log("module.exports = " + require("./src/parser").buildStandAloneParser())' > ./dist/parser.js
