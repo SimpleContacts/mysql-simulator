@@ -522,7 +522,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": []
+              "string": ""
             }
           }
         ]
@@ -3411,12 +3411,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "p",
-                "r",
-                "o",
-                "d"
-              ]
+              "string": "prod"
             }
           }
         ]
@@ -6154,12 +6149,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "O",
-                "P",
-                "E",
-                "N"
-              ]
+              "string": "OPEN"
             }
           }
         ]
@@ -6567,9 +6557,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0"
-              ]
+              "string": "0"
             }
           }
         ]
@@ -6618,9 +6606,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0"
-              ]
+              "string": "0"
             }
           }
         ]
@@ -6639,9 +6625,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0"
-              ]
+              "string": "0"
             }
           }
         ]
@@ -6660,12 +6644,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0",
-                ".",
-                "0",
-                "0"
-              ]
+              "string": "0.00"
             }
           }
         ]
@@ -12667,12 +12646,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0",
-                ".",
-                "0",
-                "0"
-              ]
+              "string": "0.00"
             }
           }
         ]
@@ -12707,12 +12681,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0",
-                ".",
-                "0",
-                "0"
-              ]
+              "string": "0.00"
             }
           }
         ]
@@ -13120,12 +13089,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0",
-                ".",
-                "0",
-                "0"
-              ]
+              "string": "0.00"
             }
           }
         ]
@@ -15756,14 +15720,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "A",
-                "C",
-                "T",
-                "I",
-                "V",
-                "E"
-              ]
+              "string": "ACTIVE"
             }
           }
         ]
@@ -15998,15 +15955,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "M",
-                "D",
-                "_",
-                "N",
-                "O",
-                "T",
-                "E"
-              ]
+              "string": "MD_NOTE"
             }
           },
           "NULL"
@@ -17541,7 +17490,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": []
+              "string": ""
             }
           }
         ]
@@ -17729,30 +17678,13 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "t",
-                "e",
-                "s",
-                "t"
-              ]
+              "string": "test"
             }
           },
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "t",
-                "e",
-                "s",
-                "t",
-                " ",
-                "/",
-                " ",
-                "l",
-                "i",
-                "v",
-                "e"
-              ]
+              "string": "test / live"
             }
           }
         ]
@@ -17771,26 +17703,13 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": []
+              "string": ""
             }
           },
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "R",
-                "a",
-                "n",
-                "d",
-                "o",
-                "m",
-                " ",
-                "v",
-                "a",
-                "l",
-                "u",
-                "e"
-              ]
+              "string": "Random value"
             }
           }
         ]
@@ -17809,83 +17728,13 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0"
-              ]
+              "string": "0"
             }
           },
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "S",
-                "e",
-                "t",
-                " ",
-                "t",
-                "o",
-                " ",
-                "1",
-                " ",
-                "t",
-                "o",
-                " ",
-                "e",
-                "f",
-                "f",
-                "e",
-                "c",
-                "t",
-                "i",
-                "v",
-                "e",
-                "l",
-                "y",
-                " ",
-                "r",
-                "e",
-                "v",
-                "o",
-                "k",
-                "e",
-                " ",
-                "t",
-                "h",
-                "e",
-                " ",
-                "s",
-                "e",
-                "c",
-                "r",
-                "e",
-                "t",
-                " ",
-                "a",
-                "n",
-                "d",
-                " ",
-                "a",
-                "l",
-                "l",
-                " ",
-                "a",
-                "s",
-                "s",
-                "o",
-                "c",
-                "i",
-                "a",
-                "t",
-                "e",
-                "d",
-                " ",
-                "t",
-                "o",
-                "k",
-                "e",
-                "n",
-                "s"
-              ]
+              "string": "Set to 1 to effectively revoke the secret and all associated tokens"
             }
           }
         ]
@@ -17947,44 +17796,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "T",
-                "h",
-                "e",
-                " ",
-                "s",
-                "e",
-                "c",
-                "r",
-                "e",
-                "t",
-                " ",
-                "t",
-                "h",
-                "a",
-                "t",
-                " ",
-                "g",
-                "e",
-                "n",
-                "e",
-                "r",
-                "a",
-                "t",
-                "e",
-                "d",
-                " ",
-                "t",
-                "h",
-                "i",
-                "s",
-                " ",
-                "t",
-                "o",
-                "k",
-                "e",
-                "n"
-              ]
+              "string": "The secret that generated this token"
             }
           }
         ]
@@ -18014,7 +17826,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": []
+              "string": ""
             }
           }
         ]
@@ -18098,20 +17910,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "R",
-                "a",
-                "n",
-                "d",
-                "o",
-                "m",
-                " ",
-                "v",
-                "a",
-                "l",
-                "u",
-                "e"
-              ]
+              "string": "Random value"
             }
           }
         ]
@@ -18619,45 +18418,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "T",
-                "h",
-                "e",
-                " ",
-                "I",
-                "D",
-                " ",
-                "o",
-                "f",
-                " ",
-                "t",
-                "h",
-                "e",
-                " ",
-                "u",
-                "s",
-                "e",
-                "r",
-                " ",
-                "i",
-                "n",
-                " ",
-                "t",
-                "h",
-                "e",
-                " ",
-                "p",
-                "a",
-                "r",
-                "t",
-                "n",
-                "e",
-                "r",
-                "s",
-                " ",
-                "D",
-                "B"
-              ]
+              "string": "The ID of the user in the partners DB"
             }
           }
         ]
@@ -18736,9 +18497,7 @@
           {
             "default": {
               "type": "LITERAL",
-              "string": [
-                "0"
-              ]
+              "string": "0"
             }
           }
         ]
@@ -19417,76 +19176,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "i",
-                "n",
-                " ",
-                "f",
-                "o",
-                "r",
-                "m",
-                "a",
-                "t",
-                " ",
-                "1",
-                "2",
-                "3",
-                "-",
-                "1",
-                "2",
-                "3",
-                "-",
-                "1",
-                "2",
-                "3",
-                "4",
-                ",",
-                " ",
-                "t",
-                "h",
-                "i",
-                "s",
-                " ",
-                "\"",
-                "c",
-                "o",
-                "u",
-                "l",
-                "d",
-                "\"",
-                " ",
-                "b",
-                "e",
-                " ",
-                "m",
-                "i",
-                "s",
-                "s",
-                "i",
-                "n",
-                "g",
-                " ",
-                "f",
-                "r",
-                "o",
-                "m",
-                " ",
-                "i",
-                "n",
-                "c",
-                "o",
-                "m",
-                "i",
-                "n",
-                "g",
-                " ",
-                "f",
-                "a",
-                "x",
-                "e",
-                "s",
-                "."
-              ]
+              "string": "in format 123-123-1234, this \"could\" be missing from incoming faxes."
             }
           }
         ]
@@ -19505,30 +19195,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "i",
-                "n",
-                " ",
-                "f",
-                "o",
-                "r",
-                "m",
-                "a",
-                "t",
-                " ",
-                "1",
-                "2",
-                "3",
-                "-",
-                "1",
-                "2",
-                "3",
-                "-",
-                "1",
-                "2",
-                "3",
-                "4"
-              ]
+              "string": "in format 123-123-1234"
             }
           }
         ]
@@ -19547,30 +19214,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "s",
-                "3",
-                " ",
-                "b",
-                "u",
-                "c",
-                "k",
-                "e",
-                "t",
-                " ",
-                "k",
-                "e",
-                "y",
-                " ",
-                "t",
-                "o",
-                " ",
-                "f",
-                "i",
-                "l",
-                "e",
-                "."
-              ]
+              "string": "s3 bucket key to file."
             }
           }
         ]
@@ -19602,49 +19246,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "f",
-                "a",
-                "x",
-                "a",
-                "g",
-                "e",
-                " ",
-                "a",
-                "p",
-                "i",
-                ",",
-                " ",
-                "o",
-                "n",
-                "l",
-                "y",
-                " ",
-                "a",
-                "p",
-                "p",
-                "l",
-                "i",
-                "c",
-                "a",
-                "b",
-                "l",
-                "e",
-                " ",
-                "f",
-                "o",
-                "r",
-                " ",
-                "o",
-                "u",
-                "t",
-                "g",
-                "o",
-                "i",
-                "n",
-                "g",
-                "."
-              ]
+              "string": "faxage api, only applicable for outgoing."
             }
           }
         ]
@@ -19670,94 +19272,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "I",
-                "n",
-                " ",
-                "f",
-                "a",
-                "x",
-                "a",
-                "g",
-                "e",
-                " ",
-                ".",
-                ".",
-                ".",
-                " ",
-                "o",
-                "u",
-                "t",
-                "g",
-                "o",
-                "i",
-                "n",
-                "g",
-                " ",
-                "f",
-                "a",
-                "x",
-                "e",
-                "s",
-                " ",
-                "t",
-                "h",
-                "i",
-                "s",
-                " ",
-                "a",
-                " ",
-                "\"",
-                "j",
-                "o",
-                "b",
-                "i",
-                "d",
-                "\"",
-                ",",
-                " ",
-                "b",
-                "u",
-                "t",
-                " ",
-                "f",
-                "o",
-                "r",
-                " ",
-                "i",
-                "n",
-                "c",
-                "o",
-                "m",
-                "i",
-                "n",
-                "g",
-                " ",
-                "i",
-                "t",
-                "s",
-                " ",
-                "c",
-                "a",
-                "l",
-                "l",
-                "e",
-                "d",
-                " ",
-                "a",
-                " ",
-                "\"",
-                "r",
-                "e",
-                "c",
-                "e",
-                "i",
-                "v",
-                "e",
-                "i",
-                "d",
-                "\""
-              ]
+              "string": "In faxage ... outgoing faxes this a \"jobid\", but for incoming its called a \"receiveid\""
             }
           }
         ]
@@ -19788,23 +19303,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "f",
-                "r",
-                "o",
-                "m",
-                " ",
-                "f",
-                "a",
-                "x",
-                "a",
-                "g",
-                "e",
-                " ",
-                "a",
-                "p",
-                "i"
-              ]
+              "string": "from faxage api"
             }
           }
         ]
@@ -19820,55 +19319,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "f",
-                "r",
-                "o",
-                "m",
-                " ",
-                "f",
-                "a",
-                "x",
-                "a",
-                "g",
-                "e",
-                " ",
-                "a",
-                "p",
-                "i",
-                " ",
-                ".",
-                ".",
-                " ",
-                "o",
-                "n",
-                "l",
-                "y",
-                " ",
-                "u",
-                "s",
-                "e",
-                "d",
-                " ",
-                "o",
-                "n",
-                " ",
-                "o",
-                "u",
-                "t",
-                "g",
-                "o",
-                "i",
-                "n",
-                "g",
-                " ",
-                "f",
-                "a",
-                "x",
-                "e",
-                "s",
-                "."
-              ]
+              "string": "from faxage api .. only used on outgoing faxes."
             }
           }
         ]
@@ -20357,18 +19808,7 @@
           {
             "comment": {
               "type": "LITERAL",
-              "string": [
-                "Y",
-                "Y",
-                "Y",
-                "Y",
-                "-",
-                "M",
-                "M",
-                "-",
-                "D",
-                "D"
-              ]
+              "string": "YYYY-MM-DD"
             }
           }
         ]

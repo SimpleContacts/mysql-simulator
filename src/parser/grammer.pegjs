@@ -351,7 +351,7 @@ __ = [ \t]*
 
 number "number" = n:[0-9]+ { return n.join('') }
 
-literal "literal" = '\'' l:[^']* '\'' { return { type: 'LITERAL', string: l } }
+literal "literal" = '\'' l:[^']* '\'' { return { type: 'LITERAL', string: l.join('') } }
 
 identifier "identifier"
   = '`'? first:[a-z_] rest:[a-zA-Z0-9_]* '`'? { return [first].concat(rest).join('') }
