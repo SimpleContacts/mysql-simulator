@@ -1,5 +1,6 @@
 // @flow
 
+import chalk from 'chalk';
 
 import ast from '../example.ast.json';
 import { addTable, emptyDb, removeTable, renameTable } from './db';
@@ -38,14 +39,17 @@ function main() {
     if (expr.type === 'CREATE') {
       const table = makeTable(expr);
       db = addTable(db, table);
+      console.log(chalk.green(`CREATE TABLE ${expr.name}`));
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tableName, expr.ifExists);
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.existingName, expr.newName);
     } else {
       // eslint-disable-next-line no-console
-      console.error(`Unknown expression type: ${expr.type}`);
+      console.error(chalk.gray(`Unknown expression type: ${expr.type}`));
     }
+
+    console.log(chalk.green(expr.type));
   }
 
   // console.log(JSON.stringify(db, null, 2));
