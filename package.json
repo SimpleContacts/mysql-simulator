@@ -24,5 +24,7 @@
     "jest-cli": "^23.0.0-alpha.0",
     "pegjs": "^0.10.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "immer": "^1.2.0"
+  }
 }

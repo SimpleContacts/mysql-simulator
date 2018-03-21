@@ -2513,6 +2513,10 @@ ignore@^3.3.3, ignore@^3.3.5:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.7.tgz#612289bfb3c220e186a58118618d5be8c1bab021"
 
+immer@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-1.2.0.tgz#06a0dd9a8f8061258149f4c609250e1e5a32ffbc"
+
 import-local@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/import-local/-/import-local-1.0.0.tgz#5e4ffdc03f4fe6c009c6729beb29631c2f8227bc"
