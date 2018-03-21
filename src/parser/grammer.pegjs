@@ -32,7 +32,7 @@ renameTable = 'RENAME TABLE'i _ existingName:identifier _ 'TO'i _ newName:identi
 // ====================================================
 createTableLike = 'CREATE TABLE'i _ newTable:identifier _ 'LIKE'i _ exisitingTable:identifier {
   return {
-    type: 'CREATE TABLE',
+    type: 'CREATE TABLE LIKE', // Copy table
     newTable,
     exisitingTable
   }

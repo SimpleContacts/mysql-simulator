@@ -12620,7 +12620,7 @@
     ]
   },
   {
-    "type": "CREATE TABLE",
+    "type": "CREATE TABLE LIKE",
     "newTable": "lenses",
     "exisitingTable": "productsv2"
   },
