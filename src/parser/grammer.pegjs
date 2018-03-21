@@ -16,26 +16,67 @@ set = 'SET 'i [^;]* { return null; }
 
 
 // ====================================================
+// Constant literals
+// ====================================================
+
+null "null literal"
+  = 'NULL'i { return { type: 'null', rawValue: 'NULL', value: null } }
+
+boolean "boolean literal"
+  = 'TRUE'i { return { type: 'boolean', rawValue: 'TRUE', value: true } }
+  / 'FALSE'i { return { type: 'boolean', rawValue: 'FALSE', value: false } }
+
+number "number literal"
+  = value:[0-9]+ {
+      return {
+        type: 'number',
+        rawValue: value.join(''),
+        value: parseInt(value.join(''), 10),
+      }
+    }
+
+string "string literal"
+  = "'" value:[^']* "'" {
+    return {
+      type: 'string',
+      rawValue: JSON.stringify(value),
+      value: value.join(''),
+    }
+  }
+
+constant
+  = null
+  / boolean
+  / string
+  / number
+
+// ====================================================
 // Rename table
 // ====================================================
 
-renameTable = renameTable1 / renameTable2
+renameTable
+  = renameTable1
+  / renameTable2
 
-renameTable1 = 'RENAME TABLE'i _ existingName:identifier _ 'TO'i _ newName:identifier {
-  return {
-    type: 'RENAME TABLE',
-    existingName,
-    newName,
-  }
-}
+renameTable1
+  = 'RENAME TABLE'i _ existingName:identifier _ 'TO'i _ newName:identifier
+    {
+      return {
+        type: 'RENAME TABLE',
+        existingName,
+        newName,
+      }
+    }
 
-renameTable2 = 'ALTER TABLE'i _ existingName:identifier _ 'RENAME'i _ 'TO'i? _ newName:identifier {
-  return {
-    type: 'RENAME TABLE',
-    existingName,
-    newName,
-  }
-}
+renameTable2
+  = 'ALTER TABLE'i _ existingName:identifier _ 'RENAME'i _ 'TO'i? _ newName:identifier
+    {
+      return {
+        type: 'RENAME TABLE',
+        existingName,
+        newName,
+      }
+    }
 
 
 // ====================================================
@@ -303,32 +344,69 @@ column = _ name:identifier _ columnType:columnType _ attrs:columnAttrs* _ {
     attrs
   }
 }
-columnType = type:columnTypeEnum size:columnLength? { return {type, size}; }
-columnLengthEnum = number / literal
-columnLengthEnumWithComma = columnLengthEnum _ ',' _
-columnLength = '(' list:columnLengthEnumWithComma* last:columnLengthEnum ')' { return list.concat(last).join('').replace(' ', '').split(',').filter(Boolean); }
-columnTypeEnum =
-  'INT'i /
-  'TIMESTAMP'i /
-  'VARCHAR'i /
-  'DECIMAL'i /
-  'BOOLEAN'i /
-  'TEXT'i /
-  'SMALLINT'i /
-  'CHAR'i /
-  'DATETIME'i /
-  'DATE'i /
-  'TINYINT'i /
-  'JSON'i /
-  'BINARY'i /
-  'VARBINARY'i /
-  'FLOAT'i /
-  'ENUM'i /
-  'TIME'
+
+columnLengthEnum = number / string
+columnLengthEnumWithComma = value:columnLengthEnum _ ',' _ { return value.rawValue }
+columnLength
+  = '(' list:columnLengthEnumWithComma* last:columnLengthEnum ')' {
+    return list.concat(last.rawValue)
+               .join('')
+               .replace(' ', '')
+               .split(',')
+               .filter(Boolean);
+  }
+
+baseColumnType
+  = 'BINARY'i
+  / 'BOOLEAN'i
+  / 'CHAR'i
+  / 'DATETIME'i
+  / 'DATE'i
+  / 'DECIMAL'i
+  / 'ENUM'i
+  / 'FLOAT'i
+  / 'INT'i
+  / 'JSON'i
+  / 'SMALLINT'i
+  / 'TEXT'i
+  / 'TIMESTAMP'i
+  / 'TIME'
+  / 'TINYINT'i
+  / 'VARBINARY'i
+  / 'VARCHAR'i
+
+param
+  = boolean
+  / number
+  / string
+
+paramList
+  = c:param _ ',' _ l:paramList { return [c.value].concat(l) }
+  / c:param { return [c.value] }
+
+columnType
+  = columnType1
+  / columnType2
+
+columnType1
+  = type:baseColumnType _ '(' _ params:paramList _ ')' { return `${type.toUpperCase()}(${params.join(', ')})` }
+
+columnType2
+  = type:baseColumnType { return type.toUpperCase() }
+
 columnAttrs = _ c:columnAttrsEnum _ { return c }
-currentTimestampLength = '(' length:number ')' { return length }
-current_timstamp = 'CURRENT_TIMESTAMP'i length:currentTimestampLength? { return { type: 'CURRENT_TIMESTAMP', length }}
-defaultValues = 'NOW()'i / current_timstamp / 'NULL'i / 'FALSE'i / 'TRUE'i / literal / number / identifier
+
+/* System functions */
+current_timestamp = 'CURRENT_TIMESTAMP'i _ ('(' number ')')? { return { type: 'CURRENT_TIMESTAMP' } }
+now = 'NOW'i _ '(' _ ')' { return { type: 'NOW()' } }
+
+constantExpr
+  = c:constant { return c.value }
+  / current_timestamp
+  / now
+defaultValues
+  = constantExpr
+  / identifier
 columnAttrsEnum =
   'NOT NULL'i /
   'NULL'i /
@@ -339,7 +417,7 @@ columnAttrsEnum =
   'DEFAULT'i _ DEFAULT:defaultValues _ { return { DEFAULT } } /
   'ON UPDATE'i _ ONUPDATE:defaultValues _ { return { ONUPDATE } } /
   'COLLATE'i _ COLLATE:identifier _ { return { COLLATE } } /
-  'COMMENT'i _ COMMENT:literal { return { COMMENT } } /
+  'COMMENT'i _ COMMENT:string { return { COMMENT } } /
   'AFTER'i _ AFTER:identifier { return { AFTER } }
 
 tableOptions = tableOptionsEnum*
@@ -357,10 +435,6 @@ whitespace = [ \t\r\n] / multiComment / singleComment / singleDashComment
 
 /* nonbreaking whitespace */
 __ = [ \t]*
-
-number "number" = n:[0-9]+ { return n.join('') }
-
-literal "literal" = '\'' l:[^']* '\'' { return { type: 'LITERAL', string: l.join('') } }
 
 identifier "identifier"
   = '`'? first:[a-z_] rest:[a-zA-Z0-9_]* '`'? { return [first].concat(rest).join('') }

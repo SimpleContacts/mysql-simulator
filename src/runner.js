@@ -20,7 +20,7 @@ function makeTable(expr): Table {
       }
 
       const nullable = !f.attrs.includes('NOT NULL');
-      const defaultValue = 'foo';
+      const defaultValue = f.defaultValue;
       return {
         name: f.name,
         type: f.columnType,
@@ -52,7 +52,9 @@ function main() {
     console.log(chalk.green(expr.type));
   }
 
-  // console.log(JSON.stringify(db, null, 2));
+  console.log('');
+  console.log('Done!');
+  console.log(chalk.blue(JSON.stringify(db, null, 2)));
 }
 
 main();
