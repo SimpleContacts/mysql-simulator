@@ -7,12 +7,21 @@
     "tdd": "jest src --watch"
   },
   "jest": {
-    "moduleFileExtensions": ["js", "pegjs", "doc"]
+    "moduleFileExtensions": [
+      "js",
+      "pegjs",
+      "doc"
+    ]
   },
   "devDependencies": {
     "@simple-contacts/babel-preset-sc": "^1.0.0",
     "@simple-contacts/eslint-config": "^0.1.6",
     "@simple-contacts/sc-scripts": "^0.4.11",
+    "import-sort-cli": "^4.2.0",
+    "import-sort-parser-babylon": "^4.2.0",
+    "import-sort-style-eslint": "^4.2.0",
+    "import-sort-style-module": "^4.2.0",
+    "jest-cli": "^23.0.0-alpha.0",
     "pegjs": "^0.10.0"
   },
   "dependencies": {}
