@@ -1,9 +1,9 @@
 // @flow
 
-import type { Database, Table } from './types';
-import { emptyDb, addTable, removeTable } from './db';
 
 import ast from '../example.ast.json';
+import { addTable, emptyDb, removeTable, renameTable } from './db';
+import type { Database, Table } from './types';
 
 function makeTable(expr): Table {
   const fields = expr.definitions.filter(def => def.type === 'COLUMN');
@@ -40,6 +40,8 @@ function main() {
       db = addTable(db, table);
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tableName, expr.ifExists);
+    } else if (expr.type === 'RENAME TABLE') {
+      db = renameTable(db, expr.existingName, expr.newName);
     } else {
       // eslint-disable-next-line no-console
       console.error(`Unknown expression type: ${expr.type}`);

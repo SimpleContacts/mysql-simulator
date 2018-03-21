@@ -1,7 +1,8 @@
 // @flow
 
 import produce from 'immer';
-import type { Database, Table, Column } from './types';
+
+import type { Column, Database, Table } from './types';
 
 /**
  * Creates a new, empty, database.
@@ -42,6 +43,26 @@ export function removeTable(
   return produce(db, $ => {
     // eslint-disable-next-line
     delete $.tables[name];
+  });
+}
+
+/**
+ * Adds a new table to a database.
+ */
+export function renameTable(db: Database, from: string, to: string): Database {
+  if (!db.tables[from]) {
+    throw new Error(`Table "${from}" does not exist`);
+  }
+
+  if (db.tables[to]) {
+    throw new Error(`Table "${to}" already exists`);
+  }
+
+  return produce(db, $ => {
+    // eslint-disable-next-line
+    $.tables[to] = $.tables[from];
+    // eslint-disable-next-line
+    delete $.tables[from];
   });
 }
 
