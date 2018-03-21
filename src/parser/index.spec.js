@@ -1,14 +1,12 @@
-import peg from 'pegjs';
 import { readFileSync as read, writeFileSync as write } from 'fs';
+
+import parse from '.';
 
 // Triggers are problemsome .replace(/CREATE\s+(TRIGGER|FUNCTION)(.|\s)+END;/, '')
 const sql = read(`${__dirname}/test.sql`).toString();
-const grammer = read(`${__dirname}/grammer.pegjs`).toString();
 
 describe('Read documentation', () => {
   it('Parse ALTER TABLE and CREATE statements', () => {
-    const { parse } = peg.generate(grammer);
-
     try {
       expect(
         parse(`CREATE TABLE users (
@@ -259,6 +257,7 @@ describe('Read documentation', () => {
       const result = parse(sql);
       write('./example.ast.json', JSON.stringify(result, null, 2));
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e.location);
       throw e;
     }
