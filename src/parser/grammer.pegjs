@@ -52,10 +52,11 @@ dropIndex = 'DROP INDEX'i _ name:identifier _ 'ON' _ tableName:identifier {
 // ====================================================
 // Drop Table
 // ====================================================
-dropTable = 'DROP TABLE'i ' IF EXISTS'i? _ tableName:identifier {
+dropTable = 'DROP TABLE'i ifExists:' IF EXISTS'i? _ tableName:identifier {
   return {
     type: 'DROP TABLE',
-    tableName
+    tableName,
+    ifExists: !!ifExists,
   }
 }
 

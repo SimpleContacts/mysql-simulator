@@ -4467,15 +4467,18 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "md_licenses"
+    "tableName": "md_licenses",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "pcs"
+    "tableName": "pcs",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "pc_addresses"
+    "tableName": "pc_addresses",
+    "ifExists": true
   },
   {
     "type": "ALTER",
@@ -4888,7 +4891,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "cart"
+    "tableName": "cart",
+    "ifExists": true
   },
   {
     "type": "CREATE",
@@ -5515,7 +5519,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "scripts"
+    "tableName": "scripts",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -5539,31 +5544,38 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "auto_renewals"
+    "tableName": "auto_renewals",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "exam_videos"
+    "tableName": "exam_videos",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "order_logs"
+    "tableName": "order_logs",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "auto_renewals"
+    "tableName": "auto_renewals",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "sessions"
+    "tableName": "sessions",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "user_icloud_tokens"
+    "tableName": "user_icloud_tokens",
+    "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "options"
+    "tableName": "options",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -5746,7 +5758,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "sms"
+    "tableName": "sms",
+    "ifExists": true
   },
   {
     "type": "CREATE",
@@ -5875,11 +5888,13 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "sms"
+    "tableName": "sms",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "messages"
+    "tableName": "messages",
+    "ifExists": true
   },
   {
     "type": "CREATE",
@@ -6847,7 +6862,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "virtual_supplies"
+    "tableName": "virtual_supplies",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -6885,11 +6901,13 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "orders_labels_xref"
+    "tableName": "orders_labels_xref",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "labels"
+    "tableName": "labels",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -6992,11 +7010,13 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "parent_products"
+    "tableName": "parent_products",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "products"
+    "tableName": "products",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -13645,23 +13665,28 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "catalog_abb"
+    "tableName": "catalog_abb",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "exam_costs"
+    "tableName": "exam_costs",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "messages"
+    "tableName": "messages",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "distributor_skus"
+    "tableName": "distributor_skus",
+    "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "catalog_ntl_lens"
+    "tableName": "catalog_ntl_lens",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -13719,7 +13744,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "mds"
+    "tableName": "mds",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -15067,7 +15093,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "user_device_ad_ids_legacy"
+    "tableName": "user_device_ad_ids_legacy",
+    "ifExists": false
   },
   {
     "type": "ALTER",
@@ -17939,7 +17966,8 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "partner_tokens"
+    "tableName": "partner_tokens",
+    "ifExists": false
   },
   {
     "type": "CREATE",
