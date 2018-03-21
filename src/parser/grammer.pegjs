@@ -19,13 +19,24 @@ set = 'SET 'i [^;]* { return null; }
 // Rename table
 // ====================================================
 
-renameTable = 'RENAME TABLE'i _ existingName:identifier _ 'TO'i _ newName:identifier {
+renameTable = renameTable1 / renameTable2
+
+renameTable1 = 'RENAME TABLE'i _ existingName:identifier _ 'TO'i _ newName:identifier {
   return {
     type: 'RENAME TABLE',
     existingName,
-    newName
+    newName,
   }
 }
+
+renameTable2 = 'ALTER TABLE'i _ existingName:identifier _ 'RENAME'i _ 'TO'i? _ newName:identifier {
+  return {
+    type: 'RENAME TABLE',
+    existingName,
+    newName,
+  }
+}
+
 
 // ====================================================
 // Create table like
@@ -91,7 +102,6 @@ changeList = list:changeWithComma* _ last:change { return list.concat(last).filt
 changeWithComma = c:change _ ',' _ { return c; }
 change =
   dropIndexAlterTable /
-  renameTableAlterTable /
   drop /
   dropPrimaryKey /
   addPrimaryKey /
@@ -221,8 +231,6 @@ dropForeignKey = 'DROP FOREIGN KEY'i _ name:identifier {
 
 dropPrimaryKey = 'DROP PRIMARY KEY'i { return { type: 'DROP PRIMARY KEY' } }
 addPrimaryKey = 'ADD PRIMARY KEY'i '(' columns:identifierList ')' { return { type: 'PRIMARY KEY', columns }}
-
-renameTableAlterTable = 'RENAME'i _ 'TO'i? _ name:identifier { return { type: 'RENAME', name }}
 
 dropIndexAlterTable = 'DROP INDEX'i _ name:identifier { return { type: 'DROP INDEX', name }}
 
