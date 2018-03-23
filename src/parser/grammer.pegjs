@@ -126,8 +126,10 @@ alterTable = ALTER TABLE tblName:identifier changes:changeList {
   }
 }
 
-changeList = _ list:changeWithComma* _ last:change _ { return list.concat(last).filter(Boolean); }
-changeWithComma = c:change _ ',' _ { return c; }
+changeList
+  = first:change COMMA rest:changeList { return [first, ...rest] }
+  / only:change { return [only] }
+
 change =
   dropIndexAlterTable /
   drop /
