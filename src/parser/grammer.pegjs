@@ -130,27 +130,17 @@ changeList
   = first:change COMMA rest:changeList { return [first, ...rest] }
   / only:change { return [only] }
 
-change =
-  dropIndexAlterTable /
-  drop /
-  dropPrimaryKey /
-  addPrimaryKey /
-  add /
-  addIndex /
-  dropKey /
-  addForeignKey /
-  changeColumn /
-  modifyColumn /
-  dropDefault /
-  uniqueConstraint /
-  dropForeignKey /
-  addFullText
-
-dropKey = DROP KEY name:identifier { return { type: 'DROP KEY', name }}
-
-drop = DROP COLUMN? colName:identifier { return { type: 'DROP COLUMN', colName } }
-add
-  = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
+change
+  = DROP INDEX name:identifier { return { type: 'DROP INDEX', name }}
+  / DROP COLUMN? colName:identifier {
+      return {
+        type: 'DROP COLUMN',
+        colName,
+      }
+    }
+  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
+  / ADD PRIMARY KEY LPAREN columns:identifierList RPAREN { return { type: 'PRIMARY KEY', columns }}
+  / ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
     after:( AFTER after:identifier { return after } )? {
       return {
         type: 'ADD COLUMN',
@@ -159,109 +149,70 @@ add
         after,
       }
     }
-
-dropDefault = ALTER COLUMN? tblName:identifier DROP DEFAULT {
-  return {
-    type: 'DROP DEFAULT',
-    tblName,
-  }
-}
-
-addIndex = 'ADD INDEX'i? _ name:identifier? _ '(' column:identifier ')' {
-  return {
-    type: 'INDEX',
-    name,
-    column
-  }
-}
-
-addFullText = 'ADD FULLTEXT'i? _ name:identifier? _ '(' columns:identifierList ')' {
-  return {
-    type: 'FULLTEXT',
-    name,
-    columns
-  }
-}
-
-changeColumn =
-  'CHANGE' ' COLUMN'i? _
-  before:identifier _
-  after:identifier _
-  columnType:columnType _
-  attrs:columnAttrs* {
-    return {
-      type: 'CHANGE',
-      before,
-      after,
-      columnType,
-      attrs
+  / ADD INDEX? name:identifier? LPAREN column:identifier RPAREN {
+      return {
+        type: 'INDEX',
+        name,
+        column
+      }
     }
-  }
-
-// TODO: Check spec
-modifyColumn =
-  MODIFY COLUMN? name:identifier definition:ColumnDefinition
-  after:( AFTER after:identifier { return after } )?
-  {
-    return {
-      type: 'CHANGE',
-      after,
-      definition,
+  / DROP KEY name:identifier { return { type: 'DROP KEY', name }}
+  / ADD constraint:NamedConstraint?
+    FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN
+    reference:ReferenceDefinition {
+      return {
+        type: 'FOREIGN KEY',
+        indexName,
+        constraint,
+        reference,
+      }
     }
-  }
-
-addForeignKey =
-  ADD constraint:NamedConstraint?
-  FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN
-  reference:ReferenceDefinition
-  {
-    return {
-      type: 'FOREIGN KEY',
-      indexName,
-      constraint,
-      reference,
+  / CHANGE COLUMN? _ before:identifier _ after:identifier _ columnType:columnType _ attrs:columnAttrs* {
+      return {
+        type: 'CHANGE',
+        before,
+        after,
+        columnType,
+        attrs
+      }
     }
-  }
-
-uniqueConstraint = uniqueConstraint1 / uniqueConstraint2 / uniqueConstraint3
-
-uniqueConstraint1 =
-  'ADD'i name:NamedConstraint? _
-  'UNIQUE' _ '(' columns:identifierList ')' {
-    return {
-      type: 'UNIQUE',
-      columns,
-      name
+  / MODIFY COLUMN? name:identifier definition:ColumnDefinition
+    after:( AFTER after:identifier { return after } )? {
+      return {
+        type: 'CHANGE',
+        after,
+        definition,
+      }
     }
-  }
-uniqueConstraint2 = 'ADD UNIQUE INDEX'i _  name:identifier _ '(' columns:identifierList ')' {
-  return {
-    type: 'UNIQUE',
-    columns,
-    name
-  }
-}
-uniqueConstraint3 = 'ADD UNIQUE'i _ name:identifier _ '(' columns:identifierList ')' {
-  return {
-    type: 'UNIQUE',
-    columns,
-    name
-  }
-}
+  / ALTER COLUMN? tblName:identifier DROP DEFAULT {
+      return {
+        type: 'DROP DEFAULT',
+        tblName,
+      }
+    }
+  / ADD constraint:NamedConstraint? UNIQUE INDEX? name:identifier? LPAREN columns:identifierList RPAREN {
+      return {
+        type: 'ADD UNIQUE INDEX',
+        constraint,
+        columns,
+      }
+    }
+  / DROP FOREIGN KEY name:identifier {
+      return {
+        type: 'DROP FOREIGN KEY',
+        name
+      }
+    }
+  / ADD FULLTEXT? name:identifier? LPAREN columns:identifierList RPAREN {
+      return {
+        type: 'FULLTEXT',
+        name,
+        columns
+      }
+    }
 
 NamedConstraint = CONSTRAINT symbol:identifier? { return symbol }
 
-dropForeignKey = 'DROP FOREIGN KEY'i _ name:identifier {
-  return {
-    type: 'DROP FOREIGN KEY',
-    name
-  }
-}
-
-dropPrimaryKey = 'DROP PRIMARY KEY'i { return { type: 'DROP PRIMARY KEY' } }
-addPrimaryKey = 'ADD PRIMARY KEY'i '(' columns:identifierList ')' { return { type: 'PRIMARY KEY', columns }}
-
-dropIndexAlterTable = 'DROP INDEX'i _ name:identifier { return { type: 'DROP INDEX', name }}
 
 // ====================================================
 // Create TABLE
@@ -608,6 +559,7 @@ BIGINT            = _ 'BIGINT'i            !IdentifierStart _ { return 'BIGINT' 
 BINARY            = _ 'BINARY'i            !IdentifierStart _ { return 'BINARY' }
 BOOLEAN           = _ 'BOOLEAN'i           !IdentifierStart _ { return 'BOOLEAN' }
 CASCADE           = _ 'CASCADE'i           !IdentifierStart _ { return 'CASCADE' }
+CHANGE            = _ 'CHANGE'i            !IdentifierStart _ { return 'CHANGE' }
 CHAR              = _ 'CHAR'i              !IdentifierStart _ { return 'CHAR' }
 CHARACTER         = _ 'CHARACTER'i         !IdentifierStart _ { return 'CHARACTER' }
 CHARSET           = _ 'CHARSET'i           !IdentifierStart _ { return 'CHARSET' }
@@ -632,6 +584,7 @@ FALSE             = _ 'FALSE'i             !IdentifierStart _ { return 'FALSE' }
 FLOAT             = _ 'FLOAT'i             !IdentifierStart _ { return 'FLOAT' }
 FOREIGN           = _ 'FOREIGN'i           !IdentifierStart _ { return 'FOREIGN' }
 FULL              = _ 'FULL'i              !IdentifierStart _ { return 'FULL' }
+FULLTEXT          = _ 'FULLTEXT'i          !IdentifierStart _ { return 'FULLTEXT' }
 IF                = _ 'IF'i                !IdentifierStart _ { return 'IF' }
 INDEX             = _ 'INDEX'i             !IdentifierStart _ { return 'INDEX' }
 INT               = _ 'INT'i               !IdentifierStart _ { return 'INT' }
