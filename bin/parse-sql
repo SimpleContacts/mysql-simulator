@@ -12,7 +12,7 @@ const indent = (text: string): string =>
     .map(s => `    ${s}`)
     .join('\n');
 
-const NUM_CONTEXT_LINES_BEFORE = 2;
+const NUM_CONTEXT_LINES_BEFORE = 4;
 const NUM_CONTEXT_LINES_AFTER = 3;
 
 // Read SQL from stdin (= 0) as a string

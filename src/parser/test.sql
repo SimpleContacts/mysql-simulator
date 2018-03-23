@@ -1185,7 +1185,7 @@ ALTER TABLE drip_schedule
   ADD UNIQUE replacement_schedule_send_interval_type_unique (
   replacement_schedule, send_interval, type);
 CREATE TABLE user_auth_passwords (
-  user_id INT PRIMARY KEY NOT NULL,
+  user_id INT NOT NULL PRIMARY KEY,
   date_modified TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
   password_hash BINARY(60) NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
@@ -1224,7 +1224,7 @@ ALTER TABLE detect_sessions
   MODIFY error_count SMALLINT UNSIGNED;
 ALTER TABLE users ADD COLUMN date_of_birth DATE DEFAULT NULL;
 CREATE TABLE subscriptions (
-  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   user_id INT NULL,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   name VARCHAR(200) NULL,
@@ -1792,7 +1792,7 @@ ALTER TABLE pv_optoms
     DROP COLUMN last_name,
     ADD COLUMN doctor_name VARCHAR(255);
 CREATE TABLE lens_options_cache (
-  lens_id INT PRIMARY KEY NOT NULL,
+  lens_id INT NOT NULL PRIMARY KEY,
   power VARCHAR(2048),
   bc VARCHAR(2048),
   dia VARCHAR(2048),
@@ -1836,7 +1836,7 @@ CREATE TABLE fsm_transitions (
   task_id INT NULL,
   to_state VARCHAR(64) NOT NULL,
   from_state VARCHAR(64) NULL,
-  date_created TIMESTAMP(6) default CURRENT_TIMESTAMP(6) NOT NULL,
+  date_created TIMESTAMP(6) NOT NULL default CURRENT_TIMESTAMP(6),
   type VARCHAR(64) NULL,
   CONSTRAINT FOREIGN KEY(task_id) REFERENCES tasks(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -1876,7 +1876,7 @@ ALTER TABLE audit_log DROP COLUMN user;
 ALTER TABLE optom_business_hours MODIFY time_open VARCHAR(64) NULL;
 ALTER TABLE optom_business_hours MODIFY time_closed VARCHAR(64) NULL;
 RENAME TABLE fsm_transitions TO rx_verification_transitions;
-ALTER TABLE rx_verification_transitions MODIFY date_created TIMESTAMP default CURRENT_TIMESTAMP NOT NULL;
+ALTER TABLE rx_verification_transitions MODIFY date_created TIMESTAMP NOT NULL default CURRENT_TIMESTAMP;
 ALTER TABLE exams
   ADD COLUMN optom_id INT DEFAULT NULL,
   ADD COLUMN optom_receptionist_name VARCHAR(128) DEFAULT NULL,

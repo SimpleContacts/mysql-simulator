@@ -11,7 +11,7 @@ function makeTable(expr): Table {
   // const fks = expr.definitions.filter(def => def.type === 'FOREIGN KEY');
   // eslint-disable-next-line
   return {
-    name: expr.name,
+    name: expr.tblName,
     fields: fields.map(f => {
       if (!f.attrs) {
         // eslint-disable-next-line
@@ -36,7 +36,7 @@ function main() {
 
   // eslint-disable-next-line
   for (const expr of ast) {
-    if (expr.type === 'CREATE') {
+    if (expr.type === 'CREATE TABLE') {
       const table = makeTable(expr);
       db = addTable(db, table);
       console.log(chalk.green(`CREATE TABLE ${expr.name}`));
