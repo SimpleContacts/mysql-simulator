@@ -131,16 +131,7 @@ changeList
   / only:change { return [only] }
 
 change
-  = DROP INDEX name:identifier { return { type: 'DROP INDEX', name }}
-  / DROP COLUMN? colName:identifier {
-      return {
-        type: 'DROP COLUMN',
-        colName,
-      }
-    }
-  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
-  / ADD PRIMARY KEY LPAREN columns:identifierList RPAREN { return { type: 'PRIMARY KEY', columns }}
-  / ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
+  = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
     after:( AFTER after:identifier { return after } )? {
       return {
         type: 'ADD COLUMN',
@@ -149,24 +140,58 @@ change
         after,
       }
     }
-  / ADD INDEX? name:identifier? LPAREN column:identifier RPAREN {
+  / ADD ( INDEX / KEY ) indexName:identifier? indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
       return {
-        type: 'INDEX',
-        name,
-        column
+        type: 'ADD INDEX',
+        indexName,
+        indexType,
+        indexColNames,
       }
     }
-  / DROP KEY name:identifier { return { type: 'DROP KEY', name }}
+  / ADD constraint:NamedConstraint? PRIMARY KEY indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
+      return {
+        type: 'ADD PRIMARY KEY',
+        constraint,
+        indexColNames,
+      }
+    }
+  / ADD constraint:NamedConstraint?
+    UNIQUE ( INDEX / KEY )? indexName:identifier? indexType:IndexType?
+    LPAREN indexColNames:IndexColNames RPAREN {
+      return {
+        type: 'ADD UNIQUE INDEX',
+        constraint,
+        indexName,
+        indexType,
+        indexColNames,
+      }
+    }
+  / ADD FULLTEXT ( INDEX / KEY )? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
+      return {
+        type: 'ADD FULLTEXT INDEX',
+        indexName,
+        indexColNames,
+      }
+    }
   / ADD constraint:NamedConstraint?
     FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN
     reference:ReferenceDefinition {
       return {
-        type: 'FOREIGN KEY',
+        type: 'ADD FOREIGN KEY',
         indexName,
         constraint,
         reference,
       }
     }
+  / DROP INDEX name:identifier { return { type: 'DROP INDEX', name }}
+  / DROP COLUMN? colName:identifier {
+      return {
+        type: 'DROP COLUMN',
+        colName,
+      }
+    }
+  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
+  / DROP KEY name:identifier { return { type: 'DROP KEY', name }}
   / CHANGE COLUMN? _ before:identifier _ after:identifier _ columnType:columnType _ attrs:columnAttrs* {
       return {
         type: 'CHANGE',
@@ -190,28 +215,16 @@ change
         tblName,
       }
     }
-  / ADD constraint:NamedConstraint? UNIQUE INDEX? name:identifier? LPAREN columns:identifierList RPAREN {
-      return {
-        type: 'ADD UNIQUE INDEX',
-        constraint,
-        columns,
-      }
-    }
   / DROP FOREIGN KEY name:identifier {
       return {
         type: 'DROP FOREIGN KEY',
         name
       }
     }
-  / ADD FULLTEXT? name:identifier? LPAREN columns:identifierList RPAREN {
-      return {
-        type: 'FULLTEXT',
-        name,
-        columns
-      }
-    }
 
 NamedConstraint = CONSTRAINT symbol:identifier? { return symbol }
+
+IndexType = USING ( BTREE / HASH )
 
 
 // ====================================================
@@ -266,9 +279,8 @@ CreateDefinition
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
   / unique
   // / {FULLTEXT|SPATIAL} [INDEX|KEY] [index_name] (index_col_name, ...) [index_option] ...
-  / constraint:(CONSTRAINT symbol:identifier?)?
+  / constraint:NamedConstraint?
     FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
-      // TODO: This returns the format that our test suite currently expects
       return {
         type: 'FOREIGN KEY',
         indexName,
@@ -558,6 +570,7 @@ AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierStart _ { return 'AUTO_INC
 BIGINT            = _ 'BIGINT'i            !IdentifierStart _ { return 'BIGINT' }
 BINARY            = _ 'BINARY'i            !IdentifierStart _ { return 'BINARY' }
 BOOLEAN           = _ 'BOOLEAN'i           !IdentifierStart _ { return 'BOOLEAN' }
+BTREE             = _ 'BTREE'i             !IdentifierStart _ { return 'BTREE' }
 CASCADE           = _ 'CASCADE'i           !IdentifierStart _ { return 'CASCADE' }
 CHANGE            = _ 'CHANGE'i            !IdentifierStart _ { return 'CHANGE' }
 CHAR              = _ 'CHAR'i              !IdentifierStart _ { return 'CHAR' }
@@ -585,6 +598,7 @@ FLOAT             = _ 'FLOAT'i             !IdentifierStart _ { return 'FLOAT' }
 FOREIGN           = _ 'FOREIGN'i           !IdentifierStart _ { return 'FOREIGN' }
 FULL              = _ 'FULL'i              !IdentifierStart _ { return 'FULL' }
 FULLTEXT          = _ 'FULLTEXT'i          !IdentifierStart _ { return 'FULLTEXT' }
+HASH              = _ 'HASH'i              !IdentifierStart _ { return 'HASH' }
 IF                = _ 'IF'i                !IdentifierStart _ { return 'IF' }
 INDEX             = _ 'INDEX'i             !IdentifierStart _ { return 'INDEX' }
 INT               = _ 'INT'i               !IdentifierStart _ { return 'INT' }
@@ -620,6 +634,7 @@ TRUE              = _ 'TRUE'i              !IdentifierStart _ { return 'TRUE' }
 UNIQUE            = _ 'UNIQUE'i            !IdentifierStart _ { return 'UNIQUE' }
 UNSIGNED          = _ 'UNSIGNED'i          !IdentifierStart _ { return 'UNSIGNED' }
 UPDATE            = _ 'UPDATE'i            !IdentifierStart _ { return 'UPDATE' }
+USING             = _ 'USING'i             !IdentifierStart _ { return 'USING' }
 VARBINARY         = _ 'VARBINARY'i         !IdentifierStart _ { return 'VARBINARY' }
 VARCHAR           = _ 'VARCHAR'i           !IdentifierStart _ { return 'VARCHAR' }
 

@@ -202,7 +202,7 @@ describe('Read documentation', () => {
             after: null,
           },
           {
-            type: 'FOREIGN KEY',
+            type: 'ADD FOREIGN KEY',
             constraint: null,
             indexName: null,
             reference: {

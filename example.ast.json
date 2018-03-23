@@ -1126,7 +1126,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_parent_product_id",
         "reference": {
@@ -1797,7 +1797,7 @@
     "tblName": "scripts",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -2114,7 +2114,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -2132,7 +2132,7 @@
         }
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -2995,9 +2995,16 @@
     "tblName": "abb_product_catalog",
     "changes": [
       {
-        "type": "INDEX",
-        "name": "ser_name",
-        "column": "ser_name"
+        "type": "ADD INDEX",
+        "indexName": "ser_name",
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "ser_name",
+            "len": null,
+            "direction": null
+          }
+        ]
       }
     ]
   },
@@ -3391,7 +3398,7 @@
     "tblName": "user_logs",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_user_id",
         "reference": {
@@ -3689,8 +3696,14 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": "constr_affiliate_id",
-        "columns": [
-          "affiliate_id"
+        "indexName": null,
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "affiliate_id",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -3700,9 +3713,16 @@
     "tblName": "products",
     "changes": [
       {
-        "type": "INDEX",
-        "name": null,
-        "column": "date_created"
+        "type": "ADD INDEX",
+        "indexName": null,
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "date_created",
+            "len": null,
+            "direction": null
+          }
+        ]
       }
     ]
   },
@@ -4014,7 +4034,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_visual_acuity_test_video_id",
         "reference": {
@@ -4038,7 +4058,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_redness_test_video_id",
         "reference": {
@@ -4160,7 +4180,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "exams_ibfk_3",
         "reference": {
@@ -4254,7 +4274,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "exams_users_fk",
         "reference": {
@@ -5174,7 +5194,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_left_parent_product_id",
         "reference": {
@@ -5198,7 +5218,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_right_parent_product_id",
         "reference": {
@@ -5242,7 +5262,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_exam_id",
         "reference": {
@@ -5268,9 +5288,19 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": "constr_addresses_user_id_label",
-        "columns": [
-          "user_id",
-          "label"
+        "indexName": null,
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "label",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -5384,7 +5414,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_user_id",
         "reference": {
@@ -5696,9 +5726,14 @@
         "type": "DROP PRIMARY KEY"
       },
       {
-        "type": "PRIMARY KEY",
-        "columns": [
-          "id"
+        "type": "ADD PRIMARY KEY",
+        "constraint": null,
+        "indexColNames": [
+          {
+            "colName": "id",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -8398,7 +8433,7 @@
     "tblName": "productsv2",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_brands_id",
         "reference": {
@@ -8502,7 +8537,7 @@
     "tblName": "audit_log",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "admin_id_fk01",
         "reference": {
@@ -8546,7 +8581,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "admin_id_fk02",
         "reference": {
@@ -9594,7 +9629,7 @@
     "tblName": "md_licenses",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "admin_id_fk03",
         "reference": {
@@ -10117,7 +10152,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -11214,8 +11249,14 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": "constr_drip_reorder_options_user_id",
-        "columns": [
-          "user_id"
+        "indexName": null,
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -11486,7 +11527,7 @@
     "tblName": "v2_messages",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "messages_drip_schedule_fk",
         "reference": {
@@ -11532,10 +11573,24 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": null,
-        "columns": [
-          "replacement_schedule",
-          "send_interval",
-          "type"
+        "indexName": "replacement_schedule_send_interval_type_unique",
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "replacement_schedule",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "send_interval",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "type",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -11808,7 +11863,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -11846,7 +11901,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -11884,7 +11939,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -12316,7 +12371,7 @@
     "tblName": "drip_reorder_options",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "preferred_address_id_fk01",
         "reference": {
@@ -12730,7 +12785,7 @@
     "tblName": "v2_messages",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "order_id_fk01",
         "reference": {
@@ -12754,7 +12809,7 @@
     "tblName": "v2_messages",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "exam_id_fk01",
         "reference": {
@@ -12852,7 +12907,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -12898,9 +12953,19 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": null,
-        "columns": [
-          "user_id",
-          "user_address_id"
+        "indexName": "addresses_user_id_user_address_id_idx",
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "user_address_id",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -13645,7 +13710,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -13677,7 +13742,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -13709,7 +13774,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -13741,7 +13806,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -14273,7 +14338,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -14463,7 +14528,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
@@ -15268,7 +15333,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_left_lens",
         "reference": {
@@ -15286,7 +15351,7 @@
         }
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_right_lens",
         "reference": {
@@ -15660,8 +15725,14 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": null,
-        "columns": [
-          "email"
+        "indexName": null,
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "email",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -16631,7 +16702,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_claimed",
         "reference": {
@@ -16715,7 +16786,7 @@
     "tblName": "notes",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_sc_notes",
         "reference": {
@@ -17241,7 +17312,7 @@
     "tblName": "tasks",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_tasks_user_id",
         "reference": {
@@ -17654,7 +17725,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_exams_rx_verification_optom_id",
         "reference": {
@@ -17728,9 +17799,19 @@
       {
         "type": "ADD UNIQUE INDEX",
         "constraint": "unique_referree_user_id_referrer_reward_rule_id",
-        "columns": [
-          "referree_user_id",
-          "referrer_reward_rule_id"
+        "indexName": null,
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "referree_user_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "referrer_reward_rule_id",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -17740,7 +17821,7 @@
     "tblName": "refer_a_friend",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_referree_reward_rule_id",
         "reference": {
@@ -17758,7 +17839,7 @@
         }
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_referrer_reward_rule_id",
         "reference": {
@@ -17816,7 +17897,7 @@
         }
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_referree_user_id",
         "reference": {
@@ -17834,7 +17915,7 @@
         }
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_referrer_user_id",
         "reference": {
@@ -17978,7 +18059,7 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_exams_optom_id",
         "reference": {
@@ -18036,11 +18117,19 @@
     "tblName": "optoms",
     "changes": [
       {
-        "type": "FULLTEXT",
-        "name": "fulltext_search",
-        "columns": [
-          "clinic_name",
-          "doctor_name"
+        "type": "ADD FULLTEXT INDEX",
+        "indexName": "fulltext_search",
+        "indexColNames": [
+          {
+            "colName": "clinic_name",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "doctor_name",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -18114,7 +18203,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_v2_left_product",
         "reference": {
@@ -18138,7 +18227,7 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_v2_right_product",
         "reference": {
@@ -18200,7 +18289,7 @@
     "tblName": "notes",
     "changes": [
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fk_notes_to_task_id",
         "reference": {
@@ -18274,12 +18363,24 @@
     "tblName": "optoms",
     "changes": [
       {
-        "type": "FULLTEXT",
-        "name": "fulltext_search",
-        "columns": [
-          "clinic_name",
-          "doctor_name",
-          "city"
+        "type": "ADD FULLTEXT INDEX",
+        "indexName": "fulltext_search",
+        "indexColNames": [
+          {
+            "colName": "clinic_name",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "doctor_name",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "city",
+            "len": null,
+            "direction": null
+          }
         ]
       }
     ]
@@ -20276,7 +20377,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fax_verification_response_fk",
         "reference": {
@@ -20294,7 +20395,7 @@
         }
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": "fax_verification_request_fk",
         "reference": {
@@ -20533,7 +20634,7 @@
         "after": null
       },
       {
-        "type": "FOREIGN KEY",
+        "type": "ADD FOREIGN KEY",
         "indexName": null,
         "constraint": null,
         "reference": {
