@@ -1755,7 +1755,7 @@ ADD CONSTRAINT fk_claimed
 FOREIGN KEY (claimed_by_admin_id)
 REFERENCES admins(id);
 ALTER TABLE notes ADD COLUMN order_id INT NULL;
-ALTER TABLE notes ADD COLUMN type VARCHAR(32) DEFAULT 'MD_NOTE' NULL;
+ALTER TABLE notes ADD COLUMN type VARCHAR(32) NULL DEFAULT 'MD_NOTE';
 ALTER TABLE notes ADD COLUMN data json DEFAULT NULL;
 ALTER TABLE notes ADD CONSTRAINT fk_sc_notes FOREIGN KEY (order_id) REFERENCES orders(id);
 ALTER TABLE tasks ADD COLUMN last_updated timestamp default now();

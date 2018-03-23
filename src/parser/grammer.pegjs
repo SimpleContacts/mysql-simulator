@@ -62,13 +62,13 @@ RenameTable1
     {
       return {
         type: 'RENAME TABLE',
-        name: tblName,
+        tblName,
         newName,
       }
     }
 
 RenameTable2
-  = 'ALTER TABLE'i _ existingName:identifier _ 'RENAME'i _ 'TO'i? _ newName:identifier
+  = ALTER TABLE existingName:identifier RENAME TO? newName:identifier
     {
       return {
         type: 'RENAME TABLE',
@@ -117,14 +117,16 @@ createIndex =
 // ====================================================
 // ALTER TABLE
 // ====================================================
-alterTable = 'ALTER TABLE'i _ tableName:identifier _ changes:changeList {
+
+alterTable = ALTER TABLE tblName:identifier changes:changeList {
   return {
-    type: 'ALTER',
+    type: 'ALTER TABLE',
+    tblName,
     changes
   }
 }
 
-changeList = list:changeWithComma* _ last:change { return list.concat(last).filter(Boolean); }
+changeList = _ list:changeWithComma* _ last:change _ { return list.concat(last).filter(Boolean); }
 changeWithComma = c:change _ ',' _ { return c; }
 change =
   dropIndexAlterTable /
@@ -142,22 +144,24 @@ change =
   dropForeignKey /
   addFullText
 
-dropKey = 'DROP KEY'i _ name:identifier { return { type: 'DROP KEY', name }}
+dropKey = DROP KEY name:identifier { return { type: 'DROP KEY', name }}
 
-drop = 'DROP'  ' COLUMN'i? _ column:identifier _ { return { type: 'DROP', column } }
-add = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition attrs:columnAttrs* {
-  return {
-    type: 'ADD COLUMN',
-    name: colName,
-    definition: columnDefinition,
-    attrs
-  }
-}
+drop = DROP COLUMN? colName:identifier { return { type: 'DROP COLUMN', colName } }
+add
+  = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
+    after:( AFTER after:identifier { return after } )? {
+      return {
+        type: 'ADD COLUMN',
+        colName,
+        definition: columnDefinition,
+        after,
+      }
+    }
 
-dropDefault = 'ALTER' ' COLUMN'i? _ tableName:identifier _ 'DROP DEFAULT' {
+dropDefault = ALTER COLUMN? tblName:identifier DROP DEFAULT {
   return {
     type: 'DROP DEFAULT',
-    tableName
+    tblName,
   }
 }
 
@@ -205,23 +209,22 @@ modifyColumn =
   }
 
 addForeignKey =
-  'ADD'i name:namedConstraint? _
-  'FOREIGN KEY'i _ '(' localColumn:identifier ')' _
-  'REFERENCES'i _ foreignTable:identifier _
-  '(' _ foreignColumn:identifier _ ')' _ {
+  ADD constraint:NamedConstraint?
+  FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN
+  reference:ReferenceDefinition
+  {
     return {
       type: 'FOREIGN KEY',
-      name,
-      localColumn,
-      foreignTable,
-      foreignColumn
+      indexName,
+      constraint,
+      reference,
     }
   }
 
 uniqueConstraint = uniqueConstraint1 / uniqueConstraint2 / uniqueConstraint3
 
 uniqueConstraint1 =
-  'ADD'i name:namedConstraint? _
+  'ADD'i name:NamedConstraint? _
   'UNIQUE' _ '(' columns:identifierList ')' {
     return {
       type: 'UNIQUE',
@@ -244,7 +247,7 @@ uniqueConstraint3 = 'ADD UNIQUE'i _ name:identifier _ '(' columns:identifierList
   }
 }
 
-namedConstraint = ' CONSTRAINT'i _ name:identifier? _ { return name }
+NamedConstraint = CONSTRAINT symbol:identifier? { return symbol }
 
 dropForeignKey = 'DROP FOREIGN KEY'i _ name:identifier {
   return {
@@ -289,18 +292,20 @@ CreateTable3
     tblName:identifier LIKE oldTblName:identifier {
     return {
       type: 'CREATE TABLE LIKE', // Copy table
-      name: tblName,
+      tblName,
       oldTblName,
       ifNotExists,
     }
   }
 
 CreateDefinitionsList
-  = first:CreateDefinition _ ',' _ rest:CreateDefinitionsList { return [first].concat(rest) }
+  = first:CreateDefinition _ ',' _ rest:CreateDefinitionsList { return [first, ...rest] }
   / only:CreateDefinition { return [only] }
 
 CreateDefinition
-  = colName:identifier _ columnDefinition:ColumnDefinition { return { name: colName, definition: columnDefinition } }
+  = colName:identifier _ columnDefinition:ColumnDefinition {
+      return { colName, definition: columnDefinition }
+    }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
   / primaryKey
   // / {INDEX|KEY} [index_name] [index_type] (index_col_name, ...)
@@ -309,14 +314,22 @@ CreateDefinition
   / unique
   // / {FULLTEXT|SPATIAL} [INDEX|KEY] [index_name] (index_col_name, ...) [index_option] ...
   / constraint:(CONSTRAINT symbol:identifier?)?
-    FOREIGN KEY indexName:identifier? LPAREN indexColNames:indexColNames RPAREN ReferenceDefinition
+    FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
+      // TODO: This returns the format that our test suite currently expects
+      return {
+        type: 'FOREIGN KEY',
+        indexName,
+        indexColNames,
+        reference,
+      }
+    }
   // / CHECK (expr)
 
 ColumnDefinition
   = dataType:DataType
-    nullable:( NULL / NOT NULL )?
+    nullable:( NULL / NOT_NULL )?
     isPrimary:( PRIMARY KEY )?
-    defaultValue:defaultValueClause?
+    defaultValue:( DEFAULT value:ConstantExpr { return value } )?
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
     ( COMMENT string )?
@@ -339,13 +352,12 @@ ColumnDefinition
       }
     }
 
-defaultValueClause = 'DEFAULT'i _ v:defaultValue { return v }
 
 len
   = LPAREN number:number RPAREN { return number }
 
 precisionSpec
-  = LPAREN number COMMA number RPAREN
+  = LPAREN length:number COMMA decimals:number RPAREN { return [length, decimals] }
 
 boolTypeName
   = BOOLEAN
@@ -378,14 +390,14 @@ boolDataType
 
 intDataType
   = type:intTypeName len:len? unsigned:UNSIGNED? {
-    len = len || '';
+    len = len ? `(${len})` : '';
     unsigned = unsigned || '';
     return (type + len + ' ' + unsigned).trim()
   }
 
 precisionDataType
   = type:precisionTypeName _ prec:precisionSpec? _ unsigned:UNSIGNED? {
-    prec = prec || '';
+    prec = prec ? `(${prec.join(', ')})` : '';
     unsigned = unsigned || '';
     return (type + prec + ' ' + unsigned).trim()
   }
@@ -408,18 +420,26 @@ DataType
   / JSON
   / ENUM LPAREN values:ValueList RPAREN
 
-indexColNames
-  = first:indexColName COMMA rest:indexColNames { return [first].concat(rest) }
-  / only:indexColName { return [only] }
+IndexColNames
+  = first:IndexColName COMMA rest:IndexColNames { return [first].concat(rest) }
+  / only:IndexColName { return [only] }
 
-indexColName
-  = colName:identifier _ len:len? direction:( ASC / DESC )?
+IndexColName
+  = colName:identifier len:len? direction:( ASC / DESC )? { return { colName, len, direction } }
 
 ReferenceDefinition
-  = REFERENCES tblName:identifier LPAREN indexColNames:indexColNames RPAREN
+  = REFERENCES tblName:identifier LPAREN indexColNames:IndexColNames RPAREN
     matchMode:( MATCH ( FULL / PARTIAL / SIMPLE ) )?
-    ( ON DELETE ReferenceOption )?
-    ( ON UPDATE ReferenceOption )?
+    onDelete:( ON DELETE ReferenceOption )?
+    onUpdate:( ON UPDATE ReferenceOption )? {
+      return {
+        tblName,
+        indexColNames,
+        matchMode,
+        onDelete,
+        onUpdate,
+      }
+    }
 
 ReferenceOption
   = RESTRICT
@@ -535,24 +555,22 @@ columnType2
 columnAttrs = _ c:columnAttrsEnum _ { return c }
 
 /* System functions */
-current_timestamp = 'CURRENT_TIMESTAMP'i _ ('(' number ')')? { return { type: 'CURRENT_TIMESTAMP' } }
-now = 'NOW'i _ '(' _ ')' { return { type: 'NOW()' } }
+current_timestamp = value:CURRENT_TIMESTAMP ( LPAREN hack:number? RPAREN )? { return value }
+now = NOW LPAREN RPAREN { return 'NOW()' }
 
-constantExpr
-  = c:constant { return c.value }
+ConstantExpr
+  = constant
   / current_timestamp
   / now
-defaultValue
-  = constantExpr
-  / identifier
+
 columnAttrsEnum =
   'NOT NULL'i /
   'NULL'i /
   'PRIMARY KEY'i /
   'AUTO_INCREMENT'i /
   'UNIQUE'i ' KEY'i? { return { UNIQUE: true }} /
-  'DEFAULT'i _ DEFAULT:defaultValue _ { return { DEFAULT } } /
-  'ON UPDATE'i _ ONUPDATE:defaultValue _ { return { ONUPDATE } } /
+  'DEFAULT'i _ DEFAULT:ConstantExpr _ { return { DEFAULT } } /
+  'ON UPDATE'i _ ONUPDATE:ConstantExpr _ { return { ONUPDATE } } /
   'COLLATE'i _ COLLATE:identifier _ { return { COLLATE } } /
   'COMMENT'i _ COMMENT:string { return { COMMENT } } /
   'AFTER'i _ AFTER:identifier { return { AFTER } }
@@ -567,7 +585,7 @@ whitespace = [ \t\r\n] / multiComment / singleComment / singleDashComment
 __ = [ \t]*
 
 identifier "identifier"
-  = _ '`'? first:[a-z_] rest:[a-zA-Z0-9_]* '`'? { return [first].concat(rest).join('') }
+  = _ '`'? first:[a-z_] rest:[a-zA-Z0-9_]* '`'? _ { return [first].concat(rest).join('') }
 
 identifierWithComma = _ i:identifier _ ',' { return i; }
 identifierList = list:identifierWithComma* _ last:identifier { return list.concat(last).filter(Boolean); }
@@ -577,10 +595,11 @@ identifierList = list:identifierWithComma* _ last:identifier { return list.conca
 // Keywords
 // ====================================================
 
-IdentifierStart = [a-z_]
+IdentifierStart = [a-zA-Z_]
 ACTION            = _ 'ACTION'i            !IdentifierStart _ { return 'ACTION' }
 ADD               = _ 'ADD'i               !IdentifierStart _ { return 'ADD' }
 AFTER             = _ 'AFTER'i             !IdentifierStart _ { return 'AFTER' }
+ALTER             = _ 'ALTER'i             !IdentifierStart _ { return 'ALTER' }
 ASC               = _ 'ASC'i               !IdentifierStart _ { return 'ASC' }
 AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierStart _ { return 'AUTO_INCREMENT' }
 BIGINT            = _ 'BIGINT'i            !IdentifierStart _ { return 'BIGINT' }
@@ -603,6 +622,7 @@ DEFAULT           = _ 'DEFAULT'i           !IdentifierStart _ { return 'DEFAULT'
 DELETE            = _ 'DELETE'i            !IdentifierStart _ { return 'DELETE' }
 DESC              = _ 'DESC'i              !IdentifierStart _ { return 'DESC' }
 DOUBLE            = _ 'DOUBLE'i            !IdentifierStart _ { return 'DOUBLE' }
+DROP              = _ 'DROP'i              !IdentifierStart _ { return 'DROP' }
 ENGINE            = _ 'ENGINE'i            !IdentifierStart _ { return 'ENGINE' }
 ENUM              = _ 'ENUM'i              !IdentifierStart _ { return 'ENUM' }
 EXISTS            = _ 'EXISTS'i            !IdentifierStart _ { return 'EXISTS' }
@@ -648,6 +668,8 @@ UPDATE            = _ 'UPDATE'i            !IdentifierStart _ { return 'UPDATE' 
 VARBINARY         = _ 'VARBINARY'i         !IdentifierStart _ { return 'VARBINARY' }
 VARCHAR           = _ 'VARCHAR'i           !IdentifierStart _ { return 'VARCHAR' }
 
+// Composite types
+NOT_NULL = NOT NULL { return 'NOT NULL' }
 
 // ====================================================
 // Tokens

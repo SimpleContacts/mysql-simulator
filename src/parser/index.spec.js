@@ -1,265 +1,232 @@
-import { readFileSync as read, writeFileSync as write } from 'fs';
+import { readFileSync as read } from 'fs';
 
 import parse from '.';
 
-// Triggers are problemsome .replace(/CREATE\s+(TRIGGER|FUNCTION)(.|\s)+END;/, '')
-const sql = read(`${__dirname}/test.sql`).toString();
-
 describe('Read documentation', () => {
-  it('Parse ALTER TABLE and CREATE statements', () => {
-    try {
-      expect(
-        parse(`CREATE TABLE users (
+  it('Parse CREATE TABLE #1', () => {
+    expect(
+      parse(`CREATE TABLE users (
             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             name VARCHAR(128),
             email VARCHAR(64)
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`),
-      ).toEqual([
-        {
-          type: 'CREATE',
-          name: 'users',
-          definitions: [
-            {
-              type: 'COLUMN',
-              name: 'id',
-              columnType: { type: 'INT', size: null },
-              attrs: ['NOT NULL', 'PRIMARY KEY', 'AUTO_INCREMENT'],
+    ).toEqual([
+      {
+        type: 'CREATE TABLE',
+        tblName: 'users',
+        ifNotExists: false,
+        definitions: [
+          {
+            colName: 'id',
+            definition: {
+              dataType: 'INT',
+              defaultValue: null,
+              nullable: false,
+              isPrimary: true,
+              isUnique: false,
+              autoIncrement: true,
+              reference: null,
             },
-            {
-              type: 'COLUMN',
-              name: 'date_created',
-              columnType: { type: 'TIMESTAMP', size: null },
-              attrs: [
-                'NOT NULL',
-                { DEFAULT: { type: 'CURRENT_TIMESTAMP', length: null } },
-              ],
+          },
+          {
+            colName: 'date_created',
+            definition: {
+              dataType: 'TIMESTAMP',
+              defaultValue: 'CURRENT_TIMESTAMP',
+              nullable: false,
+              isPrimary: false,
+              autoIncrement: false,
+              isUnique: false,
+              reference: null,
             },
-            {
-              type: 'COLUMN',
-              name: 'name',
-              columnType: { type: 'VARCHAR', size: ['128'] },
-              attrs: [],
+          },
+          {
+            colName: 'name',
+            definition: {
+              dataType: 'VARCHAR(128)',
+              defaultValue: null,
+              nullable: true,
+              isPrimary: false,
+              isUnique: false,
+              autoIncrement: false,
+              reference: null,
             },
-            {
-              type: 'COLUMN',
-              name: 'email',
-              columnType: { type: 'VARCHAR', size: ['64'] },
-              attrs: [],
+          },
+          {
+            colName: 'email',
+            definition: {
+              dataType: 'VARCHAR(64)',
+              defaultValue: null,
+              nullable: true,
+              isPrimary: false,
+              autoIncrement: false,
+              isUnique: false,
+              reference: null,
             },
-          ],
-          tableOptions: [
-            { key: 'ENGINE', value: 'InnoDB' },
-            'DEFAULT',
-            { key: 'CHARSET', value: 'utf8' },
-            { key: 'COLLATE', value: 'utf8_general_ci' },
-          ],
+          },
+        ],
+        options: {
+          ENGINE: 'InnoDB',
+          CHARSET: 'utf8',
+          COLLATE: 'utf8_general_ci',
         },
-      ]);
+      },
+    ]);
+  });
 
-      expect(
-        parse(`CREATE TABLE scripts (
-              id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-              user_id INT NOT NULL,
-              product_id INT NOT NULL,
-              date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              left_power VARCHAR(32) DEFAULT NULL,
-              left_bc VARCHAR(32) DEFAULT NULL,
-              left_diameter VARCHAR(32) DEFAULT NULL,
-              left_cyl VARCHAR(32) DEFAULT NULL,
-              left_axis VARCHAR(32) DEFAULT NULL,
-              left_ot VARCHAR(32) DEFAULT NULL,
-              right_power VARCHAR(32) DEFAULT NULL,
-              right_bc VARCHAR(32) DEFAULT NULL,
-              right_diameter VARCHAR(32) DEFAULT NULL,
-              right_cyl VARCHAR(32) DEFAULT NULL,
-              right_axis VARCHAR(32) DEFAULT NULL,
-              right_ot VARCHAR(32) DEFAULT NULL,
-              FOREIGN KEY (user_id) REFERENCES users(id),
-              FOREIGN KEY (product_id) REFERENCES products(id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`),
-      ).toEqual([
-        {
-          definitions: [
-            {
-              attrs: ['NOT NULL', 'PRIMARY KEY', 'AUTO_INCREMENT'],
-              columnType: { size: null, type: 'INT' },
-              name: 'id',
-              type: 'COLUMN',
+  it('Parse CREATE TABLE #2', () => {
+    expect(
+      parse(`
+        CREATE TABLE whatever (
+          id INT( 11 ) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+          user_id INT NOT NULL,
+          date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          text VARCHAR(32) DEFAULT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`),
+    ).toEqual([
+      {
+        type: 'CREATE TABLE',
+        tblName: 'whatever',
+        ifNotExists: false,
+        definitions: [
+          {
+            colName: 'id',
+            definition: {
+              dataType: 'INT(11)',
+              nullable: false,
+              defaultValue: null,
+              isPrimary: true,
+              autoIncrement: true,
+              isUnique: false,
+              reference: null,
             },
-            {
-              attrs: ['NOT NULL'],
-              columnType: { size: null, type: 'INT' },
-              name: 'user_id',
-              type: 'COLUMN',
+          },
+          {
+            colName: 'user_id',
+            definition: {
+              dataType: 'INT',
+              nullable: false,
+              defaultValue: null,
+              isPrimary: false,
+              autoIncrement: false,
+              isUnique: false,
+              reference: null,
             },
-            {
-              attrs: ['NOT NULL'],
-              columnType: { size: null, type: 'INT' },
-              name: 'product_id',
-              type: 'COLUMN',
+          },
+          {
+            colName: 'date_created',
+            definition: {
+              dataType: 'TIMESTAMP',
+              nullable: false,
+              defaultValue: 'CURRENT_TIMESTAMP',
+              isPrimary: false,
+              autoIncrement: false,
+              isUnique: false,
+              reference: null,
             },
-            {
-              attrs: [
-                'NOT NULL',
-                { DEFAULT: { type: 'CURRENT_TIMESTAMP', length: null } },
+          },
+          {
+            colName: 'text',
+            definition: {
+              dataType: 'VARCHAR(32)',
+              nullable: true,
+              defaultValue: 'NULL',
+              isPrimary: false,
+              autoIncrement: false,
+              isUnique: false,
+              reference: null,
+            },
+          },
+          {
+            type: 'FOREIGN KEY',
+            indexName: null,
+            indexColNames: [
+              {
+                colName: 'user_id',
+                direction: null,
+                len: null,
+              },
+            ],
+            reference: {
+              tblName: 'users',
+              indexColNames: [
+                {
+                  colName: 'id',
+                  direction: null,
+                  len: null,
+                },
               ],
-              columnType: { size: null, type: 'TIMESTAMP' },
-              name: 'date_created',
-              type: 'COLUMN',
+              matchMode: null,
+              onDelete: null,
+              onUpdate: null,
             },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'left_power',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'left_bc',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'left_diameter',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'left_cyl',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'left_axis',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'left_ot',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'right_power',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'right_bc',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'right_diameter',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'right_cyl',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'right_axis',
-              type: 'COLUMN',
-            },
-            {
-              attrs: [{ DEFAULT: 'NULL' }],
-              columnType: { size: ['32'], type: 'VARCHAR' },
-              name: 'right_ot',
-              type: 'COLUMN',
-            },
-            {
-              foreignColumn: 'id',
-              foreignTable: 'users',
-              localColumn: 'user_id',
-              type: 'FOREIGN KEY',
-              name: null,
-            },
-            {
-              foreignColumn: 'id',
-              foreignTable: 'products',
-              localColumn: 'product_id',
-              type: 'FOREIGN KEY',
-              name: null,
-            },
-          ],
-          name: 'scripts',
-          tableOptions: [
-            { key: 'ENGINE', value: 'InnoDB' },
-            'DEFAULT',
-            { key: 'CHARSET', value: 'utf8' },
-            { key: 'COLLATE', value: 'utf8_bin' },
-          ],
-          type: 'CREATE',
+          },
+        ],
+        options: {
+          ENGINE: 'InnoDB',
+          CHARSET: 'utf8',
+          COLLATE: 'utf8_bin',
         },
-      ]);
+      },
+    ]);
+  });
 
-      expect(
-        parse(`ALTER TABLE products
+  it('Parse ALTER TABLE #1', () => {
+    expect(
+      parse(`ALTER TABLE products
         DROP COLUMN name,
-        DROP COLUMN brand,
-        DROP COLUMN img_url,
-        DROP COLUMN options_power,
-        DROP COLUMN options_bc,
-        DROP COLUMN options_diameter,
-        DROP COLUMN options_cyl,
-        DROP COLUMN options_axis,
-        DROP COLUMN options_ot,
-        DROP COLUMN description,
-        DROP COLUMN num_days_per_lens,
-        ADD COLUMN parent_product_id INT,
-        ADD CONSTRAINT fk_parent_product_id
-          FOREIGN KEY (parent_product_id)
-          REFERENCES products(id);`),
-      ).toEqual([
-        {
-          changes: [
-            { column: 'name', type: 'DROP' },
-            { column: 'brand', type: 'DROP' },
-            { column: 'img_url', type: 'DROP' },
-            { column: 'options_power', type: 'DROP' },
-            { column: 'options_bc', type: 'DROP' },
-            { column: 'options_diameter', type: 'DROP' },
-            { column: 'options_cyl', type: 'DROP' },
-            { column: 'options_axis', type: 'DROP' },
-            { column: 'options_ot', type: 'DROP' },
-            { column: 'description', type: 'DROP' },
-            { column: 'num_days_per_lens', type: 'DROP' },
-            {
-              column: 'parent_product_id',
-              columnType: { type: 'INT', size: null },
-              attrs: [],
-              type: 'ADD',
+        DROP COLUMN \`brand\`,
+        ADD COLUMN \`foobar\` INT,
+        ADD FOREIGN KEY (product_id) REFERENCES products(id);`),
+    ).toEqual([
+      {
+        type: 'ALTER TABLE',
+        tblName: 'products',
+        changes: [
+          { type: 'DROP COLUMN', colName: 'name' },
+          { type: 'DROP COLUMN', colName: 'brand' },
+          {
+            type: 'ADD COLUMN',
+            colName: 'foobar',
+            definition: {
+              dataType: 'INT',
+              autoIncrement: false,
+              defaultValue: null,
+              nullable: true,
+              isPrimary: false,
+              isUnique: false,
+              reference: null,
             },
-            {
-              foreignColumn: 'id',
-              foreignTable: 'products',
-              localColumn: 'parent_product_id',
-              name: 'fk_parent_product_id',
-              type: 'FOREIGN KEY',
+            after: null,
+          },
+          {
+            type: 'FOREIGN KEY',
+            constraint: null,
+            indexName: null,
+            reference: {
+              tblName: 'products',
+              indexColNames: [
+                {
+                  colName: 'id',
+                  direction: null,
+                  len: null,
+                },
+              ],
+              matchMode: null,
+              onDelete: null,
+              onUpdate: null,
             },
-          ],
-          type: 'ALTER',
-        },
-      ]);
-      const result = parse(sql);
-      write('./example.ast.json', JSON.stringify(result, null, 2));
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e.location);
-      throw e;
-    }
+          },
+        ],
+      },
+    ]);
+  });
+
+  it('Can parse our full example file', () => {
+    const sql = read(`${__dirname}/test.sql`).toString();
+    const result = parse(sql);
+    expect(result.length).toBe(506); // 506 statements in there!
   });
 });
