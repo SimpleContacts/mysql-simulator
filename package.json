@@ -4,9 +4,12 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src",
-    "parse": "bin/parse-sql < input.sql > ast.json",
     "tdd": "jest src --watch",
-    "test": "eslint src && jest src"
+    "test": "eslint src && jest src",
+
+    "parse": "bin/parse-sql < input.sql > ast.json",
+    "simulate": "babel-node src/runner.js",
+    "all": "yarn parse && yarn simulate"
   },
   "jest": {
     "moduleFileExtensions": [
