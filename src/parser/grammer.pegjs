@@ -68,11 +68,11 @@ RenameTable1
     }
 
 RenameTable2
-  = ALTER TABLE existingName:identifier RENAME TO? newName:identifier
+  = ALTER TABLE tblName:identifier RENAME TO? newName:identifier
     {
       return {
         type: 'RENAME TABLE',
-        existingName,
+        tblName,
         newName,
       }
     }
