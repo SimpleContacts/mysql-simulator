@@ -270,14 +270,25 @@ CreateDefinitionsList
 
 CreateDefinition
   = colName:identifier _ columnDefinition:ColumnDefinition {
-      return { colName, definition: columnDefinition }
+      return {
+        type: 'COLUMN',
+        colName,
+        definition: columnDefinition,
+      }
     }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
   / primaryKey
   // / {INDEX|KEY} [index_name] [index_type] (index_col_name, ...)
   / indexCreateTable
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
-  / unique
+  / constraint:NamedConstraint?
+    UNIQUE (INDEX / KEY)? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
+      return {
+        type: 'UNIQUE INDEX',
+        indexName,
+        indexColNames,
+      }
+    }
   // / {FULLTEXT|SPATIAL} [INDEX|KEY] [index_name] (index_col_name, ...) [index_option] ...
   / constraint:NamedConstraint?
     FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
@@ -439,8 +450,6 @@ ValueList
 
 Value
   = constant
-
-unique = 'UNIQUE'i _ 'KEY'? _ name:identifier? _ '(' columns:identifierList ')' _ { type: 'UNQIUE', columns, name }
 
 primaryKey = 'PRIMARY KEY'i _ '(' columns:identifierList ')' _ {
   return {

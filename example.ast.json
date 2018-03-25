@@ -4,6 +4,7 @@
     "tblName": "users",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -16,6 +17,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -28,6 +30,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -40,6 +43,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -64,6 +68,7 @@
     "tblName": "mailing_list",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -76,6 +81,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -88,6 +94,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -99,7 +106,17 @@
           "reference": null
         }
       },
-      null
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "email",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
     ],
     "options": {
       "ENGINE": "InnoDB",
@@ -113,6 +130,7 @@
     "tblName": "user_tokens",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "token",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -125,6 +143,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -137,6 +156,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -149,6 +169,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -197,6 +218,7 @@
     "tblName": "exams",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -209,6 +231,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -221,6 +244,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -233,6 +257,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "audio_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -245,6 +270,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "video_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -293,6 +319,7 @@
     "tblName": "products",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -305,6 +332,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -317,6 +345,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "enabled",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -329,6 +358,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -341,6 +371,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "brand",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -353,6 +384,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "img_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -365,6 +397,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_power",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -377,6 +410,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_bc",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -389,6 +423,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_diameter",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -401,6 +436,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_cyl",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -413,6 +449,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_axis",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -425,6 +462,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_ot",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -437,6 +475,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_retail",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -449,6 +488,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_wholesale",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -461,6 +501,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "aab_code",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -473,6 +514,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "description",
         "definition": {
           "dataType": "TEXT",
@@ -485,6 +527,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_days_per_lens",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -497,6 +540,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_lenses",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -521,6 +565,7 @@
     "tblName": "scripts",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -533,6 +578,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -545,6 +591,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "product_id",
         "definition": {
           "dataType": "INT",
@@ -557,6 +604,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -569,6 +617,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_power",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -581,6 +630,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_bc",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -593,6 +643,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_diameter",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -605,6 +656,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_cyl",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -617,6 +669,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_axis",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -629,6 +682,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_ot",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -641,6 +695,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_power",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -653,6 +708,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_bc",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -665,6 +721,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_diameter",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -677,6 +734,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_cyl",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -689,6 +747,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_axis",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -701,6 +760,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_ot",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -773,6 +833,7 @@
     "tblName": "sessions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "session_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -785,6 +846,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "expires",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -797,6 +859,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "TEXT",
@@ -827,6 +890,7 @@
     "tblName": "versions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "to_version",
         "definition": {
           "dataType": "INT",
@@ -839,6 +903,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "from_version",
         "definition": {
           "dataType": "INT",
@@ -851,6 +916,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_migrated",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -862,7 +928,22 @@
           "reference": null
         }
       },
-      null
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "to_version",
+        "indexColNames": [
+          {
+            "colName": "to_version",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "from_version",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
     ],
     "options": {
       "ENGINE": "InnoDB",
@@ -876,6 +957,7 @@
     "tblName": "parent_products",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -888,6 +970,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -900,6 +983,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "enabled",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -912,6 +996,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -924,6 +1009,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "brand",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -936,6 +1022,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "img_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -948,6 +1035,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_power",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -960,6 +1048,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_bc",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -972,6 +1061,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_diameter",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -984,6 +1074,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_cyl",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -996,6 +1087,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_axis",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -1008,6 +1100,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options_ot",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -1020,6 +1113,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "description",
         "definition": {
           "dataType": "TEXT",
@@ -1032,6 +1126,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_days_per_lens",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -1044,6 +1139,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "additional_search_keywords",
         "definition": {
           "dataType": "TEXT",
@@ -1150,6 +1246,7 @@
     "tblName": "payment_tokens",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1162,6 +1259,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -1174,6 +1272,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -1186,6 +1285,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "enabled",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -1198,6 +1298,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "stripe_card_id",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -1210,6 +1311,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "brand",
         "definition": {
           "dataType": "CHAR(64)",
@@ -1222,6 +1324,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "last4",
         "definition": {
           "dataType": "CHAR(4)",
@@ -1234,6 +1337,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "exp_month",
         "definition": {
           "dataType": "INT",
@@ -1246,6 +1350,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "exp_year",
         "definition": {
           "dataType": "INT",
@@ -1334,6 +1439,7 @@
     "tblName": "addresses",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1346,6 +1452,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -1358,6 +1465,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -1370,6 +1478,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "street_line_1",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -1382,6 +1491,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "street_line_2",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -1394,6 +1504,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "city",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -1406,6 +1517,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -1418,6 +1530,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "postal_code",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -1430,6 +1543,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -1478,6 +1592,7 @@
     "tblName": "orders",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1490,6 +1605,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "quantity",
         "definition": {
           "dataType": "SMALLINT",
@@ -1502,6 +1618,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "script_id",
         "definition": {
           "dataType": "INT",
@@ -1514,6 +1631,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -1526,6 +1644,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "shipping_address",
         "definition": {
           "dataType": "TEXT",
@@ -1574,6 +1693,7 @@
     "tblName": "auto_renewals",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1586,6 +1706,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "script_id",
         "definition": {
           "dataType": "INT",
@@ -1598,6 +1719,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "renew_every_n_days",
         "definition": {
           "dataType": "SMALLINT",
@@ -1673,6 +1795,7 @@
     "tblName": "options",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1685,6 +1808,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -1697,6 +1821,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_lenses",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -1709,6 +1834,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "duration",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -1821,6 +1947,7 @@
     "tblName": "mds",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1833,6 +1960,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -1845,6 +1973,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -1857,6 +1986,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -1868,7 +1998,17 @@
           "reference": null
         }
       },
-      null
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "email",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
     ],
     "options": {
       "ENGINE": "InnoDB",
@@ -1882,6 +2022,7 @@
     "tblName": "labels",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1894,6 +2035,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -1906,6 +2048,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "color",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -1926,6 +2069,7 @@
     "tblName": "orders_labels_xref",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -1938,6 +2082,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -1950,6 +2095,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label_id",
         "definition": {
           "dataType": "INT",
@@ -2254,6 +2400,7 @@
     "tblName": "uploaded_videos",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -2266,6 +2413,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -2278,6 +2426,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -2290,6 +2439,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "video_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -2302,6 +2452,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "letters",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -2469,6 +2620,7 @@
     "tblName": "auth_tokens",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "guid",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -2481,6 +2633,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "valid",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -2493,6 +2646,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -2505,6 +2659,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -2563,6 +2718,7 @@
     "tblName": "abb_product_catalog",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -2575,6 +2731,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -2587,6 +2744,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "parent_product_id",
         "definition": {
           "dataType": "INT",
@@ -2599,6 +2757,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "man_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2611,6 +2770,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "man_name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2623,6 +2783,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_addition",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2635,6 +2796,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_axis",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2647,6 +2809,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_checkdigit",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2659,6 +2822,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_color",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2671,6 +2835,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_color_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2683,6 +2848,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_convert",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2695,6 +2861,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_cylinder",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2707,6 +2874,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_description",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2719,6 +2887,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2731,6 +2900,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_power",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2743,6 +2913,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prd_upc_code",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2755,6 +2926,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prf_basecurve",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2767,6 +2939,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prf_convert",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2779,6 +2952,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prf_diameter",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2791,6 +2965,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prf_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2803,6 +2978,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "prf_rev_diag_ind",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2815,6 +2991,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "ser_day_per_lens",
         "definition": {
           "dataType": "INT",
@@ -2827,6 +3004,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "ser_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2839,6 +3017,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "ser_name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2851,6 +3030,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "ser_wear_freq",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2863,6 +3043,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sty_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2875,6 +3056,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "unt_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2887,6 +3069,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "unt_lens_qtty",
         "definition": {
           "dataType": "INT",
@@ -2899,6 +3082,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "unt_name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2911,6 +3095,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "unt_pack_qtty",
         "definition": {
           "dataType": "INT",
@@ -2923,6 +3108,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "unt_patient_visible",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -2935,6 +3121,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_retail",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -2947,6 +3134,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_wholesale",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -3316,6 +3504,7 @@
     "tblName": "user_logs",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -3328,6 +3517,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -3340,6 +3530,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "subject",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -3352,6 +3543,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "device",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -3364,6 +3556,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -3442,6 +3635,7 @@
     "tblName": "virtual_supplies",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -3454,6 +3648,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -3466,6 +3661,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sku",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -3478,6 +3674,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "parent_product_id",
         "definition": {
           "dataType": "INT",
@@ -3490,6 +3687,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -3502,6 +3700,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_boxes",
         "definition": {
           "dataType": "INT",
@@ -3514,6 +3713,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -3751,6 +3951,7 @@
     "tblName": "admins",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -3763,6 +3964,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -3775,6 +3977,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -3787,6 +3990,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -3854,6 +4058,7 @@
     "tblName": "order_logs",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -3866,6 +4071,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "JSON",
@@ -3878,6 +4084,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT(11)",
@@ -3890,6 +4097,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "subject",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -3924,6 +4132,7 @@
     "tblName": "exam_logs",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -3936,6 +4145,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "JSON",
@@ -3948,6 +4158,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "exam_id",
         "definition": {
           "dataType": "INT(11)",
@@ -3960,6 +4171,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "subject",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -4433,6 +4645,7 @@
     "tblName": "md_licenses",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -4445,6 +4658,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "md_id",
         "definition": {
           "dataType": "INT",
@@ -4457,6 +4671,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "license",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -4469,6 +4684,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -4481,6 +4697,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -4529,6 +4746,7 @@
     "tblName": "pc_addresses",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -4541,6 +4759,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "street",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -4553,6 +4772,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "city",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -4565,6 +4785,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -4577,6 +4798,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "postal_code",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -4589,6 +4811,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -4613,6 +4836,7 @@
     "tblName": "pcs",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -4625,6 +4849,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -4637,6 +4862,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -4649,6 +4875,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -4661,6 +4888,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "pc_address_id",
         "definition": {
           "dataType": "INT",
@@ -4794,6 +5022,7 @@
     "tblName": "cart",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -4806,6 +5035,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -4818,6 +5048,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -4830,6 +5061,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_parent_product_id",
         "definition": {
           "dataType": "INT",
@@ -4842,6 +5074,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -4854,6 +5087,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_option",
         "definition": {
           "dataType": "JSON",
@@ -4866,6 +5100,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_parent_product_id",
         "definition": {
           "dataType": "INT",
@@ -4878,6 +5113,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
@@ -4890,6 +5126,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_option",
         "definition": {
           "dataType": "JSON",
@@ -4902,6 +5139,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "auto_renew",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -5607,6 +5845,7 @@
     "tblName": "user_device_ad_ids",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "BINARY(16)",
@@ -5619,6 +5858,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -5631,6 +5871,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -5643,6 +5884,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_last_seen",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -5655,6 +5897,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(7)",
@@ -5778,6 +6021,7 @@
     "tblName": "sms",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -5790,6 +6034,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -5802,6 +6047,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -5814,6 +6060,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sent_from",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -5826,6 +6073,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sent_to",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -5838,6 +6086,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "body",
         "definition": {
           "dataType": "TEXT",
@@ -5850,6 +6099,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "direction",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -5908,6 +6158,7 @@
     "tblName": "messages",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -5920,6 +6171,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -5932,6 +6184,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -5944,6 +6197,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sms_from",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -5956,6 +6210,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sms_to",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -5968,6 +6223,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email_from",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -5980,6 +6236,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email_to",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -5992,6 +6249,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "message",
         "definition": {
           "dataType": "TEXT",
@@ -6004,6 +6262,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "direction",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -6016,6 +6275,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "attachments",
         "definition": {
           "dataType": "JSON",
@@ -6167,6 +6427,7 @@
     "tblName": "audit_log",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -6179,6 +6440,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -6191,6 +6453,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "subject",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -6203,6 +6466,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -6287,6 +6551,7 @@
     "tblName": "national_lens_product_catalog",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -6299,6 +6564,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "comp_id",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6311,6 +6577,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "description",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6323,6 +6590,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "bc",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6335,6 +6603,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dia",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6347,6 +6616,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "color",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6359,6 +6629,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "power",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6371,6 +6642,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "axis",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6383,6 +6655,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cyl",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6395,6 +6668,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sample",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -6407,6 +6681,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "upc",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -6431,6 +6706,7 @@
     "tblName": "productsv2",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -6443,6 +6719,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -6455,6 +6732,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "additional_search_keywords",
         "definition": {
           "dataType": "TEXT",
@@ -6467,6 +6745,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "brand",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -6479,6 +6758,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "description",
         "definition": {
           "dataType": "TEXT",
@@ -6491,6 +6771,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_enabled",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -6503,6 +6784,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "img_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -6515,6 +6797,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -6527,6 +6810,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_days_per_lens",
         "definition": {
           "dataType": "SMALLINT(5) UNSIGNED",
@@ -6539,6 +6823,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_lenses",
         "definition": {
           "dataType": "SMALLINT(5) UNSIGNED",
@@ -6551,6 +6836,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_retail",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -6563,6 +6849,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "options",
         "definition": {
           "dataType": "JSON",
@@ -6778,12 +7065,12 @@
   },
   {
     "type": "RENAME TABLE",
-    "existingName": "abb_product_catalog",
+    "tblName": "abb_product_catalog",
     "newName": "catalog_abb"
   },
   {
     "type": "RENAME TABLE",
-    "existingName": "national_lens_product_catalog",
+    "tblName": "national_lens_product_catalog",
     "newName": "catalog_national_lens"
   },
   {
@@ -7154,6 +7441,7 @@
     "tblName": "rebates",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -7166,6 +7454,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "product_id",
         "definition": {
           "dataType": "INT",
@@ -7178,6 +7467,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_boxes",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -7190,6 +7480,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "amt_discount",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -7275,7 +7566,7 @@
   },
   {
     "type": "RENAME TABLE",
-    "existingName": "catalog_national_lens",
+    "tblName": "catalog_national_lens",
     "newName": "catalog_ntl_lens"
   },
   {
@@ -7283,6 +7574,7 @@
     "tblName": "product_skus",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -7295,6 +7587,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "product_id",
         "definition": {
           "dataType": "INT",
@@ -7307,6 +7600,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "power",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7319,6 +7613,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "bc",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7331,6 +7626,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dia",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7343,6 +7639,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "color",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -7355,6 +7652,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "axis",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7367,6 +7665,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cyl",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7379,6 +7678,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dn",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7391,6 +7691,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "add_power",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7439,6 +7740,7 @@
     "tblName": "distributors",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -7451,6 +7753,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -7475,6 +7778,7 @@
     "tblName": "distributor_skus",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -7487,6 +7791,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "distributor_id",
         "definition": {
           "dataType": "INT",
@@ -7499,6 +7804,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "ntl_lens_id",
         "definition": {
           "dataType": "INT",
@@ -7511,6 +7817,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "product_sku_id",
         "definition": {
           "dataType": "INT",
@@ -7523,6 +7830,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "unit_lens_qty",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -7619,6 +7927,7 @@
     "tblName": "distributor_shipping_methods",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -7631,6 +7940,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "distributor_id",
         "definition": {
           "dataType": "INT",
@@ -7643,6 +7953,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "description",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -7655,6 +7966,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "shipping_code",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -7803,6 +8115,7 @@
     "tblName": "user_attribution_adjust",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -7815,6 +8128,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -7827,6 +8141,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "idfa",
         "definition": {
           "dataType": "BINARY(16)",
@@ -7839,6 +8154,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "android_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -7851,6 +8167,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -7863,6 +8180,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "store",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7875,6 +8193,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "network_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -7887,6 +8206,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "campaign_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -7899,6 +8219,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "adgroup_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -7911,6 +8232,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "creative_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -7923,6 +8245,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "impression_based",
         "definition": {
           "dataType": "TINYINT",
@@ -7935,6 +8258,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_organic",
         "definition": {
           "dataType": "TINYINT",
@@ -7947,6 +8271,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "gclid",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -7959,6 +8284,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "click_time",
         "definition": {
           "dataType": "DATETIME",
@@ -7971,6 +8297,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "installed_at",
         "definition": {
           "dataType": "DATETIME",
@@ -7983,6 +8310,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "device_type",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -7995,6 +8323,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "fb_campaign_group_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8007,6 +8336,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "fb_campaign_group_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8019,6 +8349,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "fb_campaign_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8031,6 +8362,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "fb_campaign_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8043,6 +8375,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "fb_adgroup_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8055,6 +8388,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "fb_adgroup_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8067,6 +8401,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "twitter_line_item_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8079,6 +8414,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "ip_address",
         "definition": {
           "dataType": "VARBINARY(16)",
@@ -8385,6 +8721,7 @@
     "tblName": "brands",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -8397,6 +8734,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -8409,6 +8747,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "slug",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -8713,6 +9052,7 @@
     "tblName": "wallet_transactions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -8725,6 +9065,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -8737,6 +9078,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -8749,6 +9091,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -8761,6 +9104,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "amt",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -8773,6 +9117,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "pct",
         "definition": {
           "dataType": "TINYINT(3)",
@@ -8785,6 +9130,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -8797,6 +9143,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -8809,6 +9156,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "expires_at",
         "definition": {
           "dataType": "DATETIME",
@@ -8821,6 +9169,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "metadata",
         "definition": {
           "dataType": "JSON",
@@ -8911,6 +9260,7 @@
     "tblName": "reward_rules",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -8923,6 +9273,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -8935,6 +9286,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8947,6 +9299,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -8959,6 +9312,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -8971,6 +9325,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "branch_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -8983,6 +9338,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "reward_for",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -8995,6 +9351,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "amt",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -9007,6 +9364,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "pct",
         "definition": {
           "dataType": "TINYINT(3)",
@@ -9019,6 +9377,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "max_uses",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -9031,6 +9390,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "must_trigger_event",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -9043,6 +9403,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "expires_at",
         "definition": {
           "dataType": "DATETIME",
@@ -9076,6 +9437,7 @@
     "tblName": "deeplinks",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -9088,6 +9450,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -9100,6 +9463,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "url",
         "definition": {
           "dataType": "VARCHAR(160)",
@@ -9112,6 +9476,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "created_by_user_id",
         "definition": {
           "dataType": "INT",
@@ -9124,6 +9489,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "reward_rule_id",
         "definition": {
           "dataType": "INT",
@@ -9136,6 +9502,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_single_use",
         "definition": {
           "dataType": "TINYINT",
@@ -9148,6 +9515,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "expires_at",
         "definition": {
           "dataType": "DATETIME",
@@ -9229,6 +9597,7 @@
     "tblName": "deeplink_hits",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -9241,6 +9610,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -9253,6 +9623,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "deeplink_id",
         "definition": {
           "dataType": "INT",
@@ -9265,6 +9636,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -9366,6 +9738,7 @@
     "tblName": "refer_a_friend",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -9378,6 +9751,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -9390,6 +9764,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "referree_user_id",
         "definition": {
           "dataType": "INT",
@@ -9402,6 +9777,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "referree_wallet_transaction_id",
         "definition": {
           "dataType": "INT",
@@ -9414,6 +9790,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "referrer_user_id",
         "definition": {
           "dataType": "INT",
@@ -9426,6 +9803,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "referrer_wallet_transaction_id",
         "definition": {
           "dataType": "INT",
@@ -9438,6 +9816,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "url",
         "definition": {
           "dataType": "VARCHAR(160)",
@@ -9687,6 +10066,7 @@
     "tblName": "device_display_properties",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -9699,6 +10079,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "device_name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -9711,6 +10092,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "operating_system",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -9723,6 +10105,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "diagonal_inches",
         "definition": {
           "dataType": "DECIMAL(3, 1)",
@@ -9735,6 +10118,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "pixel_width",
         "definition": {
           "dataType": "SMALLINT",
@@ -9747,6 +10131,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "pixel_height",
         "definition": {
           "dataType": "SMALLINT",
@@ -9759,6 +10144,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "aspect_width",
         "definition": {
           "dataType": "SMALLINT",
@@ -9771,6 +10157,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "aspect_height",
         "definition": {
           "dataType": "SMALLINT",
@@ -9783,6 +10170,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "device_width",
         "definition": {
           "dataType": "SMALLINT",
@@ -9795,6 +10183,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "pixels_per_inch",
         "definition": {
           "dataType": "SMALLINT",
@@ -9838,6 +10227,7 @@
     "tblName": "v2_messages",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -9850,6 +10240,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -9862,6 +10253,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -9874,6 +10266,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "admin_id",
         "definition": {
           "dataType": "INT",
@@ -9886,6 +10279,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "thread_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -9898,6 +10292,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_sent",
         "definition": {
           "dataType": "DATETIME",
@@ -9910,6 +10305,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "min_send_date",
         "definition": {
           "dataType": "DATETIME",
@@ -9922,6 +10318,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sms_to",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -9934,6 +10331,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sms_from",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -9946,6 +10344,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email_to",
         "definition": {
           "dataType": "VARCHAR(254)",
@@ -9958,6 +10357,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email_from",
         "definition": {
           "dataType": "VARCHAR(254)",
@@ -9970,6 +10370,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -9982,6 +10383,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "optimal_send_time_threshold",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -9994,6 +10396,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "attachments",
         "definition": {
           "dataType": "JSON",
@@ -10006,6 +10409,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "content",
         "definition": {
           "dataType": "TEXT",
@@ -10018,6 +10422,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "raw_content",
         "definition": {
           "dataType": "TEXT",
@@ -10030,6 +10435,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "direction",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -10042,6 +10448,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_acknowledged",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -10190,6 +10597,7 @@
     "tblName": "do_not_disturb",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -10202,6 +10610,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -10214,6 +10623,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_expiry",
         "definition": {
           "dataType": "DATETIME",
@@ -10226,6 +10636,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -10238,6 +10649,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "channels",
         "definition": {
           "dataType": "JSON",
@@ -10250,6 +10662,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "drip_type",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -10298,6 +10711,7 @@
     "tblName": "drip_schedule",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -10310,6 +10724,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "channels",
         "definition": {
           "dataType": "JSON",
@@ -10322,6 +10737,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "send_interval",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -10334,6 +10750,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -10346,6 +10763,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "replacement_schedule",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -10370,6 +10788,7 @@
     "tblName": "drip_messages",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -10382,6 +10801,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -10394,6 +10814,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "description",
         "definition": {
           "dataType": "TEXT",
@@ -10406,6 +10827,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sendwithus_template_id",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -10418,6 +10840,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "content",
         "definition": {
           "dataType": "TEXT",
@@ -10442,6 +10865,7 @@
     "tblName": "drip_schedule_messages_xref",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -10454,6 +10878,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "drip_schedule_id",
         "definition": {
           "dataType": "INT",
@@ -10466,6 +10891,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "drip_message_id",
         "definition": {
           "dataType": "INT",
@@ -10538,6 +10964,7 @@
     "tblName": "drip_reorder_options",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -10550,6 +10977,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -10562,6 +10990,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -10574,6 +11003,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_product_id",
         "definition": {
           "dataType": "INT",
@@ -10586,6 +11016,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_qty",
         "definition": {
           "dataType": "INT",
@@ -10598,6 +11029,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -10610,6 +11042,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_product_id",
         "definition": {
           "dataType": "INT",
@@ -10622,6 +11055,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_qty",
         "definition": {
           "dataType": "INT",
@@ -10634,6 +11068,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
@@ -10759,6 +11194,7 @@
     "tblName": "notes",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -10771,6 +11207,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "admin_id",
         "definition": {
           "dataType": "INT",
@@ -10783,6 +11220,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "exam_id",
         "definition": {
           "dataType": "INT",
@@ -10795,6 +11233,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -10807,6 +11246,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -10819,6 +11259,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "text",
         "definition": {
           "dataType": "TEXT",
@@ -10831,6 +11272,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -11011,6 +11453,7 @@
     "tblName": "product_competitors",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "product_id",
         "definition": {
           "dataType": "INT",
@@ -11023,6 +11466,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "lens_com_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -11035,6 +11479,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "lens_com_selector",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -11047,6 +11492,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "lens_com_price",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -11059,6 +11505,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "lens_com_last_crawled",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11071,6 +11518,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "c1800_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -11083,6 +11531,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "c1800_price",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -11095,6 +11544,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "c1800_last_crawled",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11107,6 +11557,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "visiondirect_url",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -11119,6 +11570,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "visiondirect_price",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -11131,6 +11583,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "visiondirect_last_crawled",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11286,6 +11739,7 @@
     "tblName": "detect_sessions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "uploaded_video_id",
         "definition": {
           "dataType": "INT",
@@ -11298,6 +11752,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11310,6 +11765,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "mean_distance",
         "definition": {
           "dataType": "FLOAT(4, 2)",
@@ -11322,6 +11778,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "min_distance",
         "definition": {
           "dataType": "FLOAT(4, 2)",
@@ -11334,6 +11791,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "max_distance",
         "definition": {
           "dataType": "FLOAT(4, 2)",
@@ -11346,6 +11804,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "correct_distance_percent",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -11358,6 +11817,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "request_count",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -11370,6 +11830,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "undetected_count",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -11382,6 +11843,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "error_count",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -11394,6 +11856,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "max_faces",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -11600,6 +12063,7 @@
     "tblName": "user_auth_passwords",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -11612,6 +12076,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11624,6 +12089,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "password_hash",
         "definition": {
           "dataType": "BINARY(60)",
@@ -11672,6 +12138,7 @@
     "tblName": "user_auth_password_reset_tokens",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -11684,6 +12151,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11696,6 +12164,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_expires",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11708,6 +12177,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "token",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -11720,6 +12190,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_used",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -11777,6 +12248,7 @@
     "tblName": "shipping_options",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "TINYINT",
@@ -11789,6 +12261,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -11801,6 +12274,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -11813,6 +12287,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -11825,6 +12300,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cost",
         "definition": {
           "dataType": "DECIMAL(5, 2)",
@@ -12028,6 +12504,7 @@
     "tblName": "subscriptions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -12040,6 +12517,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -12052,6 +12530,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -12064,6 +12543,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(200)",
@@ -12076,6 +12556,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(200)",
@@ -12088,6 +12569,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "JSON",
@@ -12210,6 +12692,7 @@
     "tblName": "advertising_attribution",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -12222,6 +12705,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -12234,6 +12718,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -12246,6 +12731,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "source",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -12258,6 +12744,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "campaign",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -12270,6 +12757,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "adgroup",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -12282,6 +12770,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "keyword",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -12294,6 +12783,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "creative",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -12395,6 +12885,7 @@
     "tblName": "reorder_options",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -12407,6 +12898,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "exam_id",
         "definition": {
           "dataType": "INT",
@@ -12419,6 +12911,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_product_id",
         "definition": {
           "dataType": "INT",
@@ -12431,6 +12924,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_qty",
         "definition": {
           "dataType": "INT",
@@ -12443,6 +12937,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -12455,6 +12950,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -12467,6 +12963,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "preferred_address_id",
         "definition": {
           "dataType": "INT",
@@ -12479,6 +12976,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "preferred_shipping_option_id",
         "definition": {
           "dataType": "TINYINT(4)",
@@ -12491,6 +12989,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_product_id",
         "definition": {
           "dataType": "INT",
@@ -12503,6 +13002,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_qty",
         "definition": {
           "dataType": "INT",
@@ -12515,6 +13015,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
@@ -12527,6 +13028,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -13231,6 +13733,7 @@
     "tblName": "lens_variations",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "upc",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -13243,6 +13746,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -13255,6 +13759,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -13267,6 +13772,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "power",
         "definition": {
           "dataType": "VARCHAR(8)",
@@ -13279,6 +13785,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "bc",
         "definition": {
           "dataType": "VARCHAR(8)",
@@ -13291,6 +13798,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dia",
         "definition": {
           "dataType": "VARCHAR(8)",
@@ -13303,6 +13811,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "color",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -13315,6 +13824,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "axis",
         "definition": {
           "dataType": "VARCHAR(8)",
@@ -13327,6 +13837,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cyl",
         "definition": {
           "dataType": "VARCHAR(8)",
@@ -13339,6 +13850,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "add_power",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -13351,6 +13863,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dn",
         "definition": {
           "dataType": "VARCHAR(1)",
@@ -13363,6 +13876,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "num_lenses",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -13375,6 +13889,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "shipping_weight_grams",
         "definition": {
           "dataType": "INT UNSIGNED",
@@ -13399,6 +13914,7 @@
     "tblName": "lens_to_variation",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "lens_variation_upc",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -13411,6 +13927,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "lens_id",
         "definition": {
           "dataType": "INT",
@@ -13423,6 +13940,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "multiplier",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -13435,6 +13953,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -13521,6 +14040,7 @@
     "tblName": "distributor_lens_stock",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "lens_variation_upc",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -13533,6 +14053,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "distributor_id",
         "definition": {
           "dataType": "INT",
@@ -13545,6 +14066,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -13557,6 +14079,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -13569,6 +14092,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cost",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -13581,6 +14105,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_available",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -13593,6 +14118,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_dx",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -13605,6 +14131,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "brand_name",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -13617,6 +14144,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "product_name",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -13878,6 +14406,7 @@
     "tblName": "video_detection_segments",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "segment_id",
         "definition": {
           "dataType": "INT UNSIGNED",
@@ -13890,6 +14419,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "video_id",
         "definition": {
           "dataType": "INT",
@@ -13902,6 +14432,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "segment_timestamp",
         "definition": {
           "dataType": "DATETIME",
@@ -13914,6 +14445,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "segment_length",
         "definition": {
           "dataType": "DECIMAL(5, 2)",
@@ -13926,6 +14458,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "error_count",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -13938,6 +14471,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "mean_distance",
         "definition": {
           "dataType": "DECIMAL(4, 2)",
@@ -13950,6 +14484,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "max_faces",
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -13962,6 +14497,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "glasses_detected",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -14010,6 +14546,7 @@
     "tblName": "exam_costs",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -14022,6 +14559,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -14034,6 +14572,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cost",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -14594,6 +15133,7 @@
     "tblName": "experimental_subscriptions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -14606,6 +15146,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -14618,6 +15159,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -14630,6 +15172,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -14642,6 +15185,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "stripe_plan_id",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -14654,6 +15198,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_subscription_ends",
         "definition": {
           "dataType": "DATETIME",
@@ -14666,6 +15211,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_product_id",
         "definition": {
           "dataType": "INT",
@@ -14678,6 +15224,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -14690,6 +15237,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_product_id",
         "definition": {
           "dataType": "INT",
@@ -14702,6 +15250,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
@@ -14714,6 +15263,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "experiment_data",
         "definition": {
           "dataType": "JSON",
@@ -14738,6 +15288,7 @@
     "tblName": "experimental_passive_verification",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -14750,6 +15301,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -14762,6 +15314,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -14774,6 +15327,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -14786,6 +15340,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_product_id",
         "definition": {
           "dataType": "INT",
@@ -14798,6 +15353,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_qty",
         "definition": {
           "dataType": "INT",
@@ -14810,6 +15366,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -14822,6 +15379,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_product_id",
         "definition": {
           "dataType": "INT",
@@ -14834,6 +15392,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_qty",
         "definition": {
           "dataType": "INT",
@@ -14846,6 +15405,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
@@ -14858,6 +15418,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "verifying_md_name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -14870,6 +15431,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "verifying_md_city",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -14882,6 +15444,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "verifying_md_state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -14894,6 +15457,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "verifying_md_telephone",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -14906,6 +15470,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "experiment_data",
         "definition": {
           "dataType": "JSON",
@@ -14930,6 +15495,7 @@
     "tblName": "experimental_brand_switching",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -14942,6 +15508,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -14954,6 +15521,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -14966,6 +15534,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -14978,6 +15547,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "current_left_product_id",
         "definition": {
           "dataType": "INT",
@@ -14990,6 +15560,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "current_right_product_id",
         "definition": {
           "dataType": "INT",
@@ -15002,6 +15573,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -15014,6 +15586,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
@@ -15026,6 +15599,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "experiment_data",
         "definition": {
           "dataType": "JSON",
@@ -15050,6 +15624,7 @@
     "tblName": "distributor_orders",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -15062,6 +15637,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -15074,6 +15650,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "status",
         "definition": {
           "dataType": "VARCHAR(50)",
@@ -15086,6 +15663,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "error",
         "definition": {
           "dataType": "TEXT",
@@ -15098,6 +15676,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "sentry_id",
         "definition": {
           "dataType": "VARCHAR(50)",
@@ -15110,6 +15689,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -15122,6 +15702,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "distributor_order_no",
         "definition": {
           "dataType": "VARCHAR(250)",
@@ -15134,6 +15715,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "shipping_cost",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -15146,6 +15728,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "shipping_option",
         "definition": {
           "dataType": "VARCHAR(100)",
@@ -15158,6 +15741,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "tracking",
         "definition": {
           "dataType": "JSON",
@@ -15170,6 +15754,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_no",
         "definition": {
           "dataType": "VARCHAR(10)",
@@ -15182,6 +15767,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -15194,6 +15780,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_qty",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -15206,6 +15793,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_qty",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -15218,6 +15806,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "distributor",
         "definition": {
           "dataType": "VARCHAR(8)",
@@ -15230,6 +15819,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_lens_upc",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -15242,6 +15832,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_lens_upc",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -15254,6 +15845,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "shipping_address",
         "definition": {
           "dataType": "JSON",
@@ -15510,7 +16102,7 @@
   },
   {
     "type": "RENAME TABLE",
-    "existingName": "user_device_ad_ids",
+    "tblName": "user_device_ad_ids",
     "newName": "user_device_ad_ids_legacy"
   },
   {
@@ -15518,6 +16110,7 @@
     "tblName": "user_device_ad_ids",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "VARCHAR(45)",
@@ -15530,6 +16123,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -15542,6 +16136,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -15554,6 +16149,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -15566,6 +16162,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_last_seen",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -15822,6 +16419,7 @@
     "tblName": "experiment_overrides",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -15834,6 +16432,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "path",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -15846,6 +16445,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "override_choice",
         "definition": {
           "dataType": "INT",
@@ -15858,6 +16458,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -16130,6 +16731,7 @@
     "tblName": "user_attribution_surveys",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -16142,6 +16744,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -16154,6 +16757,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -16166,6 +16770,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "answer",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -16178,6 +16783,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "location",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -16190,6 +16796,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "device",
         "definition": {
           "dataType": "JSON",
@@ -16202,6 +16809,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "has_skipped",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -16250,6 +16858,7 @@
     "tblName": "tasks",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -16262,6 +16871,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(250)",
@@ -16274,6 +16884,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "priority",
         "definition": {
           "dataType": "INT",
@@ -16286,6 +16897,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -16298,6 +16910,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_resolved",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -16310,6 +16923,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_assigned",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -16322,6 +16936,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "metadata",
         "definition": {
           "dataType": "JSON",
@@ -16334,6 +16949,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "tags",
         "definition": {
           "dataType": "JSON",
@@ -16346,6 +16962,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "case_category",
         "definition": {
           "dataType": "VARCHAR(250)",
@@ -16358,6 +16975,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "assigned_admin_id",
         "definition": {
           "dataType": "INT",
@@ -16370,6 +16988,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "assigner_admin_id",
         "definition": {
           "dataType": "INT",
@@ -16382,6 +17001,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "completed_by_admin_id",
         "definition": {
           "dataType": "INT",
@@ -16394,6 +17014,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "status",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -16466,6 +17087,7 @@
     "tblName": "tasks_xref",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -16478,6 +17100,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "association_type",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -16490,6 +17113,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "task_id",
         "definition": {
           "dataType": "INT",
@@ -16502,6 +17126,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "order_id",
         "definition": {
           "dataType": "INT",
@@ -16514,6 +17139,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "note_id",
         "definition": {
           "dataType": "INT",
@@ -16526,6 +17152,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "message_id",
         "definition": {
           "dataType": "INT",
@@ -16538,6 +17165,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "exam_id",
         "definition": {
           "dataType": "INT",
@@ -16850,6 +17478,7 @@
     "tblName": "cloud_storage",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -16862,6 +17491,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -16874,6 +17504,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "url",
         "definition": {
           "dataType": "VARCHAR(250)",
@@ -16886,6 +17517,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(250)",
@@ -16898,6 +17530,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "data",
         "definition": {
           "dataType": "JSON",
@@ -16962,6 +17595,7 @@
     "tblName": "pv_optoms",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -16974,6 +17608,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "first_name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -16986,6 +17621,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "last_name",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -16998,6 +17634,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "clinic_name",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -17010,6 +17647,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "clinic_telephone",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -17022,6 +17660,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "clinic_street_line_1",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -17034,6 +17673,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "clinic_street_line_2",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -17046,6 +17686,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "city",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -17058,6 +17699,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -17070,6 +17712,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "postal_code",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -17082,6 +17725,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -17094,6 +17738,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -17106,6 +17751,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "additional_details",
         "definition": {
           "dataType": "JSON",
@@ -17172,6 +17818,7 @@
     "tblName": "lens_options_cache",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "lens_id",
         "definition": {
           "dataType": "INT",
@@ -17184,6 +17831,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "power",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17196,6 +17844,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "bc",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17208,6 +17857,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dia",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17220,6 +17870,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "color",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17232,6 +17883,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "axis",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17244,6 +17896,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "cyl",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17256,6 +17909,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "add_power",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17268,6 +17922,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "dn",
         "definition": {
           "dataType": "VARCHAR(2048)",
@@ -17356,6 +18011,7 @@
     "tblName": "message_templates",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -17368,6 +18024,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(250)",
@@ -17380,6 +18037,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "content",
         "definition": {
           "dataType": "TEXT",
@@ -17392,6 +18050,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -17404,6 +18063,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -17481,7 +18141,7 @@
   },
   {
     "type": "RENAME TABLE",
-    "existingName": "pv_optoms",
+    "tblName": "pv_optoms",
     "newName": "optoms"
   },
   {
@@ -17489,6 +18149,7 @@
     "tblName": "optom_business_hours",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -17501,6 +18162,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "optom_id",
         "definition": {
           "dataType": "INT",
@@ -17513,6 +18175,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "day_of_week",
         "definition": {
           "dataType": "TINYINT",
@@ -17525,6 +18188,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "time_open",
         "definition": {
           "dataType": "TIME",
@@ -17537,6 +18201,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "time_closed",
         "definition": {
           "dataType": "TIME",
@@ -17549,6 +18214,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -17597,6 +18263,7 @@
     "tblName": "fsm_transitions",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -17609,6 +18276,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "task_id",
         "definition": {
           "dataType": "INT",
@@ -17621,6 +18289,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "to_state",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -17633,6 +18302,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "from_state",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -17645,6 +18315,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -17657,6 +18328,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -18179,6 +18851,7 @@
     "tblName": "iterable_batch_logs",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "batch_end",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -18390,6 +19063,7 @@
     "tblName": "partners",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -18402,6 +19076,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -18414,6 +19089,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -18440,6 +19116,7 @@
     "tblName": "partner_users",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -18452,6 +19129,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "partner_uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -18464,6 +19142,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -18476,6 +19155,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(254)",
@@ -18488,6 +19168,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "password_hash",
         "definition": {
           "dataType": "VARCHAR(60)",
@@ -18500,6 +19181,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -18517,7 +19199,17 @@
           "id"
         ]
       },
-      null,
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "email",
+        "indexColNames": [
+          {
+            "colName": "email",
+            "len": null,
+            "direction": null
+          }
+        ]
+      },
       {
         "type": "INDEX",
         "name": "partner_uuid",
@@ -18558,6 +19250,7 @@
     "tblName": "partner_secrets",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -18570,6 +19263,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -18582,6 +19276,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "partner_uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -18594,6 +19289,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "env",
         "definition": {
           "dataType": "VARCHAR(4)",
@@ -18606,6 +19302,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "secret",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -18618,6 +19315,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_revoked",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -18635,7 +19333,17 @@
           "id"
         ]
       },
-      null,
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "secret",
+        "indexColNames": [
+          {
+            "colName": "secret",
+            "len": null,
+            "direction": null
+          }
+        ]
+      },
       {
         "type": "INDEX",
         "name": "partner_uuid",
@@ -18676,6 +19384,7 @@
     "tblName": "partner_tokens",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -18688,6 +19397,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "issued_by",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -18700,6 +19410,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "issued_at",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -18712,6 +19423,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "jwt_token",
         "definition": {
           "dataType": "VARCHAR(512)",
@@ -18729,7 +19441,17 @@
           "id"
         ]
       },
-      null,
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "jwt_token",
+        "indexColNames": [
+          {
+            "colName": "jwt_token",
+            "len": null,
+            "direction": null
+          }
+        ]
+      },
       {
         "type": "INDEX",
         "name": "issued_by",
@@ -18853,6 +19575,7 @@
     "tblName": "timezones",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -18865,6 +19588,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "city",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -18877,6 +19601,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "state",
         "definition": {
           "dataType": "VARCHAR(2)",
@@ -18889,6 +19614,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "postal_code",
         "definition": {
           "dataType": "VARCHAR(9)",
@@ -18901,6 +19627,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "latitude",
         "definition": {
           "dataType": "DECIMAL(10, 8)",
@@ -18913,6 +19640,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "longitude",
         "definition": {
           "dataType": "DECIMAL(11, 8)",
@@ -18925,6 +19653,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "area_code",
         "definition": {
           "dataType": "VARCHAR(3)",
@@ -18937,6 +19666,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "timezone",
         "definition": {
           "dataType": "VARCHAR(30)",
@@ -18961,6 +19691,7 @@
     "tblName": "price_overlays",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -18973,6 +19704,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -18985,6 +19717,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label",
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -19009,6 +19742,7 @@
     "tblName": "prices",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -19021,6 +19755,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19033,6 +19768,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price",
         "definition": {
           "dataType": "DECIMAL(5, 2)",
@@ -19045,6 +19781,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "min_quantity_threshold",
         "definition": {
           "dataType": "TINYINT UNSIGNED",
@@ -19057,6 +19794,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "lens_id",
         "definition": {
           "dataType": "INT",
@@ -19069,6 +19807,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_overlay_id",
         "definition": {
           "dataType": "INT",
@@ -19128,7 +19867,32 @@
           "onUpdate": null
         }
       },
-      null
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "unique_date_lens_price_overlay_qty",
+        "indexColNames": [
+          {
+            "colName": "date_created",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "lens_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "price_overlay_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "min_quantity_threshold",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
     ],
     "options": {
       "ENGINE": "InnoDB",
@@ -19142,6 +19906,7 @@
     "tblName": "users_price_overlays",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -19154,6 +19919,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19166,6 +19932,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_expiration",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19178,6 +19945,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -19190,6 +19958,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "price_overlay_id",
         "definition": {
           "dataType": "INT",
@@ -19249,7 +20018,22 @@
           "onUpdate": null
         }
       },
-      null
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "unique_user_price_overlay",
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "price_overlay_id",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
     ],
     "options": {
       "ENGINE": "InnoDB",
@@ -19263,6 +20047,7 @@
     "tblName": "partner_identities",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -19275,6 +20060,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19287,6 +20073,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19299,6 +20086,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "partner_uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -19311,6 +20099,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "external_id",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -19323,6 +20112,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -19335,6 +20125,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -19347,6 +20138,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "telephone",
         "definition": {
           "dataType": "VARCHAR(16)",
@@ -19364,7 +20156,22 @@
           "uuid"
         ]
       },
-      null,
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "partner_uuid",
+        "indexColNames": [
+          {
+            "colName": "partner_uuid",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "external_id",
+            "len": null,
+            "direction": null
+          }
+        ]
+      },
       {
         "type": "FOREIGN KEY",
         "indexName": null,
@@ -19476,6 +20283,7 @@
     "tblName": "promo_rewards",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -19488,6 +20296,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19500,6 +20309,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19512,6 +20322,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "expires_at",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19524,6 +20335,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "promo_code",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -19536,6 +20348,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "label",
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -19548,6 +20361,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "value",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -19560,6 +20374,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -19572,6 +20387,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "max_uses",
         "definition": {
           "dataType": "INT(1)",
@@ -19584,6 +20400,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_stackable",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19596,6 +20413,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "can_combine",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19608,6 +20426,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "for_new_users",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19620,6 +20439,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19631,7 +20451,17 @@
           "reference": null
         }
       },
-      null
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "unique_promo_code",
+        "indexColNames": [
+          {
+            "colName": "promo_code",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
     ],
     "options": {},
     "ifNotExists": false
@@ -19641,6 +20471,7 @@
     "tblName": "held_promo_rewards",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -19653,6 +20484,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "promo_reward_id",
         "definition": {
           "dataType": "INT",
@@ -19665,6 +20497,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -19677,6 +20510,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "applied_to_order_id",
         "definition": {
           "dataType": "INT",
@@ -19689,6 +20523,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19701,6 +20536,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "expires_at",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19713,6 +20549,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "value",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -19725,6 +20562,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -19737,6 +20575,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_stackable",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19749,6 +20588,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "can_combine",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19761,6 +20601,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "for_new_users",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19773,6 +20614,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19865,6 +20707,7 @@
     "tblName": "held_px_rewards",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -19877,6 +20720,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "user_id",
         "definition": {
           "dataType": "INT",
@@ -19889,6 +20733,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "applied_to_order_id",
         "definition": {
           "dataType": "INT",
@@ -19901,6 +20746,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "given_by_admin_id",
         "definition": {
           "dataType": "INT",
@@ -19913,6 +20759,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19925,6 +20772,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "value",
         "definition": {
           "dataType": "DECIMAL(13, 2)",
@@ -19937,6 +20785,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "type",
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -19949,6 +20798,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "reason",
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -19961,6 +20811,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "locked_to_order",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -19973,6 +20824,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "is_deleted",
         "definition": {
           "dataType": "TINYINT(1)",
@@ -20070,6 +20922,7 @@
     "tblName": "faxes",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT",
@@ -20082,6 +20935,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "optom_id",
         "definition": {
           "dataType": "INT",
@@ -20094,6 +20948,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "task_id",
         "definition": {
           "dataType": "INT",
@@ -20106,6 +20961,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "from",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -20118,6 +20974,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "to",
         "definition": {
           "dataType": "VARCHAR(12)",
@@ -20130,6 +20987,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "s3_key",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -20142,6 +21000,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "direction",
         "definition": {
           "dataType": [
@@ -20170,6 +21029,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "status",
         "definition": {
           "dataType": "VARCHAR(10)",
@@ -20182,6 +21042,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "longstatus",
         "definition": {
           "dataType": "TEXT",
@@ -20194,6 +21055,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "faxage_id",
         "definition": {
           "dataType": "INT",
@@ -20206,6 +21068,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "retries",
         "definition": {
           "dataType": "INT",
@@ -20218,6 +21081,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_sent",
         "definition": {
           "dataType": "DATETIME",
@@ -20230,6 +21094,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_complete",
         "definition": {
           "dataType": "DATETIME",
@@ -20242,6 +21107,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -20254,6 +21120,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -20459,6 +21326,7 @@
     "tblName": "rx_requests",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "id",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -20471,6 +21339,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -20483,6 +21352,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -20495,6 +21365,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "token",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -20507,6 +21378,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "identity_uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -20519,6 +21391,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "partner_uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -20531,6 +21404,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "target_skus",
         "definition": {
           "dataType": "JSON",
@@ -20548,7 +21422,17 @@
           "id"
         ]
       },
-      null,
+      {
+        "type": "UNIQUE INDEX",
+        "indexName": "token",
+        "indexColNames": [
+          {
+            "colName": "token",
+            "len": null,
+            "direction": null
+          }
+        ]
+      },
       {
         "type": "INDEX",
         "name": "identity_uuid",
@@ -20693,6 +21577,7 @@
     "tblName": "rx_patients",
     "definitions": [
       {
+        "type": "COLUMN",
         "colName": "uuid",
         "definition": {
           "dataType": "VARCHAR(36)",
@@ -20705,6 +21590,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_created",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -20717,6 +21603,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_modified",
         "definition": {
           "dataType": "TIMESTAMP",
@@ -20729,6 +21616,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "rx_request_id",
         "definition": {
           "dataType": "INT(11) UNSIGNED",
@@ -20741,6 +21629,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "name",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -20753,6 +21642,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "email",
         "definition": {
           "dataType": "VARCHAR(255)",
@@ -20765,6 +21655,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "date_of_birth",
         "definition": {
           "dataType": "VARCHAR(10)",
@@ -20777,6 +21668,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "scratchpad",
         "definition": {
           "dataType": "JSON",
@@ -20789,6 +21681,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "left_rx",
         "definition": {
           "dataType": "JSON",
@@ -20801,6 +21694,7 @@
         }
       },
       {
+        "type": "COLUMN",
         "colName": "right_rx",
         "definition": {
           "dataType": "JSON",
