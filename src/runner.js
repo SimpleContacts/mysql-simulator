@@ -13,6 +13,7 @@ const error = console.error;
 
 function makeTable(table): Table {
   const columns = table.definitions.filter(def => def.type === 'COLUMN');
+  const foreignKeys = table.definitions.filter(def => def.type === 'FOREIGN KEY');
   return {
     name: table.tblName,
     columns: columns.map(col => {
@@ -25,6 +26,7 @@ function makeTable(table): Table {
         defaultValue,
       };
     }),
+    foreignKeys,
   };
 }
 
@@ -35,6 +37,14 @@ function printDb(db: Database) {
     log(chalk.blue('-'.repeat(table.name.length)));
     for (const col of table.columns) {
       log(`  ${chalk.magenta(col.name)} ${chalk.gray(col.type)}`);
+    }
+    for (const fk of table.foreignKeys) {
+      const fields = fk.indexColNames.map(def => def.colName).join(', ');
+      const targetFields = fk.reference.indexColNames
+        .map(def => def.colName)
+        .join(', ');
+      const target = `${fk.reference.tblName} (${targetFields})`;
+      log(chalk.yellow(`  ${fields} => ${target}`));
     }
   }
 }
@@ -53,10 +63,8 @@ function main() {
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.tblName, expr.newName);
     } else {
-      error(chalk.gray(`Unknown expression type: ${expr.type}`));
+      error(chalk.yellow(`Unknown expression type: ${expr.type}`));
     }
-
-    log(chalk.green(expr.type));
   }
 
   log('');
