@@ -1778,15 +1778,19 @@
     "tblName": "addresses",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "label",
-        "after": "label",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "label",
+        "newColName": "label",
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -1884,7 +1888,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "scripts_ibfk_2"
+        "symbol": "scripts_ibfk_2"
       }
     ]
   },
@@ -2165,7 +2169,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "exams_ibfk_1"
+        "symbol": "exams_ibfk_1"
       },
       {
         "type": "DROP COLUMN",
@@ -2302,7 +2306,8 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "md_id",
         "after": null,
         "definition": {
           "dataType": "INT",
@@ -2321,7 +2326,8 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "letters",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -2541,7 +2547,8 @@
     "tblName": "uploaded_videos",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "letters",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(256)",
@@ -3249,16 +3256,19 @@
         "after": null
       },
       {
-        "type": "CHANGE",
-        "before": "has_qualified",
-        "after": "has_seen_qualification",
-        "columnType": "TINYINT()",
-        "attrs": [
-          "NOT NULL",
-          {
-            "DEFAULT": 0
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "has_qualified",
+        "newColName": "has_seen_qualification",
+        "definition": {
+          "dataType": "TINYINT(1)",
+          "nullable": false,
+          "defaultValue": 0,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -3357,11 +3367,19 @@
     "tblName": "users",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "qualify_run_out_date",
-        "after": "qualify_last_exam_date",
-        "columnType": "DATE",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "qualify_run_out_date",
+        "newColName": "qualify_last_exam_date",
+        "definition": {
+          "dataType": "DATE",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       },
       {
         "type": "ADD COLUMN",
@@ -3762,18 +3780,34 @@
     "tblName": "user_logs",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "data",
-        "after": "data",
-        "columnType": "JSON",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "data",
+        "newColName": "data",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       },
       {
-        "type": "CHANGE",
-        "before": "device",
-        "after": "device",
-        "columnType": "JSON",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "device",
+        "newColName": "device",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -3783,7 +3817,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "fk_user_id"
+        "symbol": "fk_user_id"
       }
     ]
   },
@@ -3822,13 +3856,19 @@
     "tblName": "virtual_supplies",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "name",
-        "after": "opt_duration",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "name",
+        "newColName": "opt_duration",
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -3837,15 +3877,19 @@
     "tblName": "virtual_supplies",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "price",
-        "after": "price_retail",
-        "columnType": "DECIMAL(, )",
-        "attrs": [
-          {
-            "DEFAULT": 0
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "price",
+        "newColName": "price_retail",
+        "definition": {
+          "dataType": "DECIMAL(13, 2)",
+          "nullable": true,
+          "defaultValue": 0,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -4015,11 +4059,19 @@
     "tblName": "uploaded_videos",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "letters",
-        "after": "letters",
-        "columnType": "JSON",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "letters",
+        "newColName": "letters",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -4318,31 +4370,49 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "video_url",
-        "after": "video_url",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "video_url",
+        "newColName": "video_url",
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       },
       {
-        "type": "CHANGE",
-        "before": "visual_acuity_video_url",
-        "after": "visual_acuity_video_url",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "visual_acuity_video_url",
+        "newColName": "visual_acuity_video_url",
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       },
       {
-        "type": "CHANGE",
-        "before": "letters",
-        "after": "letters",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "letters",
+        "newColName": "letters",
+        "definition": {
+          "dataType": "VARCHAR(256)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -4392,7 +4462,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "exams_ibfk_3"
+        "symbol": "exams_ibfk_3"
       }
     ]
   },
@@ -4401,13 +4471,19 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "script_id",
-        "after": "script_id",
-        "columnType": "INT()",
-        "attrs": [
-          "NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "script_id",
+        "newColName": "script_id",
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -5701,7 +5777,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "orders_ibfk_1"
+        "symbol": "orders_ibfk_1"
       }
     ]
   },
@@ -5745,7 +5821,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "exams_ibfk_3"
+        "symbol": "exams_ibfk_3"
       }
     ]
   },
@@ -5754,13 +5830,19 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "script_id",
-        "after": "script_id",
-        "columnType": "INT()",
-        "attrs": [
-          "NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "script_id",
+        "newColName": "script_id",
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -6348,13 +6430,19 @@
     "tblName": "user_logs",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "subject",
-        "after": "subject",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "subject",
+        "newColName": "subject",
+        "definition": {
+          "dataType": "VARCHAR(64)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -6433,16 +6521,19 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "status",
-        "after": "status",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NULL",
-          {
-            "DEFAULT": "OPEN"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "status",
+        "newColName": "status",
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": true,
+          "defaultValue": "OPEN",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -6555,18 +6646,34 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "shipping_address",
-        "after": "shipping_address",
-        "columnType": "JSON",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "shipping_address",
+        "newColName": "shipping_address",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       },
       {
-        "type": "CHANGE",
-        "before": "referral",
-        "after": "referral",
-        "columnType": "JSON",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "referral",
+        "newColName": "referral",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -7018,13 +7125,19 @@
     "tblName": "md_licenses",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "license",
-        "after": "license_no",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "license",
+        "newColName": "license_no",
+        "definition": {
+          "dataType": "VARCHAR(32)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -7143,11 +7256,11 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "fk_right_parent_product_id"
+        "symbol": "fk_right_parent_product_id"
       },
       {
         "type": "DROP FOREIGN KEY",
-        "name": "fk_left_parent_product_id"
+        "symbol": "fk_left_parent_product_id"
       }
     ]
   },
@@ -7165,11 +7278,11 @@
       },
       {
         "type": "DROP INDEX",
-        "name": "fk_right_parent_product_id"
+        "indexName": "fk_right_parent_product_id"
       },
       {
         "type": "DROP INDEX",
-        "name": "fk_left_parent_product_id"
+        "indexName": "fk_left_parent_product_id"
       }
     ]
   },
@@ -7179,7 +7292,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "catalog_abb_ibfk_1"
+        "symbol": "catalog_abb_ibfk_1"
       }
     ]
   },
@@ -7193,7 +7306,7 @@
       },
       {
         "type": "DROP INDEX",
-        "name": "parent_product_id"
+        "indexName": "parent_product_id"
       }
     ]
   },
@@ -7203,11 +7316,11 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "cart_ibfk_3"
+        "symbol": "cart_ibfk_3"
       },
       {
         "type": "DROP FOREIGN KEY",
-        "name": "cart_ibfk_2"
+        "symbol": "cart_ibfk_2"
       }
     ]
   },
@@ -7225,11 +7338,11 @@
       },
       {
         "type": "DROP INDEX",
-        "name": "right_parent_product_id"
+        "indexName": "right_parent_product_id"
       },
       {
         "type": "DROP INDEX",
-        "name": "left_parent_product_id"
+        "indexName": "left_parent_product_id"
       }
     ]
   },
@@ -7368,15 +7481,19 @@
     "tblName": "orders",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "abb_order_no",
-        "after": "distributor_order_no",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "abb_order_no",
+        "newColName": "distributor_order_no",
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -8487,7 +8604,8 @@
     "tblName": "messages",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "sms_from",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -8506,7 +8624,8 @@
     "tblName": "messages",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "sms_to",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(32)",
@@ -9058,16 +9177,19 @@
     "tblName": "admins",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "is_suspended",
-        "after": "is_deleted",
-        "columnType": "TINYINT()",
-        "attrs": [
-          "NOT NULL",
-          {
-            "DEFAULT": 0
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "is_suspended",
+        "newColName": "is_deleted",
+        "definition": {
+          "dataType": "TINYINT(1)",
+          "nullable": false,
+          "defaultValue": 0,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -10007,16 +10129,19 @@
     "tblName": "audit_log",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "data",
-        "after": "data",
-        "columnType": "JSON",
-        "attrs": [
-          "NULL",
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "data",
+        "newColName": "data",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -10025,13 +10150,19 @@
     "tblName": "audit_log",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "subject",
-        "after": "subject",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "subject",
+        "newColName": "subject",
+        "definition": {
+          "dataType": "VARCHAR(600)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -10084,15 +10215,19 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "admin_id",
-        "after": "md_admin_id",
-        "columnType": "INT",
-        "attrs": [
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "admin_id",
+        "newColName": "md_admin_id",
+        "definition": {
+          "dataType": "INT",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -10101,15 +10236,19 @@
     "tblName": "md_licenses",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "admin_id",
-        "after": "md_admin_id",
-        "columnType": "INT",
-        "attrs": [
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "admin_id",
+        "newColName": "md_admin_id",
+        "definition": {
+          "dataType": "INT",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -10260,7 +10399,8 @@
     "tblName": "users",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "email",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(254)",
@@ -12035,7 +12175,8 @@
     "tblName": "productsv2",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "lens_type",
         "after": null,
         "definition": {
           "dataType": "TEXT",
@@ -12527,7 +12668,8 @@
     "tblName": "detect_sessions",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "request_count",
         "after": null,
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -12540,7 +12682,8 @@
         }
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "undetected_count",
         "after": null,
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -12553,7 +12696,8 @@
         }
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "error_count",
         "after": null,
         "definition": {
           "dataType": "SMALLINT UNSIGNED",
@@ -13526,7 +13670,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "addresses_ibfk_1"
+        "symbol": "addresses_ibfk_1"
       }
     ]
   },
@@ -13536,7 +13680,7 @@
     "changes": [
       {
         "type": "DROP INDEX",
-        "name": "constr_addresses_user_id_label"
+        "indexName": "constr_addresses_user_id_label"
       }
     ]
   },
@@ -13589,7 +13733,8 @@
     "tblName": "user_attribution_adjust",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "network_name",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -13602,7 +13747,8 @@
         }
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "campaign_name",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -13615,7 +13761,8 @@
         }
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "adgroup_name",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -13628,7 +13775,8 @@
         }
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "creative_name",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(128)",
@@ -14478,18 +14626,34 @@
     "tblName": "mailing_list",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "state",
-        "after": "qualify_state",
-        "columnType": "VARCHAR()",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "state",
+        "newColName": "qualify_state",
+        "definition": {
+          "dataType": "VARCHAR(2)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       },
       {
-        "type": "CHANGE",
-        "before": "last_exam_date",
-        "after": "qualify_last_exam_date",
-        "columnType": "DATE",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "last_exam_date",
+        "newColName": "qualify_last_exam_date",
+        "definition": {
+          "dataType": "DATE",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -14847,7 +15011,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "exams_ibfk_2"
+        "symbol": "exams_ibfk_2"
       }
     ]
   },
@@ -14856,8 +15020,8 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "DROP KEY",
-        "name": "md_id"
+        "type": "DROP INDEX",
+        "indexName": "md_id"
       }
     ]
   },
@@ -14877,7 +15041,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "md_licenses_ibfk_1"
+        "symbol": "md_licenses_ibfk_1"
       }
     ]
   },
@@ -14886,8 +15050,8 @@
     "tblName": "md_licenses",
     "changes": [
       {
-        "type": "DROP KEY",
-        "name": "md_id"
+        "type": "DROP INDEX",
+        "indexName": "md_id"
       }
     ]
   },
@@ -14911,11 +15075,19 @@
     "tblName": "reward_rules",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "branch_id",
-        "after": "promo_code",
-        "columnType": "VARCHAR()",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "branch_id",
+        "newColName": "promo_code",
+        "definition": {
+          "dataType": "VARCHAR(64)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -14924,7 +15096,8 @@
     "tblName": "video_detection_segments",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "mean_distance",
         "after": null,
         "definition": {
           "dataType": "DECIMAL(4, 2)",
@@ -16067,15 +16240,19 @@
     "tblName": "user_attribution_adjust",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "idfa",
-        "after": "idfa",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "idfa",
+        "newColName": "idfa",
+        "definition": {
+          "dataType": "VARCHAR(45)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -16158,11 +16335,19 @@
     "tblName": "exams",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "pass_verif_optom",
-        "after": "passive_verification_optom",
-        "columnType": "JSON",
-        "attrs": []
+        "type": "CHANGE COLUMN",
+        "oldColName": "pass_verif_optom",
+        "newColName": "passive_verification_optom",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -18652,14 +18837,15 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "refer_a_friend_ibfk_1"
+        "symbol": "refer_a_friend_ibfk_1"
       },
       {
         "type": "DROP FOREIGN KEY",
-        "name": "refer_a_friend_ibfk_2"
+        "symbol": "refer_a_friend_ibfk_2"
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "referree_user_id",
         "after": null,
         "definition": {
           "dataType": "INT(11)",
@@ -18672,7 +18858,8 @@
         }
       },
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "referrer_user_id",
         "after": null,
         "definition": {
           "dataType": "INT(11)",
@@ -18737,7 +18924,8 @@
     "tblName": "optom_business_hours",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "time_open",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -18756,7 +18944,8 @@
     "tblName": "optom_business_hours",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "time_closed",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(64)",
@@ -18780,7 +18969,8 @@
     "tblName": "rx_verification_transitions",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "date_created",
         "after": null,
         "definition": {
           "dataType": "TIMESTAMP",
@@ -19111,7 +19301,7 @@
     "changes": [
       {
         "type": "DROP FOREIGN KEY",
-        "name": "fk_note"
+        "symbol": "fk_note"
       }
     ]
   },
@@ -19150,8 +19340,8 @@
     "tblName": "optoms",
     "changes": [
       {
-        "type": "DROP KEY",
-        "name": "fulltext_search"
+        "type": "DROP INDEX",
+        "indexName": "fulltext_search"
       }
     ]
   },
@@ -19616,13 +19806,19 @@
     "tblName": "partner_tokens",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "jwt_token",
-        "after": "jwt_token",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "jwt_token",
+        "newColName": "jwt_token",
+        "definition": {
+          "dataType": "VARCHAR(512)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -19631,13 +19827,19 @@
     "tblName": "partners",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "name",
-        "after": "name",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "name",
+        "newColName": "name",
+        "definition": {
+          "dataType": "VARCHAR(255)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -19646,16 +19848,19 @@
     "tblName": "partner_secrets",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "secret",
-        "after": "secret",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL",
-          {
-            "COMMENT": "Random value"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "secret",
+        "newColName": "secret",
+        "definition": {
+          "dataType": "VARCHAR(64)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -21686,13 +21891,19 @@
     "tblName": "partners",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "theme",
-        "after": "theme",
-        "columnType": "VARCHAR()",
-        "attrs": [
-          "NOT NULL"
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "theme",
+        "newColName": "theme",
+        "definition": {
+          "dataType": "VARCHAR(16)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -21876,15 +22087,19 @@
     "tblName": "rx_patients",
     "changes": [
       {
-        "type": "CHANGE",
-        "before": "scratchpad",
-        "after": "scratchpad",
-        "columnType": "JSON",
-        "attrs": [
-          {
-            "DEFAULT": "NULL"
-          }
-        ]
+        "type": "CHANGE COLUMN",
+        "oldColName": "scratchpad",
+        "newColName": "scratchpad",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
       }
     ]
   },
@@ -21913,7 +22128,8 @@
     "tblName": "shipping_options",
     "changes": [
       {
-        "type": "CHANGE",
+        "type": "MODIFY COLUMN",
+        "colName": "affiliate_id",
         "after": null,
         "definition": {
           "dataType": "VARCHAR(8)",

@@ -4,7 +4,7 @@ statementTypes
   = CreateTable
   / CreateIndex
   / RenameTable
-  / alterTable
+  / AlterTable
   / DropTable
   / DropIndex
   / select
@@ -121,19 +121,20 @@ CreateIndex
 // ALTER TABLE
 // ====================================================
 
-alterTable = ALTER TABLE tblName:identifier changes:changeList {
-  return {
-    type: 'ALTER TABLE',
-    tblName,
-    changes
+AlterTable
+  = ALTER TABLE tblName:identifier changes:AlterSpecs {
+    return {
+      type: 'ALTER TABLE',
+      tblName,
+      changes
+    }
   }
-}
 
-changeList
-  = first:change COMMA rest:changeList { return [first, ...rest] }
-  / only:change { return [only] }
+AlterSpecs
+  = first:AlterSpec COMMA rest:AlterSpecs { return [first, ...rest] }
+  / only:AlterSpec { return [only] }
 
-change
+AlterSpec
   = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
     after:( AFTER after:identifier { return after } )? {
       return {
@@ -186,42 +187,49 @@ change
         reference,
       }
     }
-  / DROP INDEX name:identifier { return { type: 'DROP INDEX', name }}
-  / DROP COLUMN? colName:identifier {
-      return {
-        type: 'DROP COLUMN',
-        colName,
-      }
-    }
-  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
-  / DROP KEY name:identifier { return { type: 'DROP KEY', name }}
-  / CHANGE COLUMN? _ before:identifier _ after:identifier _ columnType:columnType _ attrs:columnAttrs* {
-      return {
-        type: 'CHANGE',
-        before,
-        after,
-        columnType,
-        attrs
-      }
-    }
-  / MODIFY COLUMN? name:identifier definition:ColumnDefinition
-    after:( AFTER after:identifier { return after } )? {
-      return {
-        type: 'CHANGE',
-        after,
-        definition,
-      }
-    }
+  // / ALGORITHM
   / ALTER COLUMN? tblName:identifier DROP DEFAULT {
       return {
         type: 'DROP DEFAULT',
         tblName,
       }
     }
-  / DROP FOREIGN KEY name:identifier {
+  / CHANGE COLUMN? oldColName:identifier newColName:identifier definition:ColumnDefinition
+    after:( AFTER after:identifier { return after } )? {
+      return {
+        type: 'CHANGE COLUMN',
+        oldColName,
+        newColName,
+        definition,
+        after,
+      }
+    }
+  / DROP COLUMN? colName:identifier {
+      return {
+        type: 'DROP COLUMN',
+        colName,
+      }
+    }
+  / DROP (INDEX / KEY) indexName:identifier {
+      return {
+        type: 'DROP INDEX',
+        indexName,
+      }
+    }
+  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
+  / DROP FOREIGN KEY symbol:identifier {
       return {
         type: 'DROP FOREIGN KEY',
-        name
+        symbol,
+      }
+    }
+  / MODIFY COLUMN? colName:identifier definition:ColumnDefinition
+    after:( AFTER after:identifier { return after } )? {
+      return {
+        type: 'MODIFY COLUMN',
+        colName,
+        after,
+        definition,
       }
     }
 
