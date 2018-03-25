@@ -5,8 +5,8 @@ statementTypes
   / createIndex
   / RenameTable
   / alterTable
-  / dropTable
-  / dropIndex
+  / DropTable
+  / DropIndex
   / select
   / insert
   / delete
@@ -81,24 +81,26 @@ RenameTable2
 // ====================================================
 // Drop Index
 // ====================================================
-dropIndex = 'DROP INDEX'i _ name:identifier _ 'ON' _ tableName:identifier {
+DropIndex = DROP INDEX indexName:identifier ON tblName:identifier {
   return {
     type: 'DROP INDEX',
-    name,
-    tableName
+    indexName,
+    tblName
   }
 }
 
 // ====================================================
 // Drop Table
 // ====================================================
-dropTable = 'DROP TABLE'i ifExists:' IF EXISTS'i? _ tableName:identifier {
-  return {
-    type: 'DROP TABLE',
-    tableName,
-    ifExists: !!ifExists,
+
+DropTable
+  = DROP TABLE ifExists:(IF EXISTS)? tblName:identifier {
+    return {
+      type: 'DROP TABLE',
+      tblName,
+      ifExists: !!ifExists,
+    }
   }
-}
 
 // ====================================================
 // Create Index

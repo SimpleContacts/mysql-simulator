@@ -49,7 +49,7 @@ function main() {
       db = addTable(db, table);
       log(chalk.green(`CREATE TABLE ${expr.tblName}`));
     } else if (expr.type === 'DROP TABLE') {
-      db = removeTable(db, expr.tableName, expr.ifExists);
+      db = removeTable(db, expr.tblName, expr.ifExists);
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.tblName, expr.newName);
     } else {

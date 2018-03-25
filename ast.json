@@ -4587,17 +4587,17 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "md_licenses",
+    "tblName": "md_licenses",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "pcs",
+    "tblName": "pcs",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "pc_addresses",
+    "tblName": "pc_addresses",
     "ifExists": true
   },
   {
@@ -5014,7 +5014,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "cart",
+    "tblName": "cart",
     "ifExists": true
   },
   {
@@ -5762,7 +5762,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "scripts",
+    "tblName": "scripts",
     "ifExists": false
   },
   {
@@ -5787,37 +5787,37 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "auto_renewals",
+    "tblName": "auto_renewals",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "exam_videos",
+    "tblName": "exam_videos",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "order_logs",
+    "tblName": "order_logs",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "auto_renewals",
+    "tblName": "auto_renewals",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "sessions",
+    "tblName": "sessions",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "user_icloud_tokens",
+    "tblName": "user_icloud_tokens",
     "ifExists": true
   },
   {
     "type": "DROP TABLE",
-    "tableName": "options",
+    "tblName": "options",
     "ifExists": false
   },
   {
@@ -6013,7 +6013,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "sms",
+    "tblName": "sms",
     "ifExists": true
   },
   {
@@ -6145,12 +6145,12 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "sms",
+    "tblName": "sms",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "messages",
+    "tblName": "messages",
     "ifExists": true
   },
   {
@@ -7060,7 +7060,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "virtual_supplies",
+    "tblName": "virtual_supplies",
     "ifExists": false
   },
   {
@@ -7095,12 +7095,12 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "orders_labels_xref",
+    "tblName": "orders_labels_xref",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "labels",
+    "tblName": "labels",
     "ifExists": false
   },
   {
@@ -7211,12 +7211,12 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "parent_products",
+    "tblName": "parent_products",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "products",
+    "tblName": "products",
     "ifExists": false
   },
   {
@@ -10580,8 +10580,8 @@
   },
   {
     "type": "DROP INDEX",
-    "name": "deeplinks_url_idx",
-    "tableName": "deeplinks"
+    "indexName": "deeplinks_url_idx",
+    "tblName": "deeplinks"
   },
   {
     "type": "CREATE INDEX",
@@ -14718,27 +14718,27 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "catalog_abb",
+    "tblName": "catalog_abb",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "exam_costs",
+    "tblName": "exam_costs",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "messages",
+    "tblName": "messages",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "distributor_skus",
+    "tblName": "distributor_skus",
     "ifExists": false
   },
   {
     "type": "DROP TABLE",
-    "tableName": "catalog_ntl_lens",
+    "tblName": "catalog_ntl_lens",
     "ifExists": false
   },
   {
@@ -14803,7 +14803,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "mds",
+    "tblName": "mds",
     "ifExists": false
   },
   {
@@ -16292,7 +16292,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "user_device_ad_ids_legacy",
+    "tblName": "user_device_ad_ids_legacy",
     "ifExists": false
   },
   {
@@ -19567,7 +19567,7 @@
   },
   {
     "type": "DROP TABLE",
-    "tableName": "partner_tokens",
+    "tblName": "partner_tokens",
     "ifExists": false
   },
   {

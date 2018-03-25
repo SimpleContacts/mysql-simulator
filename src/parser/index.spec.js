@@ -18,6 +18,7 @@ describe('Read documentation', () => {
         ifNotExists: false,
         definitions: [
           {
+            type: 'COLUMN',
             colName: 'id',
             definition: {
               dataType: 'INT',
@@ -30,6 +31,7 @@ describe('Read documentation', () => {
             },
           },
           {
+            type: 'COLUMN',
             colName: 'date_created',
             definition: {
               dataType: 'TIMESTAMP',
@@ -42,6 +44,7 @@ describe('Read documentation', () => {
             },
           },
           {
+            type: 'COLUMN',
             colName: 'name',
             definition: {
               dataType: 'VARCHAR(128)',
@@ -54,6 +57,7 @@ describe('Read documentation', () => {
             },
           },
           {
+            type: 'COLUMN',
             colName: 'email',
             definition: {
               dataType: 'VARCHAR(64)',
@@ -92,6 +96,7 @@ describe('Read documentation', () => {
         ifNotExists: false,
         definitions: [
           {
+            type: 'COLUMN',
             colName: 'id',
             definition: {
               dataType: 'INT(11)',
@@ -104,6 +109,7 @@ describe('Read documentation', () => {
             },
           },
           {
+            type: 'COLUMN',
             colName: 'user_id',
             definition: {
               dataType: 'INT',
@@ -116,6 +122,7 @@ describe('Read documentation', () => {
             },
           },
           {
+            type: 'COLUMN',
             colName: 'date_created',
             definition: {
               dataType: 'TIMESTAMP',
@@ -128,6 +135,7 @@ describe('Read documentation', () => {
             },
           },
           {
+            type: 'COLUMN',
             colName: 'text',
             definition: {
               dataType: 'VARCHAR(32)',
