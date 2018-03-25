@@ -43,6 +43,10 @@ number "number literal"
 string "string literal"
   = "'" value:[^']* "'" { return value.join('') }
 
+StringList
+  = first:string COMMA rest:StringList { return [first, ...rest] }
+  / only:string { return [only] }
+
 constant
   = null
   / boolean
@@ -405,7 +409,9 @@ DataType
   / precisionDataType
   / type:textDataType ignore:(COLLATE CollationName)? { return type }
   / JSON
-  / ENUM LPAREN values:ValueList RPAREN
+  / ENUM LPAREN values:StringList RPAREN {
+      return `ENUM(${values.map(JSON.stringify).join(', ')})`;
+    }
 
 IndexColNames
   = first:IndexColName COMMA rest:IndexColNames { return [first].concat(rest) }

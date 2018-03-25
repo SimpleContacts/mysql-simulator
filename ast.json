@@ -16842,24 +16842,7 @@
         "type": "ADD COLUMN",
         "colName": "lens_type",
         "definition": {
-          "dataType": [
-            "ENUM",
-            [
-              null,
-              "(",
-              null
-            ],
-            [
-              "daily",
-              "weekly",
-              "monthly"
-            ],
-            [
-              null,
-              ")",
-              null
-            ]
-          ],
+          "dataType": "ENUM(\"daily\", \"weekly\", \"monthly\")",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -21332,23 +21315,7 @@
         "type": "COLUMN",
         "colName": "direction",
         "definition": {
-          "dataType": [
-            "ENUM",
-            [
-              null,
-              "(",
-              null
-            ],
-            [
-              "INBOUND",
-              "OUTBOUND"
-            ],
-            [
-              null,
-              ")",
-              null
-            ]
-          ],
+          "dataType": "ENUM(\"INBOUND\", \"OUTBOUND\")",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
