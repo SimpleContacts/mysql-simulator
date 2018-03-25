@@ -2,7 +2,7 @@
 
 import chalk from 'chalk';
 
-import ast from '../example.ast.json';
+import ast from '../ast.json';
 import { addTable, emptyDb, removeTable, renameTable } from './db';
 import type { Database, Table } from './types';
 

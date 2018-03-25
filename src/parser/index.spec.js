@@ -225,7 +225,7 @@ describe('Read documentation', () => {
   });
 
   it('Can parse our full example file', () => {
-    const sql = read(`${__dirname}/test.sql`).toString();
+    const sql = read(`${__dirname}/../../input.sql`).toString();
     const result = parse(sql);
     expect(result.length).toBe(506); // 506 statements in there!
   });

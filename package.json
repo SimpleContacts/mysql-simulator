@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "main": "dist/index.js",
   "scripts": {
+    "lint": "eslint src",
     "test": "eslint src && jest src",
     "tdd": "jest src --watch"
   },
