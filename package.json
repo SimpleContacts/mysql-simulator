@@ -4,8 +4,9 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src",
-    "test": "eslint src && jest src",
-    "tdd": "jest src --watch"
+    "parse": "bin/parse-sql < input.sql > ast.json",
+    "tdd": "jest src --watch",
+    "test": "eslint src && jest src"
   },
   "jest": {
     "moduleFileExtensions": [
