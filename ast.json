@@ -4025,13 +4025,21 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_logs_user_id_subject_idx",
-    "tableName": "user_logs",
-    "columns": [
-      "user_id",
-      "subject"
+    "indexName": "user_logs_user_id_subject_idx",
+    "tblName": "user_logs",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "subject",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -4119,13 +4127,21 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "order_logs_order_id_subject_idx",
-    "tableName": "order_logs",
-    "columns": [
-      "order_id",
-      "subject"
+    "indexName": "order_logs_order_id_subject_idx",
+    "tblName": "order_logs",
+    "indexColNames": [
+      {
+        "colName": "order_id",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "subject",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE TABLE",
@@ -4193,13 +4209,21 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "exam_logs_exam_id_subject_idx",
-    "tableName": "exam_logs",
-    "columns": [
-      "exam_id",
-      "subject"
+    "indexName": "exam_logs_exam_id_subject_idx",
+    "tblName": "exam_logs",
+    "indexColNames": [
+      {
+        "colName": "exam_id",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "subject",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -9239,21 +9263,29 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "wallet_user_id_idx",
-    "tableName": "wallet_transactions",
-    "columns": [
-      "user_id"
+    "indexName": "wallet_user_id_idx",
+    "tblName": "wallet_transactions",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "wallet_order_id_idx",
-    "tableName": "wallet_transactions",
-    "columns": [
-      "order_id"
+    "indexName": "wallet_order_id_idx",
+    "tblName": "wallet_transactions",
+    "indexColNames": [
+      {
+        "colName": "order_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE TABLE",
@@ -9425,12 +9457,16 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "reward_rules_branch_id_idx",
-    "tableName": "reward_rules",
-    "columns": [
-      "branch_id"
+    "indexName": "reward_rules_branch_id_idx",
+    "tblName": "reward_rules",
+    "indexColNames": [
+      {
+        "colName": "branch_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": "UNIQUE"
+    "unique": true
   },
   {
     "type": "CREATE TABLE",
@@ -9585,12 +9621,16 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "deeplinks_url_idx",
-    "tableName": "deeplinks",
-    "columns": [
-      "url"
+    "indexName": "deeplinks_url_idx",
+    "tblName": "deeplinks",
+    "indexColNames": [
+      {
+        "colName": "url",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE TABLE",
@@ -9706,12 +9746,16 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "deeplinks_hits_user_id_idx",
-    "tableName": "deeplink_hits",
-    "columns": [
-      "user_id"
+    "indexName": "deeplinks_hits_user_id_idx",
+    "tblName": "deeplink_hits",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -9934,21 +9978,29 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "refer_a_friend_referree_user_id_idx",
-    "tableName": "refer_a_friend",
-    "columns": [
-      "referree_user_id"
+    "indexName": "refer_a_friend_referree_user_id_idx",
+    "tblName": "refer_a_friend",
+    "indexColNames": [
+      {
+        "colName": "referree_user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "refer_a_friend_referrer_user_id_idx",
-    "tableName": "refer_a_friend",
-    "columns": [
-      "referrer_user_id"
+    "indexName": "refer_a_friend_referrer_user_id_idx",
+    "tblName": "refer_a_friend",
+    "indexColNames": [
+      {
+        "colName": "referrer_user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -10518,13 +10570,21 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "v2_messages_user_id_date_sent_idx",
-    "tableName": "v2_messages",
-    "columns": [
-      "user_id",
-      "date_sent"
+    "indexName": "v2_messages_user_id_date_sent_idx",
+    "tblName": "v2_messages",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "date_sent",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -10585,12 +10645,16 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "deeplinks_url_idx",
-    "tableName": "deeplinks",
-    "columns": [
-      "url"
+    "indexName": "deeplinks_url_idx",
+    "tblName": "deeplinks",
+    "indexColNames": [
+      {
+        "colName": "url",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": "UNIQUE"
+    "unique": true
   },
   {
     "type": "CREATE TABLE",
@@ -11162,32 +11226,52 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "drip_schedule_messages_xref_idx",
-    "tableName": "drip_schedule_messages_xref",
-    "columns": [
-      "drip_schedule_id",
-      "drip_message_id"
+    "indexName": "drip_schedule_messages_xref_idx",
+    "tblName": "drip_schedule_messages_xref",
+    "indexColNames": [
+      {
+        "colName": "drip_schedule_id",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "drip_message_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "dnd_user_id_date_expiry_idx",
-    "tableName": "do_not_disturb",
-    "columns": [
-      "user_id",
-      "date_expiry"
+    "indexName": "dnd_user_id_date_expiry_idx",
+    "tblName": "do_not_disturb",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "date_expiry",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "drip_reorder_options_user_id_idx",
-    "tableName": "drip_reorder_options",
-    "columns": [
-      "user_id"
+    "indexName": "drip_reorder_options_user_id_idx",
+    "tblName": "drip_reorder_options",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE TABLE",
@@ -12236,12 +12320,16 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_auth_password_reset_tokens_token_idx",
-    "tableName": "user_auth_password_reset_tokens",
-    "columns": [
-      "token"
+    "indexName": "user_auth_password_reset_tokens_token_idx",
+    "tblName": "user_auth_password_reset_tokens",
+    "indexColNames": [
+      {
+        "colName": "token",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": "UNIQUE"
+    "unique": true
   },
   {
     "type": "CREATE TABLE",
@@ -12829,12 +12917,16 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "advertising_attribution_user_id_idx",
-    "tableName": "advertising_attribution",
-    "columns": [
-      "user_id"
+    "indexName": "advertising_attribution_user_id_idx",
+    "tblName": "advertising_attribution",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -14594,13 +14686,21 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "subject_date_created_idx",
-    "tableName": "audit_log",
-    "columns": [
-      "subject",
-      "date_created"
+    "indexName": "subject_date_created_idx",
+    "tblName": "audit_log",
+    "indexColNames": [
+      {
+        "colName": "subject",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "date_created",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -18085,39 +18185,55 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_attribution_adjust_idfa_idx",
-    "tableName": "user_attribution_adjust",
-    "columns": [
-      "idfa"
+    "indexName": "user_attribution_adjust_idfa_idx",
+    "tblName": "user_attribution_adjust",
+    "indexColNames": [
+      {
+        "colName": "idfa",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_attribution_adjust_adid_idx",
-    "tableName": "user_attribution_adjust",
-    "columns": [
-      "adid"
+    "indexName": "user_attribution_adjust_adid_idx",
+    "tblName": "user_attribution_adjust",
+    "indexColNames": [
+      {
+        "colName": "adid",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_attribution_adjust_gps_adid_idx",
-    "tableName": "user_attribution_adjust",
-    "columns": [
-      "gps_adid"
+    "indexName": "user_attribution_adjust_gps_adid_idx",
+    "tblName": "user_attribution_adjust",
+    "indexColNames": [
+      {
+        "colName": "gps_adid",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_device_ad_ids_user_id_idx",
-    "tableName": "user_device_ad_ids",
-    "columns": [
-      "user_id"
+    "indexName": "user_device_ad_ids_user_id_idx",
+    "tblName": "user_device_ad_ids",
+    "indexColNames": [
+      {
+        "colName": "user_id",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",
@@ -18921,21 +19037,29 @@
   },
   {
     "type": "CREATE INDEX",
-    "name": "user_logs_date_created_idx",
-    "tableName": "user_logs",
-    "columns": [
-      "date_created"
+    "indexName": "user_logs_date_created_idx",
+    "tblName": "user_logs",
+    "indexColNames": [
+      {
+        "colName": "date_created",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "CREATE INDEX",
-    "name": "iterable_batch_logs_batch_end_idx",
-    "tableName": "iterable_batch_logs",
-    "columns": [
-      "batch_end"
+    "indexName": "iterable_batch_logs_batch_end_idx",
+    "tblName": "iterable_batch_logs",
+    "indexColNames": [
+      {
+        "colName": "batch_end",
+        "len": null,
+        "direction": null
+      }
     ],
-    "unique": null
+    "unique": false
   },
   {
     "type": "ALTER TABLE",

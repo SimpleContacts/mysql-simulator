@@ -2,7 +2,7 @@ start = s:statement* { return s.filter(Boolean); }
 statement = _ s:statementTypes ';'? _ { return s; }
 statementTypes
   = CreateTable
-  / createIndex
+  / CreateIndex
   / RenameTable
   / alterTable
   / DropTable
@@ -105,14 +105,15 @@ DropTable
 // ====================================================
 // Create Index
 // ====================================================
-createIndex =
-  CREATE unique:UNIQUE? INDEX name:identifier ON tableName:identifier LPAREN columns:identifierList RPAREN {
+
+CreateIndex
+  = CREATE unique:UNIQUE? INDEX indexName:identifier ON tblName:identifier LPAREN indexColNames:IndexColNames RPAREN {
     return {
       type: 'CREATE INDEX',
-      name,
-      tableName,
-      columns,
-      unique
+      indexName,
+      tblName,
+      indexColNames,
+      unique: !!unique,
     }
   }
 
