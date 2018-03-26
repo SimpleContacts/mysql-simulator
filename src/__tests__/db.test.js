@@ -12,7 +12,7 @@ describe('mutates db state', () => {
   it('create table', () => {
     const table = { name: 'foo', columns: {}, foreignKeys: {} };
     expect(addTable(db, table)).toEqual({
-      tables: { foo: { name: 'foo' } },
+      tables: { foo: { name: 'foo', columns: {}, foreignKeys: {} } },
     });
   });
 });

@@ -160,6 +160,7 @@ AlterSpec
       return {
         type: 'ADD PRIMARY KEY',
         constraint,
+        indexType,
         indexColNames,
       }
     }
@@ -186,8 +187,9 @@ AlterSpec
     reference:ReferenceDefinition {
       return {
         type: 'ADD FOREIGN KEY',
-        indexName,
         constraint,
+        indexName,
+        indexColNames,
         reference,
       }
     }
@@ -300,6 +302,7 @@ CreateDefinition
     UNIQUE (INDEX / KEY)? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'UNIQUE INDEX',
+        constraint,
         indexName,
         indexColNames,
       }
@@ -309,6 +312,7 @@ CreateDefinition
     FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
       return {
         type: 'FOREIGN KEY',
+        constraint,
         indexName,
         indexColNames,
         reference,

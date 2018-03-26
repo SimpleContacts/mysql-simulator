@@ -149,6 +149,7 @@ describe('Read documentation', () => {
           },
           {
             type: 'FOREIGN KEY',
+            constraint: null,
             indexName: null,
             indexColNames: [
               {
@@ -185,7 +186,7 @@ describe('Read documentation', () => {
     expect(
       parse(`ALTER TABLE products
         DROP COLUMN name,
-        DROP COLUMN \`brand\`,
+        DROP \`brand\`,
         ADD COLUMN \`foobar\` INT,
         ADD FOREIGN KEY (product_id) REFERENCES products(id);`),
     ).toEqual([
@@ -213,6 +214,13 @@ describe('Read documentation', () => {
             type: 'ADD FOREIGN KEY',
             constraint: null,
             indexName: null,
+            indexColNames: [
+              {
+                colName: 'product_id',
+                direction: null,
+                len: null,
+              },
+            ],
             reference: {
               tblName: 'products',
               indexColNames: [

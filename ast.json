@@ -108,6 +108,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -183,6 +184,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -284,6 +286,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -774,6 +777,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -798,6 +802,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -930,6 +935,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "to_version",
         "indexColNames": [
           {
@@ -1223,8 +1229,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_parent_product_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "parent_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "products",
           "indexColNames": [
@@ -1364,6 +1377,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -1557,6 +1571,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -1658,6 +1673,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -1733,6 +1749,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -1852,6 +1869,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -1928,8 +1946,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "parent_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "parent_products",
           "indexColNames": [
@@ -2004,6 +2029,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -2113,6 +2139,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -2137,6 +2164,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -2265,8 +2293,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "md_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "mds",
           "indexColNames": [
@@ -2283,8 +2318,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "script_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "scripts",
           "indexColNames": [
@@ -2472,6 +2514,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -3155,6 +3198,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -3610,8 +3654,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_user_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "users",
           "indexColNames": [
@@ -3745,6 +3796,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -4323,8 +4375,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_visual_acuity_test_video_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "visual_acuity_test_video_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "uploaded_videos",
           "indexColNames": [
@@ -4347,8 +4406,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_redness_test_video_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "redness_test_video_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "uploaded_videos",
           "indexColNames": [
@@ -4493,8 +4559,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "exams_ibfk_3",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "script_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "scripts",
           "indexColNames": [
@@ -4587,8 +4660,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "exams_users_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "users",
           "indexColNames": [
@@ -4811,6 +4891,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -5002,6 +5083,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -5253,6 +5335,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -5277,6 +5360,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -5301,6 +5385,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -5533,8 +5618,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_left_parent_product_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "left_parent_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "parent_products",
           "indexColNames": [
@@ -5557,8 +5649,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_right_parent_product_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "right_parent_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "parent_products",
           "indexColNames": [
@@ -5601,8 +5700,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_exam_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "exam_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "exams",
           "indexColNames": [
@@ -5753,8 +5859,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_user_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "users",
           "indexColNames": [
@@ -6017,6 +6130,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -6077,6 +6191,7 @@
       {
         "type": "ADD PRIMARY KEY",
         "constraint": null,
+        "indexType": null,
         "indexColNames": [
           {
             "colName": "id",
@@ -6219,6 +6334,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -6395,6 +6511,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -7635,6 +7752,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -7846,6 +7964,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -7985,6 +8104,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -8009,6 +8129,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -8033,6 +8154,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -8121,6 +8243,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -8569,6 +8692,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -8916,8 +9040,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_brands_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "brand_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "brands",
           "indexColNames": [
@@ -9020,8 +9151,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "admin_id_fk01",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "admin_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "admins",
           "indexColNames": [
@@ -9064,8 +9202,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "admin_id_fk02",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "admin_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "admins",
           "indexColNames": [
@@ -9329,6 +9474,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -9353,6 +9499,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -9687,6 +9834,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -9711,6 +9859,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -9812,6 +9961,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -9836,6 +9986,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -9996,6 +10147,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -10020,6 +10172,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -10044,6 +10197,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -10068,6 +10222,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -10192,8 +10347,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "admin_id_fk03",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "admin_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "admins",
           "indexColNames": [
@@ -10654,6 +10816,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -10678,6 +10841,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -10760,8 +10924,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "reward_rule_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "reward_rules",
           "indexColNames": [
@@ -10880,6 +11051,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11109,6 +11281,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11133,6 +11306,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11286,6 +11460,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11310,6 +11485,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11334,6 +11510,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11510,6 +11687,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11534,6 +11712,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -11821,6 +12000,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -12100,6 +12280,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -12216,8 +12397,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "messages_drip_schedule_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "drip_schedule_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "drip_schedule",
           "indexColNames": [
@@ -12328,6 +12516,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -12429,6 +12618,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -12569,8 +12759,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "shipping_option_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "shipping_options",
           "indexColNames": [
@@ -12607,8 +12804,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "shipping_option_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "shipping_options",
           "indexColNames": [
@@ -12645,8 +12849,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "shipping_option_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "shipping_options",
           "indexColNames": [
@@ -12815,6 +13026,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13029,6 +13241,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13098,8 +13311,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "preferred_address_id_fk01",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "preferred_address_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "addresses",
           "indexColNames": [
@@ -13284,6 +13504,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13308,6 +13529,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13332,6 +13554,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13356,6 +13579,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13380,6 +13604,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13404,6 +13629,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13428,6 +13654,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -13524,8 +13751,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "order_id_fk01",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "order_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "orders",
           "indexColNames": [
@@ -13548,8 +13782,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "exam_id_fk01",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "exam_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "exams",
           "indexColNames": [
@@ -13646,8 +13887,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "preferred_address_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "addresses",
           "indexColNames": [
@@ -14214,6 +14462,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -14238,6 +14487,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -14405,6 +14655,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -14429,6 +14680,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -14479,8 +14731,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "left_lens_distributor_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "distributors",
           "indexColNames": [
@@ -14511,8 +14770,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "right_lens_distributor_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "distributors",
           "indexColNames": [
@@ -14543,8 +14809,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "left_lens_upc",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "lens_variations",
           "indexColNames": [
@@ -14575,8 +14848,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "right_lens_upc",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "lens_variations",
           "indexColNames": [
@@ -14767,6 +15047,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -15151,8 +15432,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "dx_shipping_option_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "shipping_options",
           "indexColNames": [
@@ -15341,8 +15629,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "dx_shipping_option_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "shipping_options",
           "indexColNames": [
@@ -16132,6 +16427,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -16199,8 +16495,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_left_lens",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "left_lens_distributor_order_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "distributor_orders",
           "indexColNames": [
@@ -16217,8 +16520,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_right_lens",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "right_lens_distributor_order_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "distributor_orders",
           "indexColNames": [
@@ -16764,6 +17074,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -17091,6 +17402,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -17296,6 +17608,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_assigned_admin",
         "indexName": null,
         "indexColNames": [
           {
@@ -17320,6 +17633,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_assigner_admin",
         "indexName": null,
         "indexColNames": [
           {
@@ -17447,6 +17761,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_task",
         "indexName": null,
         "indexColNames": [
           {
@@ -17471,6 +17786,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_order",
         "indexName": null,
         "indexColNames": [
           {
@@ -17495,6 +17811,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_note",
         "indexName": null,
         "indexColNames": [
           {
@@ -17519,6 +17836,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_message",
         "indexName": null,
         "indexColNames": [
           {
@@ -17543,6 +17861,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "fk_exam",
         "indexName": null,
         "indexColNames": [
           {
@@ -17599,8 +17918,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_claimed",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "claimed_by_admin_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "admins",
           "indexColNames": [
@@ -17683,8 +18009,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_sc_notes",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "order_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "orders",
           "indexColNames": [
@@ -18236,8 +18569,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_tasks_user_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "users",
           "indexColNames": [
@@ -18512,6 +18852,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -18626,6 +18967,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": null,
         "indexColNames": [
           {
@@ -18682,8 +19024,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_exams_rx_verification_optom_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "rx_verification_optom_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "optoms",
           "indexColNames": [
@@ -18778,8 +19127,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_referree_reward_rule_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "referree_reward_rule_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "reward_rules",
           "indexColNames": [
@@ -18796,8 +19152,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_referrer_reward_rule_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "referrer_reward_rule_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "reward_rules",
           "indexColNames": [
@@ -18856,8 +19219,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_referree_user_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "referree_user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "users",
           "indexColNames": [
@@ -18874,8 +19244,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_referrer_user_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "referrer_user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "users",
           "indexColNames": [
@@ -19021,8 +19398,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_exams_optom_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "optom_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "optoms",
           "indexColNames": [
@@ -19166,8 +19550,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_v2_left_product",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "v2_left_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "productsv2",
           "indexColNames": [
@@ -19190,8 +19581,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_v2_right_product",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "v2_right_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "productsv2",
           "indexColNames": [
@@ -19260,8 +19658,15 @@
     "changes": [
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fk_notes_to_task_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "task_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "tasks",
           "indexColNames": [
@@ -19498,6 +19903,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "email",
         "indexColNames": [
           {
@@ -19516,6 +19922,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "partner_users_ibfk_1",
         "indexName": null,
         "indexColNames": [
           {
@@ -19632,6 +20039,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "secret",
         "indexColNames": [
           {
@@ -19650,6 +20058,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "partner_secrets_ibfk_1",
         "indexName": null,
         "indexColNames": [
           {
@@ -19740,6 +20149,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "jwt_token",
         "indexColNames": [
           {
@@ -19758,6 +20168,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "partner_tokens_ibfk_2",
         "indexName": null,
         "indexColNames": [
           {
@@ -20133,6 +20544,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": "fk_lens_id",
         "indexColNames": [
           {
@@ -20157,6 +20569,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": "fk_price_overlay_id",
         "indexColNames": [
           {
@@ -20181,6 +20594,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "unique_date_lens_price_overlay_qty",
         "indexColNames": [
           {
@@ -20284,6 +20698,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": "fk_user_id",
         "indexColNames": [
           {
@@ -20308,6 +20723,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": null,
         "indexName": "fk_price_overlay_id",
         "indexColNames": [
           {
@@ -20332,6 +20748,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "unique_user_price_overlay",
         "indexColNames": [
           {
@@ -20470,6 +20887,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "partner_uuid",
         "indexColNames": [
           {
@@ -20486,6 +20904,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "partner_identities_ibfk_1",
         "indexName": null,
         "indexColNames": [
           {
@@ -20765,6 +21184,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "unique_promo_code",
         "indexColNames": [
           {
@@ -20940,6 +21360,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "promo_reward_id_ibfk",
         "indexName": null,
         "indexColNames": [
           {
@@ -20964,6 +21385,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "user_held_promo_reward_ibfk",
         "indexName": null,
         "indexColNames": [
           {
@@ -20988,6 +21410,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "applied_to_order_id_ibfk_1",
         "indexName": null,
         "indexColNames": [
           {
@@ -21150,6 +21573,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "user_held_px_reward_ibfk",
         "indexName": null,
         "indexColNames": [
           {
@@ -21174,6 +21598,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "given_by_admin_id_ibfk",
         "indexName": null,
         "indexColNames": [
           {
@@ -21198,6 +21623,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "applied_to_order_id_ibfk_2",
         "indexName": null,
         "indexColNames": [
           {
@@ -21437,6 +21863,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "faxes_task_fk",
         "indexName": null,
         "indexColNames": [
           {
@@ -21461,6 +21888,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "faxes_optom_fk",
         "indexName": null,
         "indexColNames": [
           {
@@ -21541,8 +21969,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fax_verification_response_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "fax_verification_response_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "faxes",
           "indexColNames": [
@@ -21559,8 +21994,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": "fax_verification_request_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "fax_verification_request_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "faxes",
           "indexColNames": [
@@ -21720,6 +22162,7 @@
       },
       {
         "type": "UNIQUE INDEX",
+        "constraint": null,
         "indexName": "token",
         "indexColNames": [
           {
@@ -21745,6 +22188,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "rx_requests_ibfk_1",
         "indexName": null,
         "indexColNames": [
           {
@@ -21769,6 +22213,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "rx_requests_ibfk_2",
         "indexName": null,
         "indexColNames": [
           {
@@ -21815,8 +22260,15 @@
       },
       {
         "type": "ADD FOREIGN KEY",
-        "indexName": null,
         "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "parent_task_id",
+            "len": null,
+            "direction": null
+          }
+        ],
         "reference": {
           "tblName": "tasks",
           "indexColNames": [
@@ -22023,6 +22475,7 @@
       },
       {
         "type": "FOREIGN KEY",
+        "constraint": "rx_patients_ibfk_1",
         "indexName": null,
         "indexColNames": [
           {
