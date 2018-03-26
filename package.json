@@ -24,6 +24,7 @@
     "@simple-contacts/eslint-config": "^0.1.6",
     "@simple-contacts/sc-scripts": "^0.4.11",
     "flow-bin": "^0.68.0",
+    "flow-typed": "^2.4.0",
     "import-sort-cli": "^4.2.0",
     "import-sort-parser-babylon": "^4.2.0",
     "import-sort-style-eslint": "^4.2.0",
