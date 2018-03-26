@@ -5,13 +5,32 @@ import { sortBy } from 'lodash';
 
 // $FlowFixMe
 import ast from '../ast.json';
-import { addTable, emptyDb, removeTable, renameTable } from './db';
-import type { Database, Table } from './types';
+import {
+  addColumn,
+  addTable,
+  emptyDb,
+  removeColumn,
+  removeTable,
+  renameTable,
+  replaceColumn,
+} from './db';
+import type { Column, Database, Table } from './types';
 
 // eslint-disable-next-line no-console
 const log = console.log;
 // eslint-disable-next-line no-console
 const error = console.error;
+
+function makeColumn(colName, definition): Column {
+  const nullable = !definition.nullable;
+  const defaultValue = definition.defaultValue;
+  return {
+    name: colName,
+    type: definition.dataType,
+    nullable,
+    defaultValue,
+  };
+}
 
 function makeTable(table): Table {
   const columns = table.definitions.filter(def => def.type === 'COLUMN');
@@ -20,20 +39,9 @@ function makeTable(table): Table {
   );
   return {
     name: table.tblName,
-    columns: columns.map(col => {
-      const nullable = !col.definition.nullable;
-      const defaultValue = col.definition.defaultValue;
-      return {
-        name: col.colName,
-        type: col.definition.dataType,
-        nullable,
-        defaultValue,
-      };
-    }),
+    columns: columns.map(def => makeColumn(def.colName, def.definition)),
     foreignKeys: foreignKeys.map(fk => {
-      // eslint-disable-next-line no-shadow
       const columns = fk.indexColNames.map(def => def.colName);
-      log({ fk });
       const reference = {
         table: fk.reference.tblName,
         columns: fk.reference.indexColNames.map(def => def.colName),
@@ -77,9 +85,32 @@ function main() {
     if (expr.type === 'CREATE TABLE') {
       const table = makeTable(expr);
       db = addTable(db, table);
-      log(chalk.green(`CREATE TABLE ${expr.tblName}`));
+      // log(chalk.green(`CREATE TABLE ${expr.tblName}`));
+    } else if (expr.type === 'CREATE TABLE LIKE') {
+      const oldTable = db.tables[expr.oldTblName];
+      const newTable = { ...oldTable, name: expr.tblName };
+      db = addTable(db, newTable);
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tblName, expr.ifExists);
+    } else if (expr.type === 'ALTER TABLE') {
+      for (const change of expr.changes) {
+        if (change.type === 'RENAME TABLE') {
+          db = renameTable(db, expr.tblName, change.newTblName);
+        } else if (change.type === 'ADD COLUMN') {
+          const column = makeColumn(change.colName, change.definition);
+          db = addColumn(db, expr.tblName, column);
+        } else if (change.type === 'CHANGE COLUMN') {
+          const column = makeColumn(change.newColName, change.definition);
+          db = replaceColumn(db, expr.tblName, change.oldColName, column);
+        } else if (change.type === 'DROP COLUMN') {
+          db = removeColumn(db, expr.tblName, change.colName);
+        } else {
+          error(
+            chalk.yellow(`Unknown change type: ${change.type}`),
+            chalk.gray(JSON.stringify(change, null, 2)),
+          );
+        }
+      }
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.tblName, expr.newName);
     } else {

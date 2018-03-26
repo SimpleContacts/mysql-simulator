@@ -65,10 +65,46 @@ export function renameTable(db: Database, from: string, to: string): Database {
 /**
  * Adds a new column to a table
  */
-export function addColumn(table: Table, column: Column): Table {
-  return produce(table, $ => {
-    const name = column.name;
-    // eslint-disable-next-line
-    $.columns[name] = column;
+export function addColumn(
+  db: Database,
+  tblName: string,
+  column: Column,
+): Database {
+  return produce(db, $ => {
+    const table = $.tables[tblName];
+    if (!table) {
+      throw new Error(`Table "${tblName}" does not exists`);
+    }
+    table.columns[column.name] = column; // TODO: Should be error if already exists!
+  });
+}
+
+/**
+ * Replaces a column by a new definition
+ */
+export function replaceColumn(
+  db: Database,
+  tblName: string,
+  colName: string,
+  column: Column,
+): Database {
+  return produce(db, $ => {
+    const table = $.tables[tblName];
+    delete table.columns[colName]; // TODO: Should error if not exists!
+    table.columns[column.name] = column;
+  });
+}
+
+/**
+ * Removes a column from a table
+ */
+export function removeColumn(
+  db: Database,
+  tblName: string,
+  colName: string,
+): Database {
+  return produce(db, $ => {
+    const table = $.tables[tblName];
+    delete table.columns[colName]; // TODO: Should error if not exists!
   });
 }

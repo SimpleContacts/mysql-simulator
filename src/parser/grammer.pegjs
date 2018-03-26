@@ -53,26 +53,13 @@ constant
   / string
   / number
 
+
 // ====================================================
 // Rename table
 // ====================================================
 
 RenameTable
-  = RenameTable1
-  / RenameTable2
-
-RenameTable1
   = RENAME TABLE tblName:identifier TO newName:identifier
-    {
-      return {
-        type: 'RENAME TABLE',
-        tblName,
-        newName,
-      }
-    }
-
-RenameTable2
-  = ALTER TABLE tblName:identifier RENAME TO? newName:identifier
     {
       return {
         type: 'RENAME TABLE',
@@ -138,6 +125,9 @@ AlterSpecs
   = first:AlterSpec COMMA rest:AlterSpecs { return [first, ...rest] }
   / only:AlterSpec { return [only] }
 
+/**
+ * See https://dev.mysql.com/doc/refman/5.7/en/alter-table.html
+ */
 AlterSpec
   = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
     after:( AFTER after:identifier { return after } )? {
@@ -236,6 +226,19 @@ AlterSpec
         colName,
         after,
         definition,
+      }
+    }
+  / RENAME ( INDEX / KEY ) oldIndexName:identifier TO newIndexName:identifier {
+      return {
+        type: 'RENAME INDEX',
+        oldIndexName,
+        newIndexName,
+      }
+    }
+  / RENAME ( TO / AS )? newTblName:identifier {
+      return {
+        type: 'RENAME TABLE',
+        newTblName,
       }
     }
 
@@ -595,6 +598,7 @@ ACTION            = _ 'ACTION'i            !IdentifierStart _ { return 'ACTION' 
 ADD               = _ 'ADD'i               !IdentifierStart _ { return 'ADD' }
 AFTER             = _ 'AFTER'i             !IdentifierStart _ { return 'AFTER' }
 ALTER             = _ 'ALTER'i             !IdentifierStart _ { return 'ALTER' }
+AS                = _ 'AS'i                !IdentifierStart _ { return 'AS' }
 ASC               = _ 'ASC'i               !IdentifierStart _ { return 'ASC' }
 AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierStart _ { return 'AUTO_INCREMENT' }
 BIGINT            = _ 'BIGINT'i            !IdentifierStart _ { return 'BIGINT' }

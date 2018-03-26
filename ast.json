@@ -7318,14 +7318,24 @@
     "ifExists": false
   },
   {
-    "type": "RENAME TABLE",
+    "type": "ALTER TABLE",
     "tblName": "abb_product_catalog",
-    "newName": "catalog_abb"
+    "changes": [
+      {
+        "type": "RENAME TABLE",
+        "newTblName": "catalog_abb"
+      }
+    ]
   },
   {
-    "type": "RENAME TABLE",
+    "type": "ALTER TABLE",
     "tblName": "national_lens_product_catalog",
-    "newName": "catalog_national_lens"
+    "changes": [
+      {
+        "type": "RENAME TABLE",
+        "newTblName": "catalog_national_lens"
+      }
+    ]
   },
   {
     "type": "ALTER TABLE",
@@ -7824,9 +7834,14 @@
     ]
   },
   {
-    "type": "RENAME TABLE",
+    "type": "ALTER TABLE",
     "tblName": "catalog_national_lens",
-    "newName": "catalog_ntl_lens"
+    "changes": [
+      {
+        "type": "RENAME TABLE",
+        "newTblName": "catalog_ntl_lens"
+      }
+    ]
   },
   {
     "type": "CREATE TABLE",
@@ -16696,9 +16711,14 @@
     ]
   },
   {
-    "type": "RENAME TABLE",
+    "type": "ALTER TABLE",
     "tblName": "user_device_ad_ids",
-    "newName": "user_device_ad_ids_legacy"
+    "changes": [
+      {
+        "type": "RENAME TABLE",
+        "newTblName": "user_device_ad_ids_legacy"
+      }
+    ]
   },
   {
     "type": "CREATE TABLE",
@@ -18764,9 +18784,14 @@
     ]
   },
   {
-    "type": "RENAME TABLE",
+    "type": "ALTER TABLE",
     "tblName": "pv_optoms",
-    "newName": "optoms"
+    "changes": [
+      {
+        "type": "RENAME TABLE",
+        "newTblName": "optoms"
+      }
+    ]
   },
   {
     "type": "CREATE TABLE",
