@@ -2,11 +2,12 @@
   "name": "@simple-contacts/mysql-js",
   "version": "1.0.1",
   "main": "dist/index.js",
+  "license": "MIT",
   "scripts": {
     "lint": "eslint src",
     "tdd": "jest src --watch",
-    "test": "eslint src && jest src",
-
+    "test": "yarn run -s lint && yarn run -s flow && jest src",
+    "flow": "flow --include-warnings",
     "parse": "bin/parse-sql < input.sql > ast.json",
     "simulate": "babel-node src/runner.js",
     "all": "yarn parse && yarn simulate"
@@ -22,6 +23,7 @@
     "@simple-contacts/babel-preset-sc": "^1.0.0",
     "@simple-contacts/eslint-config": "^0.1.6",
     "@simple-contacts/sc-scripts": "^0.4.11",
+    "flow-bin": "^0.68.0",
     "import-sort-cli": "^4.2.0",
     "import-sort-parser-babylon": "^4.2.0",
     "import-sort-style-eslint": "^4.2.0",
