@@ -1,6 +1,7 @@
 // @flow
 
 import chalk from 'chalk';
+import { sortBy } from 'lodash';
 
 // $FlowFixMe
 import ast from '../ast.json';
@@ -47,16 +48,16 @@ function makeTable(table): Table {
 }
 
 function printDb(db: Database) {
-  for (const tableName of Object.keys(db.tables)) {
+  for (const tableName of sortBy(Object.keys(db.tables))) {
     const table = db.tables[tableName];
     log('');
     log(chalk.blue(`${table.name}`));
     log(chalk.blue('-'.repeat(table.name.length)));
-    for (const name of Object.keys(table.columns)) {
+    for (const name of sortBy(Object.keys(table.columns))) {
       const col = table.columns[name];
       log(`  ${chalk.magenta(col.name)} ${chalk.gray(col.type)}`);
     }
-    for (const name of Object.keys(table.foreignKeys)) {
+    for (const name of sortBy(Object.keys(table.foreignKeys))) {
       const fk = table.foreignKeys[name];
       log(
         chalk.yellow(
