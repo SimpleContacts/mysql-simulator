@@ -243,6 +243,6 @@ describe('Read documentation', () => {
   it('Can parse our full example file', () => {
     const sql = read(`${__dirname}/../../input.sql`).toString();
     const result = parse(sql);
-    expect(result.length).toBe(506); // 506 statements in there!
+    expect(result.length).toBe(514); // 514 statements in there!
   });
 });

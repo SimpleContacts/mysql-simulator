@@ -22592,5 +22592,186 @@
         "after": "scratchpad"
       }
     ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "distributor_orders",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "pack",
+        "definition": {
+          "dataType": "VARCHAR(20)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      },
+      {
+        "type": "ADD COLUMN",
+        "colName": "tshirt",
+        "definition": {
+          "dataType": "VARCHAR(5)",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_requests",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "target_skus",
+        "newColName": "target_product_ids",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "CREATE TABLE LIKE",
+    "tblName": "user_reattribution_adjust",
+    "oldTblName": "user_attribution_adjust",
+    "ifNotExists": null
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_patients",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "left_product_id",
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": "fulfillment"
+      },
+      {
+        "type": "ADD COLUMN",
+        "colName": "right_product_id",
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": "left_rx"
+      },
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "left_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "lenses",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      },
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "right_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "lenses",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "RENAME TABLE",
+    "tblName": "rx_requests",
+    "newName": "rx_orders"
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_patients",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "rx_request_id",
+        "newColName": "rx_order_id",
+        "definition": {
+          "dataType": "INT(11) UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "RENAME TABLE",
+    "tblName": "rx_patients",
+    "newName": "rx_requests"
+  },
+  {
+    "type": "RENAME TABLE",
+    "tblName": "partner_users",
+    "newName": "partner_portal_users"
   }
 ]

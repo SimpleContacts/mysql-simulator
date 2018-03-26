@@ -2172,3 +2172,19 @@ ALTER TABLE shipping_options
 
 ALTER TABLE rx_patients DROP date_of_birth;
 ALTER TABLE rx_patients ADD fulfillment JSON NULL DEFAULT NULL AFTER scratchpad;
+
+ALTER TABLE distributor_orders
+  ADD COLUMN pack VARCHAR(20),
+  ADD COLUMN tshirt VARCHAR(5);
+ALTER TABLE rx_requests CHANGE target_skus target_product_ids JSON NOT NULL;
+CREATE TABLE user_reattribution_adjust LIKE user_attribution_adjust;
+ALTER TABLE rx_patients
+  ADD left_product_id INT(11) NULL DEFAULT NULL AFTER fulfillment,
+  ADD right_product_id INT(11) NULL DEFAULT NULL AFTER left_rx,
+  ADD FOREIGN KEY (left_product_id) REFERENCES lenses (id),
+  ADD FOREIGN KEY (right_product_id) REFERENCES lenses (id);
+RENAME TABLE rx_requests TO rx_orders;
+
+ALTER TABLE rx_patients CHANGE rx_request_id rx_order_id INT(11) UNSIGNED NOT NULL;
+RENAME TABLE rx_patients TO rx_requests;
+RENAME TABLE partner_users TO partner_portal_users;
