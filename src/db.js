@@ -23,7 +23,6 @@ export function addTable(db: Database, table: Table): Database {
 
   return produce(db, $ => {
     const name = table.name;
-    // eslint-disable-next-line
     $.tables[name] = table;
   });
 }
@@ -41,7 +40,6 @@ export function removeTable(
   }
 
   return produce(db, $ => {
-    // eslint-disable-next-line
     delete $.tables[name];
   });
 }
@@ -59,9 +57,7 @@ export function renameTable(db: Database, from: string, to: string): Database {
   }
 
   return produce(db, $ => {
-    // eslint-disable-next-line
     $.tables[to] = $.tables[from];
-    // eslint-disable-next-line
     delete $.tables[from];
   });
 }
