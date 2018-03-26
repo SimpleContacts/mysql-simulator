@@ -5,6 +5,7 @@
 flow-typed/
 
 [ignore]
+*.json
 
 [options]
 

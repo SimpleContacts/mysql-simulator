@@ -2,6 +2,7 @@
 
 import chalk from 'chalk';
 
+// $FlowFixMe
 import ast from '../ast.json';
 import { addTable, emptyDb, removeTable, renameTable } from './db';
 import type { Database, Table } from './types';
@@ -13,7 +14,9 @@ const error = console.error;
 
 function makeTable(table): Table {
   const columns = table.definitions.filter(def => def.type === 'COLUMN');
-  const foreignKeys = table.definitions.filter(def => def.type === 'FOREIGN KEY');
+  const foreignKeys = table.definitions.filter(
+    def => def.type === 'FOREIGN KEY',
+  );
   return {
     name: table.tblName,
     columns: columns.map(col => {
@@ -26,25 +29,42 @@ function makeTable(table): Table {
         defaultValue,
       };
     }),
-    foreignKeys,
+    foreignKeys: foreignKeys.map(fk => {
+      // eslint-disable-next-line no-shadow
+      const columns = fk.indexColNames.map(def => def.colName);
+      log({ fk });
+      const reference = {
+        table: fk.reference.tblName,
+        columns: fk.reference.indexColNames.map(def => def.colName),
+      };
+      return {
+        name: fk.name,
+        columns,
+        reference,
+      };
+    }),
   };
 }
 
 function printDb(db: Database) {
-  for (const table of Object.values(db.tables)) {
+  for (const tableName of Object.keys(db.tables)) {
+    const table = db.tables[tableName];
     log('');
     log(chalk.blue(`${table.name}`));
     log(chalk.blue('-'.repeat(table.name.length)));
-    for (const col of table.columns) {
+    for (const name of Object.keys(table.columns)) {
+      const col = table.columns[name];
       log(`  ${chalk.magenta(col.name)} ${chalk.gray(col.type)}`);
     }
-    for (const fk of table.foreignKeys) {
-      const fields = fk.indexColNames.map(def => def.colName).join(', ');
-      const targetFields = fk.reference.indexColNames
-        .map(def => def.colName)
-        .join(', ');
-      const target = `${fk.reference.tblName} (${targetFields})`;
-      log(chalk.yellow(`  ${fields} => ${target}`));
+    for (const name of Object.keys(table.foreignKeys)) {
+      const fk = table.foreignKeys[name];
+      log(
+        chalk.yellow(
+          `  ${fk.name || '(unnamed)'}: ${fk.columns.join(', ')} => ${
+            fk.reference.table
+          } (${fk.reference.columns.join(', ')})`,
+        ),
+      );
     }
   }
 }
@@ -52,7 +72,6 @@ function printDb(db: Database) {
 function main() {
   let db: Database = emptyDb();
 
-  // eslint-disable-next-line
   for (const expr of ast) {
     if (expr.type === 'CREATE TABLE') {
       const table = makeTable(expr);
