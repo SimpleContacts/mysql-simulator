@@ -1,8 +1,14 @@
-start = s:statement* { return s.filter(Boolean); }
-statement = _ s:statementTypes ';'? _ { return s; }
-statementTypes
+start = StatementList
+
+StatementList
+  = first:Statement SEMICOLON* rest:StatementList { return [first, ...rest] }
+  / only:Statement SEMICOLON? { return [only] }
+
+Statement
   = CreateTable
   / CreateIndex
+  / CreateTrigger
+  / CreateFunction
   / RenameTable
   / AlterTable
   / DropTable
@@ -12,6 +18,16 @@ statementTypes
   / delete
   / update
   / set
+  / CompoundStatement
+  / IfStatement
+
+CompoundStatement
+  = BEGIN statements:StatementList END {
+    return {
+      type: 'BEGIN ... END',
+      statements,
+    }
+  }
 
 comment = _ comment:(singleComment / singleDashComment / multiComment) _ {return comment }
 singleComment = '//' p:([^\n]*) { return { type: 'comment', commentType: 'single', raw: p.join('').trim() }; }
@@ -24,6 +40,16 @@ update = 'UPDATE'i [^;]* { return null; }
 insert = 'INSERT'i [^;]* { return null; }
 delete = 'DELETE'i [^;]* { return null; }
 set = 'SET 'i [^;]* { return null; }
+IfStatement = IF condition:Expression THEN body:StatementList END IF { return null; }
+
+Expression
+  = NOT expr:Expression { return null }
+  / LPAREN expr:Expression RPAREN { return null }
+  / identifier { return null }
+  / left:Thing '<=>' right:Thing { return null }
+
+Thing
+  = ( NEW / OLD ) '.' identifier { return null }
 
 
 // ====================================================
@@ -107,6 +133,50 @@ CreateIndex
       unique: !!unique,
     }
   }
+
+// ====================================================
+// Create Trigger
+// ====================================================
+
+CreateTrigger
+  = CREATE TRIGGER triggerName:identifier
+    ( BEFORE / AFTER )
+    ( INSERT / UPDATE / DELETE )
+    ON tblName:identifier FOR EACH ROW ( ( FOLLOWS / PRECEDES ) otherTrigger:identifier )?
+    triggerBody:Statement {
+    return {
+      type: 'CREATE TRIGGER',
+      triggerName,
+      tblName,
+    }
+  }
+
+// ====================================================
+// Create Function
+// ====================================================
+
+FunctionParamList
+  = first:FunctionParam COMMA rest:FunctionParamList { return [first, ...rest] }
+  / only:FunctionParam { return [only] }
+
+FunctionParam
+  = paramName:identifier type:DataType { return { paramName, type } }
+
+CreateFunction
+  = CREATE FUNCTION spName:identifier
+    params:( LPAREN params:FunctionParamList RPAREN { return params })
+    RETURNS DataType
+    characteristic:CreateFunctionCharacteristic
+    body:Statement {
+    return {
+      type: 'CREATE TRIGGER',
+      triggerName,
+      tblName,
+    }
+  }
+
+CreateFunctionCharacteristic
+  = NOT? DETERMINISTIC
 
 // ====================================================
 // ALTER TABLE
@@ -601,6 +671,8 @@ ALTER             = _ 'ALTER'i             !IdentifierStart _ { return 'ALTER' }
 AS                = _ 'AS'i                !IdentifierStart _ { return 'AS' }
 ASC               = _ 'ASC'i               !IdentifierStart _ { return 'ASC' }
 AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierStart _ { return 'AUTO_INCREMENT' }
+BEFORE            = _ 'BEFORE'i            !IdentifierStart _ { return 'BEFORE' }
+BEGIN             = _ 'BEGIN'i             !IdentifierStart _ { return 'BEGIN' }
 BIGINT            = _ 'BIGINT'i            !IdentifierStart _ { return 'BIGINT' }
 BINARY            = _ 'BINARY'i            !IdentifierStart _ { return 'BINARY' }
 BOOLEAN           = _ 'BOOLEAN'i           !IdentifierStart _ { return 'BOOLEAN' }
@@ -622,19 +694,26 @@ DECIMAL           = _ 'DECIMAL'i           !IdentifierStart _ { return 'DECIMAL'
 DEFAULT           = _ 'DEFAULT'i           !IdentifierStart _ { return 'DEFAULT' }
 DELETE            = _ 'DELETE'i            !IdentifierStart _ { return 'DELETE' }
 DESC              = _ 'DESC'i              !IdentifierStart _ { return 'DESC' }
+DETERMINISTIC     = _ 'DETERMINISTIC'i     !IdentifierStart _ { return 'DETERMINISTIC' }
 DOUBLE            = _ 'DOUBLE'i            !IdentifierStart _ { return 'DOUBLE' }
 DROP              = _ 'DROP'i              !IdentifierStart _ { return 'DROP' }
+EACH              = _ 'EACH'i              !IdentifierStart _ { return 'EACH' }
+END               = _ 'END'i               !IdentifierStart _ { return 'END' }
 ENGINE            = _ 'ENGINE'i            !IdentifierStart _ { return 'ENGINE' }
 ENUM              = _ 'ENUM'i              !IdentifierStart _ { return 'ENUM' }
 EXISTS            = _ 'EXISTS'i            !IdentifierStart _ { return 'EXISTS' }
 FALSE             = _ 'FALSE'i             !IdentifierStart _ { return 'FALSE' }
 FLOAT             = _ 'FLOAT'i             !IdentifierStart _ { return 'FLOAT' }
+FOLLOWS           = _ 'FOLLOWS'i           !IdentifierStart _ { return 'FOLLOWS' }
+FOR               = _ 'FOR'i               !IdentifierStart _ { return 'FOR' }
 FOREIGN           = _ 'FOREIGN'i           !IdentifierStart _ { return 'FOREIGN' }
 FULL              = _ 'FULL'i              !IdentifierStart _ { return 'FULL' }
 FULLTEXT          = _ 'FULLTEXT'i          !IdentifierStart _ { return 'FULLTEXT' }
+FUNCTION          = _ 'FUNCTION'i          !IdentifierStart _ { return 'FUNCTION' }
 HASH              = _ 'HASH'i              !IdentifierStart _ { return 'HASH' }
 IF                = _ 'IF'i                !IdentifierStart _ { return 'IF' }
 INDEX             = _ 'INDEX'i             !IdentifierStart _ { return 'INDEX' }
+INSERT            = _ 'INSERT'i            !IdentifierStart _ { return 'INSERT' }
 INT               = _ 'INT'i               !IdentifierStart _ { return 'INT' }
 INTEGER           = _ 'INTEGER'i           !IdentifierStart _ { return 'INTEGER' }
 JSON              = _ 'JSON'i              !IdentifierStart _ { return 'JSON' }
@@ -643,27 +722,34 @@ LIKE              = _ 'LIKE'i              !IdentifierStart _ { return 'LIKE' }
 MATCH             = _ 'MATCH'i             !IdentifierStart _ { return 'MATCH' }
 MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierStart _ { return 'MEDIUMINT' }
 MODIFY            = _ 'MODIFY'i            !IdentifierStart _ { return 'MODIFY' }
+NEW               = _ 'NEW'i               !IdentifierStart _ { return 'NEW' }
 NO                = _ 'NO'i                !IdentifierStart _ { return 'NO' }
 NOT               = _ 'NOT'i               !IdentifierStart _ { return 'NOT' }
 NOW               = _ 'NOW'i               !IdentifierStart _ { return 'NOW' }
 NULL              = _ 'NULL'i              !IdentifierStart _ { return 'NULL' }
 NUMERIC           = _ 'NUMERIC'i           !IdentifierStart _ { return 'NUMERIC' }
+OLD               = _ 'OLD'i               !IdentifierStart _ { return 'OLD' }
 ON                = _ 'ON'i                !IdentifierStart _ { return 'ON' }
 PARTIAL           = _ 'PARTIAL'i           !IdentifierStart _ { return 'PARTIAL' }
+PRECEDES          = _ 'PRECEDES'i          !IdentifierStart _ { return 'PRECEDES' }
 PRIMARY           = _ 'PRIMARY'i           !IdentifierStart _ { return 'PRIMARY' }
 REAL              = _ 'REAL'i              !IdentifierStart _ { return 'REAL' }
 REFERENCES        = _ 'REFERENCES'i        !IdentifierStart _ { return 'REFERENCES' }
 RENAME            = _ 'RENAME'i            !IdentifierStart _ { return 'RENAME' }
 RESTRICT          = _ 'RESTRICT'i          !IdentifierStart _ { return 'RESTRICT' }
+RETURNS           = _ 'RETURNS'i           !IdentifierStart _ { return 'RETURNS' }
+ROW               = _ 'ROW'i               !IdentifierStart _ { return 'ROW' }
 SET               = _ 'SET'i               !IdentifierStart _ { return 'SET' }
 SIMPLE            = _ 'SIMPLE'i            !IdentifierStart _ { return 'SIMPLE' }
 SMALLINT          = _ 'SMALLINT'i          !IdentifierStart _ { return 'SMALLINT' }
 TABLE             = _ 'TABLE'i             !IdentifierStart _ { return 'TABLE' }
 TEXT              = _ 'TEXT'i              !IdentifierStart _ { return 'TEXT' }
+THEN              = _ 'THEN'i              !IdentifierStart _ { return 'THEN' }
 TIME              = _ 'TIME'i              !IdentifierStart _ { return 'TIME' }
 TIMESTAMP         = _ 'TIMESTAMP'i         !IdentifierStart _ { return 'TIMESTAMP' }
 TINYINT           = _ 'TINYINT'i           !IdentifierStart _ { return 'TINYINT' }
 TO                = _ 'TO'i                !IdentifierStart _ { return 'TO' }
+TRIGGER           = _ 'TRIGGER'i           !IdentifierStart _ { return 'TRIGGER' }
 TRUE              = _ 'TRUE'i              !IdentifierStart _ { return 'TRUE' }
 UNIQUE            = _ 'UNIQUE'i            !IdentifierStart _ { return 'UNIQUE' }
 UNSIGNED          = _ 'UNSIGNED'i          !IdentifierStart _ { return 'UNSIGNED' }
@@ -679,7 +765,8 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 // Tokens
 // ====================================================
 
-COMMA  = _ ',' _
-EQ     = _ '=' _
-LPAREN = _ '(' _
-RPAREN = _ ')' _
+COMMA      = _ ',' _
+EQ         = _ '=' _
+LPAREN     = _ '(' _
+RPAREN     = _ ')' _
+SEMICOLON  = _ ';' _
