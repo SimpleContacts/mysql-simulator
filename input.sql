@@ -765,7 +765,26 @@ ALTER TABLE orders ADD COLUMN distributor_shipping_cost DECIMAL(13,2) DEFAULT 0;
 ALTER TABLE orders CHANGE abb_order_no distributor_order_no VARCHAR(128) DEFAULT NULL;
 ALTER TABLE orders ADD COLUMN date_status_modified DATETIME DEFAULT NULL;
 ALTER TABLE exams ADD COLUMN date_status_modified DATETIME DEFAULT NULL;
+CREATE
+    TRIGGER upd_order_date_status_modified BEFORE UPDATE
+    ON orders
+    FOR EACH ROW
+    BEGIN
+        IF NOT (NEW.status <=> OLD.status) THEN
+           SET NEW.date_status_modified = NOW();
+        END IF;
+    END;
 
+
+CREATE
+    TRIGGER upd_exam_date_status_modified BEFORE UPDATE
+    ON exams
+    FOR EACH ROW
+    BEGIN
+        IF NOT (NEW.status <=> OLD.status) THEN
+           SET NEW.date_status_modified = NOW();
+        END IF;
+    END;
 ALTER TABLE mds ADD COLUMN mobile_number VARCHAR(32) NULL;
 ALTER TABLE mds ADD COLUMN slack_username VARCHAR(64) NULL;
 CREATE TABLE rebates (
@@ -818,7 +837,45 @@ CREATE TABLE distributor_shipping_methods (
 
   FOREIGN KEY (distributor_id) REFERENCES distributors(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
+CREATE FUNCTION levenshtein( s1 VARCHAR(255), s2 VARCHAR(255) )
+RETURNS INT
+DETERMINISTIC
+BEGIN
+DECLARE s1_len, s2_len, i, j, c, c_temp, cost INT;
+DECLARE s1_char CHAR;
+-- max strlen=255
+DECLARE cv0, cv1 VARBINARY(256);
+SET s1_len = CHAR_LENGTH(s1), s2_len = CHAR_LENGTH(s2), cv1 = 0x00, j = 1, i = 1, c = 0;
+IF s1 = s2 THEN
+RETURN 0;
+ELSEIF s1_len = 0 THEN
+RETURN s2_len;
+ELSEIF s2_len = 0 THEN
+RETURN s1_len;
+ELSE
+WHILE j <= s2_len DO
+SET cv1 = CONCAT(cv1, UNHEX(HEX(j))), j = j + 1;
+END WHILE;
+WHILE i <= s1_len DO
+SET s1_char = SUBSTRING(s1, i, 1), c = i, cv0 = UNHEX(HEX(i)), j = 1;
+WHILE j <= s2_len DO
+SET c = c + 1;
+IF s1_char = SUBSTRING(s2, j, 1) THEN
+SET cost = 0; ELSE SET cost = 1;
+END IF;
+SET c_temp = CONV(HEX(SUBSTRING(cv1, j, 1)), 16, 10) + cost;
+IF c > c_temp THEN SET c = c_temp; END IF;
+SET c_temp = CONV(HEX(SUBSTRING(cv1, j+1, 1)), 16, 10) + 1;
+IF c > c_temp THEN
+SET c = c_temp;
+END IF;
+SET cv0 = CONCAT(cv0, UNHEX(HEX(c))), j = j + 1;
+END WHILE;
+SET cv1 = cv0, i = i + 1;
+END WHILE;
+END IF;
+RETURN c;
+END;
 ALTER TABLE orders ADD COLUMN is_rebate_sent TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE orders ADD COLUMN is_rebate_returned TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE orders ADD COLUMN is_rebate_mailed TINYINT(1) NOT NULL DEFAULT 0;
@@ -1185,7 +1242,7 @@ ALTER TABLE drip_schedule
   ADD UNIQUE replacement_schedule_send_interval_type_unique (
   replacement_schedule, send_interval, type);
 CREATE TABLE user_auth_passwords (
-  user_id INT NOT NULL PRIMARY KEY,
+  user_id INT PRIMARY KEY NOT NULL,
   date_modified TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
   password_hash BINARY(60) NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
@@ -1224,7 +1281,7 @@ ALTER TABLE detect_sessions
   MODIFY error_count SMALLINT UNSIGNED;
 ALTER TABLE users ADD COLUMN date_of_birth DATE DEFAULT NULL;
 CREATE TABLE subscriptions (
-  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   user_id INT NULL,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   name VARCHAR(200) NULL,
@@ -1340,7 +1397,7 @@ CREATE TABLE lens_variations (
 
   add_power VARCHAR(32) DEFAULT NULL,
 
-  dn VARCHAR(1) DEFAULT NULL,
+  dn VARCHAR(1) DEFAULT NULL, 
 
   num_lenses SMALLINT UNSIGNED NOT NULL,
 
@@ -1356,7 +1413,7 @@ CREATE TABLE lens_to_variation (
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (lens_variation_upc, lens_id),
-
+  
   FOREIGN KEY (lens_variation_upc) REFERENCES lens_variations (upc),
   FOREIGN KEY (lens_id) REFERENCES lenses (id),
 
@@ -1383,7 +1440,7 @@ CREATE TABLE distributor_lens_stock (
 
   FOREIGN KEY (distributor_id) REFERENCES distributors (id),
   FOREIGN KEY (lens_variation_upc) REFERENCES lens_variations (upc)
-
+  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 ALTER TABLE orders
@@ -1430,7 +1487,7 @@ CREATE TABLE video_detection_segments (
   cost DECIMAL(13,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
-INSERT INTO exam_costs
+INSERT INTO exam_costs 
   (date_created, cost)
 VALUES
   ('2000-01-01', '10.00'),
@@ -1452,10 +1509,10 @@ ALTER TABLE video_detection_segments
   ADD COLUMN undetected_count SMALLINT UNSIGNED NOT NULL;
 ALTER TABLE addresses
   ADD COLUMN is_deleted TINYINT NOT NULL DEFAULT 0;
-ALTER TABLE orders
+ALTER TABLE orders 
   ADD COLUMN is_auto_renew_purchase TINYINT(1) NOT NULL DEFAULT 0;
 
-ALTER TABLE users
+ALTER TABLE users 
   ADD COLUMN is_auto_renew_on TINYINT(1) NOT NULL DEFAULT 0;DROP TABLE catalog_abb;
 DROP TABLE exam_costs;
 DROP TABLE messages;
@@ -1469,7 +1526,7 @@ ALTER TABLE md_licenses DROP FOREIGN KEY md_licenses_ibfk_1;
 ALTER TABLE md_licenses DROP KEY md_id;
 ALTER TABLE md_licenses DROP COLUMN md_id;
 DROP TABLE mds;
-ALTER TABLE reward_rules
+ALTER TABLE reward_rules 
   CHANGE branch_id promo_code VARCHAR(64);
 /*
 * Migration 179
@@ -1526,7 +1583,7 @@ ALTER TABLE orders
   ADD COLUMN dx_shipping_option_id TINYINT(0) DEFAULT NULL,
   ADD FOREIGN KEY (dx_shipping_option_id) REFERENCES shipping_options(id),
   ADD COLUMN dx_tracking_number VARCHAR(256) DEFAULT NULL,
-  ADD COLUMN dx_tracking_number_url VARCHAR(256) DEFAULT NULL,
+  ADD COLUMN dx_tracking_number_url VARCHAR(256) DEFAULT NULL, 
   ADD COLUMN is_dx_shipping_confirm_sent TINYINT(0) NOT NULL DEFAULT 0;
 CREATE TABLE experimental_subscriptions (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -1680,7 +1737,7 @@ CREATE TABLE IF NOT EXISTS experiment_overrides (
     path VARCHAR(256) NOT NULL,
     override_choice INT NOT NULL,
     date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
+  
     PRIMARY KEY (user_id, path),
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -1755,7 +1812,7 @@ ADD CONSTRAINT fk_claimed
 FOREIGN KEY (claimed_by_admin_id)
 REFERENCES admins(id);
 ALTER TABLE notes ADD COLUMN order_id INT NULL;
-ALTER TABLE notes ADD COLUMN type VARCHAR(32) NULL DEFAULT 'MD_NOTE';
+ALTER TABLE notes ADD COLUMN type VARCHAR(32) DEFAULT 'MD_NOTE' NULL;
 ALTER TABLE notes ADD COLUMN data json DEFAULT NULL;
 ALTER TABLE notes ADD CONSTRAINT fk_sc_notes FOREIGN KEY (order_id) REFERENCES orders(id);
 ALTER TABLE tasks ADD COLUMN last_updated timestamp default now();
@@ -1792,7 +1849,7 @@ ALTER TABLE pv_optoms
     DROP COLUMN last_name,
     ADD COLUMN doctor_name VARCHAR(255);
 CREATE TABLE lens_options_cache (
-  lens_id INT NOT NULL PRIMARY KEY,
+  lens_id INT PRIMARY KEY NOT NULL,
   power VARCHAR(2048),
   bc VARCHAR(2048),
   dia VARCHAR(2048),
@@ -1836,7 +1893,7 @@ CREATE TABLE fsm_transitions (
   task_id INT NULL,
   to_state VARCHAR(64) NOT NULL,
   from_state VARCHAR(64) NULL,
-  date_created TIMESTAMP(6) NOT NULL default CURRENT_TIMESTAMP(6),
+  date_created TIMESTAMP(6) default CURRENT_TIMESTAMP(6) NOT NULL,
   type VARCHAR(64) NULL,
   CONSTRAINT FOREIGN KEY(task_id) REFERENCES tasks(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -1844,21 +1901,21 @@ CREATE TABLE fsm_transitions (
 ALTER TABLE exams ADD COLUMN rx_verification_optom_id INT;
 ALTER TABLE exams ADD CONSTRAINT fk_exams_rx_verification_optom_id
 FOREIGN KEY (rx_verification_optom_id) REFERENCES optoms(id);
-ALTER TABLE refer_a_friend
+ALTER TABLE refer_a_friend 
   ADD COLUMN referree_reward_rule_id INT DEFAULT NULL,
   ADD COLUMN referrer_reward_rule_id INT DEFAULT NULL,
   ADD COLUMN is_redeemed INT DEFAULT 0;
 
-ALTER TABLE refer_a_friend
+ALTER TABLE refer_a_friend 
   ADD CONSTRAINT unique_referree_user_id_referrer_reward_rule_id
     UNIQUE (referree_user_id, referrer_reward_rule_id);
 
-ALTER TABLE refer_a_friend
-  ADD CONSTRAINT fk_referree_reward_rule_id
-    FOREIGN KEY (referree_reward_rule_id)
+ALTER TABLE refer_a_friend 
+  ADD CONSTRAINT fk_referree_reward_rule_id 
+    FOREIGN KEY (referree_reward_rule_id) 
     REFERENCES reward_rules (id),
-  ADD CONSTRAINT fk_referrer_reward_rule_id
-    FOREIGN KEY (referrer_reward_rule_id)
+  ADD CONSTRAINT fk_referrer_reward_rule_id 
+    FOREIGN KEY (referrer_reward_rule_id) 
     REFERENCES reward_rules (id);
 
 ALTER TABLE refer_a_friend
@@ -1866,17 +1923,17 @@ ALTER TABLE refer_a_friend
   DROP FOREIGN KEY refer_a_friend_ibfk_2,
   MODIFY referree_user_id int(11) NOT NULL,
   MODIFY referrer_user_id int(11) NOT NULL,
-  ADD CONSTRAINT fk_referree_user_id
-    FOREIGN KEY (referree_user_id)
+  ADD CONSTRAINT fk_referree_user_id 
+    FOREIGN KEY (referree_user_id) 
     REFERENCES users (id),
-  ADD CONSTRAINT fk_referrer_user_id
-    FOREIGN KEY (referrer_user_id)
+  ADD CONSTRAINT fk_referrer_user_id 
+    FOREIGN KEY (referrer_user_id) 
     REFERENCES users (id);
 ALTER TABLE audit_log DROP COLUMN user;
 ALTER TABLE optom_business_hours MODIFY time_open VARCHAR(64) NULL;
 ALTER TABLE optom_business_hours MODIFY time_closed VARCHAR(64) NULL;
 RENAME TABLE fsm_transitions TO rx_verification_transitions;
-ALTER TABLE rx_verification_transitions MODIFY date_created TIMESTAMP NOT NULL default CURRENT_TIMESTAMP;
+ALTER TABLE rx_verification_transitions MODIFY date_created TIMESTAMP default CURRENT_TIMESTAMP NOT NULL;
 ALTER TABLE exams
   ADD COLUMN optom_id INT DEFAULT NULL,
   ADD COLUMN optom_receptionist_name VARCHAR(128) DEFAULT NULL,
@@ -1998,14 +2055,14 @@ CREATE TABLE prices (
   price_overlay_id INT NOT NULL,
   FOREIGN KEY fk_lens_id (lens_id) REFERENCES lenses (id),
   FOREIGN KEY fk_price_overlay_id (price_overlay_id) REFERENCES price_overlays (id),
-  UNIQUE KEY unique_date_lens_price_overlay_qty
+  UNIQUE KEY unique_date_lens_price_overlay_qty 
     (date_created, lens_id, price_overlay_id, min_quantity_threshold)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE TABLE users_price_overlays (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  date_expiration TIMESTAMP NULL,
+  date_expiration TIMESTAMP NULL, 
   user_id INT NOT NULL,
   price_overlay_id INT NOT NULL,
   FOREIGN KEY fk_user_id (user_id) REFERENCES users (id),
@@ -2017,7 +2074,7 @@ CREATE TABLE `partner_identities` (
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `date_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `partner_uuid` varchar(36) NOT NULL,
-  `external_id` varchar(36) NOT NULL COMMENT 'The ID of the user in the partners DB',
+  `external_id` varchar(36) NOT NULL COMMENT 'The ID of the user in the partner''s DB',
   `email` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `telephone` varchar(16) DEFAULT NULL,
@@ -2160,19 +2217,18 @@ CREATE TABLE `rx_patients` (
   CONSTRAINT `rx_patients_ibfk_1` FOREIGN KEY (`rx_request_id`) REFERENCES `rx_requests` (`id`)
 );
 ALTER TABLE rx_patients CHANGE scratchpad scratchpad JSON DEFAULT NULL;
-ALTER TABLE shipping_options
+ALTER TABLE shipping_options 
   ADD COLUMN `affiliate_id` varchar(8) DEFAULT NULL UNIQUE;
 
-UPDATE shipping_options
+UPDATE shipping_options 
 SET affiliate_id = right(md5(concat(id, label, cost, is_dx)), 8);
 
-ALTER TABLE shipping_options
+ALTER TABLE shipping_options 
   MODIFY COLUMN `affiliate_id` varchar(8) NOT NULL UNIQUE;
 
 
 ALTER TABLE rx_patients DROP date_of_birth;
 ALTER TABLE rx_patients ADD fulfillment JSON NULL DEFAULT NULL AFTER scratchpad;
-
 ALTER TABLE distributor_orders
   ADD COLUMN pack VARCHAR(20),
   ADD COLUMN tshirt VARCHAR(5);
@@ -2188,3 +2244,200 @@ RENAME TABLE rx_requests TO rx_orders;
 ALTER TABLE rx_patients CHANGE rx_request_id rx_order_id INT(11) UNSIGNED NOT NULL;
 RENAME TABLE rx_patients TO rx_requests;
 RENAME TABLE partner_users TO partner_portal_users;
+LOCK TABLES orders WRITE, exams WRITE;
+
+ALTER TABLE exams
+  DROP FOREIGN KEY `exams_users_fk`,
+  MODIFY `user_id` int(11) NOT NULL;
+
+ALTER TABLE exams
+  ADD CONSTRAINT `exams_users_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+ALTER TABLE exams
+  MODIFY `status` varchar(128) NOT NULL DEFAULT 'USER_INCOMPLETE';
+
+ALTER TABLE orders
+  DROP FOREIGN KEY `fk_user_id`,
+  MODIFY `user_id` int(11) NOT NULL;
+
+ALTER TABLE orders 
+  ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+UNLOCK TABLES;
+CREATE INDEX direction_is_acked_idx ON v2_messages(direction, is_acknowledged);
+-- Lets remove these foreign key reference lenses.
+ALTER TABLE orders DROP FOREIGN KEY `fk_v2_left_product`;
+ALTER TABLE orders DROP FOREIGN KEY `fk_v2_right_product`;
+
+-- Lets formalize that the lenses table is the replacement for the products table.
+-- This will make codegens and admin graphql use lenses table by default instead of
+-- products table.
+ALTER TABLE orders ADD FOREIGN KEY `fk_v2_left_product` (`v2_left_product_id`) REFERENCES `lenses` (`id`);
+ALTER TABLE orders ADD FOREIGN KEY `fk_v2_right_product` (`v2_right_product_id`) REFERENCES `lenses` (`id`);
+ALTER TABLE lenses ADD FOREIGN KEY `fk_brand_id` (`brand_id`) REFERENCES `brands` (`id`);
+LOCK TABLES deeplinks WRITE, refer_a_friend WRITE;
+
+-- Remove the deeplinks reward rule foreign key reference
+ALTER TABLE deeplinks
+  DROP FOREIGN KEY `deeplinks_ibfk_2`;
+
+-- Add columns that will reference held promos instead of wallet transactions
+ALTER TABLE refer_a_friend
+  ADD COLUMN `referree_held_promo_id` INT(11) DEFAULT NULL,
+  ADD COLUMN `referrer_held_promo_id` INT(11) DEFAULT NULL;
+
+ALTER TABLE refer_a_friend
+  ADD CONSTRAINT `refer_a_friend_ibfk_5`
+  FOREIGN KEY (`referree_held_promo_id`)
+  REFERENCES `held_promo_rewards` (`id`),
+  ADD CONSTRAINT `refer_a_friend_ibfk_6`
+  FOREIGN KEY (`referrer_held_promo_id`)
+  REFERENCES `held_promo_rewards` (`id`);
+
+UNLOCK TABLES;
+ALTER TABLE exams
+  ADD COLUMN photo_rx_state VARCHAR(16) DEFAULT NULL;
+UPDATE users
+  -- Populate fields with a short random string
+  SET affiliate_id = SUBSTR(UUID(), 1, 8)
+  WHERE affiliate_id IS NULL;
+
+ALTER TABLE users CHANGE affiliate_id affiliate_id VARCHAR(16) NOT NULL;
+RENAME TABLE partners TO partners_deprecated;
+
+CREATE TABLE partners (
+    id tinyint unsigned NOT NULL AUTO_INCREMENT,
+    public_uuid varchar(36) NOT NULL,
+    date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    name varchar(255) NOT NULL,
+    theme varchar(16) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY public_uuid (public_uuid)
+);
+
+-- Now make sure to inject the special "Simple Contacts" row, which we want to
+-- be partner #1
+INSERT
+  INTO partners (id, public_uuid, name, theme)
+  VALUES (1, 'ac85fcd8-9da9-4450-be57-d528bc7ac5e0', 'Simple Contacts', 'default');
+
+-- Now copy over all the data from the previous partners table
+INSERT
+  INTO partners (public_uuid, date_created, name, theme)
+  SELECT uuid, date_created, name, theme FROM partners_deprecated;
+--
+-- The purpose of this migration is to change the primary key of the `partners`
+-- table from a UUID string value to a standard/normal auto-incrementing
+-- numeric ID.  The "uuid" value will still be used as an alternative way to
+-- reference rows publicly.
+--
+--     Replace PK  `uuid`   =>  `id` (new)
+--     Rename      `uuid`   =>  `public_uuid`
+--
+-- All references to the `partner_uuid` in the following tables are going to be
+-- replaced by an integer-based reference to the new `id` PK:
+--   - partner_identities
+--   - partner_portal_users
+--   - partner_secrets
+--   - rx_orders
+--
+-- The steps are:
+-- 1. Add a new "partner_id" column to these referencing tables (NULL initially)
+-- 2. Run an UPDATE query that inserts the correct "partner_id" values
+-- 3. Add a NOT NULL constraint to the "partner_id" column
+-- 4. Remove the `partner_uuid` column
+--
+
+-- Step 1 (4x)
+ALTER TABLE partner_identities   ADD partner_id TINYINT UNSIGNED NULL AFTER partner_uuid;
+ALTER TABLE partner_portal_users ADD partner_id TINYINT UNSIGNED NULL AFTER partner_uuid;
+ALTER TABLE partner_secrets      ADD partner_id TINYINT UNSIGNED NULL AFTER partner_uuid;
+ALTER TABLE rx_orders            ADD partner_id TINYINT UNSIGNED NULL AFTER partner_uuid;
+
+ALTER TABLE partner_identities   ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+ALTER TABLE partner_portal_users ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+ALTER TABLE partner_secrets      ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+ALTER TABLE rx_orders            ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+
+-- Step 2 (4x)
+UPDATE partner_identities t      SET partner_id = (SELECT id FROM partners WHERE public_uuid = t.partner_uuid);
+UPDATE partner_portal_users t    SET partner_id = (SELECT id FROM partners WHERE public_uuid = t.partner_uuid);
+UPDATE partner_secrets t         SET partner_id = (SELECT id FROM partners WHERE public_uuid = t.partner_uuid);
+UPDATE rx_orders t               SET partner_id = (SELECT id FROM partners WHERE public_uuid = t.partner_uuid);
+
+-- Step 3 (4x)
+-- These failed on running a migration, moved them to a new migration to fix
+-- ALTER TABLE partner_identities   CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+-- ALTER TABLE partner_portal_users CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+-- ALTER TABLE partner_secrets      CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+-- ALTER TABLE rx_orders            CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+
+-- Step 4 (4x)
+ALTER TABLE partner_identities   DROP FOREIGN KEY partner_identities_ibfk_1;
+ALTER TABLE partner_portal_users DROP FOREIGN KEY partner_portal_users_ibfk_1;
+ALTER TABLE partner_secrets      DROP FOREIGN KEY partner_secrets_ibfk_1;
+ALTER TABLE rx_orders            DROP FOREIGN KEY rx_orders_ibfk_2;
+
+ALTER TABLE partner_identities   DROP partner_uuid;
+ALTER TABLE partner_portal_users DROP partner_uuid;
+ALTER TABLE partner_secrets      DROP partner_uuid;
+ALTER TABLE rx_orders            DROP partner_uuid;
+DROP TABLE partners_deprecated;
+ALTER TABLE partner_identities   DROP FOREIGN KEY partner_identities_ibfk_2;
+ALTER TABLE partner_portal_users DROP FOREIGN KEY partner_portal_users_ibfk_2;
+ALTER TABLE partner_secrets      DROP FOREIGN KEY partner_secrets_ibfk_2;
+ALTER TABLE rx_orders            DROP FOREIGN KEY rx_orders_ibfk_3;
+
+ALTER TABLE partner_identities   CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+ALTER TABLE partner_portal_users CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+ALTER TABLE partner_secrets      CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+ALTER TABLE rx_orders            CHANGE partner_id partner_id TINYINT UNSIGNED NOT NULL;
+
+ALTER TABLE partner_identities   ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+ALTER TABLE partner_portal_users ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+ALTER TABLE partner_secrets      ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+ALTER TABLE rx_orders            ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
+CREATE TABLE `productsv4` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type` enum('birth-control','contact-lens') NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `description` text NOT NULL,
+  `img_url` varchar(128) NOT NULL,
+  `num_items_per_pack` smallint(5) unsigned NOT NULL,
+  `price` decimal(13,2) DEFAULT '0.00',
+  `generic_of_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `generic_of_id` (`generic_of_id`),
+  CONSTRAINT `productsv4_ibfk_1` FOREIGN KEY (`generic_of_id`) REFERENCES `productsv4` (`id`)
+) 
+CREATE TABLE `rxs` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user_id` INT(11) NOT NULL,
+  `type` enum('birth-control','contact-lens') NOT NULL,
+  `issued_at` date NOT NULL,
+  `expires_at` date NOT NULL,
+  `patient_name` varchar(255) NOT NULL,
+  `patient_date_of_birth` date NOT NULL,
+  `patient_address` varchar(255) NOT NULL DEFAULT '',
+  `patient_city` varchar(255) NOT NULL DEFAULT '',
+  `patient_state` varchar(255) NOT NULL DEFAULT '',
+  `md_name` varchar(255) NOT NULL DEFAULT '',
+  `md_address1` varchar(255) NOT NULL DEFAULT '',
+  `md_address2` varchar(255) NOT NULL DEFAULT '',
+  `md_phone` varchar(255) NOT NULL DEFAULT '',
+  `md_license_no` varchar(32) NOT NULL DEFAULT '',
+  `signed_off_by_md_admin_id` int(11) NOT NULL,
+  `rx_attributes` json NOT NULL,
+  `signature` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `user_id_fk` (`user_id`),
+  CONSTRAINT `user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) 
+ALTER TABLE productsv4
+    CHANGE num_items_per_pack quantity_text VARCHAR(255) NOT NULL,
+    ADD pill_type ENUM("Combination Pill", "Progestin Only") NOT NULL,
+    ADD risks VARCHAR(255) NOT NULL,
+    ADD tags JSON NOT NULL,
+    ADD ingredients JSON NOT NULL;
