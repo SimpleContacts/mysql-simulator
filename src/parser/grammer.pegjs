@@ -29,7 +29,7 @@ CompoundStatement
     }
   }
 
-comment = _ comment:(singleComment / singleDashComment / multiComment) _ {return comment }
+comment = _ comment:(singleComment / singleDashComment / multiComment) _ { return comment }
 singleComment = '//' p:([^\n]*) { return { type: 'comment', commentType: 'single', raw: p.join('').trim() }; }
 singleDashComment = '--' p:([^\n]*) { return { type: 'comment', commentType: 'single', raw: p.join('').trim() }; }
 multiComment = "/*" inner:(!"*/" i:. {return i})* "*/" { return { type: 'comment', commentType: 'multi', raw: inner.join('') }; }
@@ -40,13 +40,38 @@ update = 'UPDATE'i [^;]* { return null; }
 insert = 'INSERT'i [^;]* { return null; }
 delete = 'DELETE'i [^;]* { return null; }
 set = 'SET 'i [^;]* { return null; }
-IfStatement = IF condition:Expression THEN body:StatementList END IF { return null; }
+
+Condition
+  = boolean
+  / NOT Condition
+  / LPAREN Condition RPAREN
+  / left:Expression ( EQ / NE / LTE / GTE / LT / GT ) right:Expression
+
+ExpressionList
+  = first:Expression COMMA rest:ExpressionList { return [first, ...rest] }
+  / only:Expression { return [only] }
 
 Expression
-  = NOT expr:Expression { return null }
-  / LPAREN expr:Expression RPAREN { return null }
-  / identifier { return null }
-  / left:Thing '<=>' right:Thing { return null }
+  = CallExpression
+  / BinaryOperation
+  / SimpleExpression
+
+// Helper to try and eliminate the left recursion issues with Expressions
+SimpleExpression
+  = identifier { return null }
+  / constant
+  / Thing { return null }
+
+CallExpression
+  = FunctionName LPAREN ExpressionList RPAREN
+
+BinaryOperation
+  = SimpleExpression ( PLUS / MINUS ) SimpleExpression
+
+FunctionName
+  = HEX
+  / SUBSTRING
+  / UNHEX
 
 Thing
   = ( NEW / OLD ) '.' identifier { return null }
@@ -167,16 +192,52 @@ CreateFunction
     params:( LPAREN params:FunctionParamList RPAREN { return params })
     RETURNS DataType
     characteristic:CreateFunctionCharacteristic
-    body:Statement {
+    body:FunctionBody {
     return {
-      type: 'CREATE TRIGGER',
-      triggerName,
-      tblName,
+      type: 'CREATE FUNCTION',
+      spName,
+      params,
+      characteristic,
+      body,
     }
   }
 
 CreateFunctionCharacteristic
   = NOT? DETERMINISTIC
+
+FunctionBody
+  = BEGIN statements:FunctionStatementList END
+
+FunctionStatementList
+  = first:FunctionStatement SEMICOLON? rest:FunctionStatementList { return [first, ...rest] }
+  / only:FunctionStatement SEMICOLON? { return [only] }
+
+FunctionStatement
+  = DECLARE [^;]*
+  / SET AssignmentList
+  / IfStatement
+  / WhileStatement
+  / RETURN Expression
+  / Statement
+
+AssignmentList
+  = first:Assignment COMMA rest:AssignmentList { return [first, ...rest] }
+  / only:Assignment { return [only] }
+
+Assignment
+  = identifier EQ Expression
+
+IfStatement
+  = IF Condition THEN
+      FunctionStatementList
+    (ELSEIF Condition THEN FunctionStatementList )*
+    (ELSE FunctionStatementList)?
+    END IF
+
+WhileStatement
+  = WHILE Condition DO
+      FunctionStatementList
+    END WHILE
 
 // ====================================================
 // ALTER TABLE
@@ -691,13 +752,17 @@ CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierStart _ { return 'CURRENT_
 DATE              = _ 'DATE'i              !IdentifierStart _ { return 'DATE' }
 DATETIME          = _ 'DATETIME'i          !IdentifierStart _ { return 'DATETIME' }
 DECIMAL           = _ 'DECIMAL'i           !IdentifierStart _ { return 'DECIMAL' }
+DECLARE           = _ 'DECLARE'i           !IdentifierStart _ { return 'DECLARE' }
 DEFAULT           = _ 'DEFAULT'i           !IdentifierStart _ { return 'DEFAULT' }
 DELETE            = _ 'DELETE'i            !IdentifierStart _ { return 'DELETE' }
 DESC              = _ 'DESC'i              !IdentifierStart _ { return 'DESC' }
 DETERMINISTIC     = _ 'DETERMINISTIC'i     !IdentifierStart _ { return 'DETERMINISTIC' }
+DO                = _ 'DO'i                !IdentifierStart _ { return 'DO' }
 DOUBLE            = _ 'DOUBLE'i            !IdentifierStart _ { return 'DOUBLE' }
 DROP              = _ 'DROP'i              !IdentifierStart _ { return 'DROP' }
 EACH              = _ 'EACH'i              !IdentifierStart _ { return 'EACH' }
+ELSE              = _ 'ELSE'i              !IdentifierStart _ { return 'ELSE' }
+ELSEIF            = _ 'ELSEIF'i            !IdentifierStart _ { return 'ELSEIF' }
 END               = _ 'END'i               !IdentifierStart _ { return 'END' }
 ENGINE            = _ 'ENGINE'i            !IdentifierStart _ { return 'ENGINE' }
 ENUM              = _ 'ENUM'i              !IdentifierStart _ { return 'ENUM' }
@@ -737,6 +802,7 @@ REAL              = _ 'REAL'i              !IdentifierStart _ { return 'REAL' }
 REFERENCES        = _ 'REFERENCES'i        !IdentifierStart _ { return 'REFERENCES' }
 RENAME            = _ 'RENAME'i            !IdentifierStart _ { return 'RENAME' }
 RESTRICT          = _ 'RESTRICT'i          !IdentifierStart _ { return 'RESTRICT' }
+RETURN            = _ 'RETURN'i            !IdentifierStart _ { return 'RETURN' }
 RETURNS           = _ 'RETURNS'i           !IdentifierStart _ { return 'RETURNS' }
 ROW               = _ 'ROW'i               !IdentifierStart _ { return 'ROW' }
 SET               = _ 'SET'i               !IdentifierStart _ { return 'SET' }
@@ -757,6 +823,13 @@ UPDATE            = _ 'UPDATE'i            !IdentifierStart _ { return 'UPDATE' 
 USING             = _ 'USING'i             !IdentifierStart _ { return 'USING' }
 VARBINARY         = _ 'VARBINARY'i         !IdentifierStart _ { return 'VARBINARY' }
 VARCHAR           = _ 'VARCHAR'i           !IdentifierStart _ { return 'VARCHAR' }
+WHILE             = _ 'WHILE'i             !IdentifierStart _ { return 'WHILE' }
+
+// Reserved built-in functions
+HEX               = _ 'HEX'i               !IdentifierStart _ { return 'HEX' }
+SUBSTRING         = _ 'SUBSTRING'i         !IdentifierStart _ { return 'SUBSTRING' }
+UNHEX             = _ 'UNHEX'i             !IdentifierStart _ { return 'UNHEX' }
+
 
 // Composite types
 NOT_NULL = NOT NULL { return 'NOT NULL' }
@@ -767,6 +840,13 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 
 COMMA      = _ ',' _
 EQ         = _ '=' _
+GT         = _ '>' _
+GTE        = _ '>=' _
 LPAREN     = _ '(' _
+LT         = _ '<' _
+LTE        = _ '<=' _
+MINUS      = _ '-' _
+NE         = _ '<=>' _
+PLUS       = _ '+' _
 RPAREN     = _ ')' _
 SEMICOLON  = _ ';' _
