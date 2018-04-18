@@ -82,11 +82,13 @@ function escape(s: string): string {
 }
 
 function columnDefinition(col: Column) {
+  const defaultValue =
+    col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
   return [
     escape(col.name),
     col.type.toLowerCase(),
-    col.nullable ? 'NULL' : 'NOT NULL',
-    col.defaultValue ? `DEFAULT ${col.defaultValue}` : '',
+    col.nullable ? '' : 'NOT NULL',
+    defaultValue ? `DEFAULT ${defaultValue}` : '',
     col.autoIncrement ? 'AUTO_INCREMENT' : '',
   ]
     .filter(x => x)
