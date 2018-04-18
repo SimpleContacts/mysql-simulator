@@ -76,7 +76,12 @@ export function addColumn(
     if (!table) {
       throw new Error(`Table "${tblName}" does not exists`);
     }
-    table.columns[column.name] = column; // TODO: Should be error if already exists!
+
+    const col = table.columns.find(c => c.name === column.name);
+    if (col) {
+      throw new Error(`Column "${tblName}.${column.name}" already exists`);
+    }
+    table.columns.push(column);
   });
 }
 
@@ -91,8 +96,10 @@ export function replaceColumn(
 ): Database {
   return produce(db, $ => {
     const table = $.tables[tblName];
-    delete table.columns[colName]; // TODO: Should error if not exists!
-    table.columns[column.name] = column;
+
+    // TODO: Should error if not exists!
+    table.columns = table.columns.filter(c => c.name !== colName);
+    table.columns.push(column); // TODO: Respect insertion position (AFTER / FIRST)
   });
 }
 
@@ -106,6 +113,8 @@ export function removeColumn(
 ): Database {
   return produce(db, $ => {
     const table = $.tables[tblName];
-    delete table.columns[colName]; // TODO: Should error if not exists!
+
+    // TODO: Should error if not exists!
+    table.columns = table.columns.filter(c => c.name !== colName);
   });
 }

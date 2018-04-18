@@ -21,15 +21,13 @@ const log = console.log;
 // eslint-disable-next-line no-console
 const error = console.error;
 
-function makeColumn(colName, definition): Column {
-  const nullable = !definition.nullable;
-  const defaultValue = definition.defaultValue;
+function makeColumn(colName, def): Column {
   return {
     name: colName,
-    type: definition.dataType,
-    nullable,
-    defaultValue,
-    autoIncrement: definition.autoIncrement,
+    type: def.dataType,
+    nullable: def.nullable,
+    defaultValue: def.defaultValue,
+    autoIncrement: def.autoIncrement,
   };
 }
 

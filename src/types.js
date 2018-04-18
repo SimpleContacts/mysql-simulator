@@ -21,7 +21,7 @@ export type ForeignKey = {
 
 export type Table = {
   name: string,
-  columns: Index<Column>,
+  columns: Array<Column>,
   foreignKeys: Index<ForeignKey>,
 };
 
