@@ -7,6 +7,7 @@ export type Column = {
   type: string,
   nullable: boolean,
   defaultValue: string,
+  autoIncrement: boolean,
 };
 
 export type ForeignKey = {

@@ -29,6 +29,7 @@ function makeColumn(colName, definition): Column {
     type: definition.dataType,
     nullable,
     defaultValue,
+    autoIncrement: definition.autoIncrement,
   };
 }
 
@@ -78,6 +79,45 @@ function printDb(db: Database) {
   }
 }
 
+function escape(s: string): string {
+  return `\`${s.replace('`', '\\`')}\``;
+}
+
+function columnDefinition(col: Column) {
+  return [
+    escape(col.name),
+    col.type.toLowerCase(),
+    col.nullable ? 'NULL' : 'NOT NULL',
+    col.defaultValue ? `DEFAULT ${col.defaultValue}` : '',
+    col.autoIncrement ? 'AUTO_INCREMENT' : '',
+  ]
+    .filter(x => x)
+    .join(' ');
+}
+
+function dumpTable(table: Table) {
+  log(chalk.blue(`CREATE TABLE \`${table.name}\` (`));
+  for (const col of table.columns) {
+    log(chalk.yellow(`  ${columnDefinition(col)},`));
+  }
+  log(chalk.blue(`)`));
+  // log(chalk.blue('-'.repeat(table.name.length)));
+  // for (const name of sortBy(Object.keys(table.columns))) {
+  //   const col = table.columns[name];
+  //   log(`  ${chalk.magenta(col.name)} ${chalk.gray(col.type)}`);
+  // }
+  // for (const name of sortBy(Object.keys(table.foreignKeys))) {
+  //   const fk = table.foreignKeys[name];
+  //   log(
+  //     chalk.yellow(
+  //       `  ${fk.name || '(unnamed)'}: ${fk.columns.join(', ')} => ${
+  //         fk.reference.table
+  //       } (${fk.reference.columns.join(', ')})`,
+  //     ),
+  //   );
+  // }
+}
+
 function main() {
   let db: Database = emptyDb();
 
@@ -123,9 +163,10 @@ function main() {
     }
   }
 
-  log('');
-  log('Done!');
-  printDb(db);
+  // log('');
+  // log('Done!');
+  // printDb(db);
+  dumpTable(db.tables.users);
 }
 
 main();
