@@ -52,21 +52,16 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = CallExpression
-  / BinaryOperation
-  / SimpleExpression
+  = Expression$ ( ( PLUS / MINUS ) Expression )?
 
-// Helper to try and eliminate the left recursion issues with Expressions
-SimpleExpression
-  = identifier { return null }
+Expression$
+  = CallExpression
+  / identifier { return null }
   / constant
   / Thing { return null }
 
 CallExpression
   = FunctionName LPAREN ExpressionList RPAREN
-
-BinaryOperation
-  = SimpleExpression ( PLUS / MINUS ) SimpleExpression
 
 FunctionName
   = HEX
