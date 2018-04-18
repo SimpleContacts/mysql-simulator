@@ -1,3 +1,9 @@
+{
+  function escape(s) {
+    return "'" + s.replace("'", "''") + "'"
+  }
+}
+
 start = StatementList
 
 StatementList
@@ -91,7 +97,7 @@ number "number literal"
   = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
 
 string "string literal"
-  = hunks:strhunk+ { return hunks.join("") }
+  = hunks:strhunk+ { return escape(hunks.join("")) }
 
 strhunk
   = "'" seq:[^']* "'" _ { return seq.join('') }
@@ -555,7 +561,7 @@ DataType
   / type:textDataType ignore:(COLLATE CollationName)? { return type }
   / JSON
   / ENUM LPAREN values:StringList RPAREN {
-      return `ENUM(${values.map(JSON.stringify).join(', ')})`;
+      return `ENUM(${values.join(', ')})`;
     }
 
 IndexColNames

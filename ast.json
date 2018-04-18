@@ -509,7 +509,7 @@
         "definition": {
           "dataType": "VARCHAR(12)",
           "nullable": false,
-          "defaultValue": "",
+          "defaultValue": "''",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -3554,7 +3554,7 @@
         "definition": {
           "dataType": "VARCHAR(32)",
           "nullable": true,
-          "defaultValue": "prod",
+          "defaultValue": "'prod'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -6655,7 +6655,7 @@
         "definition": {
           "dataType": "VARCHAR(128)",
           "nullable": true,
-          "defaultValue": "OPEN",
+          "defaultValue": "'OPEN'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -7035,7 +7035,7 @@
         "definition": {
           "dataType": "TINYINT(1)",
           "nullable": false,
-          "defaultValue": "0",
+          "defaultValue": "'0'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -7074,7 +7074,7 @@
         "definition": {
           "dataType": "SMALLINT(5) UNSIGNED",
           "nullable": true,
-          "defaultValue": "0",
+          "defaultValue": "'0'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -7087,7 +7087,7 @@
         "definition": {
           "dataType": "SMALLINT(5) UNSIGNED",
           "nullable": true,
-          "defaultValue": "0",
+          "defaultValue": "'0'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -7100,7 +7100,7 @@
         "definition": {
           "dataType": "DECIMAL(13, 2)",
           "nullable": true,
-          "defaultValue": "0.00",
+          "defaultValue": "'0.00'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -14219,7 +14219,7 @@
         "definition": {
           "dataType": "DECIMAL(13, 2)",
           "nullable": false,
-          "defaultValue": "0.00",
+          "defaultValue": "'0.00'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -14247,7 +14247,7 @@
         "definition": {
           "dataType": "DECIMAL(13, 2)",
           "nullable": false,
-          "defaultValue": "0.00",
+          "defaultValue": "'0.00'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -14642,7 +14642,7 @@
         "definition": {
           "dataType": "DECIMAL(13, 2)",
           "nullable": false,
-          "defaultValue": "0.00",
+          "defaultValue": "'0.00'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -17214,7 +17214,7 @@
         "type": "ADD COLUMN",
         "colName": "lens_type",
         "definition": {
-          "dataType": "ENUM(\"daily\", \"weekly\", \"monthly\")",
+          "dataType": "ENUM('daily', 'weekly', 'monthly')",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -17660,7 +17660,7 @@
         "definition": {
           "dataType": "VARCHAR(64)",
           "nullable": false,
-          "defaultValue": "ACTIVE",
+          "defaultValue": "'ACTIVE'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -18034,7 +18034,7 @@
         "definition": {
           "dataType": "VARCHAR(32)",
           "nullable": true,
-          "defaultValue": "MD_NOTE",
+          "defaultValue": "'MD_NOTE'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -19862,7 +19862,7 @@
         "definition": {
           "dataType": "VARCHAR(255)",
           "nullable": false,
-          "defaultValue": "",
+          "defaultValue": "''",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -20064,7 +20064,7 @@
         "definition": {
           "dataType": "VARCHAR(4)",
           "nullable": false,
-          "defaultValue": "test",
+          "defaultValue": "'test'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -20077,7 +20077,7 @@
         "definition": {
           "dataType": "VARCHAR(64)",
           "nullable": false,
-          "defaultValue": "",
+          "defaultValue": "''",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -20090,7 +20090,7 @@
         "definition": {
           "dataType": "TINYINT(1)",
           "nullable": false,
-          "defaultValue": "0",
+          "defaultValue": "'0'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -20200,7 +20200,7 @@
         "definition": {
           "dataType": "VARCHAR(512)",
           "nullable": false,
-          "defaultValue": "",
+          "defaultValue": "''",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -21007,7 +21007,7 @@
         "definition": {
           "dataType": "TINYINT(1)",
           "nullable": false,
-          "defaultValue": "0",
+          "defaultValue": "'0'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
@@ -21807,7 +21807,7 @@
         "type": "COLUMN",
         "colName": "direction",
         "definition": {
-          "dataType": "ENUM(\"INBOUND\", \"OUTBOUND\")",
+          "dataType": "ENUM('INBOUND', 'OUTBOUND')",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -22909,7 +22909,7 @@
         "definition": {
           "dataType": "VARCHAR(128)",
           "nullable": false,
-          "defaultValue": "USER_INCOMPLETE",
+          "defaultValue": "'USER_INCOMPLETE'",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
