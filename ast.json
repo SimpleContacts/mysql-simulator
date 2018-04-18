@@ -481,7 +481,7 @@
         "type": "COLUMN",
         "colName": "price_retail",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -494,7 +494,7 @@
         "type": "COLUMN",
         "colName": "price_wholesale",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -3177,7 +3177,7 @@
         "type": "COLUMN",
         "colName": "price_retail",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -3190,7 +3190,7 @@
         "type": "COLUMN",
         "colName": "price_wholesale",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -3788,7 +3788,7 @@
         "type": "COLUMN",
         "colName": "price",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -3937,7 +3937,7 @@
         "oldColName": "price",
         "newColName": "price_retail",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -5779,7 +5779,7 @@
         "type": "ADD COLUMN",
         "colName": "subtotal",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -5793,7 +5793,7 @@
         "type": "ADD COLUMN",
         "colName": "sales_tax",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -5807,7 +5807,7 @@
         "type": "ADD COLUMN",
         "colName": "exam_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -5821,7 +5821,7 @@
         "type": "ADD COLUMN",
         "colName": "shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -5835,7 +5835,7 @@
         "type": "ADD COLUMN",
         "colName": "discount_amt",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -5849,7 +5849,7 @@
         "type": "ADD COLUMN",
         "colName": "total",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -7098,7 +7098,7 @@
         "type": "COLUMN",
         "colName": "price_retail",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": "'0.00'",
           "isUnique": false,
@@ -7582,7 +7582,7 @@
         "type": "ADD COLUMN",
         "colName": "wholesale_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -7602,7 +7602,7 @@
         "type": "ADD COLUMN",
         "colName": "distributor_shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -7772,7 +7772,7 @@
         "type": "COLUMN",
         "colName": "amt_discount",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -7842,7 +7842,7 @@
         "type": "ADD COLUMN",
         "colName": "mail_in_rebate_amt",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -9452,7 +9452,7 @@
         "type": "COLUMN",
         "colName": "amt",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -9709,7 +9709,7 @@
         "type": "COLUMN",
         "colName": "amt",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -10515,7 +10515,7 @@
         "type": "COLUMN",
         "colName": "diagonal_inches",
         "definition": {
-          "dataType": "DECIMAL(3, 1)",
+          "dataType": "DECIMAL(3,1)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -11952,7 +11952,7 @@
         "type": "COLUMN",
         "colName": "lens_com_price",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -11991,7 +11991,7 @@
         "type": "COLUMN",
         "colName": "c1800_price",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -12030,7 +12030,7 @@
         "type": "COLUMN",
         "colName": "visiondirect_price",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -12226,7 +12226,7 @@
         "type": "COLUMN",
         "colName": "mean_distance",
         "definition": {
-          "dataType": "FLOAT(4, 2)",
+          "dataType": "FLOAT(4,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -12239,7 +12239,7 @@
         "type": "COLUMN",
         "colName": "min_distance",
         "definition": {
-          "dataType": "FLOAT(4, 2)",
+          "dataType": "FLOAT(4,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -12252,7 +12252,7 @@
         "type": "COLUMN",
         "colName": "max_distance",
         "definition": {
-          "dataType": "FLOAT(4, 2)",
+          "dataType": "FLOAT(4,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -12776,7 +12776,7 @@
         "type": "COLUMN",
         "colName": "cost",
         "definition": {
-          "dataType": "DECIMAL(5, 2)",
+          "dataType": "DECIMAL(5,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -14217,7 +14217,7 @@
         "type": "ADD COLUMN",
         "colName": "cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": "'0.00'",
           "isUnique": false,
@@ -14245,7 +14245,7 @@
         "type": "ADD COLUMN",
         "colName": "add_cost_per_gram",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": "'0.00'",
           "isUnique": false,
@@ -14640,7 +14640,7 @@
         "type": "COLUMN",
         "colName": "cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": "'0.00'",
           "isUnique": false,
@@ -15039,7 +15039,7 @@
         "type": "COLUMN",
         "colName": "segment_length",
         "definition": {
-          "dataType": "DECIMAL(5, 2)",
+          "dataType": "DECIMAL(5,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -15065,7 +15065,7 @@
         "type": "COLUMN",
         "colName": "mean_distance",
         "definition": {
-          "dataType": "DECIMAL(4, 2)",
+          "dataType": "DECIMAL(4,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -15167,7 +15167,7 @@
         "type": "COLUMN",
         "colName": "cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -15211,7 +15211,7 @@
         "type": "ADD COLUMN",
         "colName": "exam_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": "NULL",
           "isUnique": false,
@@ -15437,7 +15437,7 @@
         "colName": "mean_distance",
         "after": null,
         "definition": {
-          "dataType": "DECIMAL(4, 2)",
+          "dataType": "DECIMAL(4,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -15659,7 +15659,7 @@
         "type": "ADD COLUMN",
         "colName": "dx_shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(5, 2)",
+          "dataType": "DECIMAL(5,2)",
           "nullable": false,
           "defaultValue": 0,
           "isUnique": false,
@@ -16342,7 +16342,7 @@
         "type": "COLUMN",
         "colName": "shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": 0,
           "isUnique": false,
@@ -16894,7 +16894,7 @@
         "type": "ADD COLUMN",
         "colName": "cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -17254,7 +17254,7 @@
         "type": "ADD COLUMN",
         "colName": "left_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -17274,7 +17274,7 @@
         "type": "ADD COLUMN",
         "colName": "right_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -17294,7 +17294,7 @@
         "type": "ADD COLUMN",
         "colName": "left_shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -17314,7 +17314,7 @@
         "type": "ADD COLUMN",
         "colName": "right_shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -17334,7 +17334,7 @@
         "type": "ADD COLUMN",
         "colName": "dx_wholesale_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": "NULL",
           "isUnique": false,
@@ -17354,7 +17354,7 @@
         "type": "ADD COLUMN",
         "colName": "dx_distributor_shipping_cost",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": true,
           "defaultValue": "NULL",
           "isUnique": false,
@@ -20419,7 +20419,7 @@
         "type": "COLUMN",
         "colName": "latitude",
         "definition": {
-          "dataType": "DECIMAL(10, 8)",
+          "dataType": "DECIMAL(10,8)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -20432,7 +20432,7 @@
         "type": "COLUMN",
         "colName": "longitude",
         "definition": {
-          "dataType": "DECIMAL(11, 8)",
+          "dataType": "DECIMAL(11,8)",
           "nullable": true,
           "defaultValue": null,
           "isUnique": false,
@@ -20560,7 +20560,7 @@
         "type": "COLUMN",
         "colName": "price",
         "definition": {
-          "dataType": "DECIMAL(5, 2)",
+          "dataType": "DECIMAL(5,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -21161,7 +21161,7 @@
         "type": "COLUMN",
         "colName": "value",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -21350,7 +21350,7 @@
         "type": "COLUMN",
         "colName": "value",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -21576,7 +21576,7 @@
         "type": "COLUMN",
         "colName": "value",
         "definition": {
-          "dataType": "DECIMAL(13, 2)",
+          "dataType": "DECIMAL(13,2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,

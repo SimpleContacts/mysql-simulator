@@ -539,7 +539,7 @@ intDataType
 
 precisionDataType
   = type:precisionTypeName _ prec:precisionSpec? _ unsigned:UNSIGNED? {
-    prec = prec ? `(${prec.join(', ')})` : '';
+    prec = prec ? `(${prec.join(',')})` : '';
     unsigned = unsigned || '';
     return (type + prec + ' ' + unsigned).trim()
   }
