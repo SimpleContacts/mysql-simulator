@@ -8,7 +8,7 @@
     "tdd": "jest src --watch",
     "test": "yarn run -s lint && yarn run -s flow && jest src",
     "flow": "flow --include-warnings",
-    "slurp": "sh -c '(cd ../simplecontacts/migrations && (ls | sort -n | xargs cat))' > input.sql",
+    "slurp": "sh -c '(cd ../simplecontacts/migrations && (ls | sort -n | while read f; do echo; echo \"--\"; echo \"-- $f\"; cat \"$f\"; echo; done))' > input.sql",
     "parse": "bin/parse-sql < input.sql > ast.json",
     "simulate": "babel-node src/runner.js",
     "all": "yarn parse && yarn simulate"

@@ -1,3 +1,6 @@
+
+--
+-- 0000_bootstrap.sql
 CREATE TABLE users (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -84,6 +87,10 @@ CREATE TABLE versions (
   date_migrated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY `to_version` (`to_version`,`from_version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0001_child_parent_products.sql
 CREATE TABLE parent_products (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -152,6 +159,10 @@ ALTER TABLE products
     REFERENCES products(id);
 
 UPDATE products SET parent_product_id=id;
+
+
+--
+-- 0002_payment_tokens.sql
 CREATE TABLE payment_tokens (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -167,6 +178,10 @@ CREATE TABLE payment_tokens (
 
 ALTER TABLE users
   ADD COLUMN stripe_customer_id VARCHAR(128);
+
+
+--
+-- 0003_bootstrap_orders.sql
 ALTER TABLE users ADD telephone VARCHAR(16);
 
 CREATE TABLE addresses (
@@ -199,6 +214,10 @@ CREATE TABLE auto_renewals (
 
   FOREIGN KEY (script_id) REFERENCES scripts(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0004_add_options.sql
 ALTER TABLE orders
 DROP COLUMN quantity;
 
@@ -212,6 +231,10 @@ CREATE TABLE options (
   duration VARCHAR(64) DEFAULT NULL,
   FOREIGN KEY (order_id) REFERENCES orders(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0005_script_parent_product.sql
 ALTER TABLE scripts
 DROP FOREIGN KEY scripts_ibfk_2;
 
@@ -223,6 +246,10 @@ ADD COLUMN parent_product_id INT NOT NULL;
 
 ALTER TABLE scripts
 ADD FOREIGN KEY (parent_product_id) REFERENCES parent_products(id);
+
+
+--
+-- 0006_add_md_table.sql
 CREATE TABLE mds (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -230,7 +257,15 @@ CREATE TABLE mds (
   email VARCHAR(64) UNIQUE,
   UNIQUE (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0007_test.sql
 select 1;
+
+
+--
+-- 0008_order_tags.sql
 CREATE TABLE labels (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   label VARCHAR(128) NOT NULL,
@@ -245,6 +280,10 @@ CREATE TABLE orders_labels_xref (
   FOREIGN KEY (order_id) REFERENCES orders(id),
   FOREIGN KEY (label_id) REFERENCES labels(id)
 )
+
+
+--
+-- 0009_added_exams.sql
 ALTER TABLE exams
   DROP FOREIGN KEY exams_ibfk_1,
   DROP COLUMN audio_url,
@@ -257,13 +296,33 @@ ALTER TABLE exams
   ADD COLUMN passed BOOLEAN DEFAULT NULL,
   ADD FOREIGN KEY (md_id) REFERENCES mds(id),
   ADD FOREIGN KEY (script_id) REFERENCES scripts(id);
+
+
+--
+-- 0010_allow_null.sql
 ALTER TABLE exams MODIFY COLUMN md_id INT null;
 
+
+
+--
+-- 0011_expand_char_limit.sql
 ALTER TABLE exams MODIFY COLUMN letters VARCHAR(256) NOT NULL;
+
+
+--
+-- 0012_add_archive_col.sql
 ALTER TABLE orders
 ADD is_archived BOOLEAN DEFAULT False;
+
+
+--
+-- 0013_add_email_cols.sql
 ALTER TABLE orders ADD COLUMN is_order_confirm_sent BOOLEAN DEFAULT False;
 ALTER TABLE orders ADD COLUMN is_shipping_confirm_sent BOOLEAN DEFAULT False;
+
+
+--
+-- 0014_add_exam_videos.sql
 CREATE TABLE uploaded_videos (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -272,13 +331,29 @@ CREATE TABLE uploaded_videos (
   letters VARCHAR(32) DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0015_add_abb_order_confirm.sql
 ALTER TABLE orders ADD COLUMN abb_order_no VARCHAR(128) DEFAULT NULL;
 ALTER TABLE orders ADD COLUMN notes TEXT DEFAULT NULL;
+
+
+--
+-- 0016_video_letters_length.sql
 ALTER TABLE uploaded_videos MODIFY COLUMN letters VARCHAR(256);
 ALTER TABLE uploaded_videos ADD COLUMN type VARCHAR(32) NOT NULL;
+
+
+--
+-- 0017_add_state_and_renewal_schedule.sql
 ALTER TABLE mailing_list ADD COLUMN state VARCHAR(2) DEFAULT NULL;
 ALTER TABLE mailing_list ADD COLUMN run_out_date DATE NULL DEFAULT NULL;
 
+
+
+--
+-- 0018_auth_tokens.sql
 CREATE TABLE auth_tokens (
   guid VARCHAR(64) NOT NULL PRIMARY KEY,
   valid TINYINT(1) NOT NULL DEFAULT 0,
@@ -287,11 +362,19 @@ CREATE TABLE auth_tokens (
   -- user_id is not set as a FK. This will likely be moved to redis or
   -- otherwise off-server.
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0019_userattribs.sql
 ALTER TABLE users
   ADD has_seen_onboarding TINYINT(1) NOT NULL DEFAULT 0,
   ADD has_qualified TINYINT(1) NOT NULL DEFAULT 0;
 
 
+
+
+--
+-- 0020_abb_catalog.sql
 CREATE TABLE abb_product_catalog (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -330,6 +413,10 @@ CREATE TABLE abb_product_catalog (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 ALTER TABLE abb_product_catalog ADD INDEX `ser_name` (`ser_name`);
+
+
+--
+-- 0021_qualify.sql
 ALTER TABLE mailing_list ADD user_id INT;
 ALTER TABLE users
   ADD qualify_state varchar(2),
@@ -337,24 +424,60 @@ ALTER TABLE users
   CHANGE has_qualified has_seen_qualification TINYINT(1) NOT NULL DEFAULT 0;
 
 
+
+
+--
+-- 0022_abb_catalog_enabled.sql
 ALTER TABLE abb_product_catalog
 ADD COLUMN enabled TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0023_add_source_col.sql
 ALTER TABLE mailing_list
 ADD COLUMN source VARCHAR(32) DEFAULT NULL;
+
+
+--
+-- 0024_drop_unneeded_abb_cols.sql
 ALTER TABLE abb_product_catalog DROP COLUMN enabled;
 ALTER TABLE abb_product_catalog DROP COLUMN price_wholesale;
 ALTER TABLE abb_product_catalog DROP COLUMN price_retail;
+
+
+--
+-- 0025_branch_referral.sql
 ALTER TABLE orders ADD COLUMN referral VARCHAR(2048) DEFAULT NULL;
+
+
+--
+-- 0026_user_qualify_updates.sql
 ALTER TABLE users
   CHANGE qualify_run_out_date qualify_last_exam_date date,
   ADD qualify_birthday date;
 
 ALTER TABLE mailing_list ADD last_exam_date date;
+
+
+--
+-- 0027_order_auto_renew.sql
 ALTER TABLE orders ADD column is_auto_renew TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0028_tracking.sql
 ALTER TABLE orders ADD COLUMN tracking_number VARCHAR(256) DEFAULT NULL;
 ALTER TABLE orders ADD COLUMN tracking_number_url VARCHAR(256) DEFAULT NULL;
+
+
+--
+-- 0029_add_is_staff_and_env.sql
 ALTER TABLE users ADD COLUMN is_staff TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE users ADD COLUMN env VARCHAR(32) DEFAULT 'prod';
+
+
+--
+-- 0030_add_user_logging.sql
 CREATE TABLE user_logs (
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- user_id is not set as a FK. This will likely be moved to redis or
@@ -366,11 +489,19 @@ CREATE TABLE user_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 ALTER TABLE user_logs ALTER COLUMN date_created DROP DEFAULT;
+
+
+--
+-- 0031_add_fkey_user_logs.sql
 ALTER TABLE user_logs
 ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 
 ALTER TABLE user_logs
 ADD id INT NOT NULL PRIMARY KEY AUTO_INCREMENT;
+
+
+--
+-- 0032_virtual_supplies.sql
 CREATE TABLE virtual_supplies (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -381,36 +512,88 @@ CREATE TABLE virtual_supplies (
   price DECIMAL(13,2) DEFAULT 0,
   FOREIGN KEY (parent_product_id) REFERENCES parent_products(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0033_user_logs_native_json.sql
 ALTER TABLE user_logs
   CHANGE data data JSON,
   CHANGE device device JSON;
+
+
+--
+-- 0034_drop_fkey_pkey_user_logs.sql
 ALTER TABLE user_logs DROP FOREIGN KEY fk_user_id;
 ALTER TABLE user_logs DROP COLUMN id;
+
+
+--
+-- 0035_add_log_indexes.sql
 SELECT 1;
 -- commented out by RQ (25 Jul 2016 18:36:27)
 -- ALTER TABLE user_logs ADD INDEX (user_id);
 -- ALTER TABLE user_logs ADD INDEX (date_created);
+
+
+--
+-- 0036_use_supply_overrides.sql
 ALTER TABLE parent_products
 ADD COLUMN use_supply_overrides TINYINT(1) DEFAULT 0;
+
+
+--
+-- 0037_rename_supply_cols.sql
 ALTER TABLE virtual_supplies
 CHANGE name opt_duration VARCHAR(128) NOT NULL;
 
 ALTER TABLE virtual_supplies
 CHANGE price price_retail DECIMAL(13,2) DEFAULT 0;
+
+
+--
+-- 0038_added_num_lenses.sql
 ALTER TABLE virtual_supplies
 ADD COLUMN num_lenses SMALLINT UNSIGNED DEFAULT 0;
+
+
+--
+-- 0039_affiliate_id.sql
 ALTER TABLE users ADD COLUMN affiliate_id VARCHAR(16) DEFAULT NULL;
+
+
+--
+-- 0040_add_unique_affiliate_id.sql
 ALTER TABLE users ADD CONSTRAINT constr_affiliate_id UNIQUE (affiliate_id);
+
+
+--
+-- 0041_products_index.sql
 ALTER TABLE products ADD INDEX (date_created);
+
+
+--
+-- 0042_add_sku_col.sql
 ALTER TABLE options ADD COLUMN sku VARCHAR(128) DEFAULT NULL;
+
+
+--
+-- 0043_add_admins.sql
 CREATE TABLE admins (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   name VARCHAR(128),
   email VARCHAR(64) UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0044_letters.sql
 ALTER TABLE uploaded_videos
   CHANGE letters letters JSON;
+
+
+--
+-- 0045_user_log_index.sql
 CREATE INDEX user_logs_user_id_subject_idx ON user_logs (user_id, subject);
 
 -- commented out by RQ (25 Jul 2016 18:36:27)
@@ -418,7 +601,15 @@ CREATE INDEX user_logs_user_id_subject_idx ON user_logs (user_id, subject);
 -- DROP INDEX date_created ON user_logs;
 -- DROP INDEX user_id_2 ON user_logs;
 -- DROP INDEX date_created_2 ON user_logs;
+
+
+--
+-- 0046_user_sandbox.sql
 ALTER TABLE users ADD column sandbox TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0047_add_logs.sql
 CREATE TABLE order_logs (
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   data JSON,
@@ -436,6 +627,10 @@ CREATE TABLE exam_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE INDEX exam_logs_exam_id_subject_idx ON exam_logs (exam_id, subject);
+
+
+--
+-- 0048_videouploadref.sql
 ALTER TABLE exams
 ADD COLUMN redness_test_video_id INT DEFAULT NULL;
 
@@ -451,6 +646,10 @@ ALTER TABLE exams
 ADD CONSTRAINT fk_redness_test_video_id
 FOREIGN KEY (redness_test_video_id)
 REFERENCES uploaded_videos(id);
+
+
+--
+-- 0049_allow_null_exam_data.sql
 ALTER TABLE exams
 CHANGE COLUMN video_url video_url VARCHAR(128) NULL,
 CHANGE COLUMN visual_acuity_video_url visual_acuity_video_url VARCHAR(128) NULL,
@@ -461,8 +660,16 @@ INSERT INTO uploaded_videos (user_id, video_url, letters, type)
 VALUES
 (NULL, 'https://s3.amazonaws.com/scdev-debug/debug_va.mp4', '{"mid": "T E S T", "top": "L O L 1", "bottom": "O M G Z"}', 'va'),
 (NULL, 'https://s3.amazonaws.com/scdev-debug/debug_eyetest.mp4', NULL, 'eye');
+
+
+--
+-- 0050_add_date_rx_expires.sql
 ALTER TABLE exams
 ADD COLUMN date_rx_expires timestamp NULL;
+
+
+--
+-- 0051_add_exam_status.sql
 ALTER TABLE exams ADD COLUMN status VARCHAR(128) NULL;
 ALTER TABLE exams DROP FOREIGN KEY exams_ibfk_3;
 ALTER TABLE exams CHANGE COLUMN script_id script_id INT(11) NULL;
@@ -478,11 +685,23 @@ ALTER TABLE exams ADD COLUMN user_id INT DEFAULT NULL;
 ALTER TABLE exams ADD CONSTRAINT exams_users_fk
       FOREIGN KEY (user_id)
       REFERENCES users (id);
+
+
+--
+-- 0052_add_video_status.sql
 ALTER TABLE uploaded_videos ADD COLUMN status VARCHAR(128) NULL;
 ALTER TABLE uploaded_videos ADD COLUMN invalid_reason JSON NULL;
 ALTER TABLE uploaded_videos ADD COLUMN tags JSON NULL;
 
+
+
+--
+-- 0053_user_log_features.sql
 ALTER TABLE user_logs ADD COLUMN features JSON NULL;
+
+
+--
+-- 0054_add_md_profile.sql
 DROP TABLE IF EXISTS md_licenses;
 DROP TABLE IF EXISTS pcs;
 DROP TABLE IF EXISTS pc_addresses;
@@ -517,10 +736,22 @@ CREATE TABLE pcs (
   pc_address_id  INT DEFAULT NULL,
   FOREIGN KEY (pc_address_id) REFERENCES pc_addresses(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0055_add_additional_options.sql
 ALTER TABLE parent_products ADD COLUMN options_distance VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE parent_products ADD COLUMN options_add_power VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE parent_products ADD COLUMN options_color VARCHAR(2048) DEFAULT NULL;
+
+
+--
+-- 0056_add_parent_product_options.sql
 ALTER TABLE parent_products ADD COLUMN options JSON NULL;
+
+
+--
+-- 0057_cart.sql
 DROP TABLE IF EXISTS cart;
 CREATE TABLE cart (
   user_id INT NOT NULL PRIMARY KEY,
@@ -539,6 +770,10 @@ CREATE TABLE cart (
   FOREIGN KEY (left_parent_product_id) REFERENCES parent_products(id),
   FOREIGN KEY (right_parent_product_id) REFERENCES parent_products(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0058_exam_flags.sql
 ALTER TABLE exams
   ADD COLUMN has_qualified DATETIME DEFAULT NULL,
   ADD COLUMN has_answered_q1 DATETIME DEFAULT NULL,
@@ -553,9 +788,17 @@ UPDATE exams SET
   has_answered_q2 = date_created,
   has_answered_q3 = date_created,
   has_signed_waiver = date_created;
+
+
+--
+-- 0059_exam_deletion.sql
 ALTER TABLE exams
   ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0;
 
+
+
+--
+-- 0060_order_script.sql
 ALTER TABLE orders ADD COLUMN order_no VARCHAR(10) DEFAULT NULL;
 ALTER TABLE orders ADD COLUMN left_parent_product_id INT NULL;
 ALTER TABLE orders ADD COLUMN right_parent_product_id INT NULL;
@@ -569,10 +812,18 @@ ALTER TABLE orders ADD CONSTRAINT fk_left_parent_product_id
 ALTER TABLE orders ADD CONSTRAINT fk_right_parent_product_id
       FOREIGN KEY (right_parent_product_id)
       REFERENCES parent_products(id);
+
+
+--
+-- 0061_order_exam_xref.sql
 ALTER TABLE orders ADD COLUMN exam_id INT NULL;
 ALTER TABLE orders ADD CONSTRAINT fk_exam_id
       FOREIGN KEY (exam_id)
       REFERENCES exams(id);
+
+
+--
+-- 0062_address_constraint.sql
 DELETE FROM addresses WHERE id NOT IN (
   SELECT * FROM (SELECT MAX(id) FROM addresses GROUP BY user_id) AS adr1
 );
@@ -580,6 +831,10 @@ UPDATE addresses SET label = 'Default';
 
 ALTER TABLE addresses ADD CONSTRAINT constr_addresses_user_id_label UNIQUE (user_id, label);
 
+
+
+--
+-- 0063_order_user_and_totals.sql
 ALTER TABLE orders
   ADD COLUMN user_id INT DEFAULT NULL,
 
@@ -591,8 +846,16 @@ ALTER TABLE orders
   ADD COLUMN total DECIMAL(13,2) NOT NULL DEFAULT 0;
 
 ALTER TABLE orders ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- 0064_drop_script_constraint.sql
 ALTER TABLE orders DROP FOREIGN KEY orders_ibfk_1;
 
+
+
+--
+-- 0065_order_options.sql
 ALTER TABLE orders
   ADD COLUMN left_qty_option JSON NULL,
   ADD COLUMN right_qty_option JSON NULL;
@@ -600,6 +863,10 @@ ALTER TABLE orders
 ALTER TABLE exams DROP FOREIGN KEY exams_ibfk_3;
 
 ALTER TABLE orders CHANGE COLUMN script_id script_id INT(11) NULL;
+
+
+--
+-- 0066_drop_scripts.sql
 SET FOREIGN_KEY_CHECKS=0;
 
 ALTER TABLE orders DROP COLUMN script_id;
@@ -607,16 +874,44 @@ ALTER TABLE exams DROP COLUMN script_id;
 
 DROP TABLE scripts;
 SET FOREIGN_KEY_CHECKS=1;
+
+
+--
+-- 0069_add_referral_id.sql
 ALTER TABLE users ADD COLUMN referral_id VARCHAR(16) DEFAULT NULL;
 
+
+
+--
+-- 0070_drop_auto_renewals.sql
 DROP TABLE auto_renewals;
+
+
+--
+-- 0071_drop_unused_tables.sql
 DROP TABLE IF EXISTS exam_videos;
 DROP TABLE IF EXISTS order_logs;
 DROP TABLE IF EXISTS auto_renewals;
+
+
+--
+-- 0072_drop_sessions_and_icloud_tokens.sql
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS user_icloud_tokens;
+
+
+--
+-- 0073_drop_order_options.sql
 DROP TABLE options;
+
+
+--
+-- 0074_add_auto_renew_date.sql
 ALTER TABLE orders ADD COLUMN date_auto_renew DATETIME DEFAULT NULL;
+
+
+--
+-- 0075_user_device_ad_ids.sql
 CREATE TABLE user_device_ad_ids (
   id binary(16) NOT NULL PRIMARY KEY,
   user_id INT NOT NULL,
@@ -625,11 +920,23 @@ CREATE TABLE user_device_ad_ids (
   type VARCHAR(7) NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0076_auth_token_byte_key.sql
 ALTER TABLE auth_tokens ADD COLUMN id binary(16) NOT NULL;
 UPDATE auth_tokens SET id = UNHEX(REPLACE(guid, '-', ''));
 ALTER TABLE auth_tokens DROP PRIMARY KEY, ADD PRIMARY KEY(id);
 ALTER TABLE auth_tokens DROP COLUMN guid;
+
+
+--
+-- 0077_add_referral_url.sql
 ALTER TABLE users ADD COLUMN referral_url VARCHAR(255) DEFAULT NULL;
+
+
+--
+-- 0078_sms.sql
 DROP TABLE IF EXISTS sms;
 CREATE TABLE sms (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -642,6 +949,10 @@ CREATE TABLE sms (
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0079_rename_sms_to_messages.sql
 DROP TABLE sms;
 DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (
@@ -662,23 +973,67 @@ CREATE TABLE messages (
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0080_user_log_subject_length.sql
 ALTER TABLE user_logs CHANGE COLUMN subject subject VARCHAR(64) NOT NULL;
+
+
+--
+-- 0081_remove_referral_url.sql
 ALTER TABLE users DROP COLUMN referral_url;
+
+
+--
+-- 0082_attachments.sql
 ALTER TABLE users ADD COLUMN attachments JSON NULL;
+
+
+--
+-- 0083_order_status.sql
 ALTER TABLE orders ADD COLUMN status VARCHAR(128) NULL;
+
+
+--
+-- 0084_order_cancel_reason.sql
 ALTER TABLE orders ADD COLUMN cancel_reason VARCHAR(128) NULL;
+
+
+--
+-- 0085_status_default_value.sql
 ALTER TABLE orders CHANGE `status` `status` VARCHAR(128) NULL DEFAULT 'OPEN';
+
+
+--
+-- 0086_audit_log.sql
 CREATE TABLE audit_log (
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   user VARCHAR(2048),
   subject VARCHAR(32) NOT NULL,
   data VARCHAR(2048)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0087_add_rx_expire_duration.sql
 ALTER TABLE exams ADD column is_shortened_rx TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0088_order_charge.sql
 ALTER TABLE orders ADD COLUMN stripe_charge_id VARCHAR(64);
+
+
+--
+-- 0089_order_shipping_json.sql
 ALTER TABLE orders
   CHANGE shipping_address shipping_address JSON,
   CHANGE referral referral JSON;
+
+
+--
+-- 0090_national_lens_catalog.sql
 CREATE TABLE national_lens_product_catalog (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   comp_id VARCHAR(255) DEFAULT NULL,
@@ -692,6 +1047,10 @@ CREATE TABLE national_lens_product_catalog (
   sample TINYINT(1) NOT NULL DEFAULT 0,
   upc VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0091_productsv2.sql
 CREATE TABLE productsv2 (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -706,24 +1065,64 @@ CREATE TABLE productsv2 (
   price_retail decimal(13,2) DEFAULT '0.00',
   options json DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0092_add_order_qty.sql
 ALTER TABLE orders ADD COLUMN left_qty INT DEFAULT 0;
 ALTER TABLE orders ADD COLUMN right_qty INT DEFAULT 0;
 ALTER TABLE orders ADD COLUMN v2_left_product_id INT NULL;
 ALTER TABLE orders ADD COLUMN v2_right_product_id INT NULL;
+
+
+--
+-- 0093_add_v2_product.sql
 ALTER TABLE cart ADD COLUMN v2_left_product_id INT NULL;
 ALTER TABLE cart ADD COLUMN v2_right_product_id INT NULL;
+
+
+--
+-- 0094_rename_licence_col.sql
 ALTER TABLE `md_licenses` CHANGE COLUMN `license` `license_no` VARCHAR(32) NOT NULL;
+
+
+--
+-- 0095_add_legacy_parent_id.sql
 ALTER TABLE productsv2 ADD COLUMN _parent_product_id INT DEFAULT 0;
+
+
+--
+-- 0096_cart_qty.sql
 ALTER TABLE cart
   ADD COLUMN right_qty TINYINT UNSIGNED DEFAULT 0,
   ADD COLUMN left_qty TINYINT UNSIGNED DEFAULT 0;
+
+
+--
+-- 0097_drop_virtual_supplies.sql
 DROP TABLE virtual_supplies;
+
+
+--
+-- 0098_renamed_catalog_tables.sql
 ALTER TABLE abb_product_catalog RENAME catalog_abb;
 ALTER TABLE national_lens_product_catalog RENAME catalog_national_lens;
 
+
+
+--
+-- 0099_add_json_label.sql
 ALTER TABLE orders ADD COLUMN labels JSON NULL;
+
+
+--
+-- 0100_drop_label_tables.sql
 DROP TABLE orders_labels_xref;
 DROP TABLE labels;
+
+
+--
+-- 0101_drop_products.sql
 ALTER TABLE productsv2
       DROP COLUMN _parent_product_id;
 
@@ -756,15 +1155,39 @@ ALTER TABLE cart
 
 DROP TABLE parent_products;
 DROP TABLE products;
+
+
+--
+-- 0102_readd_parent_products.sql
 ALTER TABLE productsv2 ADD COLUMN _parent_product_id INT DEFAULT 0;
+
+
+--
+-- 0103_deleted_orders.sql
 ALTER TABLE orders ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0104_add_order_sheet_cols.sql
 ALTER TABLE orders ADD COLUMN customer_service_grade VARCHAR(1) NULL;
 ALTER TABLE orders ADD COLUMN distributor VARCHAR(8) NULL;
 ALTER TABLE orders ADD COLUMN wholesale_cost DECIMAL(13,2) DEFAULT 0;
 ALTER TABLE orders ADD COLUMN distributor_shipping_cost DECIMAL(13,2) DEFAULT 0;
+
+
+--
+-- 0105_rename_abb_order_no.sql
 ALTER TABLE orders CHANGE abb_order_no distributor_order_no VARCHAR(128) DEFAULT NULL;
+
+
+--
+-- 0106_add_date_status_last_modified.sql
 ALTER TABLE orders ADD COLUMN date_status_modified DATETIME DEFAULT NULL;
 ALTER TABLE exams ADD COLUMN date_status_modified DATETIME DEFAULT NULL;
+
+
+--
+-- 0107_status_modified_trigger.sql
 CREATE
     TRIGGER upd_order_date_status_modified BEFORE UPDATE
     ON orders
@@ -785,8 +1208,16 @@ CREATE
            SET NEW.date_status_modified = NOW();
         END IF;
     END;
+
+
+--
+-- 0108_dr_contact.sql
 ALTER TABLE mds ADD COLUMN mobile_number VARCHAR(32) NULL;
 ALTER TABLE mds ADD COLUMN slack_username VARCHAR(64) NULL;
+
+
+--
+-- 0109_add_rebates_table.sql
 CREATE TABLE rebates (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   product_id INT NOT NULL,
@@ -794,8 +1225,20 @@ CREATE TABLE rebates (
   amt_discount DECIMAL(13, 2) NOT NULL DEFAULT 0,
   FOREIGN KEY (product_id) REFERENCES productsv2(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0110_md_is_admin.sql
 ALTER TABLE mds ADD column is_admin TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0111_add_rebate_columns.sql
 ALTER TABLE orders ADD COLUMN mail_in_rebate_amt DECIMAL(13, 2) NOT NULL DEFAULT 0;
+
+
+--
+-- 0112_product_distributor_lookup.sql
 ALTER TABLE catalog_national_lens RENAME catalog_ntl_lens;
 
 CREATE TABLE product_skus (
@@ -817,6 +1260,10 @@ CREATE TABLE distributors (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0113_distributor_skus.sql
 CREATE TABLE distributor_skus (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   distributor_id INT DEFAULT NULL,
@@ -837,6 +1284,10 @@ CREATE TABLE distributor_shipping_methods (
 
   FOREIGN KEY (distributor_id) REFERENCES distributors(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0114_levenshtein_distance.sql
 CREATE FUNCTION levenshtein( s1 VARCHAR(255), s2 VARCHAR(255) )
 RETURNS INT
 DETERMINISTIC
@@ -876,11 +1327,23 @@ END WHILE;
 END IF;
 RETURN c;
 END;
+
+
+--
+-- 0115_add_rebate_status.sql
 ALTER TABLE orders ADD COLUMN is_rebate_sent TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE orders ADD COLUMN is_rebate_returned TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE orders ADD COLUMN is_rebate_mailed TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE orders ADD COLUMN is_rebate_cashed TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0116_ack.sql
 ALTER TABLE messages ADD column is_acknowledged TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0117_adjust_attribution.sql
 CREATE TABLE user_attribution_adjust (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   user_id INT NULL,
@@ -913,19 +1376,39 @@ CREATE TABLE user_attribution_adjust (
   -- postal_code
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0118_message_raw.sql
 ALTER TABLE messages MODIFY sms_from VARCHAR(32);
 ALTER TABLE messages MODIFY sms_to VARCHAR(32);
 ALTER TABLE messages ADD COLUMN raw_message TEXT NULL;
 ALTER TABLE messages ADD COLUMN is_escalated TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0119_md_cols.sql
 ALTER TABLE exams ADD COLUMN date_md_reviewed DATETIME DEFAULT NULL;
 ALTER TABLE exams ADD COLUMN is_retake_permitted TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE exams ADD COLUMN retake_instructions TEXT NULL;
 ALTER TABLE orders ADD COLUMN date_closed DATETIME DEFAULT NULL;
+
+
+--
+-- 0120_add_user_tags.sql
 ALTER TABLE users ADD COLUMN labels JSON NULL;
 ALTER TABLE users ADD COLUMN notes TEXT DEFAULT NULL;
+
+
+--
+-- 0121_date_modified.sql
 ALTER TABLE addresses ADD date_modified TIMESTAMP DEFAULT NOW() ON UPDATE NOW();
 
 ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0122_add_brands_table.sql
 ALTER TABLE productsv2 ADD COLUMN brand_id INT NULL;
 CREATE TABLE brands (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -934,9 +1417,21 @@ CREATE TABLE brands (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 ALTER TABLE productsv2 ADD CONSTRAINT fk_brands_id FOREIGN KEY (brand_id) REFERENCES brands(id);
+
+
+--
+-- 0123_add_admin_roles.sql
 ALTER TABLE admins ADD COLUMN roles JSON NULL;
 ALTER TABLE admins ADD COLUMN profile_image VARCHAR(200) NULL;
+
+
+--
+-- 0124_audit_add_pkey.sql
     ALTER TABLE audit_log ADD id INT NOT NULL PRIMARY KEY AUTO_INCREMENT;
+
+
+--
+-- 0125_add_audit_log_user_id.sql
 ALTER TABLE audit_log ADD COLUMN admin_id INT DEFAULT NULL;
 ALTER TABLE audit_log ADD CONSTRAINT admin_id_fk01 FOREIGN KEY (admin_id) REFERENCES admins(id);
 
@@ -948,7 +1443,15 @@ ALTER TABLE admins ADD COLUMN mobile_number VARCHAR(32) NULL;
 ALTER TABLE admins ADD COLUMN slack_username VARCHAR(32) NULL;
 ALTER TABLE admins ADD COLUMN is_suspended TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE admins DROP COLUMN profile_image;
+
+
+--
+-- 0126_is_suspended_is_deleted.sql
 ALTER TABLE admins CHANGE COLUMN `is_suspended` `is_deleted` TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0127_wallet.sql
 CREATE TABLE wallet_transactions (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1028,13 +1531,29 @@ CREATE TABLE refer_a_friend (
 
 CREATE INDEX refer_a_friend_referree_user_id_idx ON refer_a_friend(referree_user_id);
 CREATE INDEX refer_a_friend_referrer_user_id_idx ON refer_a_friend(referrer_user_id);
+
+
+--
+-- 0128_audit_log_mods.sql
 ALTER TABLE audit_log CHANGE COLUMN data data JSON NULL DEFAULT NULL;
 ALTER TABLE audit_log CHANGE COLUMN subject subject VARCHAR(600) NOT NULL;
 
 ALTER TABLE md_licenses ADD COLUMN admin_id INT DEFAULT NULL;
 ALTER TABLE md_licenses ADD CONSTRAINT admin_id_fk03 FOREIGN KEY (admin_id) REFERENCES admins(id);
+
+
+--
+-- 0129_mod_md_admin_id.sql
 ALTER TABLE exams CHANGE COLUMN admin_id md_admin_id INT DEFAULT NULL;
+
+
+--
+-- 0130_mod_md_licenses.sql
 ALTER TABLE md_licenses CHANGE COLUMN admin_id md_admin_id INT DEFAULT NULL;
+
+
+--
+-- 0131_add_devices_table.sql
 CREATE TABLE device_display_properties (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   device_name VARCHAR(128) NOT NULL,
@@ -1047,6 +1566,10 @@ CREATE TABLE device_display_properties (
   device_width SMALLINT NOT NULL,
   pixels_per_inch SMALLINT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0132_v2_messages.sql
 ALTER TABLE users MODIFY email VARCHAR(254);
 
 CREATE TABLE v2_messages (
@@ -1078,6 +1601,10 @@ CREATE TABLE v2_messages (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE INDEX v2_messages_user_id_date_sent_idx ON v2_messages (user_id, date_sent);
+
+
+--
+-- 0133_promotional_discount.sql
 ALTER TABLE wallet_transactions
   ADD COLUMN is_promotional TINYINT(1) NOT NULL DEFAULT 1,
   ADD COLUMN reward_rule_id INT,
@@ -1086,6 +1613,10 @@ ALTER TABLE wallet_transactions
 
 DROP INDEX deeplinks_url_idx ON deeplinks;
 CREATE UNIQUE INDEX deeplinks_url_idx ON deeplinks(url);
+
+
+--
+-- 0134_add_reorder_drip.sql
 CREATE TABLE do_not_disturb (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1146,6 +1677,10 @@ CREATE INDEX dnd_user_id_date_expiry_idx
 ON do_not_disturb (user_id, date_expiry);
 
 CREATE INDEX drip_reorder_options_user_id_idx ON drip_reorder_options (user_id);
+
+
+--
+-- 0135_add_notes.sql
 CREATE TABLE notes (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	admin_id INT NULL,
@@ -1157,13 +1692,29 @@ CREATE TABLE notes (
   FOREIGN KEY (admin_id) REFERENCES admins(id),
   FOREIGN KEY (exam_id) REFERENCES exams(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0136_add_product_fields.sql
 ALTER TABLE productsv2 ADD COLUMN materials TEXT NULL;
 ALTER TABLE productsv2 ADD COLUMN package_details TEXT NULL;
+
+
+--
+-- 0137_add_template_id.sql
 ALTER TABLE v2_messages ADD COLUMN sendwithus_template_id VARCHAR(64);
+
+
+--
+-- 0138_add_product_detail_cols.sql
 ALTER TABLE productsv2
 ADD COLUMN lens_type VARCHAR(256) DEFAULT NULL,
 ADD COLUMN package_detail VARCHAR(256) DEFAULT NULL,
 ADD COLUMN material VARCHAR(256) DEFAULT NULL;
+
+
+--
+-- 0139_competition.sql
 CREATE TABLE product_competitors (
   product_id INT NOT NULL PRIMARY KEY,
   lens_com_url VARCHAR(128),
@@ -1178,7 +1729,15 @@ CREATE TABLE product_competitors (
   visiondirect_last_crawled TIMESTAMP NULL DEFAULT NULL,
   FOREIGN KEY (product_id) REFERENCES productsv2(id)
 );
-ALTER TABLE exams ADD COLUMN rx_images JSON NULL;ALTER TABLE productsv2
+
+
+--
+-- 0140_add_image_rxs.sql
+ALTER TABLE exams ADD COLUMN rx_images JSON NULL;
+
+--
+-- 0141_remove_old_fields.sql
+ALTER TABLE productsv2
   DROP COLUMN _parent_product_id,
   DROP COLUMN brand;
 
@@ -1192,8 +1751,20 @@ ALTER TABLE orders
 
 ALTER TABLE exams
   DROP COLUMN has_qualified;
+
+
+--
+-- 0142_reorder_options_unique_user_id.sql
 ALTER TABLE drip_reorder_options ADD CONSTRAINT constr_drip_reorder_options_user_id UNIQUE (user_id);
+
+
+--
+-- 0143_add_rx_email_col.sql
 ALTER TABLE orders ADD COLUMN is_rx_email_sent TINYINT(1) NOT NULL DEFAULT 0;
+
+
+--
+-- 0144_exam_detection_session.sql
 /*
  * Migration 144
  * 2/2/2017
@@ -1225,9 +1796,17 @@ CREATE TABLE detect_sessions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 ALTER TABLE uploaded_videos ADD COLUMN camera_metadata JSON;
+
+
+--
+-- 0145_drop_dup_cols.sql
 ALTER TABLE productsv2 DROP COLUMN package_detail;
 ALTER TABLE productsv2 DROP COLUMN material;
 ALTER TABLE productsv2 MODIFY lens_type TEXT;
+
+
+--
+-- 0146_add_drip_schedule_id_unique.sql
 ALTER TABLE v2_messages
   ADD COLUMN drip_schedule_id INT DEFAULT NULL;
 
@@ -1241,8 +1820,12 @@ ALTER TABLE v2_messages
 ALTER TABLE drip_schedule
   ADD UNIQUE replacement_schedule_send_interval_type_unique (
   replacement_schedule, send_interval, type);
+
+
+--
+-- 0147_user_passwords.sql
 CREATE TABLE user_auth_passwords (
-  user_id INT PRIMARY KEY NOT NULL,
+  user_id INT NOT NULL PRIMARY KEY,
   date_modified TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
   password_hash BINARY(60) NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
@@ -1257,6 +1840,10 @@ CREATE TABLE user_auth_password_reset_tokens (
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 CREATE UNIQUE INDEX user_auth_password_reset_tokens_token_idx ON user_auth_password_reset_tokens(token);
+
+
+--
+-- 0148_add_shipping_option.sql
 CREATE TABLE shipping_options (
   id TINYINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1264,6 +1851,10 @@ CREATE TABLE shipping_options (
   label VARCHAR(64),
   cost decimal(5,2) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0149_modify_orders_carts_shipping_not_null.sql
 ALTER TABLE orders
   ADD COLUMN shipping_option_id TINYINT DEFAULT 1,
   ADD FOREIGN KEY (shipping_option_id) REFERENCES shipping_options(id);
@@ -1275,13 +1866,25 @@ ALTER TABLE cart
 ALTER TABLE wallet_transactions
   ADD COLUMN shipping_option_id TINYINT DEFAULT NULL,
   ADD FOREIGN KEY (shipping_option_id) REFERENCES shipping_options(id);
+
+
+--
+-- 0150_detect_session_type_change.sql
 ALTER TABLE detect_sessions
   MODIFY request_count SMALLINT UNSIGNED,
   MODIFY undetected_count SMALLINT UNSIGNED,
   MODIFY error_count SMALLINT UNSIGNED;
+
+
+--
+-- 0151_dob.sql
 ALTER TABLE users ADD COLUMN date_of_birth DATE DEFAULT NULL;
+
+
+--
+-- 0152_add_subscriptions.sql
 CREATE TABLE subscriptions (
-  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   user_id INT NULL,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   name VARCHAR(200) NULL,
@@ -1289,11 +1892,23 @@ CREATE TABLE subscriptions (
   data JSON NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0153_user_logs_platform.sql
 ALTER TABLE user_logs ADD COLUMN platform_id TINYINT DEFAULT 0;
 ALTER TABLE orders ADD COLUMN platform_id TINYINT NOT NULL DEFAULT 0;
+
+
+--
+-- 0154_add_product_line_and_category.sql
 ALTER TABLE productsv2
 ADD COLUMN product_line VARCHAR(256) DEFAULT NULL,
 ADD COLUMN category VARCHAR(256) DEFAULT NULL;
+
+
+--
+-- 0155_advertising_attribution.sql
 CREATE TABLE advertising_attribution (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -1307,8 +1922,16 @@ CREATE TABLE advertising_attribution (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE INDEX advertising_attribution_user_id_idx ON advertising_attribution(user_id);
+
+
+--
+-- 0156_add_address_id_reorder_opts.sql
 ALTER TABLE drip_reorder_options ADD COLUMN preferred_address_id INT DEFAULT NULL;
 ALTER TABLE drip_reorder_options ADD CONSTRAINT preferred_address_id_fk01 FOREIGN KEY (preferred_address_id) REFERENCES addresses(id);
+
+
+--
+-- 0157_add_reorder_drip.sql
 CREATE TABLE reorder_options (
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   exam_id INT NOT NULL,
@@ -1332,35 +1955,79 @@ CREATE TABLE reorder_options (
   FOREIGN KEY (preferred_address_id) REFERENCES addresses(id),
   FOREIGN KEY (preferred_shipping_option_id) REFERENCES shipping_options(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0158_add_message_type.sql
 ALTER TABLE v2_messages ADD COLUMN type VARCHAR(16) NULL;
 ALTER TABLE v2_messages ADD COLUMN order_id INT DEFAULT NULL;
 ALTER TABLE v2_messages ADD COLUMN exam_id INT DEFAULT NULL;
 
 ALTER TABLE v2_messages ADD CONSTRAINT order_id_fk01 FOREIGN KEY (order_id) REFERENCES orders(id);
 ALTER TABLE v2_messages ADD CONSTRAINT exam_id_fk01 FOREIGN KEY (exam_id) REFERENCES exams(id);
+
+
+--
+-- 0159_add_is_photo_rx.sql
 ALTER TABLE exams
   ADD COLUMN is_photo_rx BOOLEAN DEFAULT 0;
+
+
+--
+-- 0160_add_user_address_id_column.sql
 ALTER TABLE addresses ADD COLUMN user_address_id VARCHAR(16) DEFAULT NULL;
+
+
+--
+-- 0161_add_has_seen_rx_upload.sql
 ALTER TABLE users
 	ADD COLUMN has_seen_rx_upload TINYINT(1) NOT NULL DEFAULT 0;
-	ALTER TABLE users
+	
+
+--
+-- 0162_add_preferred_address.sql
+ALTER TABLE users
   ADD COLUMN preferred_address_id INT NULL,
   ADD CONSTRAINT FOREIGN KEY(preferred_address_id) REFERENCES addresses(id);
 
 ALTER TABLE addresses DROP FOREIGN KEY addresses_ibfk_1;
 ALTER TABLE addresses DROP INDEX constr_addresses_user_id_label;
 ALTER TABLE addresses ADD UNIQUE INDEX addresses_user_id_user_address_id_idx (user_id, user_address_id);
+
+
+--
+-- 0163_add_order_date_fulfilled.sql
 ALTER TABLE orders ADD date_fulfilled DATETIME DEFAULT NULL;
+
+
+--
+-- 0164_increase_attribution_field_char_limit.sql
 ALTER TABLE user_attribution_adjust
   MODIFY network_name VARCHAR(128),
   MODIFY campaign_name VARCHAR(128),
   MODIFY adgroup_name VARCHAR(128),
   MODIFY creative_name VARCHAR(128);
+
+
+--
+-- 0165_create_available_distributors.sql
 ALTER TABLE productsv2
   ADD COLUMN available_distributor_ids JSON NULL;
-ALTER TABLE users DROP COLUMN has_seen_rx_upload;ALTER TABLE exams ADD COLUMN date_first_ready_for_dr DATETIME DEFAULT NULL;
+
+
+--
+-- 0166_drop_unneeded_has_seen_rx_upload_col.sql
+ALTER TABLE users DROP COLUMN has_seen_rx_upload;
+
+--
+-- 0167_add_rdy_for_dr_datetime_and_diagnosis.sql
+ALTER TABLE exams ADD COLUMN date_first_ready_for_dr DATETIME DEFAULT NULL;
 ALTER TABLE exams ADD COLUMN date_first_md_reviewed DATETIME DEFAULT NULL;
 ALTER TABLE exams ADD COLUMN diagnosis TEXT DEFAULT NULL;
+
+
+--
+-- 0168_multi_distributor_sku.sql
 CREATE TABLE lenses like productsv2;
 
 ALTER TABLE distributors
@@ -1458,9 +2125,17 @@ ALTER TABLE orders
 
   ADD COLUMN left_lens_distributor_qty SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   ADD COLUMN right_lens_distributor_qty SMALLINT UNSIGNED NOT NULL DEFAULT 0;
+
+
+--
+-- 0169_rename_mailing_list_columns.sql
 ALTER TABLE mailing_list
   CHANGE state qualify_state varchar(2),
   CHANGE last_exam_date qualify_last_exam_date date;
+
+
+--
+-- 0170_add_video_detection_segments.sql
 /*
  * Migration 170
  * 6/29/2017
@@ -1481,7 +2156,11 @@ CREATE TABLE video_detection_segments (
   max_faces SMALLINT UNSIGNED,
   glasses_detected TINYINT UNSIGNED,
   FOREIGN KEY (video_id) REFERENCES uploaded_videos(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;CREATE TABLE exam_costs (
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- 0171_add_exam_costs.sql
+CREATE TABLE exam_costs (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   cost DECIMAL(13,2) NOT NULL
@@ -1492,9 +2171,21 @@ INSERT INTO exam_costs
 VALUES
   ('2000-01-01', '10.00'),
   ('2017-07-22', '30.00');
+
+
+--
+-- 0172_index_audit_log.sql
 create index subject_date_created_idx ON audit_log(subject, date_created);
+
+
+--
+-- 0173_user_exam_cost.sql
 ALTER TABLE users
   ADD COLUMN exam_cost DECIMAL(13,2) DEFAULT NULL;
+
+
+--
+-- 0174_add_segment_counts.sql
 /*
 * Migration 174
 * 7/26/2017
@@ -1507,13 +2198,25 @@ ALTER TABLE users
 ALTER TABLE video_detection_segments
   ADD COLUMN request_count SMALLINT UNSIGNED NOT NULL,
   ADD COLUMN undetected_count SMALLINT UNSIGNED NOT NULL;
+
+
+--
+-- 0175_addresses_is_deleted.sql
 ALTER TABLE addresses
   ADD COLUMN is_deleted TINYINT NOT NULL DEFAULT 0;
+
+
+--
+-- 0176_move_autorenew_flag.sql
 ALTER TABLE orders 
   ADD COLUMN is_auto_renew_purchase TINYINT(1) NOT NULL DEFAULT 0;
 
 ALTER TABLE users 
-  ADD COLUMN is_auto_renew_on TINYINT(1) NOT NULL DEFAULT 0;DROP TABLE catalog_abb;
+  ADD COLUMN is_auto_renew_on TINYINT(1) NOT NULL DEFAULT 0;
+
+--
+-- 0177_remove_unused_tables.sql
+DROP TABLE catalog_abb;
 DROP TABLE exam_costs;
 DROP TABLE messages;
 DROP TABLE distributor_skus;
@@ -1526,8 +2229,16 @@ ALTER TABLE md_licenses DROP FOREIGN KEY md_licenses_ibfk_1;
 ALTER TABLE md_licenses DROP KEY md_id;
 ALTER TABLE md_licenses DROP COLUMN md_id;
 DROP TABLE mds;
+
+
+--
+-- 0178_rename_branch_id.sql
 ALTER TABLE reward_rules 
   CHANGE branch_id promo_code VARCHAR(64);
+
+
+--
+-- 0179_allow_null_distance_segments.sql
 /*
 * Migration 179
 * 8/11/2017
@@ -1539,11 +2250,19 @@ ALTER TABLE reward_rules
 
 ALTER TABLE video_detection_segments
   MODIFY COLUMN mean_distance decimal(4,2);
+
+
+--
+-- 0180_remove_old_autorenew_flags.sql
 ALTER TABLE orders
   DROP COLUMN is_auto_renew;
 
 ALTER TABLE cart
   DROP COLUMN auto_renew;
+
+
+--
+-- 0181_dx_lenses.sql
 ALTER TABLE cart
   ADD COLUMN dx_shipping_option_id TINYINT DEFAULT NULL,
   ADD FOREIGN KEY (dx_shipping_option_id) REFERENCES shipping_options(id)
@@ -1585,6 +2304,10 @@ ALTER TABLE orders
   ADD COLUMN dx_tracking_number VARCHAR(256) DEFAULT NULL,
   ADD COLUMN dx_tracking_number_url VARCHAR(256) DEFAULT NULL, 
   ADD COLUMN is_dx_shipping_confirm_sent TINYINT(0) NOT NULL DEFAULT 0;
+
+
+--
+-- 0182_kpi_driven_experiments.sql
 CREATE TABLE experimental_subscriptions (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1639,6 +2362,10 @@ CREATE TABLE experimental_brand_switching (
   right_rx JSON,
   experiment_data JSON
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0183_dist_order.sql
 CREATE TABLE distributor_orders (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 
@@ -1696,16 +2423,40 @@ ALTER TABLE orders
   ADD COLUMN right_lens_distributor_order_id INT DEFAULT NULL,
   ADD CONSTRAINT fk_left_lens FOREIGN KEY (left_lens_distributor_order_id) REFERENCES distributor_orders(id),
   ADD CONSTRAINT fk_right_lens FOREIGN KEY (right_lens_distributor_order_id) REFERENCES distributor_orders(id);
+
+
+--
+-- 0184_uaa_idfa_varchar.sql
 ALTER TABLE user_attribution_adjust CHANGE idfa idfa VARCHAR(45) DEFAULT NULL;
+
+
+--
+-- 0185_payment_log_auto_pay.sql
 ALTER TABLE orders ADD COLUMN payment_log JSON NULL;
 ALTER TABLE orders ADD COLUMN is_auto_charge_enabled BOOLEAN DEFAULT FALSE;
+
+
+--
+-- 0186_add_pass_verif.sql
 ALTER TABLE exams
   ADD COLUMN is_passive_verification TINYINT DEFAULT 0,
   ADD COLUMN pass_verif_optom JSON NULL;
+
+
+--
+-- 0187_rename_pass_verif.sql
 ALTER TABLE exams CHANGE COLUMN `pass_verif_optom` `passive_verification_optom` JSON;
+
+
+--
+-- 0188_uaa_android.sql
 ALTER TABLE user_attribution_adjust
   ADD COLUMN adid VARCHAR(45) DEFAULT NULL,
   ADD COLUMN gps_adid VARCHAR(45) DEFAULT NULL;
+
+
+--
+-- 0189_user_device_ad_ids.sql
 ALTER TABLE user_device_ad_ids RENAME user_device_ad_ids_legacy;
 
 CREATE TABLE user_device_ad_ids (
@@ -1716,22 +2467,54 @@ CREATE TABLE user_device_ad_ids (
   date_last_seen TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id, user_id, type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0190_extend_distributor_order.sql
 ALTER TABLE distributor_orders ADD COLUMN is_backordered BOOLEAN DEFAULT FALSE;
 ALTER TABLE distributor_orders ADD COLUMN is_cancelled BOOLEAN DEFAULT FALSE;
 ALTER TABLE distributor_orders ADD COLUMN cost DECIMAL(13, 2);
 ALTER TABLE distributor_orders ADD COLUMN invoice_no VARCHAR(100);
+
+
+--
+-- 0191_ct_exam_question.sql
 ALTER TABLE exams
   ADD COLUMN has_answered_ct_q1 DATETIME DEFAULT NULL
 ;
+
+
+--
+-- 0192_remove_user_device_ad_ids_legacy.sql
 DROP TABLE user_device_ad_ids_legacy;
+
+
+--
+-- 0193_force_dr_valid.sql
 ALTER TABLE exams ADD COLUMN is_dr_valid_override TINYINT DEFAULT 0;
+
+
+--
+-- 0194_unique_email_constraint.sql
 ALTER TABLE users ADD UNIQUE (email);
+
+
+--
+-- 0195_dx_auto_ordering.sql
 ALTER TABLE orders ADD COLUMN dx_left_lens_distributor_order_id INT DEFAULT NULL;
 ALTER TABLE orders ADD COLUMN dx_right_lens_distributor_order_id INT DEFAULT NULL;
 -- whether dx or regular now, but flexible for other types.
 ALTER TABLE distributor_orders ADD COLUMN type VARCHAR(10) NOT NULL;
+
+
+--
+-- 0196_add_url_to_advertising_attribution.sql
 ALTER TABLE advertising_attribution
 ADD COLUMN landing_page_url VARCHAR(255);
+
+
+--
+-- 0197_experiment_overrides.sql
 CREATE TABLE IF NOT EXISTS experiment_overrides (
     user_id INT NOT NULL,
     path VARCHAR(256) NOT NULL,
@@ -1741,9 +2524,21 @@ CREATE TABLE IF NOT EXISTS experiment_overrides (
     PRIMARY KEY (user_id, path),
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0198_add_qualification_to_exam.sql
 ALTER TABLE exams ADD COLUMN qualify_state VARCHAR(2) DEFAULT NULL;
 ALTER TABLE exams ADD COLUMN qualify_last_exam_date DATE DEFAULT NULL;
+
+
+--
+-- 0199_lens_type.sql
 ALTER TABLE users ADD COLUMN lens_type ENUM('daily', 'weekly', 'monthly');
+
+
+--
+-- 0200_wholesale_cost_fixes.sql
 -- These are additions fix issues for Connie who is calculating costs and tracking margin.
 
 -- Problem with calculating wholesale cost when there is one cost field:
@@ -1760,6 +2555,10 @@ ALTER TABLE distributor_orders ADD COLUMN right_shipping_cost DECIMAL(13,2);
 -- These fields are mostly for connie and those who use SQL to pull this information for tracking margin.
 ALTER TABLE orders ADD COLUMN dx_wholesale_cost DECIMAL(13,2) DEFAULT NULL;
 ALTER TABLE orders ADD COLUMN dx_distributor_shipping_cost DECIMAL(13,2) DEFAULT NULL;
+
+
+--
+-- 0201_add_attribution_survey.sql
 CREATE TABLE user_attribution_surveys (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1771,6 +2570,10 @@ CREATE TABLE user_attribution_surveys (
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0202_add_task.sql
 CREATE TABLE tasks (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   type VARCHAR(250) NOT NULL,
@@ -1804,6 +2607,10 @@ CREATE TABLE tasks_xref (
   CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES v2_messages(id),
   CONSTRAINT fk_exam FOREIGN KEY (exam_id) REFERENCES exams(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0203_claimit.sql
 ALTER TABLE orders
 ADD COLUMN claimed_by_admin_id INT DEFAULT NULL;
 
@@ -1811,12 +2618,24 @@ ALTER TABLE orders
 ADD CONSTRAINT fk_claimed
 FOREIGN KEY (claimed_by_admin_id)
 REFERENCES admins(id);
+
+
+--
+-- 0204_update_notes_col.sql
 ALTER TABLE notes ADD COLUMN order_id INT NULL;
-ALTER TABLE notes ADD COLUMN type VARCHAR(32) DEFAULT 'MD_NOTE' NULL;
+ALTER TABLE notes ADD COLUMN type VARCHAR(32) NULL DEFAULT 'MD_NOTE';
 ALTER TABLE notes ADD COLUMN data json DEFAULT NULL;
 ALTER TABLE notes ADD CONSTRAINT fk_sc_notes FOREIGN KEY (order_id) REFERENCES orders(id);
+
+
+--
+-- 0205_task_adjustments.sql
 ALTER TABLE tasks ADD COLUMN last_updated timestamp default now();
 ALTER TABLE tasks_xref ADD COLUMN last_updated timestamp default now();
+
+
+--
+-- 0206_add_cloud_storage.sql
 CREATE TABLE cloud_storage (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1824,8 +2643,16 @@ CREATE TABLE cloud_storage (
   name VARCHAR(250) NOT NULL,
   data JSON
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0207_add_reorder_date_column.sql
 ALTER TABLE users ADD COLUMN estimated_reorder_date TIMESTAMP NULL;
 ALTER TABLE orders ADD COLUMN estimated_reorder_date TIMESTAMP NULL;
+
+
+--
+-- 0208_pv_optoms.sql
 CREATE TABLE IF NOT EXISTS pv_optoms (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   first_name VARCHAR(128),
@@ -1844,12 +2671,20 @@ CREATE TABLE IF NOT EXISTS pv_optoms (
   KEY `date_created` (date_created),
   KEY `date_modified` (date_modified)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0209_names_to_doctor_name.sql
 ALTER TABLE pv_optoms
     DROP COLUMN first_name,
     DROP COLUMN last_name,
     ADD COLUMN doctor_name VARCHAR(255);
+
+
+--
+-- 0210_lens_options_cache.sql
 CREATE TABLE lens_options_cache (
-  lens_id INT PRIMARY KEY NOT NULL,
+  lens_id INT NOT NULL PRIMARY KEY,
   power VARCHAR(2048),
   bc VARCHAR(2048),
   dia VARCHAR(2048),
@@ -1859,6 +2694,10 @@ CREATE TABLE lens_options_cache (
   add_power VARCHAR(2048),
   dn VARCHAR(2048)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0211_task_templates.sql
 ALTER TABLE tasks ADD COLUMN user_id INT;
 ALTER TABLE tasks ADD CONSTRAINT fk_tasks_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE v2_messages ADD COLUMN subject TEXT;
@@ -1870,12 +2709,24 @@ CREATE TABLE message_templates (
     date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_modified TIMESTAMP DEFAULT NOW() ON UPDATE NOW()
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8 COLLATE = UTF8_GENERAL_CI;
+
+
+--
+-- 0212_misc_indexes.sql
 CREATE INDEX user_attribution_adjust_idfa_idx ON user_attribution_adjust(idfa);
 CREATE INDEX user_attribution_adjust_adid_idx ON user_attribution_adjust(adid);
 CREATE INDEX user_attribution_adjust_gps_adid_idx ON user_attribution_adjust(gps_adid);
 
 CREATE INDEX user_device_ad_ids_user_id_idx ON user_device_ad_ids(user_id);
+
+
+--
+-- 0213_add_ip_address_column.sql
 ALTER TABLE user_logs ADD COLUMN ip_addr VARBINARY(16);
+
+
+--
+-- 0214_create_fsm_transition_migrations.sql
 ALTER TABLE pv_optoms RENAME TO optoms;
 
 CREATE TABLE optom_business_hours (
@@ -1893,7 +2744,7 @@ CREATE TABLE fsm_transitions (
   task_id INT NULL,
   to_state VARCHAR(64) NOT NULL,
   from_state VARCHAR(64) NULL,
-  date_created TIMESTAMP(6) default CURRENT_TIMESTAMP(6) NOT NULL,
+  date_created TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   type VARCHAR(64) NULL,
   CONSTRAINT FOREIGN KEY(task_id) REFERENCES tasks(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -1901,6 +2752,10 @@ CREATE TABLE fsm_transitions (
 ALTER TABLE exams ADD COLUMN rx_verification_optom_id INT;
 ALTER TABLE exams ADD CONSTRAINT fk_exams_rx_verification_optom_id
 FOREIGN KEY (rx_verification_optom_id) REFERENCES optoms(id);
+
+
+--
+-- 0215_refer_a_friend_reward_rule.sql
 ALTER TABLE refer_a_friend 
   ADD COLUMN referree_reward_rule_id INT DEFAULT NULL,
   ADD COLUMN referrer_reward_rule_id INT DEFAULT NULL,
@@ -1929,11 +2784,27 @@ ALTER TABLE refer_a_friend
   ADD CONSTRAINT fk_referrer_user_id 
     FOREIGN KEY (referrer_user_id) 
     REFERENCES users (id);
+
+
+--
+-- 0216_drop_user_column_in_audit_logs.sql
 ALTER TABLE audit_log DROP COLUMN user;
+
+
+--
+-- 0217_update_optom_business_hours_to_allow_null.sql
 ALTER TABLE optom_business_hours MODIFY time_open VARCHAR(64) NULL;
 ALTER TABLE optom_business_hours MODIFY time_closed VARCHAR(64) NULL;
+
+
+--
+-- 0218_rename_fsm_transitions_and_modify_timestamp.sql
 RENAME TABLE fsm_transitions TO rx_verification_transitions;
-ALTER TABLE rx_verification_transitions MODIFY date_created TIMESTAMP default CURRENT_TIMESTAMP NOT NULL;
+ALTER TABLE rx_verification_transitions MODIFY date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+
+--
+-- 0219_pv_additional_cols.sql
 ALTER TABLE exams
   ADD COLUMN optom_id INT DEFAULT NULL,
   ADD COLUMN optom_receptionist_name VARCHAR(128) DEFAULT NULL,
@@ -1947,26 +2818,70 @@ ALTER TABLE exams
 ALTER TABLE optoms
   ADD COLUMN email VARCHAR(254) DEFAULT NULL,
   ADD COLUMN fax VARCHAR(16) DEFAULT NULL;
+
+
+--
+-- 0220_search_optom.sql
 ALTER TABLE optoms ADD FULLTEXT fulltext_search (clinic_name, doctor_name);
+
+
+--
+-- 0221_optom_timezone.sql
 ALTER TABLE optoms ADD COLUMN timezone VARCHAR(64) NULL;
+
+
+--
+-- 0222_date_completed.sql
 ALTER TABLE orders ADD COLUMN date_completed DATETIME DEFAULT NULL;
+
+
+--
+-- 0223_iterable_batch_logs.sql
 CREATE TABLE iterable_batch_logs (
   batch_end TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0224_orders_product_id_foreign_key.sql
 ALTER TABLE orders ADD CONSTRAINT fk_v2_left_product FOREIGN KEY (v2_left_product_id) REFERENCES productsv2(id);
 ALTER TABLE orders ADD CONSTRAINT fk_v2_right_product FOREIGN KEY (v2_right_product_id) REFERENCES productsv2(id);
+
+
+--
+-- 0225_user_logs_date_index.sql
 CREATE INDEX user_logs_date_created_idx ON user_logs (date_created);
+
+
+--
+-- 0226_iterable_batch_logs_date_index.sql
 CREATE INDEX iterable_batch_logs_batch_end_idx ON iterable_batch_logs (batch_end);
+
+
+--
+-- 0227_task_notes.sql
 ALTER TABLE notes ADD COLUMN task_id INT;
 
 ALTER TABLE notes ADD CONSTRAINT fk_notes_to_task_id FOREIGN KEY (task_id) REFERENCES tasks(id);
 
 ALTER TABLE tasks_xref DROP FOREIGN KEY fk_note;
 ALTER TABLE tasks_xref DROP COLUMN note_id;
+
+
+--
+-- 0228_adjust_add_label.sql
 ALTER TABLE user_attribution_adjust
   ADD COLUMN label VARCHAR(256);
+
+
+--
+-- 0229_optom_search_with_city.sql
 ALTER TABLE optoms DROP KEY fulltext_search;
 ALTER TABLE optoms ADD FULLTEXT fulltext_search (clinic_name, doctor_name, city);
+
+
+--
+-- 0230_create_partners.sql
 CREATE TABLE `partners` (
   `uuid` varchar(36) NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2019,17 +2934,41 @@ CREATE TABLE `partner_tokens` (
   KEY `issued_by` (`issued_by`),
   CONSTRAINT `partner_tokens_ibfk_2` FOREIGN KEY (`issued_by`) REFERENCES `partner_secrets` (`id`)
 );
+
+
+--
+-- 0231_fix_default_value_for_jwt_token.sql
 -- Removes default value from jwt_token column (field should not be optional)
 ALTER TABLE
   `partner_tokens`
 CHANGE
   `jwt_token` `jwt_token` VARCHAR(512) NOT NULL;
+
+
+--
+-- 0232_fix_more_default_values.sql
 ALTER TABLE partners CHANGE name name VARCHAR(255) NOT NULL;
 ALTER TABLE partner_secrets CHANGE secret secret VARCHAR(64) NOT NULL COMMENT 'Random value';
+
+
+--
+-- 0233_rx_verification_transition_name.sql
 ALTER TABLE rx_verification_transitions ADD COLUMN transition VARCHAR(250);
+
+
+--
+-- 0234_drop_env_column.sql
 ALTER TABLE partner_secrets DROP env;
+
+
+--
+-- 0235_drop_partner_tokens.sql
 -- We don't need auth tokens anymore, we'll just use the secret keys directly
 DROP TABLE partner_tokens;
+
+
+--
+-- 0236_timezones.sql
 CREATE TABLE timezones (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   city VARCHAR(128),
@@ -2040,6 +2979,10 @@ CREATE TABLE timezones (
   area_code VARCHAR(3),
   timezone VARCHAR(30)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0237_pricing_overlays.sql
 CREATE TABLE price_overlays (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2069,6 +3012,10 @@ CREATE TABLE users_price_overlays (
   FOREIGN KEY fk_price_overlay_id (price_overlay_id) REFERENCES price_overlays (id),
   UNIQUE KEY unique_user_price_overlay (user_id, price_overlay_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+
+--
+-- 0238_add_partner_identities.sql
 CREATE TABLE `partner_identities` (
   `uuid` varchar(36) NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2082,13 +3029,29 @@ CREATE TABLE `partner_identities` (
   UNIQUE KEY `partner_uuid` (`partner_uuid`,`external_id`),
   CONSTRAINT `partner_identities_ibfk_1` FOREIGN KEY (`partner_uuid`) REFERENCES `partners` (`uuid`)
 );
+
+
+--
+-- 0239_add_custom_product_column.sql
 ALTER TABLE lenses
   ADD COLUMN is_custom tinyint(1) NOT NULL DEFAULT '0';
+
+
+--
+-- 0240_exam_date_range_high_myope.sql
 ALTER TABLE exams
   ADD COLUMN has_signed_high_myope_waiver TIMESTAMP NULL DEFAULT NULL,
   ADD COLUMN qualify_last_exam_range_start_date DATE DEFAULT NULL,
   ADD COLUMN qualify_last_exam_range_end_date DATE DEFAULT NULL;
+
+
+--
+-- 0241_remove_options_column.sql
 ALTER TABLE lenses DROP options;
+
+
+--
+-- 0242_rewards_redesign_tables.sql
 CREATE TABLE `promo_rewards` (
   `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2139,7 +3102,15 @@ CREATE TABLE `held_px_rewards` (
   CONSTRAINT `given_by_admin_id_ibfk` FOREIGN KEY (`given_by_admin_id`) REFERENCES `admins` (`id`),
   CONSTRAINT `applied_to_order_id_ibfk_2` FOREIGN KEY (`applied_to_order_id`) REFERENCES `orders` (`id`)
 );
+
+
+--
+-- 0243_task_transitions.sql
 RENAME TABLE rx_verification_transitions to task_transitions
+
+
+--
+-- 0244_fax_table.sql
 CREATE TABLE `faxes` (
   `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `optom_id` INT,
@@ -2160,8 +3131,16 @@ CREATE TABLE `faxes` (
   CONSTRAINT `faxes_task_fk` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
   CONSTRAINT `faxes_optom_fk` FOREIGN KEY (`optom_id`) REFERENCES `optoms` (`id`)
 );
+
+
+--
+-- 0245_price_overlay_affiliate_id.sql
 ALTER TABLE price_overlays
   ADD COLUMN `affiliate_id` varchar(8) DEFAULT NULL UNIQUE;
+
+
+--
+-- 0246_exam_fax_verify.sql
 ALTER TABLE exams
   ADD COLUMN fax_verification_response_id INT,
   ADD COLUMN fax_verification_request_id INT,
@@ -2169,9 +3148,17 @@ ALTER TABLE exams
   ADD CONSTRAINT `fax_verification_request_fk` FOREIGN KEY(fax_verification_request_id) REFERENCES faxes(id);
 
 ALTER TABLE optoms ADD COLUMN incoming_fax_numbers JSON
+
+
+--
+-- 0247_unsatisfied_state_requirements.sql
 ALTER TABLE exams
   ADD COLUMN unsatisfied_state_requirements JSON;
 
+
+
+--
+-- 0248_add_rx_request_table.sql
 CREATE TABLE `rx_requests` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2187,9 +3174,17 @@ CREATE TABLE `rx_requests` (
   CONSTRAINT `rx_requests_ibfk_1` FOREIGN KEY (`identity_uuid`) REFERENCES `partner_identities` (`uuid`),
   CONSTRAINT `rx_requests_ibfk_2` FOREIGN KEY (`partner_uuid`) REFERENCES `partners` (`uuid`)
 );
+
+
+--
+-- 0249_parent_task_id.sql
 ALTER TABLE tasks
   ADD COLUMN `parent_task_id` int(11) DEFAULT NULL,
   ADD FOREIGN KEY (`parent_task_id`) REFERENCES `tasks`(`id`);
+
+
+--
+-- 0250_add_theme_on_partner.sql
 -- Allow NULLs
 ALTER TABLE partners
     ADD theme VARCHAR(16) NULL DEFAULT NULL
@@ -2201,6 +3196,10 @@ UPDATE partners SET theme = LOWER(name) WHERE theme = "" OR theme IS NULL;
 -- Disallow NULLs
 ALTER TABLE partners
     CHANGE `theme` `theme` VARCHAR(16) NOT NULL;
+
+
+--
+-- 0251_add_rx_patients_table.sql
 CREATE TABLE `rx_patients` (
   `uuid` varchar(36) NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2216,7 +3215,15 @@ CREATE TABLE `rx_patients` (
   KEY `rx_request_id` (`rx_request_id`),
   CONSTRAINT `rx_patients_ibfk_1` FOREIGN KEY (`rx_request_id`) REFERENCES `rx_requests` (`id`)
 );
+
+
+--
+-- 0252_allow_null_scratchpads.sql
 ALTER TABLE rx_patients CHANGE scratchpad scratchpad JSON DEFAULT NULL;
+
+
+--
+-- 0253_shipping_option_affiliate_id.sql
 ALTER TABLE shipping_options 
   ADD COLUMN `affiliate_id` varchar(8) DEFAULT NULL UNIQUE;
 
@@ -2227,23 +3234,59 @@ ALTER TABLE shipping_options
   MODIFY COLUMN `affiliate_id` varchar(8) NOT NULL UNIQUE;
 
 
+
+
+--
+-- 0254_remove_dob_and_add_fulfillment.sql
 ALTER TABLE rx_patients DROP date_of_birth;
 ALTER TABLE rx_patients ADD fulfillment JSON NULL DEFAULT NULL AFTER scratchpad;
+
+
+--
+-- 0255_swag.sql
 ALTER TABLE distributor_orders
   ADD COLUMN pack VARCHAR(20),
   ADD COLUMN tshirt VARCHAR(5);
+
+
+--
+-- 0256_rename_target_skus_column_to_target_product_ids.sql
 ALTER TABLE rx_requests CHANGE target_skus target_product_ids JSON NOT NULL;
+
+
+--
+-- 0257_create_reattribution_adjust_table.sql
 CREATE TABLE user_reattribution_adjust LIKE user_attribution_adjust;
+
+
+--
+-- 0258_add_left_and_right_product.sql
 ALTER TABLE rx_patients
   ADD left_product_id INT(11) NULL DEFAULT NULL AFTER fulfillment,
   ADD right_product_id INT(11) NULL DEFAULT NULL AFTER left_rx,
   ADD FOREIGN KEY (left_product_id) REFERENCES lenses (id),
   ADD FOREIGN KEY (right_product_id) REFERENCES lenses (id);
+
+
+--
+-- 0259_rename_rxrequest_to_rxorder.sql
 RENAME TABLE rx_requests TO rx_orders;
 
 ALTER TABLE rx_patients CHANGE rx_request_id rx_order_id INT(11) UNSIGNED NOT NULL;
+
+
+--
+-- 0260_rename_rxpatient_to_rxrequest.sql
 RENAME TABLE rx_patients TO rx_requests;
+
+
+--
+-- 0261_rename_partner_users_to_partner_portal_users.sql
 RENAME TABLE partner_users TO partner_portal_users;
+
+
+--
+-- 0262_update_not_nulls.sql
 LOCK TABLES orders WRITE, exams WRITE;
 
 ALTER TABLE exams
@@ -2264,7 +3307,15 @@ ALTER TABLE orders
   ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 UNLOCK TABLES;
+
+
+--
+-- 0263_v2_messages_idx.sql
 CREATE INDEX direction_is_acked_idx ON v2_messages(direction, is_acknowledged);
+
+
+--
+-- 0264_order_to_lenses_foreign_key.sql
 -- Lets remove these foreign key reference lenses.
 ALTER TABLE orders DROP FOREIGN KEY `fk_v2_left_product`;
 ALTER TABLE orders DROP FOREIGN KEY `fk_v2_right_product`;
@@ -2275,6 +3326,10 @@ ALTER TABLE orders DROP FOREIGN KEY `fk_v2_right_product`;
 ALTER TABLE orders ADD FOREIGN KEY `fk_v2_left_product` (`v2_left_product_id`) REFERENCES `lenses` (`id`);
 ALTER TABLE orders ADD FOREIGN KEY `fk_v2_right_product` (`v2_right_product_id`) REFERENCES `lenses` (`id`);
 ALTER TABLE lenses ADD FOREIGN KEY `fk_brand_id` (`brand_id`) REFERENCES `brands` (`id`);
+
+
+--
+-- 0265_update_reward_references.sql
 LOCK TABLES deeplinks WRITE, refer_a_friend WRITE;
 
 -- Remove the deeplinks reward rule foreign key reference
@@ -2295,14 +3350,26 @@ ALTER TABLE refer_a_friend
   REFERENCES `held_promo_rewards` (`id`);
 
 UNLOCK TABLES;
+
+
+--
+-- 0266_photo_rx_state.sql
 ALTER TABLE exams
   ADD COLUMN photo_rx_state VARCHAR(16) DEFAULT NULL;
+
+
+--
+-- 0267_disallow_affiliate_id_to_be_null.sql
 UPDATE users
   -- Populate fields with a short random string
   SET affiliate_id = SUBSTR(UUID(), 1, 8)
   WHERE affiliate_id IS NULL;
 
 ALTER TABLE users CHANGE affiliate_id affiliate_id VARCHAR(16) NOT NULL;
+
+
+--
+-- 0268_create_partner_number_one.sql
 RENAME TABLE partners TO partners_deprecated;
 
 CREATE TABLE partners (
@@ -2325,6 +3392,10 @@ INSERT
 INSERT
   INTO partners (public_uuid, date_created, name, theme)
   SELECT uuid, date_created, name, theme FROM partners_deprecated;
+
+
+--
+-- 0269_add_partner_id_columns.sql
 --
 -- The purpose of this migration is to change the primary key of the `partners`
 -- table from a UUID string value to a standard/normal auto-incrementing
@@ -2382,7 +3453,15 @@ ALTER TABLE partner_identities   DROP partner_uuid;
 ALTER TABLE partner_portal_users DROP partner_uuid;
 ALTER TABLE partner_secrets      DROP partner_uuid;
 ALTER TABLE rx_orders            DROP partner_uuid;
+
+
+--
+-- 0270_drop_temporary_partners_table.sql
 DROP TABLE partners_deprecated;
+
+
+--
+-- 0271_remove_not-null_constraint_on_partner_id_fks.sql
 ALTER TABLE partner_identities   DROP FOREIGN KEY partner_identities_ibfk_2;
 ALTER TABLE partner_portal_users DROP FOREIGN KEY partner_portal_users_ibfk_2;
 ALTER TABLE partner_secrets      DROP FOREIGN KEY partner_secrets_ibfk_2;
@@ -2397,47 +3476,137 @@ ALTER TABLE partner_identities   ADD FOREIGN KEY (partner_id) REFERENCES partner
 ALTER TABLE partner_portal_users ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
 ALTER TABLE partner_secrets      ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
 ALTER TABLE rx_orders            ADD FOREIGN KEY (partner_id) REFERENCES partners (id);
-CREATE TABLE `productsv4` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `type` enum('birth-control','contact-lens') NOT NULL,
-  `name` varchar(64) NOT NULL,
-  `description` text NOT NULL,
-  `img_url` varchar(128) NOT NULL,
-  `num_items_per_pack` smallint(5) unsigned NOT NULL,
-  `price` decimal(13,2) DEFAULT '0.00',
-  `generic_of_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `generic_of_id` (`generic_of_id`),
-  CONSTRAINT `productsv4_ibfk_1` FOREIGN KEY (`generic_of_id`) REFERENCES `productsv4` (`id`)
-) 
-CREATE TABLE `rxs` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user_id` INT(11) NOT NULL,
-  `type` enum('birth-control','contact-lens') NOT NULL,
-  `issued_at` date NOT NULL,
-  `expires_at` date NOT NULL,
-  `patient_name` varchar(255) NOT NULL,
-  `patient_date_of_birth` date NOT NULL,
-  `patient_address` varchar(255) NOT NULL DEFAULT '',
-  `patient_city` varchar(255) NOT NULL DEFAULT '',
-  `patient_state` varchar(255) NOT NULL DEFAULT '',
-  `md_name` varchar(255) NOT NULL DEFAULT '',
-  `md_address1` varchar(255) NOT NULL DEFAULT '',
-  `md_address2` varchar(255) NOT NULL DEFAULT '',
-  `md_phone` varchar(255) NOT NULL DEFAULT '',
-  `md_license_no` varchar(32) NOT NULL DEFAULT '',
-  `signed_off_by_md_admin_id` int(11) NOT NULL,
-  `rx_attributes` json NOT NULL,
-  `signature` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`),
-  KEY `user_id_fk` (`user_id`),
-  CONSTRAINT `user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) 
-ALTER TABLE productsv4
-    CHANGE num_items_per_pack quantity_text VARCHAR(255) NOT NULL,
-    ADD pill_type ENUM("Combination Pill", "Progestin Only") NOT NULL,
-    ADD risks VARCHAR(255) NOT NULL,
-    ADD tags JSON NOT NULL,
-    ADD ingredients JSON NOT NULL;
+
+
+--
+-- 0272_use_message_templates_table.sql
+DROP TABLE message_templates;
+CREATE TABLE message_templates (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(250) NOT NULL,
+    content TEXT NOT NULL,
+    date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modified TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+    description TEXT DEFAULT NULL,
+    categories JSON NULL,
+    name VARCHAR(250) NOT NULL,
+    UNIQUE (label),
+    UNIQUE (name)
+)  ENGINE=INNODB DEFAULT CHARSET=UTF8 COLLATE = UTF8_GENERAL_CI;
+
+
+--
+-- 0273_add_id_column_to_rx_requests.sql
+ALTER TABLE rx_requests DROP PRIMARY KEY;
+ALTER TABLE rx_requests ADD id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+ALTER TABLE rx_requests ADD UNIQUE INDEX unique_uuid (uuid);
+
+
+--
+-- 0274_rename_affiliate_id_field_to_external_id.sql
+ALTER TABLE users CHANGE affiliate_id external_id VARCHAR(32) NOT NULL AFTER id;
+
+
+--
+-- 0275_add_partner_id_column_to_users.sql
+-- Allow NULLs temporarily (will be made stricter in follow-up migration)
+ALTER TABLE users ADD partner_id TINYINT(3) UNSIGNED NULL DEFAULT NULL AFTER id;
+
+
+--
+-- 0276_populate_all_partner_ids.sql
+-- Populate all partner ID fields for existing records to point to partner #1 (= Simple Contacts)
+UPDATE users SET partner_id = 1;
+
+
+--
+-- 0277_remove_nullability_from_partner_id.sql
+-- Remove NULLability from the partner_id column now that they all have a value
+ALTER TABLE users CHANGE partner_id partner_id TINYINT(3) UNSIGNED NOT NULL;
+
+
+--
+-- 0278_enforce_fk_on_partner_id.sql
+-- Enforce FK: users.partner_id => partners.id
+ALTER TABLE users ADD CONSTRAINT partner_id_fk FOREIGN KEY (partner_id) REFERENCES partners (id);
+
+
+--
+-- 0279_enforce_uniqueness_of_external_ids.sql
+-- Make sure the (partner_id, external_id) combination is unique
+ALTER TABLE users ADD UNIQUE INDEX uniq_external_id (external_id, partner_id);
+ALTER TABLE users DROP INDEX constr_affiliate_id;
+
+
+--
+-- 0280_enforce_uniqueness_of_emails.sql
+-- Make sure the (partner_id, external_id) combination is unique
+ALTER TABLE users ADD UNIQUE INDEX uniq_email (email, partner_id);
+ALTER TABLE users DROP INDEX email;
+
+
+--
+-- 0281_add_date_modified_column_to_users.sql
+ALTER TABLE users
+  ADD COLUMN date_modified TIMESTAMP NULL DEFAULT NULL AFTER date_created;
+
+
+--
+-- 0282_copy_date_modified_values.sql
+UPDATE users SET date_modified = date_created;
+
+
+--
+-- 0283_make_date_modified_non_nullable.sql
+ALTER TABLE users
+  CHANGE date_modified date_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+
+--
+-- 0284_copy_identities_into_users.sql
+INSERT INTO users (date_created, date_modified, partner_id, external_id, email, name, telephone)
+(
+    SELECT date_created, date_modified, partner_id, external_id, email, name, telephone
+    FROM partner_identities
+)
+
+
+--
+-- 0285_add_user_id_column.sql
+-- Move partner_id column right after ID column 
+ALTER TABLE rx_orders MODIFY COLUMN partner_id TINYINT(3) UNSIGNED NOT NULL AFTER id;
+
+-- Add new user_id column right after partner_id
+ALTER TABLE rx_orders ADD user_id INT NULL DEFAULT NULL AFTER partner_id;
+
+
+--
+-- 0286_populate_user_id_columns.sql
+UPDATE rx_orders r SET user_id = (
+  SELECT id FROM users WHERE
+    partner_id = r.partner_id
+    AND external_id = (SELECT external_id FROM partner_identities WHERE uuid = r.identity_uuid));
+
+
+--
+-- 0287_make_user_id_non_nullable.sql
+ALTER TABLE rx_orders MODIFY COLUMN user_id INT NOT NULL;
+
+
+--
+-- 0288_add_fk_to_user_id.sql
+ALTER TABLE rx_orders
+  ADD CONSTRAINT user_id_fk FOREIGN KEY (user_id) REFERENCES users (id);
+
+
+--
+-- 0289_remove_fk_to_identities.sql
+ALTER TABLE rx_orders DROP FOREIGN KEY rx_orders_ibfk_1;
+ALTER TABLE rx_orders DROP identity_uuid;
+
+
+--
+-- 0290_drop_partner_identities_table.sql
+-- Now replaced by users table, where partner_id > 1
+DROP TABLE partner_identities;
+
