@@ -4,6 +4,16 @@ import produce from 'immer';
 
 import type { Column, Database, Table } from './types';
 
+function* iterInsert(arr, pos, item) {
+  yield* arr.slice(0, pos);
+  yield item;
+  yield* arr.slice(pos);
+}
+
+function insert(arr, pos, item) {
+  return [...iterInsert(arr, pos, item)];
+}
+
 /**
  * Creates a new, empty, database.
  */
@@ -70,6 +80,7 @@ export function addColumn(
   db: Database,
   tblName: string,
   column: Column,
+  position,
 ): Database {
   return produce(db, $ => {
     const table = $.tables[tblName];
@@ -81,7 +92,27 @@ export function addColumn(
     if (col) {
       throw new Error(`Column "${tblName}.${column.name}" already exists`);
     }
-    table.columns.push(column);
+
+    if (position) {
+      if (position.startsWith('AFTER ')) {
+        const afterColName = position.substring('AFTER '.length);
+        const pos = table.columns.findIndex(c => c.name === afterColName);
+        if (pos < 0) {
+          throw new Error(
+            `Column "${tblName}.${afterColName}" does not exists`,
+          );
+        }
+
+        table.columns = insert(table.columns, pos + 1, column);
+      } else if (position === 'FIRST') {
+        table.columns = insert(table.columns, 0, column);
+      } else {
+        throw new Error(`Unknown position qualifier: ${position}`);
+      }
+    } else {
+      // Insert at the end
+      table.columns.push(column);
+    }
   });
 }
 
@@ -98,8 +129,7 @@ export function replaceColumn(
     const table = $.tables[tblName];
 
     // TODO: Should error if not exists!
-    table.columns = table.columns.filter(c => c.name !== colName);
-    table.columns.push(column); // TODO: Respect insertion position (AFTER / FIRST)
+    table.columns = table.columns.map(c => (c.name === colName ? column : c));
   });
 }
 

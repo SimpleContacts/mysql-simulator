@@ -141,7 +141,7 @@ function main() {
           db = renameTable(db, expr.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
           const column = makeColumn(change.colName, change.definition);
-          db = addColumn(db, expr.tblName, column);
+          db = addColumn(db, expr.tblName, column, change.position);
         } else if (change.type === 'CHANGE COLUMN') {
           const column = makeColumn(change.newColName, change.definition);
           db = replaceColumn(db, expr.tblName, change.oldColName, column);
