@@ -82,6 +82,11 @@ function main() {
   let db: Database = emptyDb();
 
   for (const expr of ast) {
+    if (expr === null) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
     if (expr.type === 'CREATE TABLE') {
       const table = makeTable(expr);
       db = addTable(db, table);

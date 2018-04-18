@@ -58,6 +58,7 @@ export function renameTable(db: Database, from: string, to: string): Database {
 
   return produce(db, $ => {
     $.tables[to] = $.tables[from];
+    $.tables[to].name = to;
     delete $.tables[from];
   });
 }
