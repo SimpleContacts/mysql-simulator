@@ -82,12 +82,26 @@ function escape(s: string): string {
 }
 
 function columnDefinition(col: Column) {
-  const defaultValue =
+  let defaultValue =
     col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
+
+  // MySQL outputs number constants as strings. No idea why that would make
+  // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
+  if (typeof defaultValue === 'number') {
+    defaultValue = `'${defaultValue}'`;
+  }
+
+  const nullable = !col.nullable
+    ? 'NOT NULL'
+    : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
+      // data types are "NULL" by default, so we omit the explicit NULL, like
+      // MySQL does
+      col.type === 'TIMESTAMP' ? 'NULL' : '';
+
   return [
     escape(col.name),
     col.type.toLowerCase(),
-    col.nullable ? '' : 'NOT NULL',
+    nullable,
     defaultValue ? `DEFAULT ${defaultValue}` : '',
     col.autoIncrement ? 'AUTO_INCREMENT' : '',
   ]
@@ -146,7 +160,13 @@ function main() {
           db = addColumn(db, expr.tblName, column, change.position);
         } else if (change.type === 'CHANGE COLUMN') {
           const column = makeColumn(change.newColName, change.definition);
-          db = replaceColumn(db, expr.tblName, change.oldColName, column);
+          db = replaceColumn(
+            db,
+            expr.tblName,
+            change.oldColName,
+            column,
+            change.position,
+          );
         } else if (change.type === 'DROP COLUMN') {
           db = removeColumn(db, expr.tblName, change.colName);
         } else {

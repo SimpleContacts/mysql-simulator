@@ -80,7 +80,7 @@ export function addColumn(
   db: Database,
   tblName: string,
   column: Column,
-  position,
+  position: string | null,
 ): Database {
   return produce(db, $ => {
     const table = $.tables[tblName];
@@ -117,23 +117,6 @@ export function addColumn(
 }
 
 /**
- * Replaces a column by a new definition
- */
-export function replaceColumn(
-  db: Database,
-  tblName: string,
-  colName: string,
-  column: Column,
-): Database {
-  return produce(db, $ => {
-    const table = $.tables[tblName];
-
-    // TODO: Should error if not exists!
-    table.columns = table.columns.map(c => (c.name === colName ? column : c));
-  });
-}
-
-/**
  * Removes a column from a table
  */
 export function removeColumn(
@@ -146,5 +129,30 @@ export function removeColumn(
 
     // TODO: Should error if not exists!
     table.columns = table.columns.filter(c => c.name !== colName);
+  });
+}
+
+/**
+ * Replaces a column by a new definition
+ */
+export function replaceColumn(
+  db: Database,
+  tblName: string,
+  colName: string,
+  column: Column,
+  position: string | null,
+): Database {
+  if (position) {
+    return addColumn(
+      removeColumn(db, tblName, colName),
+      tblName,
+      column,
+      position,
+    );
+  }
+
+  return produce(db, $ => {
+    const table = $.tables[tblName];
+    table.columns = table.columns.map(c => (c.name === colName ? column : c));
   });
 }

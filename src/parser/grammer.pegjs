@@ -334,13 +334,16 @@ AlterSpec
       }
     }
   / CHANGE COLUMN? oldColName:identifier newColName:identifier definition:ColumnDefinition
-    after:( AFTER after:identifier { return after } )? {
+    position:(
+      AFTER ident:identifier { return `AFTER ${ident}` }
+      / FIRST { return 'FIRST' }
+    )? {
       return {
         type: 'CHANGE COLUMN',
         oldColName,
         newColName,
         definition,
-        after,
+        position,
       }
     }
   / DROP COLUMN? colName:identifier {

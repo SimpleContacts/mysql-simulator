@@ -1809,7 +1809,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3315,7 +3315,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3426,7 +3426,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -3847,7 +3847,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "CHANGE COLUMN",
@@ -3862,7 +3862,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3924,7 +3924,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3945,7 +3945,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4127,7 +4127,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4452,7 +4452,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "CHANGE COLUMN",
@@ -4467,7 +4467,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "CHANGE COLUMN",
@@ -4482,7 +4482,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4554,7 +4554,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5963,7 +5963,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6570,7 +6570,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6661,7 +6661,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6786,7 +6786,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "CHANGE COLUMN",
@@ -6801,7 +6801,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7265,7 +7265,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7631,7 +7631,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9388,7 +9388,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10350,7 +10350,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10371,7 +10371,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10443,7 +10443,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10464,7 +10464,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14973,7 +14973,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "CHANGE COLUMN",
@@ -14988,7 +14988,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15424,7 +15424,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16618,7 +16618,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16713,7 +16713,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -20278,7 +20278,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -20299,7 +20299,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -20320,7 +20320,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22389,7 +22389,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22586,7 +22586,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22712,7 +22712,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22828,7 +22828,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -23245,7 +23245,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -23697,7 +23697,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -23718,7 +23718,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -23739,7 +23739,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -23760,7 +23760,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -24098,7 +24098,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": "id"
+        "position": "AFTER id"
       }
     ]
   },
@@ -24140,7 +24140,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -24281,7 +24281,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
