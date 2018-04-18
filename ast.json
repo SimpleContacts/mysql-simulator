@@ -1165,6 +1165,7 @@
     },
     "ifNotExists": false
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "products",
@@ -1225,7 +1226,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -1254,6 +1255,7 @@
       }
     ]
   },
+  null,
   {
     "type": "CREATE TABLE",
     "tblName": "payment_tokens",
@@ -1424,7 +1426,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -1444,7 +1446,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -1936,7 +1938,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2047,6 +2049,7 @@
     },
     "ifNotExists": false
   },
+  null,
   {
     "type": "CREATE TABLE",
     "tblName": "labels",
@@ -2219,7 +2222,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -2233,7 +2236,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -2247,7 +2250,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -2261,7 +2264,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -2275,7 +2278,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -2289,7 +2292,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -2399,7 +2402,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2419,7 +2422,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2439,7 +2442,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2561,7 +2564,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2581,7 +2584,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2621,7 +2624,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2641,7 +2644,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2661,7 +2664,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -2745,7 +2748,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -2759,7 +2762,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3263,7 +3266,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3283,7 +3286,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -3297,7 +3300,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "CHANGE COLUMN",
@@ -3332,7 +3335,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3352,7 +3355,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3402,7 +3405,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3437,7 +3440,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3457,7 +3460,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3477,7 +3480,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3497,7 +3500,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3517,7 +3520,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3537,7 +3540,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3557,7 +3560,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3695,7 +3698,7 @@
           "autoIncrement": true,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3883,6 +3886,7 @@
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "parent_products",
@@ -3899,7 +3903,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3961,7 +3965,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -3981,7 +3985,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4038,7 +4042,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4161,7 +4165,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4345,7 +4349,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4365,7 +4369,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4482,6 +4486,7 @@
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "exams",
@@ -4498,7 +4503,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4518,7 +4523,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4600,7 +4605,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4650,7 +4655,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4701,7 +4706,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4721,7 +4726,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4741,7 +4746,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4761,7 +4766,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4796,7 +4801,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -4816,7 +4821,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5130,7 +5135,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5150,7 +5155,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5170,7 +5175,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5190,7 +5195,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5432,7 +5437,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5446,7 +5451,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5460,7 +5465,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5474,7 +5479,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5488,10 +5493,11 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "exams",
@@ -5508,7 +5514,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5528,7 +5534,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5548,7 +5554,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5568,7 +5574,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5588,7 +5594,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5608,7 +5614,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5690,7 +5696,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5725,6 +5731,8 @@
       }
     ]
   },
+  null,
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "addresses",
@@ -5765,7 +5773,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5779,7 +5787,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5793,7 +5801,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5807,7 +5815,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5821,7 +5829,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5835,7 +5843,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5849,7 +5857,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5910,7 +5918,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -5924,7 +5932,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -5959,6 +5967,7 @@
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "orders",
@@ -5984,6 +5993,7 @@
     "tblName": "scripts",
     "ifExists": false
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "users",
@@ -6000,7 +6010,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6055,7 +6065,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6177,10 +6187,11 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "auth_tokens",
@@ -6228,7 +6239,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6589,7 +6600,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6609,7 +6620,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6629,7 +6640,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6734,7 +6745,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -6754,7 +6765,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7133,7 +7144,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7153,7 +7164,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7173,7 +7184,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7193,7 +7204,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7213,7 +7224,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7233,7 +7244,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7274,7 +7285,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7294,7 +7305,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -7308,7 +7319,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7353,7 +7364,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7499,7 +7510,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7519,7 +7530,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7539,7 +7550,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7559,7 +7570,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7579,7 +7590,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7599,7 +7610,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7640,7 +7651,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7660,9 +7671,19 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
+  },
+  {
+    "type": "CREATE TRIGGER",
+    "triggerName": "upd_order_date_status_modified",
+    "tblName": "orders"
+  },
+  {
+    "type": "CREATE TRIGGER",
+    "triggerName": "upd_exam_date_status_modified",
+    "tblName": "exams"
   },
   {
     "type": "ALTER TABLE",
@@ -7680,7 +7701,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7700,7 +7721,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7809,7 +7830,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -7829,7 +7850,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8290,6 +8311,24 @@
     "ifNotExists": false
   },
   {
+    "type": "CREATE FUNCTION",
+    "spName": "levenshtein",
+    "params": [
+      {
+        "paramName": "s1",
+        "type": "VARCHAR(255)"
+      },
+      {
+        "paramName": "s2",
+        "type": "VARCHAR(255)"
+      }
+    ],
+    "characteristic": [
+      null,
+      "DETERMINISTIC"
+    ]
+  },
+  {
     "type": "ALTER TABLE",
     "tblName": "orders",
     "changes": [
@@ -8305,7 +8344,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8325,7 +8364,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8345,7 +8384,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8365,7 +8404,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8385,7 +8424,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8794,7 +8833,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8814,7 +8853,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8834,7 +8873,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8854,7 +8893,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8874,7 +8913,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8894,7 +8933,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8914,7 +8953,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8934,7 +8973,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8954,7 +8993,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8974,7 +9013,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -8994,7 +9033,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9096,7 +9135,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9116,7 +9155,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9136,7 +9175,7 @@
           "autoIncrement": true,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9156,7 +9195,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9207,7 +9246,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9258,7 +9297,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9278,7 +9317,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9298,7 +9337,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -9318,7 +9357,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10061,7 +10100,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10352,7 +10391,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -10921,7 +10960,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -10935,7 +10974,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -11774,7 +11813,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -11794,7 +11833,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -11814,7 +11853,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -11834,7 +11873,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -11848,7 +11887,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -11862,7 +11901,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -12058,7 +12097,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -12149,7 +12188,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -12342,7 +12381,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -12402,7 +12441,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -12453,7 +12492,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -12770,7 +12809,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -12815,7 +12854,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -12860,7 +12899,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -12953,7 +12992,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13088,7 +13127,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13108,7 +13147,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13128,7 +13167,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -13142,7 +13181,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13316,7 +13355,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13716,7 +13755,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13736,7 +13775,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13756,7 +13795,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13838,7 +13877,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13858,7 +13897,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13878,7 +13917,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -13898,7 +13937,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -13987,7 +14026,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14069,7 +14108,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14099,7 +14138,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14119,7 +14158,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14139,7 +14178,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14165,10 +14204,11 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "distributor_shipping_methods",
@@ -14185,7 +14225,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -14199,7 +14239,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -14213,7 +14253,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -14227,7 +14267,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -14742,7 +14782,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -14781,7 +14821,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -14820,7 +14860,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -14859,7 +14899,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -14898,7 +14938,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -14912,7 +14952,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15144,6 +15184,7 @@
     },
     "ifNotExists": false
   },
+  null,
   {
     "type": "CREATE INDEX",
     "indexName": "subject_date_created_idx",
@@ -15178,7 +15219,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15198,7 +15239,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15212,7 +15253,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15232,7 +15273,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15252,7 +15293,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15272,7 +15313,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15443,7 +15484,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -15488,7 +15529,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15502,7 +15543,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15516,7 +15557,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15530,7 +15571,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15544,7 +15585,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15558,7 +15599,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15572,7 +15613,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15592,7 +15633,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -15612,7 +15653,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15626,7 +15667,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15640,7 +15681,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -15679,7 +15720,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15693,7 +15734,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -15707,7 +15748,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16492,7 +16533,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -16506,7 +16547,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -16597,7 +16638,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16617,7 +16658,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16637,7 +16678,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -16651,7 +16692,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16692,7 +16733,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -16706,7 +16747,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16821,7 +16862,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16841,7 +16882,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16861,7 +16902,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16881,7 +16922,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16901,7 +16942,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16926,7 +16967,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16965,7 +17006,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -16985,7 +17026,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17005,7 +17046,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17025,7 +17066,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17141,7 +17182,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17161,7 +17202,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17181,7 +17222,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17221,7 +17262,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17241,7 +17282,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17261,7 +17302,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17281,7 +17322,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17301,7 +17342,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17321,7 +17362,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17928,7 +17969,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17979,7 +18020,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -17999,7 +18040,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18019,7 +18060,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18070,7 +18111,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18090,7 +18131,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18187,7 +18228,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18207,7 +18248,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18430,7 +18471,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18579,7 +18620,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18630,7 +18671,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -18779,7 +18820,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19039,7 +19080,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19090,7 +19131,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -19104,7 +19145,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -19118,7 +19159,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19385,7 +19426,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -19399,7 +19440,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -19413,7 +19454,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19464,7 +19505,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -19478,7 +19519,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19520,7 +19561,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19540,7 +19581,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19673,7 +19714,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -19744,7 +19785,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -20299,7 +20340,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -20972,7 +21013,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -20992,7 +21033,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -21006,7 +21047,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -21020,7 +21061,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -21956,7 +21997,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -21976,7 +22017,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -21990,7 +22031,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -22060,7 +22101,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22080,7 +22121,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22281,7 +22322,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -22326,10 +22367,11 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": "name"
+        "position": "AFTER name"
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "partners",
@@ -22564,10 +22606,11 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
+  null,
   {
     "type": "ALTER TABLE",
     "tblName": "shipping_options",
@@ -22614,7 +22657,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": "scratchpad"
+        "position": "AFTER scratchpad"
       }
     ]
   },
@@ -22634,7 +22677,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       },
       {
         "type": "ADD COLUMN",
@@ -22648,7 +22691,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": null
+        "position": null
       }
     ]
   },
@@ -22695,7 +22738,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": "fulfillment"
+        "position": "AFTER fulfillment"
       },
       {
         "type": "ADD COLUMN",
@@ -22709,7 +22752,7 @@
           "autoIncrement": false,
           "reference": null
         },
-        "after": "left_rx"
+        "position": "AFTER left_rx"
       },
       {
         "type": "ADD FOREIGN KEY",
@@ -22798,5 +22841,1546 @@
     "type": "RENAME TABLE",
     "tblName": "partner_users",
     "newName": "partner_portal_users"
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "exams",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "exams_users_fk"
+      },
+      {
+        "type": "MODIFY COLUMN",
+        "colName": "user_id",
+        "after": null,
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "exams",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": "exams_users_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "users",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "exams",
+    "changes": [
+      {
+        "type": "MODIFY COLUMN",
+        "colName": "status",
+        "after": null,
+        "definition": {
+          "dataType": "VARCHAR(128)",
+          "nullable": false,
+          "defaultValue": "USER_INCOMPLETE",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "orders",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "fk_user_id"
+      },
+      {
+        "type": "MODIFY COLUMN",
+        "colName": "user_id",
+        "after": null,
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "orders",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": "fk_user_id",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "users",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  null,
+  {
+    "type": "CREATE INDEX",
+    "indexName": "direction_is_acked_idx",
+    "tblName": "v2_messages",
+    "indexColNames": [
+      {
+        "colName": "direction",
+        "len": null,
+        "direction": null
+      },
+      {
+        "colName": "is_acknowledged",
+        "len": null,
+        "direction": null
+      }
+    ],
+    "unique": false
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "orders",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "fk_v2_left_product"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "orders",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "fk_v2_right_product"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "orders",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": "fk_v2_left_product",
+        "indexColNames": [
+          {
+            "colName": "v2_left_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "lenses",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "orders",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": "fk_v2_right_product",
+        "indexColNames": [
+          {
+            "colName": "v2_right_product_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "lenses",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "lenses",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": "fk_brand_id",
+        "indexColNames": [
+          {
+            "colName": "brand_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "brands",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "deeplinks",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "deeplinks_ibfk_2"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "refer_a_friend",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "referree_held_promo_id",
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": null
+      },
+      {
+        "type": "ADD COLUMN",
+        "colName": "referrer_held_promo_id",
+        "definition": {
+          "dataType": "INT(11)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "refer_a_friend",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": "refer_a_friend_ibfk_5",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "referree_held_promo_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "held_promo_rewards",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      },
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": "refer_a_friend_ibfk_6",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "referrer_held_promo_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "held_promo_rewards",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "exams",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "photo_rx_state",
+        "definition": {
+          "dataType": "VARCHAR(16)",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": null
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "affiliate_id",
+        "newColName": "affiliate_id",
+        "definition": {
+          "dataType": "VARCHAR(16)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "RENAME TABLE",
+    "tblName": "partners",
+    "newName": "partners_deprecated"
+  },
+  {
+    "type": "CREATE TABLE",
+    "tblName": "partners",
+    "definitions": [
+      {
+        "type": "COLUMN",
+        "colName": "id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": true,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "public_uuid",
+        "definition": {
+          "dataType": "VARCHAR(36)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "date_created",
+        "definition": {
+          "dataType": "TIMESTAMP",
+          "nullable": false,
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "name",
+        "definition": {
+          "dataType": "VARCHAR(255)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "theme",
+        "definition": {
+          "dataType": "VARCHAR(16)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "PRIMARY KEY",
+        "columns": [
+          "id"
+        ]
+      },
+      {
+        "type": "UNIQUE INDEX",
+        "constraint": null,
+        "indexName": "public_uuid",
+        "indexColNames": [
+          {
+            "colName": "public_uuid",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
+    ],
+    "options": {},
+    "ifNotExists": false
+  },
+  null,
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  null,
+  null,
+  null,
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "partner_identities_ibfk_1"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "partner_portal_users_ibfk_1"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "partner_secrets_ibfk_1"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "rx_orders_ibfk_2"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "DROP COLUMN",
+        "colName": "partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "DROP COLUMN",
+        "colName": "partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "DROP COLUMN",
+        "colName": "partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "DROP COLUMN",
+        "colName": "partner_uuid"
+      }
+    ]
+  },
+  {
+    "type": "DROP TABLE",
+    "tblName": "partners_deprecated",
+    "ifExists": false
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "partner_identities_ibfk_2"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "partner_portal_users_ibfk_2"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "partner_secrets_ibfk_2"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "rx_orders_ibfk_3"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "partner_id",
+        "newColName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "partner_id",
+        "newColName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "partner_id",
+        "newColName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "partner_id",
+        "newColName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_identities",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_portal_users",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "partner_secrets",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "DROP TABLE",
+    "tblName": "message_templates",
+    "ifExists": false
+  },
+  {
+    "type": "CREATE TABLE",
+    "tblName": "message_templates",
+    "definitions": [
+      {
+        "type": "COLUMN",
+        "colName": "id",
+        "definition": {
+          "dataType": "INT",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": true,
+          "autoIncrement": true,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "label",
+        "definition": {
+          "dataType": "VARCHAR(250)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "content",
+        "definition": {
+          "dataType": "TEXT",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "date_created",
+        "definition": {
+          "dataType": "TIMESTAMP",
+          "nullable": false,
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "date_modified",
+        "definition": {
+          "dataType": "TIMESTAMP",
+          "nullable": true,
+          "defaultValue": "NOW()",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "description",
+        "definition": {
+          "dataType": "TEXT",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "categories",
+        "definition": {
+          "dataType": "JSON",
+          "nullable": true,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "COLUMN",
+        "colName": "name",
+        "definition": {
+          "dataType": "VARCHAR(250)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      },
+      {
+        "type": "UNIQUE INDEX",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "label",
+            "len": null,
+            "direction": null
+          }
+        ]
+      },
+      {
+        "type": "UNIQUE INDEX",
+        "constraint": null,
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "name",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
+    ],
+    "options": {
+      "ENGINE": "InnoDB",
+      "CHARSET": "utf8",
+      "COLLATE": "utf8_general_ci"
+    },
+    "ifNotExists": false
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_requests",
+    "changes": [
+      {
+        "type": "DROP PRIMARY KEY"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_requests",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "id",
+        "definition": {
+          "dataType": "INT UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": true,
+          "autoIncrement": true,
+          "reference": null
+        },
+        "position": "FIRST"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_requests",
+    "changes": [
+      {
+        "type": "ADD UNIQUE INDEX",
+        "constraint": null,
+        "indexName": "unique_uuid",
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "uuid",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "affiliate_id",
+        "newColName": "external_id",
+        "definition": {
+          "dataType": "VARCHAR(32)",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": "id"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT(3) UNSIGNED",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER id"
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "partner_id",
+        "newColName": "partner_id",
+        "definition": {
+          "dataType": "TINYINT(3) UNSIGNED",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": "partner_id_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "partners",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "ADD UNIQUE INDEX",
+        "constraint": null,
+        "indexName": "uniq_external_id",
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "external_id",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "DROP INDEX",
+        "indexName": "constr_affiliate_id"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "ADD UNIQUE INDEX",
+        "constraint": null,
+        "indexName": "uniq_email",
+        "indexType": null,
+        "indexColNames": [
+          {
+            "colName": "email",
+            "len": null,
+            "direction": null
+          },
+          {
+            "colName": "partner_id",
+            "len": null,
+            "direction": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "DROP INDEX",
+        "indexName": "email"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "date_modified",
+        "definition": {
+          "dataType": "TIMESTAMP",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER date_created"
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "users",
+    "changes": [
+      {
+        "type": "CHANGE COLUMN",
+        "oldColName": "date_modified",
+        "newColName": "date_modified",
+        "definition": {
+          "dataType": "TIMESTAMP",
+          "nullable": false,
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "after": null
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "ADD COLUMN",
+        "colName": "user_id",
+        "definition": {
+          "dataType": "INT",
+          "nullable": true,
+          "defaultValue": "NULL",
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        },
+        "position": "AFTER partner_id"
+      }
+    ]
+  },
+  null,
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "MODIFY COLUMN",
+        "colName": "user_id",
+        "after": null,
+        "definition": {
+          "dataType": "INT",
+          "nullable": false,
+          "defaultValue": null,
+          "isUnique": false,
+          "isPrimary": false,
+          "autoIncrement": false,
+          "reference": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "ADD FOREIGN KEY",
+        "constraint": "user_id_fk",
+        "indexName": null,
+        "indexColNames": [
+          {
+            "colName": "user_id",
+            "len": null,
+            "direction": null
+          }
+        ],
+        "reference": {
+          "tblName": "users",
+          "indexColNames": [
+            {
+              "colName": "id",
+              "len": null,
+              "direction": null
+            }
+          ],
+          "matchMode": null,
+          "onDelete": null,
+          "onUpdate": null
+        }
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "DROP FOREIGN KEY",
+        "symbol": "rx_orders_ibfk_1"
+      }
+    ]
+  },
+  {
+    "type": "ALTER TABLE",
+    "tblName": "rx_orders",
+    "changes": [
+      {
+        "type": "DROP COLUMN",
+        "colName": "identity_uuid"
+      }
+    ]
+  },
+  {
+    "type": "DROP TABLE",
+    "tblName": "partner_identities",
+    "ifExists": false
   }
 ]

@@ -201,7 +201,7 @@ CreateFunction
       spName,
       params,
       characteristic,
-      body,
+      // body,
     }
   }
 
