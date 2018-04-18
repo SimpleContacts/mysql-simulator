@@ -561,7 +561,7 @@ DataType
   / type:textDataType ignore:(COLLATE CollationName)? { return type }
   / JSON
   / ENUM LPAREN values:StringList RPAREN {
-      return `ENUM(${values.join(', ')})`;
+      return `ENUM(${values.join(',')})`;
     }
 
 IndexColNames
