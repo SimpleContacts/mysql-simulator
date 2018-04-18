@@ -18,6 +18,8 @@ Statement
   / delete
   / update
   / set
+  / lock
+  / unlock
   / CompoundStatement
   / IfStatement
 
@@ -40,6 +42,8 @@ update = 'UPDATE'i [^;]* { return null; }
 insert = 'INSERT'i [^;]* { return null; }
 delete = 'DELETE'i [^;]* { return null; }
 set = 'SET 'i [^;]* { return null; }
+lock = 'LOCK 'i [^;]* { return null; }
+unlock = 'UNLOCK 'i [^;]* { return null; }
 
 Condition
   = boolean
@@ -87,7 +91,11 @@ number "number literal"
   = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
 
 string "string literal"
-  = "'" value:[^']* "'" { return value.join('') }
+  = hunks:strhunk+ { return hunks.join("") }
+
+strhunk
+  = "'" seq:[^']* "'" _ { return seq.join('') }
+  / '"' seq:[^"]* '"' _ { return seq.join('') }
 
 StringList
   = first:string COMMA rest:StringList { return [first, ...rest] }
@@ -256,12 +264,15 @@ AlterSpecs
  */
 AlterSpec
   = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
-    after:( AFTER after:identifier { return after } )? {
+    position:(
+      AFTER ident:identifier { return `AFTER ${ident}` }
+      / FIRST { return 'FIRST' }
+    )? {
       return {
         type: 'ADD COLUMN',
         colName,
         definition: columnDefinition,
-        after,
+        position,
       }
     }
   / ADD ( INDEX / KEY ) indexName:identifier? indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
@@ -452,10 +463,11 @@ CreateDefinition
 ColumnDefinition
   = dataType:DataType
     nullable:( NULL / NOT_NULL )?
-    isPrimary:( PRIMARY KEY )?
     defaultValue:( DEFAULT value:ConstantExpr { return value } )?
+    isPrimary1:( PRIMARY KEY )?
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
+    isPrimary2:( PRIMARY KEY )?
     ( COMMENT string )?
     reference:ReferenceDefinition?
 
@@ -470,7 +482,7 @@ ColumnDefinition
         nullable: nullable !== 'NOT NULL',
         defaultValue,
         isUnique: !!isUnique,
-        isPrimary: !!isPrimary,
+        isPrimary: !!isPrimary1 || !!isPrimary2,
         autoIncrement: !!autoIncrement,
         reference,
       }
@@ -763,6 +775,7 @@ ENGINE            = _ 'ENGINE'i            !IdentifierStart _ { return 'ENGINE' 
 ENUM              = _ 'ENUM'i              !IdentifierStart _ { return 'ENUM' }
 EXISTS            = _ 'EXISTS'i            !IdentifierStart _ { return 'EXISTS' }
 FALSE             = _ 'FALSE'i             !IdentifierStart _ { return 'FALSE' }
+FIRST             = _ 'FIRST'i             !IdentifierStart _ { return 'FIRST' }
 FLOAT             = _ 'FLOAT'i             !IdentifierStart _ { return 'FLOAT' }
 FOLLOWS           = _ 'FOLLOWS'i           !IdentifierStart _ { return 'FOLLOWS' }
 FOR               = _ 'FOR'i               !IdentifierStart _ { return 'FOR' }
