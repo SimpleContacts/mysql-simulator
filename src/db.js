@@ -74,6 +74,54 @@ export function renameTable(db: Database, from: string, to: string): Database {
 }
 
 /**
+ * Adds a primary key to a table
+ */
+export function addPrimaryKey(
+  db: Database,
+  tblName: string,
+  columnNames: Array<string>,
+): Database {
+  return produce(db, $ => {
+    const table = $.tables[tblName];
+    if (!table) {
+      throw new Error(`Table "${tblName}" does not exists`);
+    }
+
+    if (table.primaryKey) {
+      throw new Error(`Table "${tblName}" already has a primary key`);
+    }
+
+    for (const colName of columnNames) {
+      if (table.columns.findIndex(col => col.name === colName) < 0) {
+        throw new Error(
+          `Table "${tblName}" does not have column referenced in primary key: "${colName}"`,
+        );
+      }
+    }
+
+    table.primaryKey = columnNames;
+  });
+}
+
+/**
+ * Drops primary key from table
+ */
+export function dropPrimaryKey(db: Database, tblName: string): Database {
+  return produce(db, $ => {
+    const table = $.tables[tblName];
+    if (!table) {
+      throw new Error(`Table "${tblName}" does not exists`);
+    }
+
+    if (!table.primaryKey) {
+      throw new Error(`Table "${tblName}" has no primary key`);
+    }
+
+    table.primaryKey = null;
+  });
+}
+
+/**
  * Adds a new column to a table
  */
 export function addColumn(

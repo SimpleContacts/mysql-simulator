@@ -7,7 +7,9 @@ import { sortBy } from 'lodash';
 import ast from '../ast.json';
 import {
   addColumn,
+  addPrimaryKey,
   addTable,
+  dropPrimaryKey,
   emptyDb,
   removeColumn,
   removeTable,
@@ -36,9 +38,21 @@ function makeTable(table): Table {
   const foreignKeys = table.definitions.filter(
     def => def.type === 'FOREIGN KEY',
   );
+
+  let primaryKey =
+    table.definitions
+      .filter(def => def.type === 'PRIMARY KEY')
+      .map(def => def.columns)[0] || null;
+
+  // Primary key can also be defined on a column directly
+  if (!primaryKey) {
+    const pks = columns.filter(c => c.definition.isPrimary).map(c => c.colName);
+    primaryKey = pks.length > 0 ? pks : null;
+  }
   return {
     name: table.tblName,
     columns: columns.map(def => makeColumn(def.colName, def.definition)),
+    primaryKey,
     foreignKeys: foreignKeys.map(fk => {
       const columns = fk.indexColNames.map(def => def.colName);
       const reference = {
@@ -114,6 +128,13 @@ function dumpTable(table: Table) {
   for (const col of table.columns) {
     log(chalk.yellow(`  ${columnDefinition(col)},`));
   }
+  if (table.primaryKey) {
+    log(
+      chalk.yellow(
+        `  PRIMARY KEY (${table.primaryKey.map(escape).join(', ')}),`,
+      ),
+    );
+  }
   log(chalk.blue(`)`));
   // log(chalk.blue('-'.repeat(table.name.length)));
   // for (const name of sortBy(Object.keys(table.columns))) {
@@ -158,6 +179,9 @@ function main() {
         } else if (change.type === 'ADD COLUMN') {
           const column = makeColumn(change.colName, change.definition);
           db = addColumn(db, expr.tblName, column, change.position);
+          if (change.definition.isPrimary) {
+            db = addPrimaryKey(db, expr.tblName, [change.colName]);
+          }
         } else if (change.type === 'CHANGE COLUMN') {
           const column = makeColumn(change.newColName, change.definition);
           db = replaceColumn(
@@ -169,6 +193,14 @@ function main() {
           );
         } else if (change.type === 'DROP COLUMN') {
           db = removeColumn(db, expr.tblName, change.colName);
+        } else if (change.type === 'ADD PRIMARY KEY') {
+          db = addPrimaryKey(
+            db,
+            expr.tblName,
+            change.indexColNames.map(col => col.colName),
+          );
+        } else if (change.type === 'DROP PRIMARY KEY') {
+          db = dropPrimaryKey(db, expr.tblName);
         } else {
           error(
             chalk.yellow(`Unknown change type: ${change.type}`),
