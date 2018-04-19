@@ -68,29 +68,6 @@ function makeTable(table): Table {
   };
 }
 
-function printDb(db: Database) {
-  for (const tableName of sortBy(Object.keys(db.tables))) {
-    const table = db.tables[tableName];
-    log('');
-    log(chalk.blue(`${table.name}`));
-    log(chalk.blue('-'.repeat(table.name.length)));
-    for (const name of sortBy(Object.keys(table.columns))) {
-      const col = table.columns[name];
-      log(`  ${chalk.magenta(col.name)} ${chalk.gray(col.type)}`);
-    }
-    for (const name of sortBy(Object.keys(table.foreignKeys))) {
-      const fk = table.foreignKeys[name];
-      log(
-        chalk.yellow(
-          `  ${fk.name || '(unnamed)'}: ${fk.columns.join(', ')} => ${
-            fk.reference.table
-          } (${fk.reference.columns.join(', ')})`,
-        ),
-      );
-    }
-  }
-}
-
 function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
 }
@@ -123,7 +100,7 @@ function columnDefinition(col: Column) {
     .join(' ');
 }
 
-function dumpTable(table: Table) {
+function printTable(table: Table) {
   log(chalk.blue(`CREATE TABLE \`${table.name}\` (`));
   for (const col of table.columns) {
     log(chalk.yellow(`  ${columnDefinition(col)},`));
@@ -135,7 +112,7 @@ function dumpTable(table: Table) {
       ),
     );
   }
-  log(chalk.blue(`)`));
+  log(chalk.blue(`);`));
   // log(chalk.blue('-'.repeat(table.name.length)));
   // for (const name of sortBy(Object.keys(table.columns))) {
   //   const col = table.columns[name];
@@ -153,6 +130,13 @@ function dumpTable(table: Table) {
   // }
 }
 
+function printDb(db: Database) {
+  for (const tableName of sortBy(Object.keys(db.tables))) {
+    log('');
+    printTable(db.tables[tableName]);
+  }
+}
+
 function main() {
   let db: Database = emptyDb();
 
@@ -165,7 +149,10 @@ function main() {
     if (expr.type === 'CREATE TABLE') {
       const table = makeTable(expr);
       db = addTable(db, table);
-      // log(chalk.green(`CREATE TABLE ${expr.tblName}`));
+      if (expr.tblName === 'users') {
+        log(chalk.green(`CREATE TABLE ${expr.tblName}`));
+        log(chalk.green(JSON.stringify(expr, null, 2)));
+      }
     } else if (expr.type === 'CREATE TABLE LIKE') {
       const oldTable = db.tables[expr.oldTblName];
       const newTable = { ...oldTable, name: expr.tblName };
@@ -173,6 +160,10 @@ function main() {
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tblName, expr.ifExists);
     } else if (expr.type === 'ALTER TABLE') {
+      if (expr.tblName === 'users') {
+        log(chalk.green(`ALTER TABLE ${expr.tblName}`));
+        log(chalk.green(JSON.stringify(expr, null, 2)));
+      }
       for (const change of expr.changes) {
         if (change.type === 'RENAME TABLE') {
           db = renameTable(db, expr.tblName, change.newTblName);
@@ -217,8 +208,7 @@ function main() {
 
   // log('');
   // log('Done!');
-  // printDb(db);
-  dumpTable(db.tables.users);
+  printDb(db);
 }
 
 main();
