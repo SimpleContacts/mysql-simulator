@@ -130,8 +130,9 @@ function printTable(table: Table) {
   // }
 }
 
-function printDb(db: Database) {
-  for (const tableName of sortBy(Object.keys(db.tables))) {
+function printDb(db: Database, tableName: string | void = undefined) {
+  const tableNames = tableName ? [tableName] : sortBy(Object.keys(db.tables));
+  for (const tableName of tableNames) {
     log('');
     printTable(db.tables[tableName]);
   }
@@ -208,7 +209,12 @@ function main() {
 
   // log('');
   // log('Done!');
-  printDb(db);
+  const tableName = process.argv[2];
+  if (tableName) {
+    printDb(db, tableName);
+  } else {
+    printDb(db);
+  }
 }
 
 main();
