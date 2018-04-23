@@ -49,6 +49,8 @@ function makeTable(table): Table {
     const pks = columns.filter(c => c.definition.isPrimary).map(c => c.colName);
     primaryKey = pks.length > 0 ? pks : null;
   }
+
+  let nextFkNum = 1;
   return {
     name: table.tblName,
     columns: columns.map(def => makeColumn(def.colName, def.definition)),
@@ -60,7 +62,12 @@ function makeTable(table): Table {
         columns: fk.reference.indexColNames.map(def => def.colName),
       };
       return {
-        name: fk.name,
+        // TODO: This is doomed to become too complicated. We should be
+        // assigning the FK names (and derived implicit KEY's) on table
+        // creation time instead.
+
+        // eslint-disable-next-line no-plusplus
+        name: fk.name ? fk.name : `${table.tblName}_ibfk_${nextFkNum++}`,
         columns,
         reference,
       };
@@ -108,15 +115,17 @@ function printTable(table: Table) {
   for (const fk of table.foreignKeys) {
     log(
       chalk.green(
-        `  ${fk.name}(${fk.columns.join(', ')}) => ${
-          fk.reference.table
-        }(${fk.reference.columns.join(', ')})`,
+        `  CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
+          .map(escape)
+          .join(', ')}) REFERENCES ${escape(
+          fk.reference.table,
+        )} (${fk.reference.columns.map(escape).join(', ')}),`,
       ),
     );
   }
   if (table.primaryKey) {
     log(
-      chalk.yellow(
+      chalk.magenta(
         `  PRIMARY KEY (${table.primaryKey.map(escape).join(', ')}),`,
       ),
     );
