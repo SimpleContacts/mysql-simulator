@@ -523,11 +523,9 @@ precisionTypeName
   / NUMERIC
 
 dateTypeName
-  = // Hack! This is invalid SQL, but we're using it anyway
-    type:TIMESTAMP hack:len? { return type }
+  = type:TIMESTAMP precision:len? { return precision ? `${type}(${precision})`:type }
   / TIME
-  / // Hack! This is invalid SQL, but we're using it anyway
-    type:DATETIME hack:len? { return type }
+  / type:DATETIME precision:len? { return precision ? `${type}(${precision})`:type }
   / DATE
 
 boolDataType
@@ -700,7 +698,7 @@ columnType2
 columnAttrs = _ c:columnAttrsEnum _ { return c }
 
 /* System functions */
-current_timestamp = value:CURRENT_TIMESTAMP ( LPAREN hack:number? RPAREN )? { return value }
+current_timestamp = value:CURRENT_TIMESTAMP precision:( LPAREN n:number? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
 now = NOW LPAREN RPAREN { return 'NOW()' }
 
 ConstantExpr

@@ -15026,7 +15026,7 @@
         "type": "COLUMN",
         "colName": "segment_timestamp",
         "definition": {
-          "dataType": "DATETIME",
+          "dataType": "DATETIME(2)",
           "nullable": false,
           "defaultValue": null,
           "isUnique": false,
@@ -19009,9 +19009,9 @@
         "type": "COLUMN",
         "colName": "date_created",
         "definition": {
-          "dataType": "TIMESTAMP",
+          "dataType": "TIMESTAMP(6)",
           "nullable": false,
-          "defaultValue": "CURRENT_TIMESTAMP",
+          "defaultValue": "CURRENT_TIMESTAMP(6)",
           "isUnique": false,
           "isPrimary": false,
           "autoIncrement": false,
