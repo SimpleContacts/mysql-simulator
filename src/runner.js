@@ -105,6 +105,15 @@ function printTable(table: Table) {
   for (const col of table.columns) {
     log(chalk.yellow(`  ${columnDefinition(col)},`));
   }
+  for (const fk of table.foreignKeys) {
+    log(
+      chalk.green(
+        `  ${fk.name}(${fk.columns.join(', ')}) => ${
+          fk.reference.table
+        }(${fk.reference.columns.join(', ')})`,
+      ),
+    );
+  }
   if (table.primaryKey) {
     log(
       chalk.yellow(

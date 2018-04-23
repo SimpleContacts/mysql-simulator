@@ -11,7 +11,7 @@ export type Column = {
 };
 
 export type ForeignKey = {
-  name: string | null,
+  name: string,
   columns: Array<string>,
   reference: {
     table: string,
@@ -23,7 +23,7 @@ export type Table = {
   name: string,
   columns: Array<Column>,
   primaryKey: Array<string> | null,
-  foreignKeys: Index<ForeignKey>,
+  foreignKeys: Array<ForeignKey>,
 };
 
 export type Database = {

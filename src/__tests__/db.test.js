@@ -10,9 +10,16 @@ describe('mutates db state', () => {
   });
 
   it('create table', () => {
-    const table = { name: 'foo', columns: {}, foreignKeys: {} };
+    const table = {
+      name: 'foo',
+      columns: [],
+      foreignKeys: [],
+      primaryKey: null,
+    };
     expect(addTable(db, table)).toEqual({
-      tables: { foo: { name: 'foo', columns: {}, foreignKeys: {} } },
+      tables: {
+        foo: { name: 'foo', columns: [], foreignKeys: [], primaryKey: null },
+      },
     });
   });
 });
