@@ -14,6 +14,20 @@ function insert(arr, pos, item) {
   return [...iterInsert(arr, pos, item)];
 }
 
+function assertTableDoesNotExist(db: Database, tblName: string): void {
+  if (db.tables[tblName]) {
+    throw new Error(`Table "${tblName}" already exist`);
+  }
+}
+
+function getTable(db: Database, tblName: string): Table {
+  const table = db.tables[tblName];
+  if (!table) {
+    throw new Error(`Table "${tblName}" does not exist`);
+  }
+  return table;
+}
+
 /**
  * Creates a new, empty, database.
  */
@@ -32,8 +46,24 @@ export function addTable(db: Database, table: Table): Database {
   }
 
   return produce(db, $ => {
-    const name = table.name;
-    $.tables[name] = table;
+    $.tables[table.name] = table;
+  });
+}
+
+export function addTableLike(
+  db: Database,
+  newTblName: string,
+  oldTblName: string,
+): Database {
+  assertTableDoesNotExist(db, newTblName);
+
+  const oldTable = getTable(db, oldTblName);
+  const newTable = produce(oldTable, $ => {
+    $.name = newTblName;
+    $.foreignKeys = [];
+  });
+  return produce(db, $ => {
+    $.tables[newTblName] = newTable;
   });
 }
 
@@ -45,11 +75,12 @@ export function removeTable(
   name: string,
   ifExists: boolean = false,
 ): Database {
-  if (!ifExists && !db.tables[name]) {
-    throw new Error(`Cannot DROP non-existing table "${name}"`);
+  if (!ifExists) {
+    getTable(db, name); // Will fail if table does not exist
   }
 
   return produce(db, $ => {
+    // TODO: Also remove foreign key names from the global FK registry
     delete $.tables[name];
   });
 }
@@ -58,16 +89,9 @@ export function removeTable(
  * Adds a new table to a database.
  */
 export function renameTable(db: Database, from: string, to: string): Database {
-  if (!db.tables[from]) {
-    throw new Error(`Table "${from}" does not exist`);
-  }
-
-  if (db.tables[to]) {
-    throw new Error(`Table "${to}" already exists`);
-  }
-
+  assertTableDoesNotExist(db, to);
   return produce(db, $ => {
-    $.tables[to] = $.tables[from];
+    $.tables[to] = getTable($, from);
     $.tables[to].name = to;
     delete $.tables[from];
   });
@@ -82,11 +106,7 @@ export function addPrimaryKey(
   columnNames: Array<string>,
 ): Database {
   return produce(db, $ => {
-    const table = $.tables[tblName];
-    if (!table) {
-      throw new Error(`Table "${tblName}" does not exists`);
-    }
-
+    const table = getTable($, tblName);
     if (table.primaryKey) {
       throw new Error(`Table "${tblName}" already has a primary key`);
     }
@@ -108,11 +128,7 @@ export function addPrimaryKey(
  */
 export function dropPrimaryKey(db: Database, tblName: string): Database {
   return produce(db, $ => {
-    const table = $.tables[tblName];
-    if (!table) {
-      throw new Error(`Table "${tblName}" does not exists`);
-    }
-
+    const table = getTable($, tblName);
     if (!table.primaryKey) {
       throw new Error(`Table "${tblName}" has no primary key`);
     }
@@ -131,11 +147,7 @@ export function addColumn(
   position: string | null,
 ): Database {
   return produce(db, $ => {
-    const table = $.tables[tblName];
-    if (!table) {
-      throw new Error(`Table "${tblName}" does not exists`);
-    }
-
+    const table = getTable($, tblName);
     const col = table.columns.find(c => c.name === column.name);
     if (col) {
       throw new Error(`Column "${tblName}.${column.name}" already exists`);

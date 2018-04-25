@@ -9,6 +9,7 @@ import {
   addColumn,
   addPrimaryKey,
   addTable,
+  addTableLike,
   dropPrimaryKey,
   emptyDb,
   removeColumn,
@@ -173,9 +174,7 @@ function main() {
         log(chalk.green(JSON.stringify(expr, null, 2)));
       }
     } else if (expr.type === 'CREATE TABLE LIKE') {
-      const oldTable = db.tables[expr.oldTblName];
-      const newTable = { ...oldTable, name: expr.tblName };
-      db = addTable(db, newTable);
+      db = addTableLike(db, expr.tblName, expr.oldTblName);
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tblName, expr.ifExists);
     } else if (expr.type === 'ALTER TABLE') {
