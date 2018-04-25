@@ -122,7 +122,7 @@ function columnDefinition(col: Column) {
 
   // Special case: MySQL does not omit an explicit DEFAULT NULL for
   // TEXT/BLOB/JSON columns
-  if (type === 'text' || type === 'blob' || type === 'json') {
+  if (type === 'text' || type === 'blob') {
     if (defaultValue === 'DEFAULT NULL') {
       defaultValue = '';
     }
@@ -208,13 +208,11 @@ function applySql(db: Database, ast: Array<*>): Database {
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tblName, expr.ifExists);
     } else if (expr.type === 'ALTER TABLE') {
-      const changes1 = expr.changes.filter(
-        change => !change.type.startsWith('DROP '),
+      const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
+      const changes = sortBy(expr.changes, change =>
+        order.indexOf(change.type),
       );
-      const changes2 = expr.changes.filter(change =>
-        change.type.startsWith('DROP '),
-      );
-      for (const change of [...changes1, ...changes2]) {
+      for (const change of changes) {
         if (change.type === 'RENAME TABLE') {
           db = renameTable(db, expr.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
