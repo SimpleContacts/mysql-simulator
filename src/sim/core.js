@@ -332,10 +332,18 @@ export function removeColumn(
   colName: string,
 ): Database {
   return produce(db, $ => {
-    const table = $.tables[tblName];
-
-    // TODO: Should error if not exists!
+    const table = getTable($, tblName);
     table.columns = table.columns.filter(c => c.name !== colName);
+
+    table.indexes = table.indexes
+      // Implicitly remove this column from any multi-column indexes that contain it
+      .map(index =>
+        produce(index, $ => {
+          $.columns = $.columns.filter(name => name !== colName);
+        }),
+      )
+      // If this leads to "empty" indexes, drop them
+      .filter(index => index.columns.length > 0);
   });
 }
 
