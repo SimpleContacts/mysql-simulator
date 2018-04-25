@@ -101,6 +101,7 @@ function escape(s: string): string {
 }
 
 function columnDefinition(col: Column) {
+  let type = col.type.toLowerCase();
   let defaultValue =
     col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
 
@@ -115,61 +116,74 @@ function columnDefinition(col: Column) {
     : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
       // data types are "NULL" by default, so we omit the explicit NULL, like
       // MySQL does
-      col.type === 'TIMESTAMP' ? 'NULL' : '';
+      type === 'timestamp' ? 'NULL' : '';
+
+  defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
+
+  // Special case: MySQL does not omit an explicit DEFAULT NULL for
+  // TEXT/BLOB/JSON columns
+  if (type === 'text' || type === 'blob' || type === 'json') {
+    if (defaultValue === 'DEFAULT NULL') {
+      defaultValue = '';
+    }
+  } else if (type === 'int') {
+    type = 'int(11)';
+  }
 
   return [
     escape(col.name),
-    col.type.toLowerCase(),
+    type,
     nullable,
-    defaultValue ? `DEFAULT ${defaultValue}` : '',
+    defaultValue,
     col.autoIncrement ? 'AUTO_INCREMENT' : '',
   ]
     .filter(x => x)
     .join(' ');
 }
 
-function printTable(table: Table) {
-  log(chalk.blue(`CREATE TABLE \`${table.name}\` (`));
-  for (const col of table.columns) {
-    log(chalk.yellow(`  ${columnDefinition(col)},`));
-  }
-  for (const index of table.indexes.filter(i => i.unique)) {
-    log(
-      chalk.white(
-        `  UNIQUE KEY ${escape(index.name)} (${index.columns
-          .map(escape)
-          .join(', ')}),`,
+function tableLines(table: Table): Array<string> {
+  return [
+    ...table.columns.map(col => columnDefinition(col)),
+
+    ...(table.primaryKey
+      ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(', ')})`]
+      : []),
+
+    ...table.indexes
+      .filter(i => i.unique)
+      .map(
+        index =>
+          `UNIQUE KEY ${escape(index.name)} (${index.columns
+            .map(escape)
+            .join(', ')})`,
       ),
-    );
-  }
-  for (const index of table.indexes.filter(i => !i.unique)) {
-    log(
-      chalk.white(
-        `  KEY ${escape(index.name)} (${index.columns
-          .map(escape)
-          .join(', ')}),`,
+
+    ...table.indexes
+      .filter(i => !i.unique)
+      .map(
+        index =>
+          `KEY ${escape(index.name)} (${index.columns.map(escape).join(', ')})`,
       ),
-    );
-  }
-  for (const fk of table.foreignKeys) {
-    log(
-      chalk.green(
-        `  CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
+
+    ...table.foreignKeys.map(
+      fk =>
+        `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
           .map(escape)
           .join(', ')}) REFERENCES ${escape(
           fk.reference.table,
-        )} (${fk.reference.columns.map(escape).join(', ')}),`,
-      ),
-    );
-  }
-  if (table.primaryKey) {
-    log(
-      chalk.magenta(
-        `  PRIMARY KEY (${table.primaryKey.map(escape).join(', ')}),`,
-      ),
-    );
-  }
-  log(chalk.blue(`);`));
+        )} (${fk.reference.columns.map(escape).join(', ')})`,
+    ),
+  ];
+}
+
+function printTable(table: Table) {
+  log(`CREATE TABLE \`${table.name}\` (`);
+  log(
+    tableLines(table)
+      .map(line => `  ${line}`)
+      .join(',\n'),
+  );
+  log(`) ENGINE=InnoDB DEFAULT CHARSET=utf8;`);
 }
 
 function printDb(db: Database, tables: Array<string> = []) {
@@ -290,7 +304,7 @@ function main(program) {
       const fullpath = path.join(dir, file);
 
       if (program.verbose) {
-        log(`===> ${chalk.magenta(file)}`);
+        error(`===> ${chalk.magenta(file)}`);
       }
       const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
       const ast: Array<*> = parseSql(sql, fullpath);
