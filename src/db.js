@@ -1,9 +1,9 @@
 // @flow
 
 import produce from 'immer';
-import { maxBy } from 'lodash';
+import { maxBy, some } from 'lodash';
 
-import type { Column, Database, ForeignKey, Table } from './types';
+import type { Column, Database, ForeignKey, Index, Table } from './types';
 
 function* iterInsert(arr, pos, item) {
   yield* arr.slice(0, pos);
@@ -46,6 +46,7 @@ export function emptyTable(name: string): Table {
     name,
     columns: [],
     primaryKey: null,
+    indexes: [],
     foreignKeys: [],
   };
 }
@@ -169,6 +170,42 @@ function generateForeignKeyName(table: Table) {
 }
 
 /**
+ * Adds an index to a table
+ */
+export function addIndex(
+  db: Database,
+  tblName: string,
+  indexName: string | null,
+  columns: Array<string>,
+): Database {
+  return produce(db, $ => {
+    const table = getTable($, tblName);
+
+    // If indexName is null, auto-generate it
+    if (!indexName) {
+      // Try to name it after the first column in the columns list...
+      const idealName = columns[0];
+      indexName = idealName;
+
+      // ...but attempt to add a counter value to avoid name clashes
+      const existingIndexNames = new Set(table.indexes.map(i => i.name));
+      let counter = 1;
+      while (existingIndexNames.has(indexName)) {
+        // eslint-disable-next-line no-plusplus
+        indexName = `${idealName}_${++counter}`;
+      }
+    }
+
+    const index: Index = {
+      name: indexName,
+      columns,
+    };
+
+    table.indexes.push(index);
+  });
+}
+
+/**
  * Adds a foreign key to a table
  */
 export function addForeignKey(
@@ -186,8 +223,14 @@ export function addForeignKey(
     // TODO: Assert local columns exist
     // TODO: Assert target columns exist
     // TODO: Assert local & target columns have equal data types
-    // TODO: Add implicit index if necessary
     // TODO: Register this foreign key name globally
+
+    // Add implicit local index for given columns if no such index exists yet
+    const needle = localColumns.join('+');
+
+    if (!some(table.indexes, index => index.columns.join('+') === needle)) {
+      $ = addIndex($, tblName, fkName, localColumns);
+    }
 
     fkName = fkName || generateForeignKeyName(table);
     const fk: ForeignKey = {

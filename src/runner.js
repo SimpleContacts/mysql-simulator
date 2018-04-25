@@ -127,6 +127,15 @@ function printTable(table: Table) {
   for (const col of table.columns) {
     log(chalk.yellow(`  ${columnDefinition(col)},`));
   }
+  for (const index of table.indexes) {
+    log(
+      chalk.white(
+        `  KEY ${escape(index.name)} (${index.columns
+          .map(escape)
+          .join(', ')}),`,
+      ),
+    );
+  }
   for (const fk of table.foreignKeys) {
     log(
       chalk.green(
@@ -146,21 +155,6 @@ function printTable(table: Table) {
     );
   }
   log(chalk.blue(`);`));
-  // log(chalk.blue('-'.repeat(table.name.length)));
-  // for (const name of sortBy(Object.keys(table.columns))) {
-  //   const col = table.columns[name];
-  //   log(`  ${chalk.magenta(col.name)} ${chalk.gray(col.type)}`);
-  // }
-  // for (const name of sortBy(Object.keys(table.foreignKeys))) {
-  //   const fk = table.foreignKeys[name];
-  //   log(
-  //     chalk.yellow(
-  //       `  ${fk.name || '(unnamed)'}: ${fk.columns.join(', ')} => ${
-  //         fk.reference.table
-  //       } (${fk.reference.columns.join(', ')})`,
-  //     ),
-  //   );
-  // }
 }
 
 function printDb(db: Database, tableName: string | void = undefined) {
