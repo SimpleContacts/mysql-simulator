@@ -1,8 +1,9 @@
 // @flow
 
 import produce from 'immer';
+import { maxBy } from 'lodash';
 
-import type { Column, Database, Table } from './types';
+import type { Column, Database, ForeignKey, Table } from './types';
 
 function* iterInsert(arr, pos, item) {
   yield* arr.slice(0, pos);
@@ -110,9 +111,17 @@ export function removeTable(
 export function renameTable(db: Database, from: string, to: string): Database {
   assertTableDoesNotExist(db, to);
   return produce(db, $ => {
-    $.tables[to] = getTable($, from);
-    $.tables[to].name = to;
+    const table = getTable($, from);
+    $.tables[to] = table;
     delete $.tables[from];
+
+    // Consistency
+    for (const fk of table.foreignKeys) {
+      if (fk.name.startsWith(`${table.name}_ibfk_`)) {
+        fk.name = `${to}${fk.name.substring(table.name.length)}`;
+      }
+    }
+    table.name = to;
   });
 }
 
@@ -139,6 +148,57 @@ export function addPrimaryKey(
     }
 
     table.primaryKey = columnNames;
+  });
+}
+
+/**
+ * Generates a name for a new foreign key, based on the table's current state.
+ */
+function generateForeignKeyName(table: Table) {
+  const prefix = `${table.name}_ibfk_`;
+  const autoFKs = table.foreignKeys
+    .filter(fk => fk.name.startsWith(prefix))
+    .map(fk => {
+      const parts = fk.name.split('_');
+      const num = parts[parts.length - 1];
+      return parseInt(num, 10);
+    });
+
+  const max = autoFKs.length > 0 ? maxBy(autoFKs) : 0;
+  return `${prefix}${max + 1}`;
+}
+
+/**
+ * Adds a foreign key to a table
+ */
+export function addForeignKey(
+  db: Database,
+  tblName: string,
+  fkName: string | null,
+  localColumns: Array<string>,
+  targetTblName: string,
+  targetColumns: Array<string>,
+): Database {
+  return produce(db, $ => {
+    const table = getTable($, tblName);
+    const targetTable = getTable($, targetTblName);
+
+    // TODO: Assert local columns exist
+    // TODO: Assert target columns exist
+    // TODO: Assert local & target columns have equal data types
+    // TODO: Add implicit index if necessary
+    // TODO: Register this foreign key name globally
+
+    fkName = fkName || generateForeignKeyName(table);
+    const fk: ForeignKey = {
+      name: fkName,
+      columns: localColumns,
+      reference: {
+        table: targetTable.name,
+        columns: targetColumns,
+      },
+    };
+    table.foreignKeys.push(fk);
   });
 }
 

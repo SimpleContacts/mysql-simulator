@@ -7,6 +7,7 @@ import { sortBy } from 'lodash';
 import ast from '../ast.json';
 import {
   addColumn,
+  addForeignKey,
   addPrimaryKey,
   addTableLike,
   createTable,
@@ -76,14 +77,14 @@ function handleCreateTable(db: Database, expr): Database {
   const fks = expr.definitions.filter(def => def.type === 'FOREIGN KEY');
   // let nextFkNum = 1;
   for (const fk of fks) {
-    console.log(JSON.stringify(fk, null, 2));
-    // `${table.tblName}_ibfk_${nextFkNum++}`,
-
-    // const columns = fk.indexColNames.map(def => def.colName);
-    // const reference = {
-    //   table: fk.reference.tblName,
-    //   columns: fk.reference.indexColNames.map(def => def.colName),
-    // };
+    db = addForeignKey(
+      db,
+      tblName,
+      fk.name, // Name for this FK, from the "constraint" clause
+      fk.indexColNames.map(def => def.colName), // Local columns
+      fk.reference.tblName, // Foreign/target table
+      fk.reference.indexColNames.map(def => def.colName), // Foreign/target columns
+    );
   }
 
   return db;
