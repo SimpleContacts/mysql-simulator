@@ -248,6 +248,29 @@ export function addForeignKey(
 /**
  * Drops primary key from table
  */
+export function dropForeignKey(
+  db: Database,
+  tblName: string,
+  symbol: string,
+): Database {
+  return produce(db, $ => {
+    const table = getTable($, tblName);
+
+    if (!some(table.foreignKeys, fk => fk.name === symbol)) {
+      throw new Error(
+        `Foreign key "${symbol}" does not exist on table "${tblName}". These do: ${table.foreignKeys
+          .map(fk => fk.name)
+          .join(', ')}`,
+      );
+    }
+
+    table.foreignKeys = table.foreignKeys.filter(fk => fk.name !== symbol);
+  });
+}
+
+/**
+ * Drops primary key from table
+ */
 export function dropPrimaryKey(db: Database, tblName: string): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
