@@ -1,30 +1,23 @@
-# Running it
+# Usage
 
-To run all steps sequantially, simply run:
+Usage:
 
-    $ yarn all
+    $ bin/mysql-simulate <path>
 
-This will run both the SQL parser as well as the evaluator/simulator.
+To run it on all the migrations in the Simple Contacts main repo:
 
+    $ bin/mysql-simulate ../simplecontacts/migrations
 
-# Parsing SQL
-
-To only run the parser, run:
-
-    $ yarn parse
-
-This will effectively take the SQL in `input.sql` and write the parsed AST to
-`ast.json`, equivalent to running:
-
-    $ parse-sql < input.sql > ast.json
+This will sort all SQL files in that directory and simulate running them
+sequentially.  At the end, the DB's state is outputted as a single big DB dump.
 
 
-# Simulating / replay
+# For developers
 
-To only evalutate the AST, run:
+### Regenerating the parser
 
-    $ yarn simulate
+After changing the grammar file (`src/parser/mysql.pegjs`), you need to
+recompile the parser:
 
-This will simulate a new DB in-memory, and process SQL statements from
-`ast.json` one-by-one, keeping track of state changes with each change, and
-outputs the final DB structure.
+    $ yarn build:parser
+

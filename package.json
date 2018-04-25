@@ -4,15 +4,11 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build-parser": "rm -f src/parser/mysql.js && pegjs --cache src/parser/mysql.pegjs",
+    "build:parser": "pegjs --cache src/parser/mysql.pegjs",
     "lint": "eslint src",
     "tdd": "jest src --watch",
     "test": "yarn run -s lint && yarn run -s flow && jest src",
-    "flow": "flow --include-warnings",
-    "slurp": "sh -c '(cd ../simplecontacts/migrations && (ls | sort -n | while read f; do echo; echo \"--\"; echo \"-- $f\"; cat \"$f\"; echo; done))' > input.sql",
-    "parse": "bin/parse-sql < input.sql > ast.json",
-    "simulate": "babel-node src/runner.js",
-    "all": "yarn parse && yarn simulate"
+    "flow": "flow --include-warnings"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -31,12 +27,13 @@
     "import-sort-parser-babylon": "^4.2.0",
     "import-sort-style-eslint": "^4.2.0",
     "import-sort-style-module": "^4.2.0",
-    "jest-cli": "^23.0.0-alpha.0"
+    "jest-cli": "^23.0.0-alpha.0",
+    "pegjs": "^0.10.0"
   },
   "dependencies": {
     "chalk": "^2.3.2",
+    "commander": "^2.15.1",
     "immer": "^1.2.0",
-    "lodash": "^4.17.5",
-    "pegjs": "^0.10.0"
+    "lodash": "^4.17.5"
   }
 }
