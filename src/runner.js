@@ -169,19 +169,11 @@ function main() {
     if (expr.type === 'CREATE TABLE') {
       const table = makeTable(expr);
       db = addTable(db, table);
-      if (expr.tblName === 'users') {
-        log(chalk.green(`CREATE TABLE ${expr.tblName}`));
-        log(chalk.green(JSON.stringify(expr, null, 2)));
-      }
     } else if (expr.type === 'CREATE TABLE LIKE') {
       db = addTableLike(db, expr.tblName, expr.oldTblName);
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tblName, expr.ifExists);
     } else if (expr.type === 'ALTER TABLE') {
-      if (expr.tblName === 'users') {
-        log(chalk.green(`ALTER TABLE ${expr.tblName}`));
-        log(chalk.green(JSON.stringify(expr, null, 2)));
-      }
       for (const change of expr.changes) {
         if (change.type === 'RENAME TABLE') {
           db = renameTable(db, expr.tblName, change.newTblName);
