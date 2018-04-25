@@ -209,6 +209,15 @@ function applySql(db: Database, ast: Array<*>): Database {
             expr.tblName,
             change.indexColNames.map(col => col.colName),
           );
+        } else if (change.type === 'ADD FOREIGN KEY') {
+          db = addForeignKey(
+            db,
+            expr.tblName,
+            change.constraint,
+            change.indexColNames.map(def => def.colName),
+            change.reference.tblName,
+            change.reference.indexColNames.map(def => def.colName),
+          );
         } else if (change.type === 'DROP PRIMARY KEY') {
           db = dropPrimaryKey(db, expr.tblName);
         } else {
