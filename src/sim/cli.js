@@ -12,6 +12,7 @@ import parseSql from '../parser';
 import {
   addColumn,
   addForeignKey,
+  addIndex,
   addPrimaryKey,
   addTableLike,
   createTable,
@@ -132,7 +133,16 @@ function printTable(table: Table) {
   for (const col of table.columns) {
     log(chalk.yellow(`  ${columnDefinition(col)},`));
   }
-  for (const index of table.indexes) {
+  for (const index of table.indexes.filter(i => i.unique)) {
+    log(
+      chalk.white(
+        `  UNIQUE KEY ${escape(index.name)} (${index.columns
+          .map(escape)
+          .join(', ')}),`,
+      ),
+    );
+  }
+  for (const index of table.indexes.filter(i => !i.unique)) {
     log(
       chalk.white(
         `  KEY ${escape(index.name)} (${index.columns
@@ -221,6 +231,21 @@ function applySql(db: Database, ast: Array<*>): Database {
             change.reference.tblName,
             change.reference.indexColNames.map(def => def.colName),
           );
+        } else if (change.type === 'ADD INDEX') {
+          db = addIndex(
+            db,
+            expr.tblName,
+            change.indexName,
+            change.indexColNames.map(def => def.colName),
+          );
+        } else if (change.type === 'ADD UNIQUE INDEX') {
+          db = addIndex(
+            db,
+            expr.tblName,
+            change.indexName,
+            change.indexColNames.map(def => def.colName),
+            true,
+          );
         } else if (change.type === 'DROP FOREIGN KEY') {
           db = dropForeignKey(db, expr.tblName, change.symbol);
         } else {
@@ -232,8 +257,18 @@ function applySql(db: Database, ast: Array<*>): Database {
       }
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.tblName, expr.newName);
+    } else if (expr.type === 'CREATE INDEX') {
+      db = addIndex(
+        db,
+        expr.tblName,
+        expr.indexName,
+        expr.indexColNames.map(def => def.colName),
+      );
     } else {
-      error(chalk.yellow(`Unknown expression type: ${expr.type}`));
+      error(
+        chalk.yellow(`Unknown expression type: ${expr.type}`),
+        chalk.gray(JSON.stringify(expr, null, 2)),
+      );
     }
   }
 

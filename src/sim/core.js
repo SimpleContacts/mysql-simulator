@@ -177,6 +177,7 @@ export function addIndex(
   tblName: string,
   indexName: string | null,
   columns: Array<string>,
+  unique: boolean = false,
 ): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
@@ -199,6 +200,7 @@ export function addIndex(
     const index: Index = {
       name: indexName,
       columns,
+      unique,
     };
 
     table.indexes.push(index);

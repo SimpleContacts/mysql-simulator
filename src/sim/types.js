@@ -13,6 +13,7 @@ export type Column = {
 export type Index = {
   name: string,
   columns: Array<string>,
+  unique: boolean,
 };
 
 export type ForeignKey = {
