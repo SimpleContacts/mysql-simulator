@@ -161,9 +161,9 @@ function printTable(table: Table) {
   log(chalk.blue(`);`));
 }
 
-function printDb(db: Database, tableName: string | void = undefined) {
-  const tableNames = tableName ? [tableName] : sortBy(Object.keys(db.tables));
-  for (const tableName of tableNames) {
+function printDb(db: Database, tables: Array<string> = []) {
+  tables = tables.length > 0 ? tables : sortBy(Object.keys(db.tables));
+  for (const tableName of tables) {
     log('');
     printTable(db.tables[tableName]);
   }
@@ -242,10 +242,12 @@ function main(program) {
 
   for (const dir of program.args) {
     // Naturally sort files before processing -- order is crucial!
-    const files = sortBy(
-      fs.readdirSync(dir).filter(f => f.endsWith('.sql')),
-      f => parseInt(f, 10),
-    );
+    let files = fs.readdirSync(dir).filter(f => f.endsWith('.sql'));
+    files = sortBy(files, f => parseInt(f, 10));
+    if (program.limit) {
+      files = files.slice(0, program.limit);
+    }
+
     for (const file of files) {
       const fullpath = path.join(dir, file);
 
@@ -255,10 +257,19 @@ function main(program) {
       const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
       const ast: Array<*> = parseSql(sql, fullpath);
       db = applySql(db, ast);
+
+      if (program.step) {
+        printDb(db, program.table);
+      }
     }
   }
 
-  printDb(db);
+  printDb(db, program.table);
+}
+
+function collect(val, memo) {
+  memo.push(val);
+  return memo;
 }
 
 program
@@ -266,6 +277,9 @@ program
   .usage('[options] <path> [<path> ...]')
   // .command('command <inputs>')
   .description('Parses SQL migration files and outputs the resulting DB state.')
+  .option('--step', 'Dump table after every alteration')
+  .option('--limit <n>', 'Run only the first N migrations', parseInt)
+  .option('--table <table>', 'Dump only these tables', collect, [])
   .option('-v, --verbose', 'Be verbose')
   .parse(process.argv);
 
