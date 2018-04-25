@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
+    "build-parser": "rm -f src/parser/mysql.js && pegjs --cache src/parser/mysql.pegjs",
     "lint": "eslint src",
     "tdd": "jest src --watch",
     "test": "yarn run -s lint && yarn run -s flow && jest src",
