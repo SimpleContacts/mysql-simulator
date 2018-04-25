@@ -165,7 +165,7 @@ function tableLines(table: Table): Array<string> {
           `KEY ${escape(index.name)} (${index.columns.map(escape).join(', ')})`,
       ),
 
-    ...table.foreignKeys.map(
+    ...sortBy(table.foreignKeys, fk => fk.name).map(
       fk =>
         `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
           .map(escape)
@@ -208,7 +208,13 @@ function applySql(db: Database, ast: Array<*>): Database {
     } else if (expr.type === 'DROP TABLE') {
       db = removeTable(db, expr.tblName, expr.ifExists);
     } else if (expr.type === 'ALTER TABLE') {
-      for (const change of expr.changes) {
+      const changes1 = expr.changes.filter(
+        change => !change.type.startsWith('DROP '),
+      );
+      const changes2 = expr.changes.filter(change =>
+        change.type.startsWith('DROP '),
+      );
+      for (const change of [...changes1, ...changes2]) {
         if (change.type === 'RENAME TABLE') {
           db = renameTable(db, expr.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
@@ -256,7 +262,7 @@ function applySql(db: Database, ast: Array<*>): Database {
           db = addIndex(
             db,
             expr.tblName,
-            change.indexName,
+            change.constraint,
             change.indexColNames.map(def => def.colName),
             true,
           );
