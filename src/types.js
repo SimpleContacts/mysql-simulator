@@ -34,4 +34,8 @@ export type Table = {
 
 export type Database = {
   tables: LUT<Table>,
+
+  // TODO: Track foreign key names assigned within any table, since they're
+  // essentially a "global" registry.
+  // foreignKeyNames: Set<string>,
 };
