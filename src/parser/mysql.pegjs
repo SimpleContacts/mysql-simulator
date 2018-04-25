@@ -366,12 +366,20 @@ AlterSpec
       }
     }
   / MODIFY COLUMN? colName:identifier definition:ColumnDefinition
-    after:( AFTER after:identifier { return after } )? {
+    position:(
+      AFTER ident:identifier { return `AFTER ${ident}` }
+      / FIRST { return 'FIRST' }
+    )? {
+      // MODIFY COLUMN is like CHANGE COLUMN in every way, except that it
+      // cannot be used to rename a column.  We'll therefore parse any MODIFY
+      // COLUMN statement as a CHANGE COLUMN statement where old + new columns
+      // are identical (i.e. no rename).
       return {
-        type: 'MODIFY COLUMN',
-        colName,
-        after,
+        type: 'CHANGE COLUMN',
+        oldColName: colName,
+        newColName: colName,
         definition,
+        position,
       }
     }
   / RENAME ( INDEX / KEY ) oldIndexName:identifier TO newIndexName:identifier {
