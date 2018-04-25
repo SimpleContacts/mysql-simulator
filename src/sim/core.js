@@ -1,7 +1,7 @@
 // @flow
 
 import produce from 'immer';
-import { maxBy, some } from 'lodash';
+import { flatten, maxBy, some } from 'lodash';
 
 import type { Column, Database, ForeignKey, Index, Table } from './types';
 
@@ -333,8 +333,14 @@ export function removeColumn(
 ): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
-    table.columns = table.columns.filter(c => c.name !== colName);
 
+    if (
+      some(flatten(table.foreignKeys.map(fk => fk.columns)), c => c === colName)
+    ) {
+      throw new Error("Cannot drop column because it's used by a FK");
+    }
+
+    table.columns = table.columns.filter(c => c.name !== colName);
     table.indexes = table.indexes
       // Implicitly remove this column from any multi-column indexes that contain it
       .map(index =>
