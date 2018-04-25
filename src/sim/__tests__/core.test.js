@@ -1,6 +1,6 @@
 // @flow
 
-import { createTable, emptyDb } from '../db';
+import { createTable, emptyDb } from '../core';
 
 describe('mutates db state', () => {
   const db = emptyDb();

@@ -43,13 +43,13 @@ singleDashComment = '--' p:([^\n]*) { return { type: 'comment', commentType: 'si
 multiComment = "/*" inner:(!"*/" i:. {return i})* "*/" { return { type: 'comment', commentType: 'multi', raw: inner.join('') }; }
 
 // We ignore select/insert/delete statements for now
-select = 'SELECT'i [^;]* { return null; }
-update = 'UPDATE'i [^;]* { return null; }
-insert = 'INSERT'i [^;]* { return null; }
-delete = 'DELETE'i [^;]* { return null; }
-set = 'SET 'i [^;]* { return null; }
-lock = 'LOCK 'i [^;]* { return null; }
-unlock = 'UNLOCK 'i [^;]* { return null; }
+select = SELECT [^;]* { return null; }
+update = UPDATE [^;]* { return null; }
+insert = INSERT [^;]* { return null; }
+delete = DELETE [^;]* { return null; }
+set = SET [^;]* { return null; }
+lock = LOCK [^;]* { return null; }
+unlock = UNLOCK [^;]* { return null; }
 
 Condition
   = boolean
@@ -799,6 +799,7 @@ INTEGER           = _ 'INTEGER'i           !IdentifierStart _ { return 'INTEGER'
 JSON              = _ 'JSON'i              !IdentifierStart _ { return 'JSON' }
 KEY               = _ 'KEY'i               !IdentifierStart _ { return 'KEY' }
 LIKE              = _ 'LIKE'i              !IdentifierStart _ { return 'LIKE' }
+LOCK              = _ 'LOCK'i              !IdentifierStart _ { return 'LOCK' }
 MATCH             = _ 'MATCH'i             !IdentifierStart _ { return 'MATCH' }
 MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierStart _ { return 'MEDIUMINT' }
 MODIFY            = _ 'MODIFY'i            !IdentifierStart _ { return 'MODIFY' }
@@ -820,6 +821,7 @@ RESTRICT          = _ 'RESTRICT'i          !IdentifierStart _ { return 'RESTRICT
 RETURN            = _ 'RETURN'i            !IdentifierStart _ { return 'RETURN' }
 RETURNS           = _ 'RETURNS'i           !IdentifierStart _ { return 'RETURNS' }
 ROW               = _ 'ROW'i               !IdentifierStart _ { return 'ROW' }
+SELECT            = _ 'SELECT'i            !IdentifierStart _ { return 'SELECT' }
 SET               = _ 'SET'i               !IdentifierStart _ { return 'SET' }
 SIMPLE            = _ 'SIMPLE'i            !IdentifierStart _ { return 'SIMPLE' }
 SMALLINT          = _ 'SMALLINT'i          !IdentifierStart _ { return 'SMALLINT' }
@@ -833,6 +835,7 @@ TO                = _ 'TO'i                !IdentifierStart _ { return 'TO' }
 TRIGGER           = _ 'TRIGGER'i           !IdentifierStart _ { return 'TRIGGER' }
 TRUE              = _ 'TRUE'i              !IdentifierStart _ { return 'TRUE' }
 UNIQUE            = _ 'UNIQUE'i            !IdentifierStart _ { return 'UNIQUE' }
+UNLOCK            = _ 'UNLOCK'i            !IdentifierStart _ { return 'UNLOCK' }
 UNSIGNED          = _ 'UNSIGNED'i          !IdentifierStart _ { return 'UNSIGNED' }
 UPDATE            = _ 'UPDATE'i            !IdentifierStart _ { return 'UPDATE' }
 USING             = _ 'USING'i             !IdentifierStart _ { return 'USING' }

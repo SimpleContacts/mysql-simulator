@@ -1,10 +1,14 @@
+#!/usr/bin/env babel-node
 // @flow
 
+import fs from 'fs';
+import path from 'path';
+
 import chalk from 'chalk';
+import program from 'commander';
 import { sortBy } from 'lodash';
 
-// $FlowFixMe
-import ast from '../ast.json';
+import parseSql from '../parser';
 import {
   addColumn,
   addForeignKey,
@@ -17,7 +21,7 @@ import {
   removeTable,
   renameTable,
   replaceColumn,
-} from './db';
+} from './core';
 import type { Column, Database, Table } from './types';
 
 // eslint-disable-next-line no-console
@@ -165,9 +169,7 @@ function printDb(db: Database, tableName: string | void = undefined) {
   }
 }
 
-function main() {
-  let db: Database = emptyDb();
-
+function applySql(db: Database, ast: Array<*>): Database {
   for (const expr of ast) {
     if (expr === null) {
       // eslint-disable-next-line no-continue
@@ -223,14 +225,43 @@ function main() {
     }
   }
 
-  // log('');
-  // log('Done!');
-  const tableName = process.argv[2];
-  if (tableName) {
-    printDb(db, tableName);
-  } else {
-    printDb(db);
-  }
+  return db;
 }
 
-main();
+function main(program) {
+  let db: Database = emptyDb();
+
+  for (const dir of program.args) {
+    // Naturally sort files before processing -- order is crucial!
+    const files = sortBy(
+      fs.readdirSync(dir).filter(f => f.endsWith('.sql')),
+      f => parseInt(f, 10),
+    );
+    for (const file of files) {
+      const fullpath = path.join(dir, file);
+
+      if (program.verbose) {
+        log(`===> ${chalk.magenta(file)}`);
+      }
+      const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
+      const ast: Array<*> = parseSql(sql, fullpath);
+      db = applySql(db, ast);
+    }
+  }
+
+  printDb(db);
+}
+
+program
+  .version('0.0.1')
+  .usage('[options] <path> [<path> ...]')
+  // .command('command <inputs>')
+  .description('Parses SQL migration files and outputs the resulting DB state.')
+  .option('-v, --verbose', 'Be verbose')
+  .parse(process.argv);
+
+if (program.args.length < 1) {
+  program.help();
+} else {
+  main(program);
+}
