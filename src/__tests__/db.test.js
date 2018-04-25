@@ -1,6 +1,6 @@
 // @flow
 
-import { addTable, emptyDb } from '../db';
+import { createTable, emptyDb } from '../db';
 
 describe('mutates db state', () => {
   const db = emptyDb();
@@ -10,13 +10,7 @@ describe('mutates db state', () => {
   });
 
   it('create table', () => {
-    const table = {
-      name: 'foo',
-      columns: [],
-      foreignKeys: [],
-      primaryKey: null,
-    };
-    expect(addTable(db, table)).toEqual({
+    expect(createTable(db, 'foo')).toEqual({
       tables: {
         foo: { name: 'foo', columns: [], foreignKeys: [], primaryKey: null },
       },

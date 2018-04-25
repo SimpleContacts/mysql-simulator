@@ -38,17 +38,36 @@ export function emptyDb(): Database {
 }
 
 /**
- * Adds a new table to a database.
+ * Creates a new, empty, table.
  */
-export function addTable(db: Database, table: Table): Database {
-  if (db.tables[table.name]) {
-    throw new Error(`Table "${table.name}" already exists`);
-  }
+export function emptyTable(name: string): Table {
+  return {
+    name,
+    columns: [],
+    primaryKey: null,
+    foreignKeys: [],
+  };
+}
 
+/**
+ * Adds a new, empty, table to a database.
+ */
+export function createTable(db: Database, name: string): Database {
+  assertTableDoesNotExist(db, name);
   return produce(db, $ => {
-    $.tables[table.name] = table;
+    $.tables[name] = emptyTable(name);
   });
 }
+
+/**
+ * Adds a new table to a database.
+ */
+// export function addTable(db: Database, table: Table): Database {
+//   assertTableDoesNotExist(db, table.name);
+//   return produce(db, $ => {
+//     $.tables[table.name] = table;
+//   });
+// }
 
 export function addTableLike(
   db: Database,

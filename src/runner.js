@@ -8,8 +8,8 @@ import ast from '../ast.json';
 import {
   addColumn,
   addPrimaryKey,
-  addTable,
   addTableLike,
+  createTable,
   dropPrimaryKey,
   emptyDb,
   removeColumn,
@@ -34,46 +34,59 @@ function makeColumn(colName, def): Column {
   };
 }
 
-function makeTable(table): Table {
-  const columns = table.definitions.filter(def => def.type === 'COLUMN');
-  const foreignKeys = table.definitions.filter(
-    def => def.type === 'FOREIGN KEY',
-  );
+function handleCreateTable(db: Database, expr): Database {
+  const tblName = expr.tblName;
+  db = createTable(db, tblName);
 
-  let primaryKey =
-    table.definitions
-      .filter(def => def.type === 'PRIMARY KEY')
-      .map(def => def.columns)[0] || null;
-
-  // Primary key can also be defined on a column directly
-  if (!primaryKey) {
-    const pks = columns.filter(c => c.definition.isPrimary).map(c => c.colName);
-    primaryKey = pks.length > 0 ? pks : null;
+  // One-by-one, add the columns to the table
+  const columns = expr.definitions.filter(def => def.type === 'COLUMN');
+  for (const coldef of columns) {
+    db = addColumn(
+      db,
+      tblName,
+      {
+        name: coldef.colName,
+        type: coldef.definition.dataType,
+        nullable: coldef.definition.nullable,
+        defaultValue: coldef.definition.defaultValue,
+        autoIncrement: coldef.definition.autoIncrement,
+      },
+      null,
+    );
   }
 
-  let nextFkNum = 1;
-  return {
-    name: table.tblName,
-    columns: columns.map(def => makeColumn(def.colName, def.definition)),
-    primaryKey,
-    foreignKeys: foreignKeys.map(fk => {
-      const columns = fk.indexColNames.map(def => def.colName);
-      const reference = {
-        table: fk.reference.tblName,
-        columns: fk.reference.indexColNames.map(def => def.colName),
-      };
-      return {
-        // TODO: This is doomed to become too complicated. We should be
-        // assigning the FK names (and derived implicit KEY's) on table
-        // creation time instead.
+  // Add a primary key, if any. A primary key can be added explicitly (1), or
+  // defined on a column directly (2).
 
-        // eslint-disable-next-line no-plusplus
-        name: fk.name ? fk.name : `${table.tblName}_ibfk_${nextFkNum++}`,
-        columns,
-        reference,
-      };
-    }),
-  };
+  const pks = [
+    // (1) Explicit PRIMARY KEY definitions
+    ...expr.definitions
+      .filter(def => def.type === 'PRIMARY KEY')
+      .map(def => def.columns),
+
+    // (2) Primary key can also be defined on a column declaratively
+    ...columns.filter(c => c.definition.isPrimary).map(c => [c.colName]),
+  ];
+
+  for (const pk of pks) {
+    db = addPrimaryKey(db, tblName, pk);
+  }
+
+  // Add all foreign keys we encounter
+  const fks = expr.definitions.filter(def => def.type === 'FOREIGN KEY');
+  // let nextFkNum = 1;
+  for (const fk of fks) {
+    console.log(JSON.stringify(fk, null, 2));
+    // `${table.tblName}_ibfk_${nextFkNum++}`,
+
+    // const columns = fk.indexColNames.map(def => def.colName);
+    // const reference = {
+    //   table: fk.reference.tblName,
+    //   columns: fk.reference.indexColNames.map(def => def.colName),
+    // };
+  }
+
+  return db;
 }
 
 function escape(s: string): string {
@@ -167,8 +180,7 @@ function main() {
     }
 
     if (expr.type === 'CREATE TABLE') {
-      const table = makeTable(expr);
-      db = addTable(db, table);
+      db = handleCreateTable(db, expr);
     } else if (expr.type === 'CREATE TABLE LIKE') {
       db = addTableLike(db, expr.tblName, expr.oldTblName);
     } else if (expr.type === 'DROP TABLE') {

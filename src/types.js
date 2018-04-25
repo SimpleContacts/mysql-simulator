@@ -1,6 +1,6 @@
 // @flow
 
-export type Index<T> = { [string]: T };
+type LUT<T> = { [string]: T };
 
 export type Column = {
   name: string,
@@ -27,5 +27,5 @@ export type Table = {
 };
 
 export type Database = {
-  tables: Index<Table>,
+  tables: LUT<Table>,
 };
