@@ -346,6 +346,12 @@ function applySql(db: Database, ast: Array<*>): Database {
         expr.indexName,
         expr.indexColNames.map(def => def.colName),
       );
+    } else if (expr.type === 'DROP INDEX') {
+      db = dropIndex(db, expr.tblName, expr.indexName);
+    } else if (expr.type === 'CREATE FUNCTION') {
+      // Ignore
+    } else if (expr.type === 'CREATE TRIGGER') {
+      // Ignore
     } else {
       error(
         chalk.yellow(`Unknown expression type: ${expr.type}`),
