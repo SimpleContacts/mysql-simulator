@@ -640,15 +640,6 @@ IndexDefinition =
     }
   }
 
-column = _ name:identifier _ columnType:columnType _ attrs:columnAttrs* _ {
-  return {
-    type: 'COLUMN',
-    name,
-    columnType,
-    attrs
-  }
-}
-
 columnLengthEnum = number / string
 columnLengthEnumWithComma = value:columnLengthEnum _ ',' _ { return value.rawValue }
 columnLength
@@ -698,8 +689,6 @@ columnType1
 columnType2
   = type:baseColumnType { return type.toUpperCase() }
 
-columnAttrs = _ c:columnAttrsEnum _ { return c }
-
 /* System functions */
 current_timestamp = value:CURRENT_TIMESTAMP precision:( LPAREN n:number? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
 NowCall = NOW LPAREN RPAREN { return 'NOW()' }
@@ -708,18 +697,6 @@ ConstantExpr
   = constant
   / current_timestamp
   / NowCall
-
-columnAttrsEnum =
-  'NOT NULL'i /
-  'NULL'i /
-  'PRIMARY KEY'i /
-  'AUTO_INCREMENT'i /
-  'UNIQUE'i ' KEY'i? { return { UNIQUE: true }} /
-  'DEFAULT'i _ DEFAULT:ConstantExpr _ { return { DEFAULT } } /
-  'ON UPDATE'i _ ONUPDATE:ConstantExpr _ { return { ONUPDATE } } /
-  'COLLATE'i _ COLLATE:identifier _ { return { COLLATE } } /
-  'COMMENT'i _ COMMENT:string { return { COMMENT } } /
-  'AFTER'i _ AFTER:identifier { return { AFTER } }
 
 // ====================================================
 // Util
