@@ -186,14 +186,14 @@ function tableLines(table: Table): Array<string> {
         index =>
           `UNIQUE KEY ${escape(index.name)} (${index.columns
             .map(escape)
-            .join(', ')})`,
+            .join(',')})`,
       ),
 
     ...table.indexes
       .filter(i => !i.unique)
       .map(
         index =>
-          `KEY ${escape(index.name)} (${index.columns.map(escape).join(', ')})`,
+          `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
       ),
 
     ...sortBy(table.foreignKeys, fk => fk.name).map(
