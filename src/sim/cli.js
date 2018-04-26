@@ -333,7 +333,7 @@ function applySql(db: Database, ast: Array<*>): Database {
         } else {
           error(
             chalk.yellow(`Unknown change type: ${change.type}`),
-            chalk.gray(JSON.stringify(change, null, 2)),
+            chalk.gray(JSON.stringify({ expr, change }, null, 2)),
           );
         }
       }
@@ -349,7 +349,7 @@ function applySql(db: Database, ast: Array<*>): Database {
     } else {
       error(
         chalk.yellow(`Unknown expression type: ${expr.type}`),
-        chalk.gray(JSON.stringify(expr, null, 2)),
+        chalk.gray(JSON.stringify({ expr }, null, 2)),
       );
     }
   }
