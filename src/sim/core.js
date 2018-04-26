@@ -350,6 +350,11 @@ export function removeColumn(
       )
       // If this leads to "empty" indexes, drop them
       .filter(index => index.columns.length > 0);
+
+    if (table.primaryKey) {
+      const newPK = table.primaryKey.filter(name => name !== colName);
+      table.primaryKey = newPK.length > 0 ? newPK : null;
+    }
   });
 }
 
