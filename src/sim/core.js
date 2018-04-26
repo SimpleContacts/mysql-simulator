@@ -359,6 +359,25 @@ export function removeColumn(
 }
 
 /**
+ * Drops the default value for a given column
+ */
+export function dropDefault(
+  db: Database,
+  tblName: string,
+  colName: string,
+): Database {
+  return produce(db, $ => {
+    const table = getTable($, tblName);
+
+    for (const col of table.columns) {
+      if (col.name === colName) {
+        col.defaultValue = null;
+      }
+    }
+  });
+}
+
+/**
  * Replaces a column by a new definition
  */
 export function replaceColumn(

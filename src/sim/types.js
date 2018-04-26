@@ -6,7 +6,7 @@ export type Column = {
   name: string,
   type: string,
   nullable: boolean,
-  defaultValue: string,
+  defaultValue: null | string,
   autoIncrement: boolean,
 };
 

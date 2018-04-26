@@ -293,10 +293,10 @@ function peg$parse(input, options) {
               reference,
             }
           },
-      peg$c58 = function(tblName) {
+      peg$c58 = function(colName) {
             return {
               type: 'DROP DEFAULT',
-              tblName,
+              colName,
             }
           },
       peg$c59 = function(oldColName, newColName, definition, ident) { return `AFTER ${ident}` },

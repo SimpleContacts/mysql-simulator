@@ -327,10 +327,10 @@ AlterSpec
       }
     }
   // / ALGORITHM
-  / ALTER COLUMN? tblName:identifier DROP DEFAULT {
+  / ALTER COLUMN? colName:identifier DROP DEFAULT {
       return {
         type: 'DROP DEFAULT',
-        tblName,
+        colName,
       }
     }
   / CHANGE COLUMN? oldColName:identifier newColName:identifier definition:ColumnDefinition

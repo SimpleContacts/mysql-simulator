@@ -16,6 +16,7 @@ import {
   addPrimaryKey,
   addTableLike,
   createTable,
+  dropDefault,
   dropForeignKey,
   dropPrimaryKey,
   emptyDb,
@@ -297,6 +298,8 @@ function applySql(db: Database, ast: Array<*>): Database {
           );
         } else if (change.type === 'DROP FOREIGN KEY') {
           db = dropForeignKey(db, expr.tblName, change.symbol);
+        } else if (change.type === 'DROP DEFAULT') {
+          db = dropDefault(db, expr.tblName, change.colName);
         } else {
           error(
             chalk.yellow(`Unknown change type: ${change.type}`),
