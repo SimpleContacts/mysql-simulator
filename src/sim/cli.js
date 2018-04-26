@@ -69,7 +69,7 @@ function handleCreateTable(db: Database, expr): Database {
     // (1) Explicit PRIMARY KEY definitions
     ...expr.definitions
       .filter(def => def.type === 'PRIMARY KEY')
-      .map(def => def.columns),
+      .map(def => def.indexColNames.map(def => def.colName)),
 
     // (2) Primary key can also be defined on a column declaratively
     ...columns.filter(c => c.definition.isPrimary).map(c => [c.colName]),

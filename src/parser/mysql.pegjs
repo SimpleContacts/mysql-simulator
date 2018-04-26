@@ -451,9 +451,9 @@ CreateDefinition
       }
     }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
-  / primaryKey
+  / PrimaryKeyDefinition
   // / {INDEX|KEY} [index_name] [index_type] (index_col_name, ...)
-  / indexCreateTable
+  / IndexDefinition
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
   / constraint:NamedConstraint?
     UNIQUE (INDEX / KEY)? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
@@ -628,20 +628,19 @@ ValueList
 Value
   = constant
 
-primaryKey = 'PRIMARY KEY'i _ '(' columns:identifierList ')' _ {
+PrimaryKeyDefinition = PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
   return {
     type: 'PRIMARY KEY',
-    columns
+    indexColNames,
   }
 }
 
-indexTableKeyword = 'INDEX'i / 'KEY'i
-indexCreateTable =
-  indexTableKeyword _ name:identifier _ '(' columns:identifierList ')' _ {
+IndexDefinition =
+  ( INDEX / KEY ) name:identifier LPAREN indexColNames:IndexColNames RPAREN {
     return {
       type: 'INDEX',
       name,
-      columns
+      indexColNames,
     }
   }
 
