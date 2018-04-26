@@ -35,12 +35,27 @@ const error = console.error;
 
 function makeColumn(colName, def): Column {
   const type = def.dataType.toLowerCase();
+  let nullable = def.nullable;
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
   if (type === 'timestamp') {
-    // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    if (defaultValue === null) {
+    // If an explicit default value is provided, timestamps are implicitly
+    // non-NULLable. Gaahhhh.
+    if (defaultValue && nullable) {
+      nullable = false;
+    }
+
+    if (!nullable && defaultValue === null) {
+      // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       defaultValue = 'CURRENT_TIMESTAMP';
+      onUpdate = 'CURRENT_TIMESTAMP';
+    }
+
+    if (defaultValue === 'NOW()') {
+      defaultValue = 'CURRENT_TIMESTAMP';
+    }
+
+    if (onUpdate === 'NOW()') {
       onUpdate = 'CURRENT_TIMESTAMP';
     }
   }
@@ -48,7 +63,7 @@ function makeColumn(colName, def): Column {
   return {
     name: colName,
     type: def.dataType,
-    nullable: def.nullable,
+    nullable,
     defaultValue,
     onUpdate,
     autoIncrement: def.autoIncrement,
