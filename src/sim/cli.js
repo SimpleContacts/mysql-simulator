@@ -79,6 +79,26 @@ function handleCreateTable(db: Database, expr): Database {
     db = addPrimaryKey(db, tblName, pk);
   }
 
+  // Add indexes, if any. Indexes can be added explicitly (1), or defined on
+  // a column directly (2).
+  const indexes = expr.definitions.filter(
+    def => def.type === 'UNIQUE INDEX' || def.type === 'INDEX',
+  );
+  for (const index of indexes) {
+    db = addIndex(
+      db,
+      tblName,
+      index.constraint,
+      index.indexColNames.map(def => def.colName),
+      index.type === 'UNIQUE INDEX',
+    );
+  }
+
+  // (2) Shorthand syntax to define index on a column directly
+  for (const col of columns.filter(c => c.definition.isUnique)) {
+    db = addIndex(db, tblName, null, [col.colName], true);
+  }
+
   // Add all foreign keys we encounter
   const fks = expr.definitions.filter(def => def.type === 'FOREIGN KEY');
   // let nextFkNum = 1;
