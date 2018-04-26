@@ -7,6 +7,7 @@ export type Column = {
   type: string,
   nullable: boolean,
   defaultValue: null | string,
+  onUpdate: null | string,
   autoIncrement: boolean,
 };
 

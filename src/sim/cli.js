@@ -33,11 +33,23 @@ const log = console.log;
 const error = console.error;
 
 function makeColumn(colName, def): Column {
+  const type = def.dataType.toLowerCase();
+  let defaultValue = def.defaultValue;
+  let onUpdate = def.onUpdate;
+  if (type === 'timestamp') {
+    // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    if (defaultValue === null) {
+      defaultValue = 'CURRENT_TIMESTAMP';
+      onUpdate = 'CURRENT_TIMESTAMP';
+    }
+  }
+
   return {
     name: colName,
     type: def.dataType,
     nullable: def.nullable,
-    defaultValue: def.defaultValue,
+    defaultValue,
+    onUpdate,
     autoIncrement: def.autoIncrement,
   };
 }
@@ -52,13 +64,7 @@ function handleCreateTable(db: Database, expr): Database {
     db = addColumn(
       db,
       tblName,
-      {
-        name: coldef.colName,
-        type: coldef.definition.dataType,
-        nullable: coldef.definition.nullable,
-        defaultValue: coldef.definition.defaultValue,
-        autoIncrement: coldef.definition.autoIncrement,
-      },
+      makeColumn(coldef.colName, coldef.definition),
       null,
     );
   }
@@ -167,6 +173,7 @@ function columnDefinition(col: Column) {
     type,
     nullable,
     defaultValue,
+    col.onUpdate !== null ? `ON UPDATE ${col.onUpdate}` : '',
     col.autoIncrement ? 'AUTO_INCREMENT' : '',
   ]
     .filter(x => x)

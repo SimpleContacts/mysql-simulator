@@ -487,17 +487,13 @@ ColumnDefinition
     isPrimary2:( PRIMARY KEY )?
     ( COMMENT string )?
     reference:ReferenceDefinition?
-
-    // TODO: Really this is a hack! We've been using the ON UPDATE NOW() clause
-    // in a way that isn't valid SQL!  We'll just eat it so we can continue
-    // parsing, but we'll simply ignore it.
-    hack:( ON UPDATE ( NOW LPAREN RPAREN / CURRENT_TIMESTAMP ) )?  // TODO: Fix this by fixing the SQL!
-
+    onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
     {
       return {
         dataType,
         nullable: nullable !== 'NOT NULL',
         defaultValue,
+        onUpdate,
         isUnique: !!isUnique,
         isPrimary: !!isPrimary1 || !!isPrimary2,
         autoIncrement: !!autoIncrement,
@@ -706,12 +702,12 @@ columnAttrs = _ c:columnAttrsEnum _ { return c }
 
 /* System functions */
 current_timestamp = value:CURRENT_TIMESTAMP precision:( LPAREN n:number? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
-now = NOW LPAREN RPAREN { return 'NOW()' }
+NowCall = NOW LPAREN RPAREN { return 'NOW()' }
 
 ConstantExpr
   = constant
   / current_timestamp
-  / now
+  / NowCall
 
 columnAttrsEnum =
   'NOT NULL'i /
