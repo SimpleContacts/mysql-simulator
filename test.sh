@@ -8,13 +8,16 @@ usage () {
     echo >&2
     echo "Options:" >&2
     echo "-l <n>       Limit to N migrations" >&2
+    echo "-t <table>   Output only diff for <table>" >&2
     echo "-h           Show this help" >&2
 }
 
 limit=0
-while getopts l:h flag; do
+table=""
+while getopts l:t:h flag; do
     case "$flag" in
         l) limit=$OPTARG;;
+        t) table=$OPTARG;;
         h) usage; exit 2;;
     esac
 done
@@ -25,19 +28,25 @@ if [ $limit -gt 0 ]; then
     limit_args="--limit $limit"
 fi
 
+table_args=""
+if [ -n "$table" ]; then
+  table_args="--table $table"
+fi
+
+
 # }}}
 
 # Generate real DB dump
 (
   cd ../simplecontacts
-  bin/resetDb.js $limit_args
-  mysqldump simplecontacts --no-data --compact \
+  bin/resetDb.js --quiet $limit_args
+  mysqldump simplecontacts $table --no-data --compact \
     | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' \
     > /tmp/real.sql
 )
 
 # Generate simulated DB dump
-bin/mysql-simulate ../simplecontacts/migrations -v $limit_args > /tmp/simulated.sql
+bin/mysql-simulate ../simplecontacts/migrations $limit_args $table_args > /tmp/simulated.sql
 
 # Show the diff
-colordiff -U8 /tmp/real.sql /tmp/simulated.sql 
+colordiff -U8 /tmp/real.sql /tmp/simulated.sql | less -R
