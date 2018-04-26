@@ -108,7 +108,14 @@ function columnDefinition(col: Column) {
   // MySQL outputs number constants as strings. No idea why that would make
   // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
   if (typeof defaultValue === 'number') {
-    defaultValue = `'${defaultValue}'`;
+    if (type.startsWith('decimal')) {
+      defaultValue = `'${defaultValue.toFixed(2)}'`;
+    } else {
+      defaultValue = `'${defaultValue}'`;
+    }
+  } else if (type === 'tinyint(1)') {
+    if (defaultValue === 'FALSE') defaultValue = "'0'";
+    else if (defaultValue === 'TRUE') defaultValue = "'1'";
   }
 
   const nullable = !col.nullable
@@ -128,6 +135,10 @@ function columnDefinition(col: Column) {
     }
   } else if (type === 'int') {
     type = 'int(11)';
+  } else if (type === 'smallint') {
+    type = 'smallint(6)';
+  } else if (type === 'smallint unsigned') {
+    type = 'smallint(5) unsigned';
   }
 
   return [
