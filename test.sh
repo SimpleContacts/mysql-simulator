@@ -51,4 +51,9 @@ fi
 bin/mysql-simulate ../simplecontacts/migrations $limit_args $table_args > /tmp/simulated.sql
 
 # Show the diff
-colordiff -U8 /tmp/real.sql /tmp/simulated.sql | less -R
+if diff -q /tmp/real.sql /tmp/simulated.sql > /dev/null; then
+  echo "All good!"
+else
+  echo "Uh-oh! There were differences!"
+  colordiff -U8 /tmp/real.sql /tmp/simulated.sql | less -R
+fi
