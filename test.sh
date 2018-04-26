@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+# Command line arg parsing {{{
+
 usage () {
     echo "usage: ./test.sh [-lth]" >&2
     echo >&2
@@ -23,12 +25,15 @@ if [ $limit -gt 0 ]; then
     limit_args="--limit $limit"
 fi
 
+# }}}
+
 # Generate real DB dump
 (
   cd ../simplecontacts
-  touch migrations/*
   bin/resetDb.js $limit_args
-  mysqldump simplecontacts --no-data --compact | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' > /tmp/real.sql
+  mysqldump simplecontacts --no-data --compact \
+    | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' \
+    > /tmp/real.sql
 )
 
 # Generate simulated DB dump
