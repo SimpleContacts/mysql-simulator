@@ -248,6 +248,29 @@ export function addForeignKey(
 }
 
 /**
+ * Drops an index from a table
+ */
+export function dropIndex(
+  db: Database,
+  tblName: string,
+  indexName: string,
+): Database {
+  return produce(db, $ => {
+    const table = getTable($, tblName);
+
+    if (!some(table.indexes, index => index.name === indexName)) {
+      throw new Error(
+        `Index "${indexName}" does not exist on table "${tblName}". These do: ${table.indexes
+          .map(index => index.name)
+          .join(', ')}`,
+      );
+    }
+
+    table.indexes = table.indexes.filter(index => index.name !== indexName);
+  });
+}
+
+/**
  * Drops primary key from table
  */
 export function dropForeignKey(

@@ -18,6 +18,7 @@ import {
   createTable,
   dropDefault,
   dropForeignKey,
+  dropIndex,
   dropPrimaryKey,
   emptyDb,
   removeColumn,
@@ -235,6 +236,7 @@ function printDb(db: Database, tables: Array<string> = []) {
     log('');
     printTable(db.tables[tableName]);
   }
+  log('');
 }
 
 function applySql(db: Database, ast: Array<*>): Database {
@@ -299,6 +301,8 @@ function applySql(db: Database, ast: Array<*>): Database {
             change.indexName,
             change.indexColNames.map(def => def.colName),
           );
+        } else if (change.type === 'DROP INDEX') {
+          db = dropIndex(db, expr.tblName, change.indexName);
         } else if (change.type === 'ADD UNIQUE INDEX') {
           db = addIndex(
             db,
