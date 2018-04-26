@@ -235,23 +235,32 @@ function tableLines(table: Table): Array<string> {
   ];
 }
 
-function printTable(table: Table) {
-  log(`CREATE TABLE \`${table.name}\` (`);
-  log(
-    tableLines(table)
-      .map(line => `  ${line}`)
-      .join(',\n'),
-  );
-  log(`) ENGINE=InnoDB DEFAULT CHARSET=utf8;`);
+function* iterDumpTable(table: Table) {
+  yield `CREATE TABLE \`${table.name}\` (`;
+  yield tableLines(table)
+    .map(line => `  ${line}`)
+    .join(',\n');
+  yield `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`;
+}
+
+function* iterDumpDb(
+  db: Database,
+  tables: Array<string> = [],
+): Iterable<string> {
+  tables = tables.length > 0 ? tables : sortBy(Object.keys(db.tables));
+  for (const tableName of tables) {
+    yield '';
+    yield* iterDumpTable(db.tables[tableName]);
+  }
+  yield '';
+}
+
+function dumpDb(db: Database, tables: Array<string> = []): string {
+  return [...iterDumpDb(db, tables)].join('\n');
 }
 
 function printDb(db: Database, tables: Array<string> = []) {
-  tables = tables.length > 0 ? tables : sortBy(Object.keys(db.tables));
-  for (const tableName of tables) {
-    log('');
-    printTable(db.tables[tableName]);
-  }
-  log('');
+  log(dumpDb(db, tables));
 }
 
 function applySql(db: Database, ast: Array<*>): Database {
