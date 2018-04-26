@@ -42,6 +42,7 @@ fi
   bin/resetDb.js --quiet $limit_args
   mysqldump simplecontacts $table --no-data --compact \
     | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' \
+    | sed -Ee 's/[[:space:]]+(CHARACTER SET|COLLATE)[[:space:]=]+[A-Za-z0-9_]+//' \
     > /tmp/real.sql
 )
 
