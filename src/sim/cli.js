@@ -423,3 +423,5 @@ if (program.args.length < 1) {
 } else {
   main(program);
 }
+
+export { dumpDb, emptyDb, applySql, parseSql };
