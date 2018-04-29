@@ -321,6 +321,8 @@ export function applySql(db: Database, ast: Array<*>): Database {
             expr.tblName,
             change.indexName,
             change.indexColNames.map(def => def.colName),
+            false,
+            !!change.indexName,
           );
         } else if (change.type === 'DROP INDEX') {
           db = dropIndex(db, expr.tblName, change.indexName);
@@ -331,6 +333,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
             change.constraint,
             change.indexColNames.map(def => def.colName),
             true,
+            !!change.constraint,
           );
         } else if (change.type === 'DROP FOREIGN KEY') {
           db = dropForeignKey(db, expr.tblName, change.symbol);

@@ -177,7 +177,8 @@ export function addIndex(
   tblName: string,
   indexName: string | null,
   columns: Array<string>,
-  unique: boolean = false,
+  unique: boolean,
+  $$locked: boolean,
 ): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
@@ -201,6 +202,7 @@ export function addIndex(
       name: indexName,
       columns,
       unique,
+      $$locked,
     };
 
     table.indexes.push(index);
@@ -229,9 +231,16 @@ export function addForeignKey(
 
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
-
     if (!some(table.indexes, index => index.columns.join('+') === needle)) {
-      $ = addIndex($, tblName, fkName, localColumns);
+      $ = addIndex($, tblName, fkName, localColumns, false, false);
+    } else if (fkName) {
+      for (const index of table.indexes) {
+        if (index.columns.join('+') === needle) {
+          if (!index.$$locked) {
+            index.name = fkName;
+          }
+        }
+      }
     }
 
     fkName = fkName || generateForeignKeyName(table);
