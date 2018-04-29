@@ -198,14 +198,27 @@ export function addIndex(
       }
     }
 
-    const index: Index = {
-      name: indexName,
-      columns,
-      unique,
-      $$locked,
-    };
+    // If an index already exists for this column combination, reuse it (don't
+    // create a new one)
+    const needle = columns.join('+');
+    const pos = table.indexes.findIndex(
+      i => i.columns.join('+') === needle && !i.$$locked,
+    );
+    if (pos >= 0) {
+      // Change the name and move it to the end of the indexes array
+      const [index] = table.indexes.splice(pos, 1);
+      index.name = indexName;
+      table.indexes.push(index);
+    } else {
+      const index: Index = {
+        name: indexName,
+        columns,
+        unique,
+        $$locked,
+      };
 
-    table.indexes.push(index);
+      table.indexes.push(index);
+    }
   });
 }
 
