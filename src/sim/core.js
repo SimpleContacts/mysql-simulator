@@ -182,6 +182,10 @@ export function addIndex(
 ): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
+    if (indexName === 'constr_drip_reorder_options_user_id') {
+      console.error(new Error().stack);
+      console.log({ indexName, columns, unique, table, $$locked });
+    }
 
     // If indexName is null, auto-generate it
     if (!indexName) {
@@ -288,6 +292,11 @@ export function dropIndex(
 ): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
+
+    // TODO
+    // Dropping an index that's still implicitly required by a FK should fail.
+    // MySQL fails with "Cannot drop index \'user_id\': needed in a foreign key
+    // constraint" here.
 
     if (!some(table.indexes, index => index.name === indexName)) {
       throw new Error(

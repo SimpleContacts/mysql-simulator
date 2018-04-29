@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+rm -rf tests/real/* tests/simulated/*
+rm -rf tests/real/.DS_Store tests/simulated/.DS_Store
+
+# Run in parallel...
+./bin/run-simulation.sh &
+./bin/run-real.sh &
+
+# ...wait for both procs to finish
+wait
+
+# Show the diff
+if diff -q tests/real tests/simulated > /dev/null; then
+  echo "All good!"
+else
+  echo "Uh-oh! There were differences!"
+  colordiff -U8 tests/real tests/simulated | less -R
+  exit 2
+fi

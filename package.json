@@ -7,7 +7,7 @@
     "build:parser": "pegjs --cache src/parser/mysql.pegjs",
     "lint": "eslint src",
     "tdd": "jest src --watch",
-    "test": "yarn run -s lint && yarn run -s flow && jest src",
+    "test": "./test2.sh && yarn run -s lint && yarn run -s flow && jest src",
     "flow": "flow --include-warnings"
   },
   "jest": {

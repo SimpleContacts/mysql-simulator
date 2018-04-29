@@ -351,13 +351,14 @@ export function applySql(db: Database, ast: Array<*>): Database {
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.tblName, expr.newName);
     } else if (expr.type === 'CREATE INDEX') {
+      const $$locked = !expr.indexName;
       db = addIndex(
         db,
         expr.tblName,
         expr.indexName,
         expr.indexColNames.map(def => def.colName),
         expr.unique,
-        !!expr.indexName,
+        $$locked,
       );
     } else if (expr.type === 'DROP INDEX') {
       db = dropIndex(db, expr.tblName, expr.indexName);

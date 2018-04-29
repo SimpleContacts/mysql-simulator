@@ -21,3 +21,21 @@ recompile the parser:
 
     $ yarn build:parser
 
+
+### Running the test suite
+
+The test suite for this project is a little bit different from "normal"
+JavaScript project tests.  It's invoked by
+
+    $ yarn test
+
+And will basically do the following for all test files found in `tests/*.sql`:
+
+1. Run test files against a real, running, MySQL database. Output to
+   `tests/real/*.sql`.
+1. Run test files against the simulator. Output to `tests/simulated/*.sql`.
+1. Diff the results.  No diff means test suite passes.
+
+This setup offers the level of confidence that the simulator is actually
+working as expected, and at the same time makes it really easy to add specific
+test cases later on: simply add a new `*.sql` file!
