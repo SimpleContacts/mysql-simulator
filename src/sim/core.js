@@ -437,17 +437,45 @@ export function replaceColumn(
   column: Column,
   position: string | null,
 ): Database {
+  const oldName = colName;
+  const newName = column.name;
+
   if (position) {
-    return addColumn(
+    db = addColumn(
       removeColumn(db, tblName, colName),
       tblName,
       column,
       position,
     );
+  } else {
+    db = produce(db, $ => {
+      const table = $.tables[tblName];
+      table.columns = table.columns.map(c => (c.name === colName ? column : c));
+    });
   }
 
-  return produce(db, $ => {
-    const table = $.tables[tblName];
-    table.columns = table.columns.map(c => (c.name === colName ? column : c));
-  });
+  // If the name of the column has changed, this is a rename. We'll also need
+  // to rename the column in all the indexes where it's used.
+  if (oldName !== newName) {
+    db = produce(db, $ => {
+      const table = $.tables[tblName];
+      if (table.primaryKey) {
+        table.primaryKey = table.primaryKey.map(
+          name => (name === oldName ? newName : name),
+        );
+      }
+      for (const fk of table.foreignKeys) {
+        fk.columns = fk.columns.map(
+          name => (name === oldName ? newName : name),
+        );
+      }
+      for (const index of table.indexes) {
+        index.columns = index.columns.map(
+          name => (name === oldName ? newName : name),
+        );
+      }
+    });
+  }
+
+  return db;
 }
