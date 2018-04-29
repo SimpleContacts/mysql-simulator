@@ -354,7 +354,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
         expr.tblName,
         expr.indexName,
         expr.indexColNames.map(def => def.colName),
-        false,
+        expr.unique,
         !!expr.indexName,
       );
     } else if (expr.type === 'DROP INDEX') {
