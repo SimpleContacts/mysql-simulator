@@ -199,15 +199,19 @@ export function addIndex(
     }
 
     // If an index already exists for this column combination, reuse it (don't
-    // create a new one)
+    // create a new one).  An index will also be reused if the new index
+    // definition is more specific (user_id, foo) will replace an existing
+    // index on (user_id).
     const needle = columns.join('+');
     const pos = table.indexes.findIndex(
-      i => i.columns.join('+') === needle && !i.$$locked,
+      i => needle.startsWith(i.columns.join('+')) && !i.$$locked,
     );
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
       const [index] = table.indexes.splice(pos, 1);
       index.name = indexName;
+      index.columns = columns;
+      index.unique = unique;
       table.indexes.push(index);
     } else {
       const index: Index = {
