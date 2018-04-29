@@ -234,12 +234,14 @@ export function addForeignKey(
     if (!some(table.indexes, index => index.columns.join('+') === needle)) {
       $ = addIndex($, tblName, fkName, localColumns, false, false);
     } else if (fkName) {
-      for (const index of table.indexes) {
-        if (index.columns.join('+') === needle) {
-          if (!index.$$locked) {
-            index.name = fkName;
-          }
-        }
+      const pos = table.indexes.findIndex(
+        i => i.columns.join('+') === needle && !i.$$locked,
+      );
+      if (pos >= 0) {
+        // Change the name and move it to the end of the indexes array
+        const [index] = table.indexes.splice(pos, 1);
+        index.name = fkName;
+        table.indexes.push(index);
       }
     }
 
