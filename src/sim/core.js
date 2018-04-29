@@ -232,7 +232,10 @@ export function addForeignKey(
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
     if (!some(table.indexes, index => index.columns.join('+') === needle)) {
-      $ = addIndex($, tblName, fkName, localColumns, false, false);
+      // Don't add if a primary key already exists
+      if (!(table.primaryKey && table.primaryKey.join('+') === needle)) {
+        $ = addIndex($, tblName, fkName, localColumns, false, false);
+      }
     } else if (fkName) {
       const pos = table.indexes.findIndex(
         i => i.columns.join('+') === needle && !i.$$locked,
