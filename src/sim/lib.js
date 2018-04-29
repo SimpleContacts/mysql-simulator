@@ -172,6 +172,8 @@ function columnDefinition(col: Column) {
     }
   } else if (type === 'int') {
     type = 'int(11)';
+  } else if (type === 'int unsigned') {
+    type = 'int(10) unsigned';
   } else if (type === 'tinyint') {
     type = 'tinyint(4)';
   } else if (type === 'tinyint unsigned') {

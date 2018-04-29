@@ -141,11 +141,15 @@ export function addPrimaryKey(
     }
 
     for (const colName of columnNames) {
-      if (table.columns.findIndex(col => col.name === colName) < 0) {
+      const col = table.columns.find(col => col.name === colName);
+      if (!col) {
         throw new Error(
           `Table "${tblName}" does not have column referenced in primary key: "${colName}"`,
         );
       }
+
+      // Implicitly convert this column to NOT NULL
+      col.nullable = false;
     }
 
     table.primaryKey = columnNames;
