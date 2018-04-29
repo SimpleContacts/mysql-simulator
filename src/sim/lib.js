@@ -26,16 +26,18 @@ const error = console.error;
 
 function makeColumn(colName, def): Column {
   const type = def.dataType.toLowerCase();
-  let nullable = def.nullable;
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
-  if (type === 'timestamp') {
-    // If an explicit default value is provided, timestamps are implicitly
-    // non-NULLable. Gaahhhh.
-    if (defaultValue && nullable) {
-      nullable = false;
-    }
 
+  // Whether a definition is "NOT NULL" or "NULL" by default, depends on the
+  // data type.  MySQL's TIMESTAMP columns are NOT NULL unless explicitly
+  // specified.  All other types are NULL unless explicitly specified.
+  let nullable = def.nullable;
+  if (nullable === null) {
+    nullable = type !== 'timestamp';
+  }
+
+  if (type === 'timestamp') {
     if (!nullable && defaultValue === null) {
       // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       defaultValue = 'CURRENT_TIMESTAMP';

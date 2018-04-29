@@ -403,12 +403,18 @@ function peg$parse(input, options) {
               reference,
             }
           },
-      peg$c79 = function(dataType, nullable, value) { return value },
-      peg$c80 = function(dataType, nullable, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, reference, expr) { return expr },
-      peg$c81 = function(dataType, nullable, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, reference, onUpdate) {
+      peg$c79 = function(dataType, nullableClause, value) { return value },
+      peg$c80 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, reference, expr) { return expr },
+      peg$c81 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, reference, onUpdate) {
+            let nullable = null;
+            if (nullableClause === 'NULL') {
+              nullable = true;
+            } else  if (nullableClause === 'NOT NULL') {
+              nullable = false;
+            };
             return {
               dataType,
-              nullable: nullable !== 'NOT NULL',
+              nullable,
               defaultValue,
               onUpdate,
               isUnique: !!isUnique,

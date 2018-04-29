@@ -479,7 +479,7 @@ CreateDefinition
 
 ColumnDefinition
   = dataType:DataType
-    nullable:( NULL / NOT_NULL )?
+    nullableClause:( NULL / NOT_NULL )?
     defaultValue:( DEFAULT value:ConstantExpr { return value } )?
     isPrimary1:( PRIMARY KEY )?
     autoIncrement:AUTO_INCREMENT?
@@ -489,9 +489,15 @@ ColumnDefinition
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
     {
+      let nullable = null;
+      if (nullableClause === 'NULL') {
+        nullable = true;
+      } else  if (nullableClause === 'NOT NULL') {
+        nullable = false;
+      };
       return {
         dataType,
-        nullable: nullable !== 'NOT NULL',
+        nullable,
         defaultValue,
         onUpdate,
         isUnique: !!isUnique,
