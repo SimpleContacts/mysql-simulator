@@ -22,30 +22,40 @@ function printDb(db: Database, tables: Array<string> = []) {
   log(dumpDb(db, tables));
 }
 
+function* iterInputFiles(program): Iterable<string> {
+  for (const inputPath of program.args) {
+    if (fs.statSync(inputPath).isDirectory()) {
+      // Naturally sort files before processing -- order is crucial!
+      let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
+      files = sortBy(files, f => parseInt(f, 10)).map(f =>
+        path.join(inputPath, f),
+      );
+      yield* files;
+    } else {
+      yield inputPath;
+    }
+  }
+}
+
 function main(program) {
   let db: Database = emptyDb();
 
-  for (const dir of program.args) {
-    // Naturally sort files before processing -- order is crucial!
-    let files = fs.readdirSync(dir).filter(f => f.endsWith('.sql'));
-    files = sortBy(files, f => parseInt(f, 10));
-    if (program.limit) {
-      files = files.slice(0, program.limit);
+  let files = [...iterInputFiles(program)];
+  if (program.limit) {
+    files = files.slice(0, program.limit);
+  }
+
+  for (const fullpath of files) {
+    const file = path.basename(fullpath);
+    if (program.verbose) {
+      error(`===> ${chalk.magenta(file)}`);
     }
+    const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
+    const ast: Array<*> = parseSql(sql, fullpath);
+    db = applySql(db, ast);
 
-    for (const file of files) {
-      const fullpath = path.join(dir, file);
-
-      if (program.verbose) {
-        error(`===> ${chalk.magenta(file)}`);
-      }
-      const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
-      const ast: Array<*> = parseSql(sql, fullpath);
-      db = applySql(db, ast);
-
-      if (program.step) {
-        printDb(db, program.table);
-      }
+    if (program.step) {
+      printDb(db, program.table);
     }
   }
 
