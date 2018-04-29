@@ -40,7 +40,7 @@ fi
 (
   cd ../simplecontacts
   bin/resetDb.js --quiet $limit_args
-  mysqldump simplecontacts $table --no-data --compact \
+  mysqldump simplecontacts $table --no-data --skip-triggers --compact \
     | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' \
     | sed -Ee 's/([[:space:]]+(CHARACTER SET|COLLATE)[[:space:]=]+[A-Za-z0-9_]+)+//' \
     | sed -Ee 's/[[:space:]]+AUTO_INCREMENT=[0-9]+//' \
