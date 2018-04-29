@@ -16,9 +16,10 @@ to_outfile() {
 run_simulation() {
   infile="$1"
   outfile=$(to_outfile "$infile")
-  dump $infile > $outfile
+  dump $infile > $outfile &
 }
 
 for f in $(ls tests/*.sql | sort -n); do
   run_simulation "$f"
 done
+wait
