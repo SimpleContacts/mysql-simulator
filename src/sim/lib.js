@@ -201,7 +201,7 @@ function tableLines(table: Table): Array<string> {
     ...table.columns.map(col => columnDefinition(col)),
 
     ...(table.primaryKey
-      ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(', ')})`]
+      ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(',')})`]
       : []),
 
     ...table.indexes
