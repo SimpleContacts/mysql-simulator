@@ -3,7 +3,14 @@
 import produce from 'immer';
 import { flatten, maxBy, some } from 'lodash';
 
-import type { Column, Database, ForeignKey, Index, Table } from './types';
+import type {
+  Column,
+  Database,
+  ForeignKey,
+  Index,
+  IndexType,
+  Table,
+} from './types';
 
 function* iterInsert(arr, pos, item) {
   yield* arr.slice(0, pos);
@@ -180,8 +187,8 @@ export function addIndex(
   db: Database,
   tblName: string,
   indexName: string | null,
+  type: IndexType,
   columns: Array<string>,
-  unique: boolean,
   $$locked: boolean,
 ): Database {
   return produce(db, $ => {
@@ -211,21 +218,21 @@ export function addIndex(
       i =>
         needle.startsWith(i.columns.join('+')) &&
         !i.$$locked &&
-        (needle !== i.columns.join('+') || i.unique === unique),
+        (needle !== i.columns.join('+') || i.type === type),
     );
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
       const [index] = table.indexes.splice(pos, 1);
       index.name = indexName;
       index.columns = columns;
-      index.unique = unique;
+      index.type = type;
       index.$$locked = $$locked;
       table.indexes.push(index);
     } else {
       const index: Index = {
         name: indexName,
+        type,
         columns,
-        unique,
         $$locked,
       };
 
@@ -261,7 +268,7 @@ export function addForeignKey(
       if (
         !(table.primaryKey && table.primaryKey.join('+').startsWith(needle))
       ) {
-        $ = addIndex($, tblName, fkName, localColumns, false, false);
+        $ = addIndex($, tblName, fkName, 'NORMAL', localColumns, false);
       }
     } else if (fkName) {
       const pos = table.indexes.findIndex(

@@ -101,19 +101,20 @@ function handleCreateTable(db: Database, expr): Database {
     def => def.type === 'UNIQUE INDEX' || def.type === 'INDEX',
   );
   for (const index of indexes) {
+    const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : 'NORMAL';
     db = addIndex(
       db,
       tblName,
       index.name,
+      type,
       index.indexColNames.map(def => def.colName),
-      index.type === 'UNIQUE INDEX',
       true,
     );
   }
 
   // (2) Shorthand syntax to define index on a column directly
   for (const col of columns.filter(c => c.definition.isUnique)) {
-    db = addIndex(db, tblName, null, [col.colName], true, true);
+    db = addIndex(db, tblName, null, 'UNIQUE', [col.colName], true);
   }
 
   // Add all foreign keys we encounter
@@ -205,7 +206,7 @@ function tableLines(table: Table): Array<string> {
       : []),
 
     ...table.indexes
-      .filter(i => i.unique)
+      .filter(i => i.type === 'UNIQUE')
       .map(
         index =>
           `UNIQUE KEY ${escape(index.name)} (${index.columns
@@ -214,7 +215,16 @@ function tableLines(table: Table): Array<string> {
       ),
 
     ...table.indexes
-      .filter(i => !i.unique)
+      .filter(i => i.type === 'FULLTEXT')
+      .map(
+        index =>
+          `FULLTEXT KEY ${escape(index.name)} (${index.columns
+            .map(escape)
+            .join(',')})`,
+      ),
+
+    ...table.indexes
+      .filter(i => i.type === 'NORMAL')
       .map(
         index =>
           `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
@@ -325,8 +335,8 @@ export function applySql(db: Database, ast: Array<*>): Database {
             db,
             expr.tblName,
             change.constraint || change.indexName,
+            'UNIQUE',
             change.indexColNames.map(def => def.colName),
-            true,
             $$locked,
           );
         } else if (change.type === 'ADD INDEX') {
@@ -335,8 +345,8 @@ export function applySql(db: Database, ast: Array<*>): Database {
             db,
             expr.tblName,
             change.indexName,
+            'NORMAL',
             change.indexColNames.map(def => def.colName),
-            false,
             $$locked,
           );
         } else if (change.type === 'DROP INDEX') {
@@ -356,12 +366,13 @@ export function applySql(db: Database, ast: Array<*>): Database {
       db = renameTable(db, expr.tblName, expr.newName);
     } else if (expr.type === 'CREATE INDEX') {
       const $$locked = !!expr.indexName;
+      const type = expr.unique ? 'UNIQUE' : 'NORMAL';
       db = addIndex(
         db,
         expr.tblName,
         expr.indexName,
+        type,
         expr.indexColNames.map(def => def.colName),
-        expr.unique,
         $$locked,
       );
     } else if (expr.type === 'DROP INDEX') {

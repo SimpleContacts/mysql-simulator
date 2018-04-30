@@ -1,6 +1,7 @@
 // @flow
 
 type LUT<T> = { [string]: T };
+export type IndexType = 'NORMAL' | 'UNIQUE';
 
 export type Column = {
   name: string,
@@ -14,7 +15,7 @@ export type Column = {
 export type Index = {
   name: string,
   columns: Array<string>,
-  unique: boolean,
+  type: IndexType,
 
   // NOTE: There's some subtlety to MySQL's behavior on index naming.
   // Depending on how an index was created in the system, MySQL may implicitly
