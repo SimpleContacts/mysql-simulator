@@ -48,7 +48,7 @@ fi
 )
 
 # Generate simulated DB dump
-bin/mysql-simulate ../simplecontacts/migrations $limit_args $table_args > /tmp/simulated.sql
+bin/mysql-simulate ../simplecontacts/migrations -v $limit_args $table_args > /tmp/simulated.sql
 
 # Show the diff
 if diff -q /tmp/real.sql /tmp/simulated.sql > /dev/null; then
