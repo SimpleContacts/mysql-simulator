@@ -15,7 +15,7 @@ dump() {
 resetdb() {
   # Recreate test DB
   echo "DROP DATABASE IF EXISTS $testdb;" | mysql
-  echo "CREATE DATABASE $testdb;" | mysql
+  echo "CREATE DATABASE $testdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql
 }
 
 to_outfile() {
