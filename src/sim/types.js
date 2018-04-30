@@ -10,6 +10,7 @@ export type Column = {
   defaultValue: null | string,
   onUpdate: null | string,
   autoIncrement: boolean,
+  comment: null | string,
 };
 
 export type Index = {

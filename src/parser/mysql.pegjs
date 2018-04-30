@@ -96,21 +96,24 @@ boolean "boolean literal"
 number "number literal"
   = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
 
-string "string literal"
-  = hunks:strhunk+ { return escape(hunks.join("")) }
+String "string literal"
+  = SingleQuotedStringLiteral
+  / DoubleQuotedStringLiteral
 
-strhunk
-  = "'" seq:[^']* "'" _ { return seq.join('') }
-  / '"' seq:[^"]* '"' _ { return seq.join('') }
+SingleQuotedStringLiteral
+  = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" { return `'${seq.join('')}'` }
+
+DoubleQuotedStringLiteral
+  = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' { return `'${seq.join('')}'` }
 
 StringList
-  = first:string COMMA rest:StringList { return [first, ...rest] }
-  / only:string { return [only] }
+  = first:String COMMA rest:StringList { return [first, ...rest] }
+  / only:String { return [only] }
 
 constant
   = null
   / boolean
-  / string
+  / String
   / number
 
 
@@ -492,7 +495,7 @@ ColumnDefinition
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
     isPrimary2:( PRIMARY KEY )?
-    ( COMMENT string )?
+    comment:( COMMENT value:String { return value } )?
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
     {
@@ -510,6 +513,7 @@ ColumnDefinition
         isUnique: !!isUnique,
         isPrimary: !!isPrimary1 || !!isPrimary2,
         autoIncrement: !!autoIncrement,
+        comment,
         reference,
       }
     }
@@ -653,7 +657,7 @@ IndexDefinition =
     }
   }
 
-columnLengthEnum = number / string
+columnLengthEnum = number / String
 columnLengthEnumWithComma = value:columnLengthEnum _ ',' _ { return value.rawValue }
 columnLength
   = '(' list:columnLengthEnumWithComma* last:columnLengthEnum ')' {
@@ -686,7 +690,7 @@ baseColumnType
 param
   = boolean
   / number
-  / string
+  / String
 
 paramList
   = c:param _ ',' _ l:paramList { return [c.value].concat(l) }

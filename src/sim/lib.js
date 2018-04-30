@@ -60,6 +60,7 @@ function makeColumn(colName, def): Column {
     defaultValue,
     onUpdate,
     autoIncrement: def.autoIncrement,
+    comment: def.comment,
   };
 }
 
@@ -198,6 +199,7 @@ function columnDefinition(col: Column) {
     defaultValue,
     col.onUpdate !== null ? `ON UPDATE ${col.onUpdate}` : '',
     col.autoIncrement ? 'AUTO_INCREMENT' : '',
+    col.comment !== null ? `COMMENT ${col.comment}` : '',
   ]
     .filter(x => x)
     .join(' ');
