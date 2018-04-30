@@ -259,7 +259,7 @@ function* iterDumpDb(
 export function dumpDb(
   db: Database,
   tables: Array<string> = [],
-  includeAttrs = true,
+  includeAttrs: boolean = true,
 ): string {
   return [...iterDumpDb(db, tables, includeAttrs)].join('\n');
 }

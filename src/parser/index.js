@@ -2,6 +2,7 @@
 
 import chalk from 'chalk';
 
+// $FlowFixMe - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
 
 const indent = (text: string): string =>
