@@ -1,5 +1,3 @@
-import { readFileSync as read } from 'fs';
-
 import parse from '.';
 
 describe('Read documentation', () => {
@@ -28,6 +26,7 @@ describe('Read documentation', () => {
               isUnique: false,
               autoIncrement: true,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -41,6 +40,7 @@ describe('Read documentation', () => {
               autoIncrement: false,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -49,11 +49,12 @@ describe('Read documentation', () => {
             definition: {
               dataType: 'VARCHAR(128)',
               defaultValue: null,
-              nullable: true,
+              nullable: null,
               isPrimary: false,
               isUnique: false,
               autoIncrement: false,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -62,11 +63,12 @@ describe('Read documentation', () => {
             definition: {
               dataType: 'VARCHAR(64)',
               defaultValue: null,
-              nullable: true,
+              nullable: null,
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
           },
         ],
@@ -106,6 +108,7 @@ describe('Read documentation', () => {
               autoIncrement: true,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -119,6 +122,7 @@ describe('Read documentation', () => {
               autoIncrement: false,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -132,6 +136,7 @@ describe('Read documentation', () => {
               autoIncrement: false,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -139,12 +144,13 @@ describe('Read documentation', () => {
             colName: 'text',
             definition: {
               dataType: 'VARCHAR(32)',
-              nullable: true,
+              nullable: null,
               defaultValue: 'NULL',
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
           },
           {
@@ -203,12 +209,13 @@ describe('Read documentation', () => {
               dataType: 'INT',
               autoIncrement: false,
               defaultValue: null,
-              nullable: true,
+              nullable: null,
               isPrimary: false,
               isUnique: false,
               reference: null,
+              onUpdate: null,
             },
-            after: null,
+            position: null,
           },
           {
             type: 'ADD FOREIGN KEY',
@@ -238,11 +245,5 @@ describe('Read documentation', () => {
         ],
       },
     ]);
-  });
-
-  it('Can parse our full example file', () => {
-    const sql = read(`${__dirname}/../../input.sql`).toString();
-    const result = parse(sql);
-    expect(result.length).toBe(514); // 514 statements in there!
   });
 });

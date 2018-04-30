@@ -186,10 +186,6 @@ export function addIndex(
 ): Database {
   return produce(db, $ => {
     const table = getTable($, tblName);
-    if (indexName === 'constr_drip_reorder_options_user_id') {
-      console.error(new Error().stack);
-      console.log({ indexName, columns, unique, table, $$locked });
-    }
 
     // If indexName is null, auto-generate it
     if (!indexName) {
