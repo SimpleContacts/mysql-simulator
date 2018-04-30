@@ -211,7 +211,7 @@ export function addIndex(
       i =>
         needle.startsWith(i.columns.join('+')) &&
         !i.$$locked &&
-        i.unique === unique,
+        (needle !== i.columns.join('+') || i.unique === unique),
     );
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
