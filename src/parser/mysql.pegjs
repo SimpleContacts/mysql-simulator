@@ -158,13 +158,14 @@ DropTable
 // ====================================================
 
 CreateIndex
-  = CREATE unique:UNIQUE? INDEX indexName:identifier ON tblName:identifier LPAREN indexColNames:IndexColNames RPAREN {
+  = CREATE indexKind:( UNIQUE / FULLTEXT )? INDEX indexName:identifier ON tblName:identifier LPAREN indexColNames:IndexColNames RPAREN {
+    indexKind = indexKind || 'NORMAL'
     return {
       type: 'CREATE INDEX',
       indexName,
+      indexKind,
       tblName,
       indexColNames,
-      unique: !!unique,
     }
   }
 
@@ -464,7 +465,13 @@ CreateDefinition
         indexColNames,
       }
     }
-  // / {FULLTEXT|SPATIAL} [INDEX|KEY] [index_name] (index_col_name, ...) [index_option] ...
+  / FULLTEXT (INDEX / KEY)? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
+      return {
+        type: 'FULLTEXT INDEX',
+        indexName,
+        indexColNames,
+      }
+    }
   / constraint:NamedConstraint?
     FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
       return {
@@ -638,10 +645,10 @@ PrimaryKeyDefinition = PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
 }
 
 IndexDefinition =
-  ( INDEX / KEY ) name:identifier LPAREN indexColNames:IndexColNames RPAREN {
+  ( INDEX / KEY ) indexName:identifier LPAREN indexColNames:IndexColNames RPAREN {
     return {
       type: 'INDEX',
-      name,
+      indexName,
       indexColNames,
     }
   }

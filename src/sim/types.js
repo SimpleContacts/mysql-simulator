@@ -1,7 +1,7 @@
 // @flow
 
 type LUT<T> = { [string]: T };
-export type IndexType = 'NORMAL' | 'UNIQUE';
+export type IndexType = 'NORMAL' | 'UNIQUE' | 'FULLTEXT';
 
 export type Column = {
   name: string,

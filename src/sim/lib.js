@@ -98,14 +98,20 @@ function handleCreateTable(db: Database, expr): Database {
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
   // a column directly (2).
   const indexes = expr.definitions.filter(
-    def => def.type === 'UNIQUE INDEX' || def.type === 'INDEX',
+    def =>
+      def.type === 'FULLTEXT INDEX' ||
+      def.type === 'UNIQUE INDEX' ||
+      def.type === 'INDEX',
   );
   for (const index of indexes) {
-    const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : 'NORMAL';
+    const type =
+      index.type === 'UNIQUE INDEX'
+        ? 'UNIQUE'
+        : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
     db = addIndex(
       db,
       tblName,
-      index.name,
+      index.indexName,
       type,
       index.indexColNames.map(def => def.colName),
       true,
@@ -215,19 +221,19 @@ function tableLines(table: Table): Array<string> {
       ),
 
     ...table.indexes
+      .filter(i => i.type === 'NORMAL')
+      .map(
+        index =>
+          `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
+      ),
+
+    ...table.indexes
       .filter(i => i.type === 'FULLTEXT')
       .map(
         index =>
           `FULLTEXT KEY ${escape(index.name)} (${index.columns
             .map(escape)
             .join(',')})`,
-      ),
-
-    ...table.indexes
-      .filter(i => i.type === 'NORMAL')
-      .map(
-        index =>
-          `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
       ),
 
     ...sortBy(table.foreignKeys, fk => fk.name).map(
@@ -339,6 +345,16 @@ export function applySql(db: Database, ast: Array<*>): Database {
             change.indexColNames.map(def => def.colName),
             $$locked,
           );
+        } else if (change.type === 'ADD FULLTEXT INDEX') {
+          const $$locked = !!change.constraint;
+          db = addIndex(
+            db,
+            expr.tblName,
+            change.constraint || change.indexName,
+            'FULLTEXT',
+            change.indexColNames.map(def => def.colName),
+            $$locked,
+          );
         } else if (change.type === 'ADD INDEX') {
           const $$locked = !!change.indexName;
           db = addIndex(
@@ -366,12 +382,11 @@ export function applySql(db: Database, ast: Array<*>): Database {
       db = renameTable(db, expr.tblName, expr.newName);
     } else if (expr.type === 'CREATE INDEX') {
       const $$locked = !!expr.indexName;
-      const type = expr.unique ? 'UNIQUE' : 'NORMAL';
       db = addIndex(
         db,
         expr.tblName,
         expr.indexName,
-        type,
+        expr.indexKind,
         expr.indexColNames.map(def => def.colName),
         $$locked,
       );
