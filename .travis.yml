@@ -1,4 +1,22 @@
+sudo: required
+dist: trusty
+addons:
+  apt:
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client
+
 language: node_js
 node_js: '8'
-
 cache: yarn
+before_install:
+  - sudo mysql_upgrade
+  - sudo service mysql restart
+
+script:
+  - yarn test
+
+after_script:
+  - sudo service mysql stop
