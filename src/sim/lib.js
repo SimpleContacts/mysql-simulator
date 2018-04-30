@@ -104,7 +104,7 @@ function handleCreateTable(db: Database, expr): Database {
     db = addIndex(
       db,
       tblName,
-      index.constraint,
+      index.name,
       index.indexColNames.map(def => def.colName),
       index.type === 'UNIQUE INDEX',
       true,

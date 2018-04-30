@@ -257,7 +257,9 @@ export function addForeignKey(
     const needle = localColumns.join('+');
     if (!some(table.indexes, index => index.columns.join('+') === needle)) {
       // Don't add if a primary key already exists
-      if (!(table.primaryKey && table.primaryKey.join('+') === needle)) {
+      if (
+        !(table.primaryKey && table.primaryKey.join('+').startsWith(needle))
+      ) {
         $ = addIndex($, tblName, fkName, localColumns, false, false);
       }
     } else if (fkName) {
