@@ -146,8 +146,24 @@ function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
 }
 
+function normalizeType(type: string): string {
+  const matches = type.match(/^([^(]+)(?:[(]([^)]+)[)])?(.*)?$/);
+  if (!matches) {
+    throw new Error(`Error parsing data type: ${type}`);
+  }
+
+  let basetype = matches[1];
+  let params = matches[2];
+  let rest = matches[3];
+
+  basetype = basetype.toLowerCase();
+  params = params ? `(${params})` : '';
+  rest = rest ? `${rest.toLowerCase()}` : '';
+  return [basetype, params, rest].join('');
+}
+
 function columnDefinition(col: Column) {
-  let type = col.type.toLowerCase();
+  let type = normalizeType(col.type);
   let defaultValue =
     col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
 
