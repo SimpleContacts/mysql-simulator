@@ -219,6 +219,7 @@ export function addIndex(
       index.name = indexName;
       index.columns = columns;
       index.unique = unique;
+      index.$$locked = $$locked;
       table.indexes.push(index);
     } else {
       const index: Index = {
