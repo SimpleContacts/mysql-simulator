@@ -325,6 +325,15 @@ export function applySql(db: Database, ast: Array<*>): Database {
           db = addColumn(db, expr.tblName, column, change.position);
           if (change.definition.isPrimary) {
             db = addPrimaryKey(db, expr.tblName, [change.colName]);
+          } else if (change.definition.isUnique) {
+            db = addIndex(
+              db,
+              expr.tblName,
+              null,
+              'UNIQUE',
+              [change.colName],
+              true,
+            );
           }
         } else if (change.type === 'CHANGE COLUMN') {
           const column = makeColumn(change.newColName, change.definition);
