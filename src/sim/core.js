@@ -208,7 +208,10 @@ export function addIndex(
     // index on (user_id).
     const needle = columns.join('+');
     const pos = table.indexes.findIndex(
-      i => needle.startsWith(i.columns.join('+')) && !i.$$locked,
+      i =>
+        needle.startsWith(i.columns.join('+')) &&
+        !i.$$locked &&
+        i.unique === unique,
     );
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array

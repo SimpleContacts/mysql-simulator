@@ -320,24 +320,26 @@ export function applySql(db: Database, ast: Array<*>): Database {
             change.reference.indexColNames.map(def => def.colName),
           );
         } else if (change.type === 'ADD INDEX') {
+          const $$locked = !!change.indexName;
           db = addIndex(
             db,
             expr.tblName,
             change.indexName,
             change.indexColNames.map(def => def.colName),
             false,
-            !!change.indexName,
+            $$locked,
           );
         } else if (change.type === 'DROP INDEX') {
           db = dropIndex(db, expr.tblName, change.indexName);
         } else if (change.type === 'ADD UNIQUE INDEX') {
+          const $$locked = !!change.constraint;
           db = addIndex(
             db,
             expr.tblName,
             change.constraint,
             change.indexColNames.map(def => def.colName),
             true,
-            !!change.constraint,
+            $$locked,
           );
         } else if (change.type === 'DROP FOREIGN KEY') {
           db = dropForeignKey(db, expr.tblName, change.symbol);
@@ -353,7 +355,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
     } else if (expr.type === 'RENAME TABLE') {
       db = renameTable(db, expr.tblName, expr.newName);
     } else if (expr.type === 'CREATE INDEX') {
-      const $$locked = !expr.indexName;
+      const $$locked = !!expr.indexName;
       db = addIndex(
         db,
         expr.tblName,
