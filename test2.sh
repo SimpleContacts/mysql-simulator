@@ -13,9 +13,13 @@ wait
 
 # Show the diff
 if diff -q tests/real tests/simulated > /dev/null; then
-  echo "All good!"
+echo "All good!" >&2
 else
-  echo "Uh-oh! There were differences!"
-  colordiff -U8 tests/real tests/simulated | less -R
+  echo "Uh-oh! There were differences!" >&2
+  if [ -n "$TRAVIS" ]; then
+    diff -U8 tests/real tests/simulated
+  else
+    colordiff -U8 tests/real tests/simulated | less -R
+  fi
   exit 2
 fi
