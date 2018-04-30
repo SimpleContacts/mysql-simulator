@@ -1,0 +1,7 @@
+CREATE TABLE aaa (id INT, PRIMARY KEY (id));
+
+CREATE TABLE bbb (
+  id INT PRIMARY KEY,
+  a INT NOT NULL,
+  CONSTRAINT xyz FOREIGN KEY (a) REFERENCES aaa (id)
+);

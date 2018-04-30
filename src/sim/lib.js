@@ -123,7 +123,7 @@ function handleCreateTable(db: Database, expr): Database {
     db = addForeignKey(
       db,
       tblName,
-      fk.name, // Name for this FK, from the "constraint" clause
+      fk.constraint, // Name for this FK, from the "constraint" clause
       fk.indexColNames.map(def => def.colName), // Local columns
       fk.reference.tblName, // Foreign/target table
       fk.reference.indexColNames.map(def => def.colName), // Foreign/target columns
