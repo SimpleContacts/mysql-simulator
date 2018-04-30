@@ -131,7 +131,8 @@ function handleCreateTable(db: Database, expr): Database {
     db = addForeignKey(
       db,
       tblName,
-      fk.constraint, // Name for this FK, from the "constraint" clause
+      fk.constraint,
+      fk.indexName,
       fk.indexColNames.map(def => def.colName), // Local columns
       fk.reference.tblName, // Foreign/target table
       fk.reference.indexColNames.map(def => def.colName), // Foreign/target columns
@@ -333,6 +334,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
             db,
             expr.tblName,
             change.constraint,
+            change.indexName,
             change.indexColNames.map(def => def.colName),
             change.reference.tblName,
             change.reference.indexColNames.map(def => def.colName),

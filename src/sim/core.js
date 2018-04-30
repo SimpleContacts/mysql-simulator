@@ -247,7 +247,8 @@ export function addIndex(
 export function addForeignKey(
   db: Database,
   tblName: string,
-  fkName: string | null,
+  constraintName: string | null,
+  indexName: string | null,
   localColumns: Array<string>,
   targetTblName: string,
   targetColumns: Array<string>,
@@ -261,6 +262,8 @@ export function addForeignKey(
     // TODO: Assert local & target columns have equal data types
     // TODO: Register this foreign key name globally
 
+    indexName = indexName || constraintName;
+
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
     if (!some(table.indexes, index => index.columns.join('+') === needle)) {
@@ -268,23 +271,23 @@ export function addForeignKey(
       if (
         !(table.primaryKey && table.primaryKey.join('+').startsWith(needle))
       ) {
-        $ = addIndex($, tblName, fkName, 'NORMAL', localColumns, false);
+        $ = addIndex($, tblName, indexName, 'NORMAL', localColumns, false);
       }
-    } else if (fkName) {
+    } else if (indexName) {
       const pos = table.indexes.findIndex(
         i => i.columns.join('+') === needle && !i.$$locked,
       );
       if (pos >= 0) {
         // Change the name and move it to the end of the indexes array
         const [index] = table.indexes.splice(pos, 1);
-        index.name = fkName;
+        index.name = indexName;
         table.indexes.push(index);
       }
     }
 
-    fkName = fkName || generateForeignKeyName(table);
+    constraintName = constraintName || generateForeignKeyName(table);
     const fk: ForeignKey = {
-      name: fkName,
+      name: constraintName,
       columns: localColumns,
       reference: {
         table: targetTable.name,
