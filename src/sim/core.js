@@ -215,10 +215,7 @@ export function addIndex(
     // index on (user_id).
     const needle = columns.join('+');
     const pos = table.indexes.findIndex(
-      i =>
-        needle.startsWith(i.columns.join('+')) &&
-        !i.$$locked &&
-        (needle !== i.columns.join('+') || i.type === type),
+      i => needle.startsWith(i.columns.join('+')) && !i.$$locked,
     );
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
@@ -266,7 +263,9 @@ export function addForeignKey(
 
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
-    if (!some(table.indexes, index => index.columns.join('+') === needle)) {
+    if (
+      !some(table.indexes, index => index.columns.join('+').startsWith(needle))
+    ) {
       // Don't add if a primary key already exists
       if (
         !(table.primaryKey && table.primaryKey.join('+').startsWith(needle))
