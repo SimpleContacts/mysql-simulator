@@ -27,6 +27,7 @@ describe('Read documentation', () => {
               autoIncrement: true,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -41,6 +42,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -55,6 +57,7 @@ describe('Read documentation', () => {
               autoIncrement: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -69,6 +72,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
         ],
@@ -109,6 +113,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -123,6 +128,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -137,6 +143,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -151,6 +158,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
           },
           {
@@ -214,6 +222,7 @@ describe('Read documentation', () => {
               isUnique: false,
               reference: null,
               onUpdate: null,
+              comment: null,
             },
             position: null,
           },
