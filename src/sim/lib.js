@@ -344,6 +344,16 @@ export function applySql(db: Database, ast: Array<*>): Database {
             column,
             change.position,
           );
+          if (change.definition.isUnique) {
+            db = addIndex(
+              db,
+              expr.tblName,
+              null,
+              'UNIQUE',
+              [change.newColName],
+              true,
+            );
+          }
         } else if (change.type === 'DROP COLUMN') {
           db = removeColumn(db, expr.tblName, change.colName);
         } else if (change.type === 'ADD PRIMARY KEY') {
