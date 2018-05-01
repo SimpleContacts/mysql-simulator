@@ -389,6 +389,7 @@ export function addColumn(
       throw new Error(`Column "${tblName}.${column.name}" already exists`);
     }
 
+    // TODO: DRY this logic of "moving a column" up with the logic in replaceColumn()
     if (position) {
       if (position.startsWith('AFTER ')) {
         const afterColName = position.substring('AFTER '.length);
@@ -479,19 +480,10 @@ export function replaceColumn(
   const oldName = colName;
   const newName = column.name;
 
-  if (position) {
-    db = addColumn(
-      removeColumn(db, tblName, colName),
-      tblName,
-      column,
-      position,
-    );
-  } else {
-    db = produce(db, $ => {
-      const table = $.tables[tblName];
-      table.columns = table.columns.map(c => (c.name === colName ? column : c));
-    });
-  }
+  db = produce(db, $ => {
+    const table = $.tables[tblName];
+    table.columns = table.columns.map(c => (c.name === oldName ? column : c));
+  });
 
   // If the name of the column has changed, this is a rename. We'll also need
   // to rename the column in all the indexes where it's used.
@@ -512,6 +504,39 @@ export function replaceColumn(
         index.columns = index.columns.map(
           name => (name === oldName ? newName : name),
         );
+      }
+    });
+  }
+
+  // If there was a position spec change, pull the column out of the list,
+  // figure out the new position, and insert it there.
+  if (position) {
+    db = produce(db, $ => {
+      const table = $.tables[tblName];
+
+      // TODO: DRY this logic of "moving a column" up with the logic in addColumn()
+      if (position) {
+        const colIndex = table.columns.findIndex(c => c.name === newName);
+        if (colIndex < 0) {
+          throw new Error(`Column "${newName}" not found in "${tblName}"`);
+        }
+        const [column] = table.columns.splice(colIndex, 1);
+
+        if (position.startsWith('AFTER ')) {
+          const afterColName = position.substring('AFTER '.length);
+          const pos = table.columns.findIndex(c => c.name === afterColName);
+          if (pos < 0) {
+            throw new Error(
+              `Column "${tblName}.${afterColName}" does not exists`,
+            );
+          }
+
+          table.columns = insert(table.columns, pos + 1, column);
+        } else if (position === 'FIRST') {
+          table.columns = insert(table.columns, 0, column);
+        } else {
+          throw new Error(`Unknown position qualifier: ${position}`);
+        }
       }
     });
   }
