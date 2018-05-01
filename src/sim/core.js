@@ -129,6 +129,17 @@ export function renameTable(db: Database, from: string, to: string): Database {
         fk.name = `${to}${fk.name.substring(table.name.length)}`;
       }
     }
+
+    // Also update all FKs pointing to this table in the rest of the database
+    for (const name of Object.keys($.tables)) {
+      const t = $.tables[name];
+      for (const fk: ForeignKey of t.foreignKeys) {
+        if (fk.reference.table === from) {
+          fk.reference.table = to;
+        }
+      }
+    }
+
     table.name = to;
   });
 }
