@@ -355,12 +355,6 @@ AlterSpec
         position,
       }
     }
-  / DROP COLUMN? colName:Identifier {
-      return {
-        type: 'DROP COLUMN',
-        colName,
-      }
-    }
   / DROP (INDEX / KEY) indexName:Identifier {
       return {
         type: 'DROP INDEX',
@@ -372,6 +366,12 @@ AlterSpec
       return {
         type: 'DROP FOREIGN KEY',
         symbol,
+      }
+    }
+  / DROP COLUMN? colName:Identifier {
+      return {
+        type: 'DROP COLUMN',
+        colName,
       }
     }
   / MODIFY COLUMN? colName:Identifier definition:ColumnDefinition

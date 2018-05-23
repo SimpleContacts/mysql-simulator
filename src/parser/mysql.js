@@ -319,23 +319,23 @@ function peg$parse(input, options) {
               position,
             }
           },
-      peg$c70 = function(colName) {
-            return {
-              type: 'DROP COLUMN',
-              colName,
-            }
-          },
-      peg$c71 = function(indexName) {
+      peg$c70 = function(indexName) {
             return {
               type: 'DROP INDEX',
               indexName,
             }
           },
-      peg$c72 = function() { return { type: 'DROP PRIMARY KEY' } },
-      peg$c73 = function(symbol) {
+      peg$c71 = function() { return { type: 'DROP PRIMARY KEY' } },
+      peg$c72 = function(symbol) {
             return {
               type: 'DROP FOREIGN KEY',
               symbol,
+            }
+          },
+      peg$c73 = function(colName) {
+            return {
+              type: 'DROP COLUMN',
+              colName,
             }
           },
       peg$c74 = function(colName, definition, ident) { return `AFTER ${ident}` },
@@ -4280,9 +4280,9 @@ function peg$parse(input, options) {
                     s0 = peg$currPos;
                     s1 = peg$parseDROP();
                     if (s1 !== peg$FAILED) {
-                      s2 = peg$parseCOLUMN();
+                      s2 = peg$parseINDEX();
                       if (s2 === peg$FAILED) {
-                        s2 = null;
+                        s2 = peg$parseKEY();
                       }
                       if (s2 !== peg$FAILED) {
                         s3 = peg$parseIdentifier();
@@ -4306,15 +4306,12 @@ function peg$parse(input, options) {
                       s0 = peg$currPos;
                       s1 = peg$parseDROP();
                       if (s1 !== peg$FAILED) {
-                        s2 = peg$parseINDEX();
-                        if (s2 === peg$FAILED) {
-                          s2 = peg$parseKEY();
-                        }
+                        s2 = peg$parsePRIMARY();
                         if (s2 !== peg$FAILED) {
-                          s3 = peg$parseIdentifier();
+                          s3 = peg$parseKEY();
                           if (s3 !== peg$FAILED) {
                             peg$savedPos = s0;
-                            s1 = peg$c71(s3);
+                            s1 = peg$c71();
                             s0 = s1;
                           } else {
                             peg$currPos = s0;
@@ -4332,13 +4329,19 @@ function peg$parse(input, options) {
                         s0 = peg$currPos;
                         s1 = peg$parseDROP();
                         if (s1 !== peg$FAILED) {
-                          s2 = peg$parsePRIMARY();
+                          s2 = peg$parseFOREIGN();
                           if (s2 !== peg$FAILED) {
                             s3 = peg$parseKEY();
                             if (s3 !== peg$FAILED) {
-                              peg$savedPos = s0;
-                              s1 = peg$c72();
-                              s0 = s1;
+                              s4 = peg$parseIdentifier();
+                              if (s4 !== peg$FAILED) {
+                                peg$savedPos = s0;
+                                s1 = peg$c72(s4);
+                                s0 = s1;
+                              } else {
+                                peg$currPos = s0;
+                                s0 = peg$FAILED;
+                              }
                             } else {
                               peg$currPos = s0;
                               s0 = peg$FAILED;
@@ -4355,19 +4358,16 @@ function peg$parse(input, options) {
                           s0 = peg$currPos;
                           s1 = peg$parseDROP();
                           if (s1 !== peg$FAILED) {
-                            s2 = peg$parseFOREIGN();
+                            s2 = peg$parseCOLUMN();
+                            if (s2 === peg$FAILED) {
+                              s2 = null;
+                            }
                             if (s2 !== peg$FAILED) {
-                              s3 = peg$parseKEY();
+                              s3 = peg$parseIdentifier();
                               if (s3 !== peg$FAILED) {
-                                s4 = peg$parseIdentifier();
-                                if (s4 !== peg$FAILED) {
-                                  peg$savedPos = s0;
-                                  s1 = peg$c73(s4);
-                                  s0 = s1;
-                                } else {
-                                  peg$currPos = s0;
-                                  s0 = peg$FAILED;
-                                }
+                                peg$savedPos = s0;
+                                s1 = peg$c73(s3);
+                                s0 = s1;
                               } else {
                                 peg$currPos = s0;
                                 s0 = peg$FAILED;
