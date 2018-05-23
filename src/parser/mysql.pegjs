@@ -37,10 +37,15 @@ CompoundStatement
     }
   }
 
-comment = _ comment:(singleComment / singleDashComment / multiComment) _ { return comment }
-singleComment = '//' p:([^\n]*) { return { type: 'comment', commentType: 'single', raw: p.join('').trim() }; }
-singleDashComment = '--' p:([^\n]*) { return { type: 'comment', commentType: 'single', raw: p.join('').trim() }; }
-multiComment = "/*" inner:(!"*/" i:. {return i})* "*/" { return { type: 'comment', commentType: 'multi', raw: inner.join('') }; }
+Comment
+  = SingleLineComment
+  / MultiLineComment
+
+SingleLineComment
+  = ( '//' / '-- ' ) p:([^\n]*) { return { type: 'comment', raw: p.join('').trim() } }
+
+MultiLineComment
+  = "/*" inner:(!"*/" i:. { return i } )* "*/" { return { type: 'comment', raw: inner.join('') } }
 
 // We ignore select/insert/delete statements for now
 SelectStatement = SELECT [^;]* { return null; }
@@ -718,11 +723,10 @@ ConstantExpr
 // ====================================================
 // Util
 // ====================================================
-_ "whitespace" = whitespace* { return null }
-whitespace = [ \t\r\n] / multiComment / singleComment / singleDashComment
-
-/* nonbreaking whitespace */
-__ = [ \t]*
+_ "whitespace" = Whitespace* { return null }
+Whitespace
+  = [ \t\r\n]
+  / Comment
 
 Identifier "identifier"
   = QuotedIdentifier
