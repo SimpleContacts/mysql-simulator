@@ -96,6 +96,11 @@ function handleCreateTable(db: Database, expr): Database {
     db = addPrimaryKey(db, tblName, pk);
   }
 
+  // (2) Shorthand syntax to define index on a column directly
+  for (const col of columns.filter(c => c.definition.isUnique)) {
+    db = addIndex(db, tblName, null, 'UNIQUE', [col.colName], true);
+  }
+
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
   // a column directly (2).
   const indexes = expr.definitions.filter(
@@ -134,11 +139,6 @@ function handleCreateTable(db: Database, expr): Database {
         $$locked,
       );
     }
-  }
-
-  // (2) Shorthand syntax to define index on a column directly
-  for (const col of columns.filter(c => c.definition.isUnique)) {
-    db = addIndex(db, tblName, null, 'UNIQUE', [col.colName], true);
   }
 
   return db;
