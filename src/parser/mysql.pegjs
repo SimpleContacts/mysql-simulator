@@ -82,7 +82,10 @@ MemberExpression
   = object:Identifier '.' property:Identifier { return null }
 
 FunctionName
-  = HEX
+  = CHAR_LENGTH
+  / CONCAT
+  / CONV
+  / HEX
   / SUBSTRING
   / UNHEX
 
@@ -99,7 +102,14 @@ BooleanLiteral
   / FALSE
 
 NumberLiteral
+  = HexNumberLiteral
+  / DecimalNumberLiteral
+
+DecimalNumberLiteral
   = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
+
+HexNumberLiteral
+  = '0x' digits:[0-9a-fA-F]+ { return parseInt(digits.join(''), 16) }
 
 StringLiteral
   = SingleQuotedStringLiteral
@@ -684,7 +694,7 @@ Whitespace
   = [ \t\r\n]
   / Comment
 
-Identifier "identifier"
+Identifier
   = QuotedIdentifier
   / NonQuotedIdentifier
 
@@ -692,8 +702,7 @@ QuotedIdentifier
   = _ '`' chars:[^`]+ '`' { return chars.join('') }
 
 NonQuotedIdentifier
-  = _ first:IdentifierStart rest:IdentifierChar* { return [first, ...rest].join('') }
-
+  = _ !Keyword first:IdentifierStart rest:IdentifierChar* { return [first, ...rest].join('') }
 
 // ====================================================
 // Keywords
@@ -701,6 +710,9 @@ NonQuotedIdentifier
 
 IdentifierStart = [a-zA-Z_]
 IdentifierChar = [a-zA-Z0-9_]
+
+Keyword
+  = FOREIGN / KEY / PRIMARY / UNIQUE
 
 ACTION            = _ 'ACTION'i            !IdentifierChar _ { return 'ACTION' }
 ADD               = _ 'ADD'i               !IdentifierChar _ { return 'ADD' }
@@ -807,10 +819,13 @@ VARCHAR           = _ 'VARCHAR'i           !IdentifierChar _ { return 'VARCHAR' 
 WHILE             = _ 'WHILE'i             !IdentifierChar _ { return 'WHILE' }
 
 // Reserved built-in functions
+// TODO: Complete this list
+CHAR_LENGTH       = _ 'CHAR_LENGTH'i       !IdentifierChar _ { return 'CHAR_LENGTH' }
+CONCAT            = _ 'CONCAT'i            !IdentifierChar _ { return 'CONCAT' }
+CONV              = _ 'CONV'i              !IdentifierChar _ { return 'CONV' }
 HEX               = _ 'HEX'i               !IdentifierChar _ { return 'HEX' }
 SUBSTRING         = _ 'SUBSTRING'i         !IdentifierChar _ { return 'SUBSTRING' }
 UNHEX             = _ 'UNHEX'i             !IdentifierChar _ { return 'UNHEX' }
-
 
 // Composite types
 NOT_NULL = NOT NULL { return 'NOT NULL' }
