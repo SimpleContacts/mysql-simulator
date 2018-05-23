@@ -238,11 +238,10 @@ function tableLines(table: Table): Array<string> {
       // MySQL seems to output unique indexes on *NOT* NULL columns first, then
       // all NULLable unique column indexes. Let's mimick this behaviour in our
       // output
-      (idx, pos) => {
+      idx => {
         const colName = idx.columns[0];
         const column = table.columns.find(c => c.name === colName);
-        const isNotNull = column && !column.nullable;
-        return [isNotNull ? 0 : 1, pos];
+        return column && !column.nullable ? 0 : 1;
       },
     ).map(
       index =>
