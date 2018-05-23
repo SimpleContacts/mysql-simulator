@@ -230,14 +230,24 @@ function tableLines(table: Table): Array<string> {
       ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(',')})`]
       : []),
 
-    ...table.indexes
-      .filter(i => i.type === 'UNIQUE')
-      .map(
-        index =>
-          `UNIQUE KEY ${escape(index.name)} (${index.columns
-            .map(escape)
-            .join(',')})`,
-      ),
+    ...sortBy(
+      table.indexes.filter(i => i.type === 'UNIQUE'),
+
+      // MySQL seems to output unique indexes on *NOT* NULL columns first, then
+      // all NULLable unique column indexes. Let's mimick this behaviour in our
+      // output
+      (idx, pos) => {
+        const colName = idx.columns[0];
+        const column = table.columns.find(c => c.name === colName);
+        const isNotNull = column && !column.nullable;
+        return [isNotNull ? 0 : 1, pos];
+      },
+    ).map(
+      index =>
+        `UNIQUE KEY ${escape(index.name)} (${index.columns
+          .map(escape)
+          .join(',')})`,
+    ),
 
     ...table.indexes
       .filter(i => i.type === 'NORMAL')
