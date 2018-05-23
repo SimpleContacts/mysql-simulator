@@ -100,43 +100,41 @@ function handleCreateTable(db: Database, expr): Database {
   // a column directly (2).
   const indexes = expr.definitions.filter(
     def =>
+      def.type === 'FOREIGN KEY' ||
       def.type === 'FULLTEXT INDEX' ||
       def.type === 'UNIQUE INDEX' ||
       def.type === 'INDEX',
   );
   for (const index of indexes) {
-    const type =
-      index.type === 'UNIQUE INDEX'
-        ? 'UNIQUE'
-        : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
-    db = addIndex(
-      db,
-      tblName,
-      index.indexName,
-      type,
-      index.indexColNames.map(def => def.colName),
-      true,
-    );
+    if (index.type === 'FOREIGN KEY') {
+      db = addForeignKey(
+        db,
+        tblName,
+        index.constraint,
+        index.indexName,
+        index.indexColNames.map(def => def.colName), // Local columns
+        index.reference.tblName, // Foreign/target table
+        index.reference.indexColNames.map(def => def.colName), // Foreign/target columns
+      );
+    } else {
+      const type =
+        index.type === 'UNIQUE INDEX'
+          ? 'UNIQUE'
+          : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
+      db = addIndex(
+        db,
+        tblName,
+        index.indexName,
+        type,
+        index.indexColNames.map(def => def.colName),
+        true,
+      );
+    }
   }
 
   // (2) Shorthand syntax to define index on a column directly
   for (const col of columns.filter(c => c.definition.isUnique)) {
     db = addIndex(db, tblName, null, 'UNIQUE', [col.colName], true);
-  }
-
-  // Add all foreign keys we encounter
-  const fks = expr.definitions.filter(def => def.type === 'FOREIGN KEY');
-  // let nextFkNum = 1;
-  for (const fk of fks) {
-    db = addForeignKey(
-      db,
-      tblName,
-      fk.constraint,
-      fk.indexName,
-      fk.indexColNames.map(def => def.colName), // Local columns
-      fk.reference.tblName, // Foreign/target table
-      fk.reference.indexColNames.map(def => def.colName), // Foreign/target columns
-    );
   }
 
   return db;
