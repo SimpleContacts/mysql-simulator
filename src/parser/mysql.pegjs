@@ -70,21 +70,21 @@ Expression
   = Expression$ ( ( PLUS / MINUS ) Expression )?
 
 Expression$
-  = CallExpression
+  = MemberExpression
+  / CallExpression
   / Identifier { return null }
   / Constant
-  / Thing { return null }
 
 CallExpression
   = FunctionName LPAREN ExpressionList RPAREN
+
+MemberExpression
+  = object:Identifier '.' property:Identifier { return null }
 
 FunctionName
   = HEX
   / SUBSTRING
   / UNHEX
-
-Thing
-  = ( NEW / OLD ) '.' Identifier { return null }
 
 
 // ====================================================
