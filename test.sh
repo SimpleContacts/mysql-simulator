@@ -19,7 +19,7 @@ else
   if [ -n "$TRAVIS" ]; then
     diff -U8 tests/real tests/simulated
   else
-    colordiff -U8 tests/real tests/simulated | less -R
+    colordiff -U8 tests/real tests/simulated
   fi
   exit 2
 fi
