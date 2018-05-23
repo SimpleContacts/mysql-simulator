@@ -42,7 +42,7 @@ Comment
   / MultiLineComment
 
 SingleLineComment
-  = ( '//' / '-- ' ) p:([^\n]*) { return { type: 'comment', raw: p.join('').trim() } }
+  = ( '//' / '--' ) p:([^\n]*) { return { type: 'comment', raw: p.join('').trim() } }
 
 MultiLineComment
   = "/*" inner:(!"*/" i:. { return i } )* "*/" { return { type: 'comment', raw: inner.join('') } }

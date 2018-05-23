@@ -151,8 +151,8 @@ function peg$parse(input, options) {
         },
       peg$c3 = "//",
       peg$c4 = peg$literalExpectation("//", false),
-      peg$c5 = "-- ",
-      peg$c6 = peg$literalExpectation("-- ", false),
+      peg$c5 = "--",
+      peg$c6 = peg$literalExpectation("--", false),
       peg$c7 = /^[^\n]/,
       peg$c8 = peg$classExpectation(["\n"], true, false),
       peg$c9 = function(p) { return { type: 'comment', raw: p.join('').trim() } },
@@ -1243,9 +1243,9 @@ function peg$parse(input, options) {
       if (peg$silentFails === 0) { peg$fail(peg$c4); }
     }
     if (s1 === peg$FAILED) {
-      if (input.substr(peg$currPos, 3) === peg$c5) {
+      if (input.substr(peg$currPos, 2) === peg$c5) {
         s1 = peg$c5;
-        peg$currPos += 3;
+        peg$currPos += 2;
       } else {
         s1 = peg$FAILED;
         if (peg$silentFails === 0) { peg$fail(peg$c6); }
