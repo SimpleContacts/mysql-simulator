@@ -121,13 +121,17 @@ function handleCreateTable(db: Database, expr): Database {
         index.type === 'UNIQUE INDEX'
           ? 'UNIQUE'
           : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
+      const $$locked =
+        type === 'NORMAL'
+          ? !!index.indexName
+          : !!(index.constraint || index.indexName);
       db = addIndex(
         db,
         tblName,
         index.indexName,
         type,
         index.indexColNames.map(def => def.colName),
-        true,
+        $$locked,
       );
     }
   }
@@ -383,14 +387,13 @@ export function applySql(db: Database, ast: Array<*>): Database {
             change.reference.indexColNames.map(def => def.colName),
           );
         } else if (change.type === 'ADD UNIQUE INDEX') {
-          const $$locked = !!change.constraint;
           db = addIndex(
             db,
             expr.tblName,
             change.constraint || change.indexName,
             'UNIQUE',
             change.indexColNames.map(def => def.colName),
-            $$locked,
+            true, // UNIQUE indexes are always explicit
           );
         } else if (change.type === 'ADD FULLTEXT INDEX') {
           const $$locked = !!change.constraint;
