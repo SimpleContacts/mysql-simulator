@@ -20,7 +20,7 @@ export type Index = {
 
   // NOTE: There's some subtlety to MySQL's behavior on index naming.
   // Depending on how an index was created in the system, MySQL may implicitly
-  // decide to rename it later on, as a side-effect of another statmeent.  This
+  // decide to rename it later on, as a side-effect of another statement.  This
   // behaviour can only be reliably replicated by tracking the "lockedness" of
   // its name explicitly.  (The $$ signifies this is an internal implementation
   // detail.)
