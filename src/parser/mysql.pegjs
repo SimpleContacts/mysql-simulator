@@ -57,7 +57,7 @@ LockStatement = LOCK [^;]* { return null; }
 UnlockStatement = UNLOCK [^;]* { return null; }
 
 Condition
-  = boolean
+  = BooleanLiteral
   / NOT Condition
   / LPAREN Condition RPAREN
   / left:Expression ( EQ / NE / LTE / GTE / LT / GT ) right:Expression
@@ -72,7 +72,7 @@ Expression
 Expression$
   = CallExpression
   / Identifier { return null }
-  / constant
+  / Constant
   / Thing { return null }
 
 CallExpression
@@ -91,17 +91,17 @@ Thing
 // Constant literals
 // ====================================================
 
-null "null literal"
+NullLiteral
   = NULL
 
-boolean "boolean literal"
+BooleanLiteral
   = TRUE
   / FALSE
 
-number "number literal"
+NumberLiteral
   = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
 
-String "string literal"
+StringLiteral
   = SingleQuotedStringLiteral
   / DoubleQuotedStringLiteral
 
@@ -112,14 +112,14 @@ DoubleQuotedStringLiteral
   = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' { return `'${seq.join('')}'` }
 
 StringList
-  = first:String COMMA rest:StringList { return [first, ...rest] }
-  / only:String { return [only] }
+  = first:StringLiteral COMMA rest:StringList { return [first, ...rest] }
+  / only:StringLiteral { return [only] }
 
-constant
-  = null
-  / boolean
-  / String
-  / number
+Constant
+  = NullLiteral
+  / BooleanLiteral
+  / NumberLiteral
+  / StringLiteral
 
 
 // ====================================================
@@ -500,7 +500,7 @@ ColumnDefinition
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
     isPrimary2:( PRIMARY KEY )?
-    comment:( COMMENT value:String { return value } )?
+    comment:( COMMENT value:StringLiteral { return value } )?
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
     {
@@ -524,16 +524,16 @@ ColumnDefinition
     }
 
 
-len
-  = LPAREN number:number RPAREN { return number }
+Len
+  = LPAREN number:NumberLiteral RPAREN { return number }
 
-precisionSpec
-  = LPAREN length:number COMMA decimals:number RPAREN { return [length, decimals] }
+PrecisionSpec
+  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length, decimals] }
 
-boolTypeName
+BoolTypeName
   = BOOLEAN
 
-intTypeName
+IntTypeName
   = BIGINT
   / INTEGER
   / INT
@@ -541,51 +541,51 @@ intTypeName
   / SMALLINT
   / TINYINT
 
-precisionTypeName
+PrecisionTypeName
   = REAL
   / DOUBLE
   / FLOAT
   / DECIMAL
   / NUMERIC
 
-dateTypeName
-  = type:TIMESTAMP precision:len? { return precision ? `${type}(${precision})`:type }
+DateTypeName
+  = type:TIMESTAMP precision:Len? { return precision ? `${type}(${precision})`:type }
   / TIME
-  / type:DATETIME precision:len? { return precision ? `${type}(${precision})`:type }
+  / type:DATETIME precision:Len? { return precision ? `${type}(${precision})`:type }
   / DATE
 
-boolDataType
-  = type:boolTypeName len:len? { return 'TINYINT(1)' }
+BoolDataType
+  = type:BoolTypeName len:Len? { return 'TINYINT(1)' }
 
-intDataType
-  = type:intTypeName len:len? unsigned:UNSIGNED? {
+IntDataType
+  = type:IntTypeName len:Len? unsigned:UNSIGNED? {
     len = len ? `(${len})` : '';
     unsigned = unsigned || '';
     return (type + len + ' ' + unsigned).trim()
   }
 
-precisionDataType
-  = type:precisionTypeName _ prec:precisionSpec? _ unsigned:UNSIGNED? {
+PrecisionDataType
+  = type:PrecisionTypeName _ prec:PrecisionSpec? _ unsigned:UNSIGNED? {
     prec = prec ? `(${prec.join(',')})` : '';
     unsigned = unsigned || '';
     return (type + prec + ' ' + unsigned).trim()
   }
 
-dateDataType
-  = type:dateTypeName { return type }
+DateDataType
+  = type:DateTypeName { return type }
 
-textDataType
+TextDataType
   = // Length required
-    type:( VARCHAR / VARBINARY ) len:len { return `${type}(${len})` }
+    type:( VARCHAR / VARBINARY ) len:Len { return `${type}(${len})` }
   / // Length required
-    type:( CHAR / BINARY / TEXT ) len:len? { return len ? `${type}(${len})` : type }
+    type:( CHAR / BINARY / TEXT ) len:Len? { return len ? `${type}(${len})` : type }
 
 DataType
-  = intDataType
-  / boolDataType
-  / dateDataType
-  / precisionDataType
-  / type:textDataType ignore:(COLLATE CollationName)? { return type }
+  = IntDataType
+  / BoolDataType
+  / DateDataType
+  / PrecisionDataType
+  / type:TextDataType ignore:(COLLATE CollationName)? { return type }
   / JSON
   / ENUM LPAREN values:StringList RPAREN {
       return `ENUM(${values.join(',')})`;
@@ -596,7 +596,7 @@ IndexColNames
   / only:IndexColName { return [only] }
 
 IndexColName
-  = colName:Identifier len:len? direction:( ASC / DESC )? { return { colName, len, direction } }
+  = colName:Identifier len:Len? direction:( ASC / DESC )? { return { colName, len, direction } }
 
 ReferenceDefinition
   = REFERENCES tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN
@@ -644,7 +644,7 @@ ValueList
   / only:Value { return [only] }
 
 Value
-  = constant
+  = Constant
 
 PrimaryKeyDefinition = PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
   return {
@@ -662,67 +662,23 @@ IndexDefinition =
     }
   }
 
-columnLengthEnum = number / String
-columnLengthEnumWithComma = value:columnLengthEnum _ ',' _ { return value.rawValue }
-columnLength
-  = '(' list:columnLengthEnumWithComma* last:columnLengthEnum ')' {
-    return list.concat(last.rawValue)
-               .join('')
-               .replace(' ', '')
-               .split(',')
-               .filter(Boolean);
-  }
-
-baseColumnType
-  = BINARY
-  / BOOLEAN
-  / CHAR
-  / DATETIME
-  / DATE
-  / DECIMAL
-  / ENUM
-  / FLOAT
-  / INT
-  / JSON
-  / SMALLINT
-  / TEXT
-  / TIMESTAMP
-  / TIME
-  / TINYINT
-  / VARBINARY
-  / VARCHAR
-
-param
-  = boolean
-  / number
-  / String
-
-paramList
-  = c:param COMMA l:paramList { return [c.value, ...l] }
-  / c:param { return [c.value] }
-
-columnType
-  = columnType1
-  / columnType2
-
-columnType1
-  = type:baseColumnType _ '(' _ params:paramList _ ')' { return `${type.toUpperCase()}(${params.join(', ')})` }
-
-columnType2
-  = type:baseColumnType { return type.toUpperCase() }
-
 /* System functions */
-current_timestamp = value:CURRENT_TIMESTAMP precision:( LPAREN n:number? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
-NowCall = NOW LPAREN RPAREN { return 'NOW()' }
 
 ConstantExpr
-  = constant
-  / current_timestamp
+  = Constant
+  / CurrentTimestamp
   / NowCall
+
+CurrentTimestamp
+  = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
+
+NowCall
+  = NOW LPAREN RPAREN { return 'NOW()' }
 
 // ====================================================
 // Util
 // ====================================================
+
 _ "whitespace" = Whitespace* { return null }
 Whitespace
   = [ \t\r\n]
