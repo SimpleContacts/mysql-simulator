@@ -19,13 +19,13 @@ Statement
   / AlterTable
   / DropTable
   / DropIndex
-  / select
-  / insert
-  / delete
-  / update
-  / set
-  / lock
-  / unlock
+  / SelectStatement
+  / InsertStatement
+  / DeleteStatement
+  / UpdateStatement
+  / SetStatement
+  / LockStatement
+  / UnlockStatement
   / CompoundStatement
   / IfStatement
 
@@ -43,13 +43,13 @@ singleDashComment = '--' p:([^\n]*) { return { type: 'comment', commentType: 'si
 multiComment = "/*" inner:(!"*/" i:. {return i})* "*/" { return { type: 'comment', commentType: 'multi', raw: inner.join('') }; }
 
 // We ignore select/insert/delete statements for now
-select = SELECT [^;]* { return null; }
-update = UPDATE [^;]* { return null; }
-insert = INSERT [^;]* { return null; }
-delete = DELETE [^;]* { return null; }
-set = SET [^;]* { return null; }
-lock = LOCK [^;]* { return null; }
-unlock = UNLOCK [^;]* { return null; }
+SelectStatement = SELECT [^;]* { return null; }
+UpdateStatement = UPDATE [^;]* { return null; }
+InsertStatement = INSERT [^;]* { return null; }
+DeleteStatement = DELETE [^;]* { return null; }
+SetStatement = SET [^;]* { return null; }
+LockStatement = LOCK [^;]* { return null; }
+UnlockStatement = UNLOCK [^;]* { return null; }
 
 Condition
   = boolean

@@ -1126,19 +1126,19 @@ function peg$parse(input, options) {
                 if (s0 === peg$FAILED) {
                   s0 = peg$parseDropIndex();
                   if (s0 === peg$FAILED) {
-                    s0 = peg$parseselect();
+                    s0 = peg$parseSelectStatement();
                     if (s0 === peg$FAILED) {
-                      s0 = peg$parseinsert();
+                      s0 = peg$parseInsertStatement();
                       if (s0 === peg$FAILED) {
-                        s0 = peg$parsedelete();
+                        s0 = peg$parseDeleteStatement();
                         if (s0 === peg$FAILED) {
-                          s0 = peg$parseupdate();
+                          s0 = peg$parseUpdateStatement();
                           if (s0 === peg$FAILED) {
-                            s0 = peg$parseset();
+                            s0 = peg$parseSetStatement();
                             if (s0 === peg$FAILED) {
-                              s0 = peg$parselock();
+                              s0 = peg$parseLockStatement();
                               if (s0 === peg$FAILED) {
-                                s0 = peg$parseunlock();
+                                s0 = peg$parseUnlockStatement();
                                 if (s0 === peg$FAILED) {
                                   s0 = peg$parseCompoundStatement();
                                   if (s0 === peg$FAILED) {
@@ -1494,7 +1494,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseselect() {
+  function peg$parseSelectStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 8,
@@ -1545,7 +1545,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseupdate() {
+  function peg$parseUpdateStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 9,
@@ -1596,7 +1596,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseinsert() {
+  function peg$parseInsertStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 10,
@@ -1647,7 +1647,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parsedelete() {
+  function peg$parseDeleteStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 11,
@@ -1698,7 +1698,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseset() {
+  function peg$parseSetStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 12,
@@ -1749,7 +1749,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parselock() {
+  function peg$parseLockStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 13,
@@ -1800,7 +1800,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseunlock() {
+  function peg$parseUnlockStatement() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 219 + 14,
