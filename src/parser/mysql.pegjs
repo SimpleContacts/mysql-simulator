@@ -587,7 +587,7 @@ DataType
     }
 
 IndexColNames
-  = first:IndexColName COMMA rest:IndexColNames { return [first].concat(rest) }
+  = first:IndexColName COMMA rest:IndexColNames { return [first, ...rest] }
   / only:IndexColName { return [only] }
 
 IndexColName
@@ -615,7 +615,7 @@ ReferenceOption
   / SET DEFAULT
 
 TableOptions
-  = first:TableOption COMMA? rest:TableOptions { return [first].concat(rest) }
+  = first:TableOption COMMA? rest:TableOptions { return [first, ...rest] }
   / only:TableOption { return [only] }
 
 TableOption
@@ -693,7 +693,7 @@ param
   / String
 
 paramList
-  = c:param _ ',' _ l:paramList { return [c.value].concat(l) }
+  = c:param COMMA l:paramList { return [c.value, ...l] }
   / c:param { return [c.value] }
 
 columnType
