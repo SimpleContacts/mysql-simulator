@@ -1,0 +1,10 @@
+CREATE TABLE aaa (foo VARCHAR(12), bar TIMESTAMP);
+
+CREATE
+  TRIGGER qux BEFORE UPDATE
+  ON aaa FOR EACH ROW
+  BEGIN
+    IF NOT (NEW.foo <=> OLD.foo) THEN
+      SET NEW.bar = NOW();
+    END IF;
+  END;
