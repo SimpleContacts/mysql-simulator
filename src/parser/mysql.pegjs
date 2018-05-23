@@ -66,7 +66,7 @@ Expression
 
 Expression$
   = CallExpression
-  / identifier { return null }
+  / Identifier { return null }
   / constant
   / Thing { return null }
 
@@ -79,7 +79,7 @@ FunctionName
   / UNHEX
 
 Thing
-  = ( NEW / OLD ) '.' identifier { return null }
+  = ( NEW / OLD ) '.' Identifier { return null }
 
 
 // ====================================================
@@ -122,7 +122,7 @@ constant
 // ====================================================
 
 RenameTable
-  = RENAME TABLE tblName:identifier TO newName:identifier
+  = RENAME TABLE tblName:Identifier TO newName:Identifier
     {
       return {
         type: 'RENAME TABLE',
@@ -135,7 +135,7 @@ RenameTable
 // ====================================================
 // Drop Index
 // ====================================================
-DropIndex = DROP INDEX indexName:identifier ON tblName:identifier {
+DropIndex = DROP INDEX indexName:Identifier ON tblName:Identifier {
   return {
     type: 'DROP INDEX',
     indexName,
@@ -148,7 +148,7 @@ DropIndex = DROP INDEX indexName:identifier ON tblName:identifier {
 // ====================================================
 
 DropTable
-  = DROP TABLE ifExists:(IF EXISTS)? tblName:identifier {
+  = DROP TABLE ifExists:(IF EXISTS)? tblName:Identifier {
     return {
       type: 'DROP TABLE',
       tblName,
@@ -161,7 +161,7 @@ DropTable
 // ====================================================
 
 CreateIndex
-  = CREATE indexKind:( UNIQUE / FULLTEXT )? INDEX indexName:identifier ON tblName:identifier LPAREN indexColNames:IndexColNames RPAREN {
+  = CREATE indexKind:( UNIQUE / FULLTEXT )? INDEX indexName:Identifier ON tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN {
     indexKind = indexKind || 'NORMAL'
     return {
       type: 'CREATE INDEX',
@@ -177,10 +177,10 @@ CreateIndex
 // ====================================================
 
 CreateTrigger
-  = CREATE TRIGGER triggerName:identifier
+  = CREATE TRIGGER triggerName:Identifier
     ( BEFORE / AFTER )
     ( INSERT / UPDATE / DELETE )
-    ON tblName:identifier FOR EACH ROW ( ( FOLLOWS / PRECEDES ) otherTrigger:identifier )?
+    ON tblName:Identifier FOR EACH ROW ( ( FOLLOWS / PRECEDES ) otherTrigger:Identifier )?
     triggerBody:Statement {
     return {
       type: 'CREATE TRIGGER',
@@ -198,10 +198,10 @@ FunctionParamList
   / only:FunctionParam { return [only] }
 
 FunctionParam
-  = paramName:identifier type:DataType { return { paramName, type } }
+  = paramName:Identifier type:DataType { return { paramName, type } }
 
 CreateFunction
-  = CREATE FUNCTION spName:identifier
+  = CREATE FUNCTION spName:Identifier
     params:( LPAREN params:FunctionParamList RPAREN { return params })
     RETURNS DataType
     characteristic:CreateFunctionCharacteristic
@@ -238,7 +238,7 @@ AssignmentList
   / only:Assignment { return [only] }
 
 Assignment
-  = identifier EQ Expression
+  = Identifier EQ Expression
 
 IfStatement
   = IF Condition THEN
@@ -257,7 +257,7 @@ WhileStatement
 // ====================================================
 
 AlterTable
-  = ALTER TABLE tblName:identifier changes:AlterSpecs {
+  = ALTER TABLE tblName:Identifier changes:AlterSpecs {
     return {
       type: 'ALTER TABLE',
       tblName,
@@ -273,9 +273,9 @@ AlterSpecs
  * See https://dev.mysql.com/doc/refman/5.7/en/alter-table.html
  */
 AlterSpec
-  = ADD COLUMN? colName:identifier columnDefinition:ColumnDefinition
+  = ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition
     position:(
-      AFTER ident:identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident}` }
       / FIRST { return 'FIRST' }
     )? {
       return {
@@ -285,7 +285,7 @@ AlterSpec
         position,
       }
     }
-  / ADD ( INDEX / KEY ) indexName:identifier? indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
+  / ADD ( INDEX / KEY ) indexName:Identifier? indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'ADD INDEX',
         indexName,
@@ -302,7 +302,7 @@ AlterSpec
       }
     }
   / ADD constraint:NamedConstraint?
-    UNIQUE ( INDEX / KEY )? indexName:identifier? indexType:IndexType?
+    UNIQUE ( INDEX / KEY )? indexName:Identifier? indexType:IndexType?
     LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'ADD UNIQUE INDEX',
@@ -312,7 +312,7 @@ AlterSpec
         indexColNames,
       }
     }
-  / ADD FULLTEXT ( INDEX / KEY )? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
+  / ADD FULLTEXT ( INDEX / KEY )? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'ADD FULLTEXT INDEX',
         indexName,
@@ -320,7 +320,7 @@ AlterSpec
       }
     }
   / ADD constraint:NamedConstraint?
-    FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN
+    FOREIGN KEY indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN
     reference:ReferenceDefinition {
       return {
         type: 'ADD FOREIGN KEY',
@@ -331,15 +331,15 @@ AlterSpec
       }
     }
   // / ALGORITHM
-  / ALTER COLUMN? colName:identifier DROP DEFAULT {
+  / ALTER COLUMN? colName:Identifier DROP DEFAULT {
       return {
         type: 'DROP DEFAULT',
         colName,
       }
     }
-  / CHANGE COLUMN? oldColName:identifier newColName:identifier definition:ColumnDefinition
+  / CHANGE COLUMN? oldColName:Identifier newColName:Identifier definition:ColumnDefinition
     position:(
-      AFTER ident:identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident}` }
       / FIRST { return 'FIRST' }
     )? {
       return {
@@ -350,28 +350,28 @@ AlterSpec
         position,
       }
     }
-  / DROP COLUMN? colName:identifier {
+  / DROP COLUMN? colName:Identifier {
       return {
         type: 'DROP COLUMN',
         colName,
       }
     }
-  / DROP (INDEX / KEY) indexName:identifier {
+  / DROP (INDEX / KEY) indexName:Identifier {
       return {
         type: 'DROP INDEX',
         indexName,
       }
     }
   / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
-  / DROP FOREIGN KEY symbol:identifier {
+  / DROP FOREIGN KEY symbol:Identifier {
       return {
         type: 'DROP FOREIGN KEY',
         symbol,
       }
     }
-  / MODIFY COLUMN? colName:identifier definition:ColumnDefinition
+  / MODIFY COLUMN? colName:Identifier definition:ColumnDefinition
     position:(
-      AFTER ident:identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident}` }
       / FIRST { return 'FIRST' }
     )? {
       // MODIFY COLUMN is like CHANGE COLUMN in every way, except that it
@@ -386,21 +386,21 @@ AlterSpec
         position,
       }
     }
-  / RENAME ( INDEX / KEY ) oldIndexName:identifier TO newIndexName:identifier {
+  / RENAME ( INDEX / KEY ) oldIndexName:Identifier TO newIndexName:Identifier {
       return {
         type: 'RENAME INDEX',
         oldIndexName,
         newIndexName,
       }
     }
-  / RENAME ( TO / AS )? newTblName:identifier {
+  / RENAME ( TO / AS )? newTblName:Identifier {
       return {
         type: 'RENAME TABLE',
         newTblName,
       }
     }
 
-NamedConstraint = CONSTRAINT symbol:identifier? { return symbol }
+NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol }
 
 IndexType = USING ( BTREE / HASH )
 
@@ -416,7 +416,7 @@ CreateTable
 CreateTable1
   = CREATE TABLE
     ifNotExists:(IF NOT EXISTS)?
-    tblName:identifier
+    tblName:Identifier
     LPAREN definitions:CreateDefinitionsList RPAREN
     tableOptions:TableOptions? {
       // Turn the list-of-option-pairs into an object
@@ -433,7 +433,7 @@ CreateTable1
 CreateTable3
   = CREATE TABLE
     ifNotExists:(IF NOT EXISTS)?
-    tblName:identifier LIKE oldTblName:identifier {
+    tblName:Identifier LIKE oldTblName:Identifier {
     return {
       type: 'CREATE TABLE LIKE', // Copy table
       tblName,
@@ -447,7 +447,7 @@ CreateDefinitionsList
   / only:CreateDefinition { return [only] }
 
 CreateDefinition
-  = colName:identifier _ columnDefinition:ColumnDefinition {
+  = colName:Identifier _ columnDefinition:ColumnDefinition {
       return {
         type: 'COLUMN',
         colName,
@@ -460,7 +460,7 @@ CreateDefinition
   / IndexDefinition
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
   / constraint:NamedConstraint?
-    UNIQUE (INDEX / KEY)? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
+    UNIQUE (INDEX / KEY)? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'UNIQUE INDEX',
         constraint,
@@ -468,7 +468,7 @@ CreateDefinition
         indexColNames,
       }
     }
-  / FULLTEXT (INDEX / KEY)? indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN {
+  / FULLTEXT (INDEX / KEY)? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'FULLTEXT INDEX',
         indexName,
@@ -476,7 +476,7 @@ CreateDefinition
       }
     }
   / constraint:NamedConstraint?
-    FOREIGN KEY indexName:identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
+    FOREIGN KEY indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
       return {
         type: 'FOREIGN KEY',
         constraint,
@@ -591,10 +591,10 @@ IndexColNames
   / only:IndexColName { return [only] }
 
 IndexColName
-  = colName:identifier len:len? direction:( ASC / DESC )? { return { colName, len, direction } }
+  = colName:Identifier len:len? direction:( ASC / DESC )? { return { colName, len, direction } }
 
 ReferenceDefinition
-  = REFERENCES tblName:identifier LPAREN indexColNames:IndexColNames RPAREN
+  = REFERENCES tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN
     matchMode:( MATCH ( FULL / PARTIAL / SIMPLE ) )?
     onDelete:( ON DELETE ReferenceOption )?
     onUpdate:( ON UPDATE ReferenceOption )? {
@@ -649,7 +649,7 @@ PrimaryKeyDefinition = PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
 }
 
 IndexDefinition =
-  ( INDEX / KEY ) indexName:identifier LPAREN indexColNames:IndexColNames RPAREN {
+  ( INDEX / KEY ) indexName:Identifier LPAREN indexColNames:IndexColNames RPAREN {
     return {
       type: 'INDEX',
       indexName,
@@ -724,7 +724,7 @@ whitespace = [ \t\r\n] / multiComment / singleComment / singleDashComment
 /* nonbreaking whitespace */
 __ = [ \t]*
 
-identifier "identifier"
+Identifier "identifier"
   = QuotedIdentifier
   / NonQuotedIdentifier
 
