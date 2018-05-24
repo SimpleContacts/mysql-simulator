@@ -1,6 +1,7 @@
 // @flow
 
 import fs from 'fs';
+import path from 'path';
 
 import { sortBy } from 'lodash';
 
@@ -475,4 +476,32 @@ export function applySql(db: Database, sql: string, srcFile: string): Database {
 export function applySqlFile(db: Database, path: string): Database {
   const sql = fs.readFileSync(path, { encoding: 'utf-8' });
   return applySql(db, sql, path);
+}
+
+function* expandInputFiles(paths: Array<string>): Iterable<string> {
+  for (const inputPath of paths) {
+    if (fs.statSync(inputPath).isDirectory()) {
+      // Naturally sort files before processing -- order is crucial!
+      let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
+      files = sortBy(files, f => parseInt(f, 10)).map(f =>
+        path.join(inputPath, f),
+      );
+      yield* files;
+    } else {
+      yield inputPath;
+    }
+  }
+}
+
+/**
+ * Returns the new DB state given an initial DB state, and a list of directory
+ * or file names on disk.  For every directory given, it will collect
+ * a naturally-sorted list of *.sql files.  Does not modify the original input
+ * DB state.
+ */
+export function applySqlFiles(db: Database, ...paths: Array<string>): Database {
+  for (const path of expandInputFiles(paths)) {
+    db = applySqlFile(db, path);
+  }
+  return db;
 }
