@@ -39,7 +39,7 @@ fi
 # Generate real DB dump
 (
   cd ../simplecontacts
-  bin/resetDb.js --quiet $limit_args
+  bin/resetDb.js --no-cache --quiet $limit_args
   mysqldump simplecontacts $table --no-data --skip-triggers --compact \
     | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' \
     | sed -Ee 's/([[:space:]]+(CHARACTER SET|COLLATE)[[:space:]=]+[A-Za-z0-9_]+)+//' \
