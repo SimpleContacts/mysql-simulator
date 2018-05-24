@@ -17,6 +17,7 @@ import {
   dropForeignKey,
   dropIndex,
   dropPrimaryKey,
+  emptyDb,
   removeColumn,
   removeTable,
   renameTable,
@@ -504,4 +505,13 @@ export function applySqlFiles(db: Database, ...paths: Array<string>): Database {
     db = applySqlFile(db, path);
   }
   return db;
+}
+
+/**
+ * All-in-one function call to simply return the final DB state, given
+ * a collection of file or directory names.  For every directory given, it will
+ * collect a naturally-sorted list of *.sql files.
+ */
+export function simulate(...paths: Array<string>): Database {
+  return applySqlFiles(emptyDb(), ...paths);
 }
