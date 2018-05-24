@@ -699,10 +699,10 @@ Identifier
   / NonQuotedIdentifier
 
 QuotedIdentifier
-  = _ '`' chars:[^`]+ '`' { return chars.join('') }
+  = _ '`' chars:[^`]+ '`' _ { return chars.join('') }
 
 NonQuotedIdentifier
-  = _ !Keyword first:IdentifierStart rest:IdentifierChar* { return [first, ...rest].join('') }
+  = _ !Keyword first:IdentifierStart rest:IdentifierChar* _ { return [first, ...rest].join('') }
 
 // ====================================================
 // Keywords
