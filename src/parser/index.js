@@ -1,7 +1,5 @@
 // @flow
 
-import chalk from 'chalk';
-
 // $FlowFixMe - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
 
@@ -25,7 +23,7 @@ const printErr = (filename, input, e: Error) => {
   const loc = e.location;
   if (!loc) {
     // Likely not a parser error
-    error(chalk.red(e.toString()));
+    error(e.toString());
     return;
   }
 
@@ -38,25 +36,17 @@ const printErr = (filename, input, e: Error) => {
   const line = lines[start.line - 1];
   const after = lines.slice(start.line, start.line + NUM_CONTEXT_LINES_AFTER);
   const offset = start.column;
-  error(
-    chalk.red(
-      `Parse error${filename ? ` in ${chalk.bold(filename)}` : ''}: ${
-        e.message
-      }`,
-    ),
-  );
+  error(`Parse error${filename ? ` in ${filename}` : ''}: ${e.message}`);
   error('');
-  error(indent(chalk.gray(before.join('\n'))));
-  error(indent(chalk.white(line)));
+  error(indent(before.join('\n')));
+  error(indent(line));
   error(
     indent(
       ' '.repeat(offset - 1) +
-        chalk.yellow(
-          '^'.repeat(end.line !== start.line ? 1 : end.column - start.column),
-        ),
+        '^'.repeat(end.line !== start.line ? 1 : end.column - start.column),
     ),
   );
-  error(indent(chalk.gray(after.join('\n'))));
+  error(indent(after.join('\n')));
   error('');
 };
 

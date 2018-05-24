@@ -4,7 +4,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import chalk from 'chalk';
 import program from 'commander';
 import { sortBy } from 'lodash';
 
@@ -56,7 +55,7 @@ function runWithOptions(options: Options) {
   for (const fullpath of files) {
     const file = path.basename(fullpath);
     if (options.verbose) {
-      error(`===> ${chalk.magenta(file)}`);
+      error(`===> ${file}`);
     }
     const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
     const ast: Array<*> = parseSql(sql, fullpath);

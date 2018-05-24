@@ -1,6 +1,5 @@
 // @flow
 
-import chalk from 'chalk';
 import { sortBy } from 'lodash';
 
 import {
@@ -421,10 +420,12 @@ export function applySql(db: Database, ast: Array<*>): Database {
         } else if (change.type === 'DROP DEFAULT') {
           db = dropDefault(db, expr.tblName, change.colName);
         } else {
-          error(
-            chalk.yellow(`Unknown change type: ${change.type}`),
-            chalk.gray(JSON.stringify({ expr, change }, null, 2)),
-          );
+          // Log details to the console (useful for debugging)
+          error(`Unknown change type: ${change.type}`);
+          error(JSON.stringify({ expr, change }, null, 2));
+
+          // Error out
+          throw new Error(`Unknown change type: ${change.type}`);
         }
       }
     } else if (expr.type === 'RENAME TABLE') {
@@ -446,10 +447,10 @@ export function applySql(db: Database, ast: Array<*>): Database {
     } else if (expr.type === 'CREATE TRIGGER') {
       // Ignore
     } else {
-      error(
-        chalk.yellow(`Unknown expression type: ${expr.type}`),
-        chalk.gray(JSON.stringify({ expr }, null, 2)),
-      );
+      // Log details to the console (useful for debugging)
+      error(`Unknown expression type: ${expr.type}`);
+      error(JSON.stringify({ expr }, null, 2));
+      throw new Error(`Unknown expression type: ${expr.type}`);
     }
   }
 
