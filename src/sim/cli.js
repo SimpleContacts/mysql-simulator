@@ -7,9 +7,8 @@ import path from 'path';
 import program from 'commander';
 import { sortBy } from 'lodash';
 
-import { emptyDb } from './core';
+import Database from './Database';
 import { applySqlFile, dumpDb } from './lib';
-import type { Database } from './types';
 
 // eslint-disable-next-line no-console
 const log = console.log;
@@ -44,7 +43,7 @@ function* iterInputFiles(paths: Array<string>): Iterable<string> {
 }
 
 function runWithOptions(options: Options) {
-  let db: Database = emptyDb();
+  let db: Database = new Database();
 
   let files = [...iterInputFiles(options.args)];
   if (options.limit) {
