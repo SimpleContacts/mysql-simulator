@@ -16,7 +16,7 @@
     "check:eslint": "eslint --report-unused-disable-directives src",
     "check:import-sort": "import-sort --list-different 'src/**/*.js'",
     "check:prettier": "prettier --list-different 'src/**/*.js'",
-    "tdd": "jest src --watch",
+    "tdd": "onchange 'src/**' 'tests/*.sql' -- './test.sh'",
     "test": "./test.sh && yarn run -s lint && yarn run -s flow && jest src",
     "flow": "flow --include-warnings",
     "prepublish": "in-publish && yarn run actually-prepublish || not-in-publish",
@@ -49,6 +49,7 @@
     "import-sort-style-module": "^4.2.0",
     "in-publish": "^2.0.0",
     "jest-cli": "^23.0.0-alpha.0",
+    "onchange": "^4.0.0",
     "pegjs": "^0.10.0",
     "rimraf": "^2.6.2"
   },
