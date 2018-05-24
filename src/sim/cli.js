@@ -7,9 +7,8 @@ import path from 'path';
 import program from 'commander';
 import { sortBy } from 'lodash';
 
-import parseSql from '../parser';
 import { emptyDb } from './core';
-import { applySql, dumpDb } from './lib';
+import { applySqlFile, dumpDb } from './lib';
 import type { Database } from './types';
 
 // eslint-disable-next-line no-console
@@ -57,9 +56,7 @@ function runWithOptions(options: Options) {
     if (options.verbose) {
       error(`===> ${file}`);
     }
-    const sql = fs.readFileSync(fullpath, { encoding: 'utf-8' });
-    const ast: Array<*> = parseSql(sql, fullpath);
-    db = applySql(db, ast);
+    db = applySqlFile(db, fullpath);
 
     if (options.step) {
       printDb(db, options.tables);

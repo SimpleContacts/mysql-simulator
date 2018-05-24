@@ -1,7 +1,10 @@
 // @flow
 
+import fs from 'fs';
+
 import { sortBy } from 'lodash';
 
+import parseSql from '../parser';
 import {
   addColumn,
   addForeignKey,
@@ -63,12 +66,12 @@ function makeColumn(colName, def): Column {
   };
 }
 
-function handleCreateTable(db: Database, expr): Database {
-  const tblName = expr.tblName;
+function handleCreateTable(db: Database, stm): Database {
+  const tblName = stm.tblName;
   db = createTable(db, tblName);
 
   // One-by-one, add the columns to the table
-  const columns = expr.definitions.filter(def => def.type === 'COLUMN');
+  const columns = stm.definitions.filter(def => def.type === 'COLUMN');
   for (const coldef of columns) {
     db = addColumn(
       db,
@@ -83,7 +86,7 @@ function handleCreateTable(db: Database, expr): Database {
 
   const pks = [
     // (1) Explicit PRIMARY KEY definitions
-    ...expr.definitions
+    ...stm.definitions
       .filter(def => def.type === 'PRIMARY KEY')
       .map(def => def.indexColNames.map(def => def.colName)),
 
@@ -102,7 +105,7 @@ function handleCreateTable(db: Database, expr): Database {
 
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
   // a column directly (2).
-  const indexes = expr.definitions.filter(
+  const indexes = stm.definitions.filter(
     def =>
       def.type === 'FOREIGN KEY' ||
       def.type === 'FULLTEXT INDEX' ||
@@ -309,36 +312,34 @@ export function dumpDb(
   return [...iterDumpDb(db, tables, includeAttrs)].join('\n');
 }
 
-export function applySql(db: Database, ast: Array<*>): Database {
-  for (const expr of ast) {
-    if (expr === null) {
+function applySqlStatements(db: Database, statements: Array<*>): Database {
+  for (const stm of statements) {
+    if (stm === null) {
       // eslint-disable-next-line no-continue
       continue;
     }
 
-    if (expr.type === 'CREATE TABLE') {
-      db = handleCreateTable(db, expr);
-    } else if (expr.type === 'CREATE TABLE LIKE') {
-      db = addTableLike(db, expr.tblName, expr.oldTblName);
-    } else if (expr.type === 'DROP TABLE') {
-      db = removeTable(db, expr.tblName, expr.ifExists);
-    } else if (expr.type === 'ALTER TABLE') {
+    if (stm.type === 'CREATE TABLE') {
+      db = handleCreateTable(db, stm);
+    } else if (stm.type === 'CREATE TABLE LIKE') {
+      db = addTableLike(db, stm.tblName, stm.oldTblName);
+    } else if (stm.type === 'DROP TABLE') {
+      db = removeTable(db, stm.tblName, stm.ifExists);
+    } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
-      const changes = sortBy(expr.changes, change =>
-        order.indexOf(change.type),
-      );
+      const changes = sortBy(stm.changes, change => order.indexOf(change.type));
       for (const change of changes) {
         if (change.type === 'RENAME TABLE') {
-          db = renameTable(db, expr.tblName, change.newTblName);
+          db = renameTable(db, stm.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
           const column = makeColumn(change.colName, change.definition);
-          db = addColumn(db, expr.tblName, column, change.position);
+          db = addColumn(db, stm.tblName, column, change.position);
           if (change.definition.isPrimary) {
-            db = addPrimaryKey(db, expr.tblName, [change.colName]);
+            db = addPrimaryKey(db, stm.tblName, [change.colName]);
           } else if (change.definition.isUnique) {
             db = addIndex(
               db,
-              expr.tblName,
+              stm.tblName,
               null,
               'UNIQUE',
               [change.colName],
@@ -349,7 +350,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
           const column = makeColumn(change.newColName, change.definition);
           db = replaceColumn(
             db,
-            expr.tblName,
+            stm.tblName,
             change.oldColName,
             column,
             change.position,
@@ -357,7 +358,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
           if (change.definition.isUnique) {
             db = addIndex(
               db,
-              expr.tblName,
+              stm.tblName,
               null,
               'UNIQUE',
               [change.newColName],
@@ -365,19 +366,19 @@ export function applySql(db: Database, ast: Array<*>): Database {
             );
           }
         } else if (change.type === 'DROP COLUMN') {
-          db = removeColumn(db, expr.tblName, change.colName);
+          db = removeColumn(db, stm.tblName, change.colName);
         } else if (change.type === 'ADD PRIMARY KEY') {
           db = addPrimaryKey(
             db,
-            expr.tblName,
+            stm.tblName,
             change.indexColNames.map(col => col.colName),
           );
         } else if (change.type === 'DROP PRIMARY KEY') {
-          db = dropPrimaryKey(db, expr.tblName);
+          db = dropPrimaryKey(db, stm.tblName);
         } else if (change.type === 'ADD FOREIGN KEY') {
           db = addForeignKey(
             db,
-            expr.tblName,
+            stm.tblName,
             change.constraint,
             change.indexName,
             change.indexColNames.map(def => def.colName),
@@ -387,7 +388,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
         } else if (change.type === 'ADD UNIQUE INDEX') {
           db = addIndex(
             db,
-            expr.tblName,
+            stm.tblName,
             change.constraint || change.indexName,
             'UNIQUE',
             change.indexColNames.map(def => def.colName),
@@ -397,7 +398,7 @@ export function applySql(db: Database, ast: Array<*>): Database {
           const $$locked = !!change.constraint;
           db = addIndex(
             db,
-            expr.tblName,
+            stm.tblName,
             change.constraint || change.indexName,
             'FULLTEXT',
             change.indexColNames.map(def => def.colName),
@@ -407,52 +408,71 @@ export function applySql(db: Database, ast: Array<*>): Database {
           const $$locked = !!change.indexName;
           db = addIndex(
             db,
-            expr.tblName,
+            stm.tblName,
             change.indexName,
             'NORMAL',
             change.indexColNames.map(def => def.colName),
             $$locked,
           );
         } else if (change.type === 'DROP INDEX') {
-          db = dropIndex(db, expr.tblName, change.indexName);
+          db = dropIndex(db, stm.tblName, change.indexName);
         } else if (change.type === 'DROP FOREIGN KEY') {
-          db = dropForeignKey(db, expr.tblName, change.symbol);
+          db = dropForeignKey(db, stm.tblName, change.symbol);
         } else if (change.type === 'DROP DEFAULT') {
-          db = dropDefault(db, expr.tblName, change.colName);
+          db = dropDefault(db, stm.tblName, change.colName);
         } else {
           // Log details to the console (useful for debugging)
           error(`Unknown change type: ${change.type}`);
-          error(JSON.stringify({ expr, change }, null, 2));
+          error(JSON.stringify({ stm, change }, null, 2));
 
           // Error out
           throw new Error(`Unknown change type: ${change.type}`);
         }
       }
-    } else if (expr.type === 'RENAME TABLE') {
-      db = renameTable(db, expr.tblName, expr.newName);
-    } else if (expr.type === 'CREATE INDEX') {
-      const $$locked = !!expr.indexName;
+    } else if (stm.type === 'RENAME TABLE') {
+      db = renameTable(db, stm.tblName, stm.newName);
+    } else if (stm.type === 'CREATE INDEX') {
+      const $$locked = !!stm.indexName;
       db = addIndex(
         db,
-        expr.tblName,
-        expr.indexName,
-        expr.indexKind,
-        expr.indexColNames.map(def => def.colName),
+        stm.tblName,
+        stm.indexName,
+        stm.indexKind,
+        stm.indexColNames.map(def => def.colName),
         $$locked,
       );
-    } else if (expr.type === 'DROP INDEX') {
-      db = dropIndex(db, expr.tblName, expr.indexName);
-    } else if (expr.type === 'CREATE FUNCTION') {
+    } else if (stm.type === 'DROP INDEX') {
+      db = dropIndex(db, stm.tblName, stm.indexName);
+    } else if (stm.type === 'CREATE FUNCTION') {
       // Ignore
-    } else if (expr.type === 'CREATE TRIGGER') {
+    } else if (stm.type === 'CREATE TRIGGER') {
       // Ignore
     } else {
       // Log details to the console (useful for debugging)
-      error(`Unknown expression type: ${expr.type}`);
-      error(JSON.stringify({ expr }, null, 2));
-      throw new Error(`Unknown expression type: ${expr.type}`);
+      error(`Unknown expression type: ${stm.type}`);
+      error(JSON.stringify({ stm }, null, 2));
+      throw new Error(`Unknown expression type: ${stm.type}`);
     }
   }
 
   return db;
+}
+
+/**
+ * Returns the new DB state given an initial DB state, and a SQL expression to
+ * apply. The `srcFile` argument is used to provide friendly error reporting.
+ * Does not modify the original input DB state.
+ */
+export function applySql(db: Database, sql: string, srcFile: string): Database {
+  const ast: Array<*> = parseSql(sql, srcFile);
+  return applySqlStatements(db, ast);
+}
+
+/**
+ * Returns the new DB state given an initial DB state, and a file on disk that
+ * contains an SQL statement.  Does not modify the original input DB state.
+ */
+export function applySqlFile(db: Database, path: string): Database {
+  const sql = fs.readFileSync(path, { encoding: 'utf-8' });
+  return applySql(db, sql, path);
 }
