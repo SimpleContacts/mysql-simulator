@@ -1,6 +1,6 @@
 // @flow
 
-import { flatten, maxBy } from 'lodash';
+import { flatten, maxBy, sortBy } from 'lodash';
 
 import type { Column, ForeignKey, Index, IndexType } from './types';
 
@@ -12,6 +12,86 @@ function* iterInsert(arr, pos, item) {
 
 function insert(arr, pos, item) {
   return [...iterInsert(arr, pos, item)];
+}
+
+function escape(s: string): string {
+  return `\`${s.replace('`', '\\`')}\``;
+}
+
+function normalizeType(type: string): string {
+  const matches = type.match(/^([^(]+)(?:[(]([^)]+)[)])?(.*)?$/);
+  if (!matches) {
+    throw new Error(`Error parsing data type: ${type}`);
+  }
+
+  let basetype = matches[1];
+  let params = matches[2];
+  let rest = matches[3];
+
+  basetype = basetype.toLowerCase();
+  params = params ? `(${params})` : '';
+  rest = rest ? `${rest.toLowerCase()}` : '';
+  return [basetype, params, rest].join('');
+}
+
+// TODO: Make Column a class by itself and put this on there
+function columnDefinition(col: Column) {
+  let type = normalizeType(col.type);
+  let defaultValue = col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
+
+  // MySQL outputs number constants as strings. No idea why that would make
+  // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
+  if (typeof defaultValue === 'number') {
+    if (type.startsWith('decimal')) {
+      defaultValue = `'${defaultValue.toFixed(2)}'`;
+    } else {
+      defaultValue = `'${defaultValue}'`;
+    }
+  } else if (type === 'tinyint(1)') {
+    if (defaultValue === 'FALSE') defaultValue = "'0'";
+    else if (defaultValue === 'TRUE') defaultValue = "'1'";
+  }
+
+  const nullable = !col.nullable
+    ? 'NOT NULL'
+    : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
+      // data types are "NULL" by default, so we omit the explicit NULL, like
+      // MySQL does
+      type === 'timestamp' ? 'NULL' : '';
+
+  defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
+
+  // Special case: MySQL does not omit an explicit DEFAULT NULL for
+  // TEXT/BLOB/JSON columns
+  if (type === 'text' || type === 'blob') {
+    if (defaultValue === 'DEFAULT NULL') {
+      defaultValue = '';
+    }
+  } else if (type === 'int') {
+    type = 'int(11)';
+  } else if (type === 'int unsigned') {
+    type = 'int(10) unsigned';
+  } else if (type === 'tinyint') {
+    type = 'tinyint(4)';
+  } else if (type === 'tinyint unsigned') {
+    type = 'tinyint(3) unsigned';
+  } else if (type === 'smallint') {
+    type = 'smallint(6)';
+  } else if (type === 'smallint unsigned') {
+    type = 'smallint(5) unsigned';
+  }
+
+  return [
+    escape(col.name),
+    type,
+    nullable,
+    defaultValue,
+    col.onUpdate !== null ? `ON UPDATE ${col.onUpdate}` : '',
+    col.autoIncrement ? 'AUTO_INCREMENT' : '',
+    col.comment !== null ? `COMMENT ${col.comment}` : '',
+  ]
+    .filter(x => x)
+    .join(' ');
 }
 
 export default class Table {
@@ -488,5 +568,67 @@ export default class Table {
 
     const indexes = this.indexes.filter(index => index.name !== indexName);
     return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
+  }
+
+  getNormalIndexes(): Array<Index> {
+    return this.indexes.filter(i => i.type === 'NORMAL');
+  }
+
+  getFullTextIndexes(): Array<Index> {
+    return this.indexes.filter(i => i.type === 'FULLTEXT');
+  }
+
+  getUniqueIndexes(): Array<Index> {
+    return sortBy(
+      this.indexes.filter(i => i.type === 'UNIQUE'),
+
+      // MySQL seems to output unique indexes on *NOT* NULL columns first, then
+      // all NULLable unique column indexes. Let's mimick this behaviour in our
+      // output
+      idx => {
+        const colName = idx.columns[0];
+        const column = this.columns.find(c => c.name === colName);
+        return column && !column.nullable ? 0 : 1;
+      },
+    );
+  }
+
+  getForeignKeys(): Array<ForeignKey> {
+    return sortBy(this.foreignKeys, fk => fk.name);
+  }
+
+  serializeDefinitions(): Array<string> {
+    return [
+      ...this.columns.map(col => columnDefinition(col)),
+
+      // TODO: Make these Indexes separate classes and put .toString() methods on them
+      ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
+      ...this.getUniqueIndexes().map(
+        index => `UNIQUE KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
+      ),
+      ...this.getNormalIndexes().map(index => `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
+      ...this.getFullTextIndexes().map(
+        index => `FULLTEXT KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
+      ),
+
+      // TODO: Make ForeignKey a separate class and put .toString() method on it
+      ...this.getForeignKeys().map(
+        fk =>
+          `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns.map(escape).join(', ')}) REFERENCES ${escape(
+            fk.reference.table,
+          )} (${fk.reference.columns.map(escape).join(', ')})`,
+      ),
+    ];
+  }
+
+  toString(): string {
+    const indent = (line: string) => `  ${line}`;
+    return [
+      `CREATE TABLE \`${this.name}\` (`,
+      this.serializeDefinitions()
+        .map(indent)
+        .join(',\n'),
+      `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`,
+    ].join('\n');
   }
 }

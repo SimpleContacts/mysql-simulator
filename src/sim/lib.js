@@ -112,144 +112,17 @@ function handleCreateTable(db: Database, stm): Database {
   return db;
 }
 
-function escape(s: string): string {
-  return `\`${s.replace('`', '\\`')}\``;
-}
-
-function normalizeType(type: string): string {
-  const matches = type.match(/^([^(]+)(?:[(]([^)]+)[)])?(.*)?$/);
-  if (!matches) {
-    throw new Error(`Error parsing data type: ${type}`);
-  }
-
-  let basetype = matches[1];
-  let params = matches[2];
-  let rest = matches[3];
-
-  basetype = basetype.toLowerCase();
-  params = params ? `(${params})` : '';
-  rest = rest ? `${rest.toLowerCase()}` : '';
-  return [basetype, params, rest].join('');
-}
-
-function columnDefinition(col: Column) {
-  let type = normalizeType(col.type);
-  let defaultValue = col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
-
-  // MySQL outputs number constants as strings. No idea why that would make
-  // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-  if (typeof defaultValue === 'number') {
-    if (type.startsWith('decimal')) {
-      defaultValue = `'${defaultValue.toFixed(2)}'`;
-    } else {
-      defaultValue = `'${defaultValue}'`;
-    }
-  } else if (type === 'tinyint(1)') {
-    if (defaultValue === 'FALSE') defaultValue = "'0'";
-    else if (defaultValue === 'TRUE') defaultValue = "'1'";
-  }
-
-  const nullable = !col.nullable
-    ? 'NOT NULL'
-    : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
-      // data types are "NULL" by default, so we omit the explicit NULL, like
-      // MySQL does
-      type === 'timestamp' ? 'NULL' : '';
-
-  defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
-
-  // Special case: MySQL does not omit an explicit DEFAULT NULL for
-  // TEXT/BLOB/JSON columns
-  if (type === 'text' || type === 'blob') {
-    if (defaultValue === 'DEFAULT NULL') {
-      defaultValue = '';
-    }
-  } else if (type === 'int') {
-    type = 'int(11)';
-  } else if (type === 'int unsigned') {
-    type = 'int(10) unsigned';
-  } else if (type === 'tinyint') {
-    type = 'tinyint(4)';
-  } else if (type === 'tinyint unsigned') {
-    type = 'tinyint(3) unsigned';
-  } else if (type === 'smallint') {
-    type = 'smallint(6)';
-  } else if (type === 'smallint unsigned') {
-    type = 'smallint(5) unsigned';
-  }
-
-  return [
-    escape(col.name),
-    type,
-    nullable,
-    defaultValue,
-    col.onUpdate !== null ? `ON UPDATE ${col.onUpdate}` : '',
-    col.autoIncrement ? 'AUTO_INCREMENT' : '',
-    col.comment !== null ? `COMMENT ${col.comment}` : '',
-  ]
-    .filter(x => x)
-    .join(' ');
-}
-
-function tableLines(table: Table): Array<string> {
-  return [
-    ...table.columns.map(col => columnDefinition(col)),
-
-    ...(table.primaryKey ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(',')})`] : []),
-
-    ...sortBy(
-      table.indexes.filter(i => i.type === 'UNIQUE'),
-
-      // MySQL seems to output unique indexes on *NOT* NULL columns first, then
-      // all NULLable unique column indexes. Let's mimick this behaviour in our
-      // output
-      idx => {
-        const colName = idx.columns[0];
-        const column = table.columns.find(c => c.name === colName);
-        return column && !column.nullable ? 0 : 1;
-      },
-    ).map(index => `UNIQUE KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
-
-    ...table.indexes
-      .filter(i => i.type === 'NORMAL')
-      .map(index => `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
-
-    ...table.indexes
-      .filter(i => i.type === 'FULLTEXT')
-      .map(index => `FULLTEXT KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
-
-    ...sortBy(table.foreignKeys, fk => fk.name).map(
-      fk =>
-        `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns.map(escape).join(', ')}) REFERENCES ${escape(
-          fk.reference.table,
-        )} (${fk.reference.columns.map(escape).join(', ')})`,
-    ),
-  ];
-}
-
-function* iterDumpTable(table: Table, includeAttrs: boolean) {
-  yield `CREATE TABLE \`${table.name}\` (`;
-  yield tableLines(table)
-    .map(line => `  ${line}`)
-    .join(',\n');
-  if (includeAttrs) {
-    yield `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`;
-  } else {
-    yield `);`;
-  }
-}
-
-function* iterDumpDb(db: Database, tables: Array<string> = [], includeAttrs: boolean = true): Iterable<string> {
+function* iterDumpDb(db: Database, tables: Array<string> = []): Iterable<string> {
   tables = tables.length > 0 ? tables : db.tables().map(t => t.name);
   for (const tableName of tables) {
     yield '';
-    yield* iterDumpTable(db.getTable(tableName), includeAttrs);
+    yield db.getTable(tableName).toString();
   }
   yield '';
 }
 
-export function dumpDb(db: Database, tables: Array<string> = [], includeAttrs: boolean = true): string {
-  return [...iterDumpDb(db, tables, includeAttrs)].join('\n');
+export function dumpDb(db: Database, tables: Array<string> = []): string {
+  return [...iterDumpDb(db, tables)].join('\n');
 }
 
 function applySqlStatements(db: Database, statements: Array<*>): Database {
