@@ -96,7 +96,7 @@ export default class Database {
       this.getTable(name); // Will fail if table does not exist
     }
 
-    const newTables = { ...this.tables };
+    const newTables = { ...this._tables };
     delete newTables[name];
     return new Database(newTables);
   }

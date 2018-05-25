@@ -144,13 +144,13 @@ export default class Table {
    */
   moveColumn(colName: string, position: string): Table {
     const column = this.getColumn(colName);
-    let columns;
+    let columns = this.columns.filter(c => c.name !== column.name);
     if (position.startsWith('AFTER ')) {
       const afterColName = position.substring('AFTER '.length);
       const pos = this.getColumnIndex(afterColName);
-      columns = insert(this.columns, pos + 1, column);
+      columns = insert(columns, pos + 1, column);
     } else if (position === 'FIRST') {
-      columns = insert(this.columns, 0, column);
+      columns = insert(columns, 0, column);
     } else {
       throw new Error(`Unknown position qualifier: ${position}`);
     }
@@ -295,15 +295,21 @@ export default class Table {
     columnNames.forEach(name => this.getColumn(name));
 
     // MySQL implicitly converts columns used in PKs to NOT NULL
-    const newColumns = this.columns.map(c => ({
-      name: c.name,
-      type: c.type,
-      nullable: false, // <-- This is what we're changing
-      defaultValue: c.defaultValue,
-      onUpdate: c.onUpdate,
-      autoIncrement: c.autoIncrement,
-      comment: c.comment,
-    }));
+    const newColumns = this.columns.map(c => {
+      if (!columnNames.includes(c.name)) {
+        return c;
+      }
+
+      return {
+        name: c.name,
+        type: c.type,
+        nullable: false, // <-- This is what we're changing
+        defaultValue: c.defaultValue,
+        onUpdate: c.onUpdate,
+        autoIncrement: c.autoIncrement,
+        comment: c.comment,
+      };
+    });
 
     return new Table(
       this.name,
@@ -443,16 +449,15 @@ export default class Table {
     let indexes = this.indexes;
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
-      // const origIndex = this.indexes[pos];
       indexes = [
         ...this.indexes.slice(0, pos),
+        ...this.indexes.slice(pos + 1),
         {
           name: indexName,
           columns,
           type,
           $$locked,
         },
-        ...this.indexes.slice(pos + 1),
       ];
     } else {
       const index: Index = {
