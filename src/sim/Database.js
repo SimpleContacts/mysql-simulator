@@ -108,9 +108,7 @@ export default class Database {
   swapTable(tblName: string, mapper: Table => Table): Database {
     const newTable = mapper(this.getTable(tblName));
     if (newTable.name !== tblName) {
-      throw new Error(
-        'Database.swapTable() cannot be used to change the name of the table.',
-      );
+      throw new Error('Database.swapTable() cannot be used to change the name of the table.');
     }
     return new Database({
       ...this._tables,
@@ -130,11 +128,7 @@ export default class Database {
   /**
    * Returns a new DB with the given column added to the given table.
    */
-  addColumn(
-    tblName: string,
-    column: Column,
-    position: string | null,
-  ): Database {
+  addColumn(tblName: string, column: Column, position: string | null): Database {
     return this.swapTable(tblName, table => table.addColumn(column, position));
   }
 
@@ -146,15 +140,8 @@ export default class Database {
    * Returns a new Database with the column in the table replaced by the new
    * definition.
    */
-  replaceColumn(
-    tblName: string,
-    colName: string,
-    column: Column,
-    position: string | null,
-  ): Database {
-    return this.swapTable(tblName, table =>
-      table.replaceColumn(colName, column, position),
-    );
+  replaceColumn(tblName: string, colName: string, column: Column, position: string | null): Database {
+    return this.swapTable(tblName, table => table.replaceColumn(colName, column, position));
   }
 
   /**
@@ -188,13 +175,7 @@ export default class Database {
     this.getTable(targetTblName);
 
     return this.swapTable(tblName, table =>
-      table.addForeignKey(
-        constraintName,
-        indexName,
-        localColumns,
-        targetTblName,
-        targetColumns,
-      ),
+      table.addForeignKey(constraintName, indexName, localColumns, targetTblName, targetColumns),
     );
   }
 
@@ -212,9 +193,7 @@ export default class Database {
     columns: Array<string>,
     $$locked: boolean,
   ): Database {
-    return this.swapTable(tblName, table =>
-      table.addIndex(indexName, type, columns, $$locked),
-    );
+    return this.swapTable(tblName, table => table.addIndex(indexName, type, columns, $$locked));
   }
 
   dropIndex(tblName: string, indexName: string): Database {

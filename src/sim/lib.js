@@ -60,11 +60,7 @@ function handleCreateTable(db: Database, stm): Database {
   // One-by-one, add the columns to the table
   const columns = stm.definitions.filter(def => def.type === 'COLUMN');
   for (const coldef of columns) {
-    db = db.addColumn(
-      tblName,
-      makeColumn(coldef.colName, coldef.definition),
-      null,
-    );
+    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -72,9 +68,7 @@ function handleCreateTable(db: Database, stm): Database {
 
   const pks = [
     // (1) Explicit PRIMARY KEY definitions
-    ...stm.definitions
-      .filter(def => def.type === 'PRIMARY KEY')
-      .map(def => def.indexColNames.map(def => def.colName)),
+    ...stm.definitions.filter(def => def.type === 'PRIMARY KEY').map(def => def.indexColNames.map(def => def.colName)),
 
     // (2) Primary key can also be defined on a column declaratively
     ...columns.filter(c => c.definition.isPrimary).map(c => [c.colName]),
@@ -109,21 +103,9 @@ function handleCreateTable(db: Database, stm): Database {
         index.reference.indexColNames.map(def => def.colName), // Foreign/target columns
       );
     } else {
-      const type =
-        index.type === 'UNIQUE INDEX'
-          ? 'UNIQUE'
-          : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
-      const $$locked =
-        type === 'NORMAL'
-          ? !!index.indexName
-          : !!(index.constraint || index.indexName);
-      db = db.addIndex(
-        tblName,
-        index.indexName,
-        type,
-        index.indexColNames.map(def => def.colName),
-        $$locked,
-      );
+      const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
+      const $$locked = type === 'NORMAL' ? !!index.indexName : !!(index.constraint || index.indexName);
+      db = db.addIndex(tblName, index.indexName, type, index.indexColNames.map(def => def.colName), $$locked);
     }
   }
 
@@ -152,8 +134,7 @@ function normalizeType(type: string): string {
 
 function columnDefinition(col: Column) {
   let type = normalizeType(col.type);
-  let defaultValue =
-    col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
+  let defaultValue = col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
 
   // MySQL outputs number constants as strings. No idea why that would make
   // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
@@ -214,9 +195,7 @@ function tableLines(table: Table): Array<string> {
   return [
     ...table.columns.map(col => columnDefinition(col)),
 
-    ...(table.primaryKey
-      ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(',')})`]
-      : []),
+    ...(table.primaryKey ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(',')})`] : []),
 
     ...sortBy(
       table.indexes.filter(i => i.type === 'UNIQUE'),
@@ -229,34 +208,19 @@ function tableLines(table: Table): Array<string> {
         const column = table.columns.find(c => c.name === colName);
         return column && !column.nullable ? 0 : 1;
       },
-    ).map(
-      index =>
-        `UNIQUE KEY ${escape(index.name)} (${index.columns
-          .map(escape)
-          .join(',')})`,
-    ),
+    ).map(index => `UNIQUE KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
 
     ...table.indexes
       .filter(i => i.type === 'NORMAL')
-      .map(
-        index =>
-          `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
-      ),
+      .map(index => `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
 
     ...table.indexes
       .filter(i => i.type === 'FULLTEXT')
-      .map(
-        index =>
-          `FULLTEXT KEY ${escape(index.name)} (${index.columns
-            .map(escape)
-            .join(',')})`,
-      ),
+      .map(index => `FULLTEXT KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
 
     ...sortBy(table.foreignKeys, fk => fk.name).map(
       fk =>
-        `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
-          .map(escape)
-          .join(', ')}) REFERENCES ${escape(
+        `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns.map(escape).join(', ')}) REFERENCES ${escape(
           fk.reference.table,
         )} (${fk.reference.columns.map(escape).join(', ')})`,
     ),
@@ -275,11 +239,7 @@ function* iterDumpTable(table: Table, includeAttrs: boolean) {
   }
 }
 
-function* iterDumpDb(
-  db: Database,
-  tables: Array<string> = [],
-  includeAttrs: boolean = true,
-): Iterable<string> {
+function* iterDumpDb(db: Database, tables: Array<string> = [], includeAttrs: boolean = true): Iterable<string> {
   tables = tables.length > 0 ? tables : db.tables().map(t => t.name);
   for (const tableName of tables) {
     yield '';
@@ -288,11 +248,7 @@ function* iterDumpDb(
   yield '';
 }
 
-export function dumpDb(
-  db: Database,
-  tables: Array<string> = [],
-  includeAttrs: boolean = true,
-): string {
+export function dumpDb(db: Database, tables: Array<string> = [], includeAttrs: boolean = true): string {
   return [...iterDumpDb(db, tables, includeAttrs)].join('\n');
 }
 
@@ -321,38 +277,18 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
           if (change.definition.isPrimary) {
             db = db.addPrimaryKey(stm.tblName, [change.colName]);
           } else if (change.definition.isUnique) {
-            db = db.addIndex(
-              stm.tblName,
-              null,
-              'UNIQUE',
-              [change.colName],
-              true,
-            );
+            db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
           }
         } else if (change.type === 'CHANGE COLUMN') {
           const column = makeColumn(change.newColName, change.definition);
-          db = db.replaceColumn(
-            stm.tblName,
-            change.oldColName,
-            column,
-            change.position,
-          );
+          db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
-            db = db.addIndex(
-              stm.tblName,
-              null,
-              'UNIQUE',
-              [change.newColName],
-              true,
-            );
+            db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);
           }
         } else if (change.type === 'DROP COLUMN') {
           db = db.removeColumn(stm.tblName, change.colName);
         } else if (change.type === 'ADD PRIMARY KEY') {
-          db = db.addPrimaryKey(
-            stm.tblName,
-            change.indexColNames.map(col => col.colName),
-          );
+          db = db.addPrimaryKey(stm.tblName, change.indexColNames.map(col => col.colName));
         } else if (change.type === 'DROP PRIMARY KEY') {
           db = db.dropPrimaryKey(stm.tblName);
         } else if (change.type === 'ADD FOREIGN KEY') {
@@ -409,13 +345,7 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
       db = db.renameTable(stm.tblName, stm.newName);
     } else if (stm.type === 'CREATE INDEX') {
       const $$locked = !!stm.indexName;
-      db = db.addIndex(
-        stm.tblName,
-        stm.indexName,
-        stm.indexKind,
-        stm.indexColNames.map(def => def.colName),
-        $$locked,
-      );
+      db = db.addIndex(stm.tblName, stm.indexName, stm.indexKind, stm.indexColNames.map(def => def.colName), $$locked);
     } else if (stm.type === 'DROP INDEX') {
       db = db.dropIndex(stm.tblName, stm.indexName);
     } else if (stm.type === 'CREATE FUNCTION') {
@@ -457,9 +387,7 @@ function* expandInputFiles(paths: Array<string>): Iterable<string> {
     if (fs.statSync(inputPath).isDirectory()) {
       // Naturally sort files before processing -- order is crucial!
       let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
-      files = sortBy(files, f => parseInt(f, 10)).map(f =>
-        path.join(inputPath, f),
-      );
+      files = sortBy(files, f => parseInt(f, 10)).map(f => path.join(inputPath, f));
       yield* files;
     } else {
       yield inputPath;

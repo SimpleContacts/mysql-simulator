@@ -29,10 +29,7 @@ const printErr = (filename, input, e: Error) => {
 
   const lines = input.split('\n');
   const { start, end } = loc;
-  const before = lines.slice(
-    start.line - 1 - NUM_CONTEXT_LINES_BEFORE,
-    start.line - 1,
-  );
+  const before = lines.slice(start.line - 1 - NUM_CONTEXT_LINES_BEFORE, start.line - 1);
   const line = lines[start.line - 1];
   const after = lines.slice(start.line, start.line + NUM_CONTEXT_LINES_AFTER);
   const offset = start.column;
@@ -40,12 +37,7 @@ const printErr = (filename, input, e: Error) => {
   error('');
   error(indent(before.join('\n')));
   error(indent(line));
-  error(
-    indent(
-      ' '.repeat(offset - 1) +
-        '^'.repeat(end.line !== start.line ? 1 : end.column - start.column),
-    ),
-  );
+  error(indent(' '.repeat(offset - 1) + '^'.repeat(end.line !== start.line ? 1 : end.column - start.column)));
   error(indent(after.join('\n')));
   error('');
 };
@@ -55,10 +47,7 @@ const printErr = (filename, input, e: Error) => {
  * with much better error reporting, showing source line position where it
  * failed.
  */
-export default function parse(
-  inputSql: string,
-  filename: string = '',
-): Array<*> {
+export default function parse(inputSql: string, filename: string = ''): Array<*> {
   try {
     return rawParseSql(inputSql);
   } catch (e) {

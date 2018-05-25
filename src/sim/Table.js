@@ -46,25 +46,19 @@ export default class Table {
    * Returns whether the given Column is used in any of the foreign keys.
    */
   isUsedInForeignKey(colName: string) {
-    return new Set(flatten(this.foreignKeys.map(fk => fk.columns))).has(
-      colName,
-    );
+    return new Set(flatten(this.foreignKeys.map(fk => fk.columns))).has(colName);
   }
 
   assertColumnDoesNotExist(colName: string) {
     if (this.has(colName)) {
-      throw new Error(
-        `Column "${colName}" already exist in table "${this.name}"`,
-      );
+      throw new Error(`Column "${colName}" already exist in table "${this.name}"`);
     }
   }
 
   getColumn(colName: string): Column {
     const column = this.columns.find(c => c.name === colName);
     if (!column) {
-      throw new Error(
-        `Column "${colName}" does not exist in table "${this.name}"`,
-      );
+      throw new Error(`Column "${colName}" does not exist in table "${this.name}"`);
     }
     return column;
   }
@@ -72,9 +66,7 @@ export default class Table {
   getColumnIndex(colName: string): number {
     const index = this.columns.findIndex(c => c.name === colName);
     if (index < 0) {
-      throw new Error(
-        `Column "${colName}" does not exist in table "${this.name}"`,
-      );
+      throw new Error(`Column "${colName}" does not exist in table "${this.name}"`);
     }
     return index;
   }
@@ -107,13 +99,7 @@ export default class Table {
       };
     });
 
-    return new Table(
-      newName,
-      this.columns,
-      this.primaryKey,
-      this.indexes,
-      foreignKeys,
-    );
+    return new Table(newName, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -136,13 +122,7 @@ export default class Table {
       };
     });
 
-    return new Table(
-      this.name,
-      this.columns,
-      this.primaryKey,
-      this.indexes,
-      foreignKeys,
-    );
+    return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -152,13 +132,7 @@ export default class Table {
     this.assertColumnDoesNotExist(column.name);
 
     const columns = [...this.columns, column];
-    let table = new Table(
-      this.name,
-      columns,
-      this.primaryKey,
-      this.indexes,
-      this.foreignKeys,
-    );
+    let table = new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
     if (position) {
       table = table.moveColumn(column.name, position);
     }
@@ -181,13 +155,7 @@ export default class Table {
       throw new Error(`Unknown position qualifier: ${position}`);
     }
 
-    return new Table(
-      this.name,
-      columns,
-      this.primaryKey,
-      this.indexes,
-      this.foreignKeys,
-    );
+    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -238,27 +206,13 @@ export default class Table {
   swapColumn(colName: string, mapper: Column => Column): Table {
     const newColumn = mapper(this.getColumn(colName));
     if (newColumn.name !== colName) {
-      throw new Error(
-        'Table.swapColumn() cannot be used to change the name of the column.',
-      );
+      throw new Error('Table.swapColumn() cannot be used to change the name of the column.');
     }
-    const columns = this.columns.map(
-      column => (column.name === colName ? newColumn : column),
-    );
-    return new Table(
-      this.name,
-      columns,
-      this.primaryKey,
-      this.indexes,
-      this.foreignKeys,
-    );
+    const columns = this.columns.map(column => (column.name === colName ? newColumn : column));
+    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
-  replaceColumn(
-    oldColName: string,
-    newColumn: Column,
-    position: string | null,
-  ): Table {
+  replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
     // If this is a rename, make sure to do that now first
     let table = this;
     if (oldColName !== newColumn.name) {
@@ -292,13 +246,7 @@ export default class Table {
       comment: column.comment,
     };
     const columns = this.columns.map(c => (c.name === colName ? newColumn : c));
-    return new Table(
-      this.name,
-      columns,
-      this.primaryKey,
-      this.indexes,
-      this.foreignKeys,
-    );
+    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -375,13 +323,7 @@ export default class Table {
     }
 
     const primaryKey = null;
-    return new Table(
-      this.name,
-      this.columns,
-      primaryKey,
-      this.indexes,
-      this.foreignKeys,
-    );
+    return new Table(this.name, this.columns, primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -389,13 +331,11 @@ export default class Table {
    */
   generateForeignKeyName() {
     const prefix = `${this.name}_ibfk_`;
-    const autoFKs = this.foreignKeys
-      .filter(fk => fk.name.startsWith(prefix))
-      .map(fk => {
-        const parts = fk.name.split('_');
-        const num = parts[parts.length - 1];
-        return parseInt(num, 10);
-      });
+    const autoFKs = this.foreignKeys.filter(fk => fk.name.startsWith(prefix)).map(fk => {
+      const parts = fk.name.split('_');
+      const num = parts[parts.length - 1];
+      return parseInt(num, 10);
+    });
 
     const max = autoFKs.length > 0 ? maxBy(autoFKs) : 0;
     return `${prefix}${max + 1}`;
@@ -421,17 +361,13 @@ export default class Table {
 
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
-    if (
-      !this.indexes.some(index => index.columns.join('+').startsWith(needle))
-    ) {
+    if (!this.indexes.some(index => index.columns.join('+').startsWith(needle))) {
       // Don't add if a primary key already exists
       if (!(this.primaryKey && this.primaryKey.join('+').startsWith(needle))) {
         table = table.addIndex(indexName, 'NORMAL', localColumns, false);
       }
     } else if (indexName) {
-      const pos = this.indexes.findIndex(
-        i => i.columns.join('+') === needle && !i.$$locked,
-      );
+      const pos = this.indexes.findIndex(i => i.columns.join('+') === needle && !i.$$locked);
       if (pos >= 0) {
         const origIndex = table.indexes[pos];
         const indexes = [
@@ -445,13 +381,7 @@ export default class Table {
             $$locked: origIndex.$$locked,
           },
         ];
-        table = new Table(
-          table.name,
-          table.columns,
-          table.primaryKey,
-          indexes,
-          table.foreignKeys,
-        );
+        table = new Table(table.name, table.columns, table.primaryKey, indexes, table.foreignKeys);
       }
     }
 
@@ -466,13 +396,7 @@ export default class Table {
     };
     const foreignKeys = [...table.foreignKeys, fk];
 
-    return new Table(
-      table.name,
-      table.columns,
-      table.primaryKey,
-      table.indexes,
-      foreignKeys,
-    );
+    return new Table(table.name, table.columns, table.primaryKey, table.indexes, foreignKeys);
   }
 
   /**
@@ -481,31 +405,20 @@ export default class Table {
   dropForeignKey(symbol: string): Table {
     if (!this.foreignKeys.some(fk => fk.name === symbol)) {
       throw new Error(
-        `Foreign key "${symbol}" does not exist on table "${
-          this.name
-        }". These do: ${this.foreignKeys.map(fk => fk.name).join(', ')}`,
+        `Foreign key "${symbol}" does not exist on table "${this.name}". These do: ${this.foreignKeys
+          .map(fk => fk.name)
+          .join(', ')}`,
       );
     }
 
     const foreignKeys = this.foreignKeys.filter(fk => fk.name !== symbol);
-    return new Table(
-      this.name,
-      this.columns,
-      this.primaryKey,
-      this.indexes,
-      foreignKeys,
-    );
+    return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
    * Returns a new Table with the requested Index added.
    */
-  addIndex(
-    indexName: string | null,
-    type: IndexType,
-    columns: Array<string>,
-    $$locked: boolean,
-  ): Table {
+  addIndex(indexName: string | null, type: IndexType, columns: Array<string>, $$locked: boolean): Table {
     // If indexName is null, auto-generate it
     if (!indexName) {
       // Try to name it after the first column in the columns list...
@@ -526,9 +439,7 @@ export default class Table {
     // definition is more specific (user_id, foo) will replace an existing
     // index on (user_id).
     const needle = columns.join('+');
-    const pos = this.indexes.findIndex(
-      i => needle.startsWith(i.columns.join('+')) && !i.$$locked,
-    );
+    const pos = this.indexes.findIndex(i => needle.startsWith(i.columns.join('+')) && !i.$$locked);
     let indexes = this.indexes;
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
@@ -553,13 +464,7 @@ export default class Table {
       indexes = [...indexes, index];
     }
 
-    return new Table(
-      this.name,
-      this.columns,
-      this.primaryKey,
-      indexes,
-      this.foreignKeys,
-    );
+    return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   dropIndex(indexName: string): Table {
@@ -570,19 +475,13 @@ export default class Table {
 
     if (!this.indexes.some(index => index.name === indexName)) {
       throw new Error(
-        `Index "${indexName}" does not exist on table "${
-          this.name
-        }". These do: ${this.indexes.map(index => index.name).join(', ')}`,
+        `Index "${indexName}" does not exist on table "${this.name}". These do: ${this.indexes
+          .map(index => index.name)
+          .join(', ')}`,
       );
     }
 
     const indexes = this.indexes.filter(index => index.name !== indexName);
-    return new Table(
-      this.name,
-      this.columns,
-      this.primaryKey,
-      indexes,
-      this.foreignKeys,
-    );
+    return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 }

@@ -32,9 +32,7 @@ function* iterInputFiles(paths: Array<string>): Iterable<string> {
     if (fs.statSync(inputPath).isDirectory()) {
       // Naturally sort files before processing -- order is crucial!
       let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
-      files = sortBy(files, f => parseInt(f, 10)).map(f =>
-        path.join(inputPath, f),
-      );
+      files = sortBy(files, f => parseInt(f, 10)).map(f => path.join(inputPath, f));
       yield* files;
     } else {
       yield inputPath;
@@ -75,9 +73,7 @@ function run() {
     .version('0.0.1')
     .usage('[options] <path> [<path> ...]')
     // .command('command <inputs>')
-    .description(
-      'Parses SQL migration files and outputs the resulting DB state.',
-    )
+    .description('Parses SQL migration files and outputs the resulting DB state.')
     .option('--step', 'Dump table after every alteration')
     .option('--limit <n>', 'Run only the first N migrations', parseInt)
     .option('--table <table>', 'Dump only these tables', collect, [])
