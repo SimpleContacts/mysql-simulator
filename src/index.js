@@ -1,23 +1,14 @@
 // @flow
 
-import { emptyDb } from './sim/core';
-import {
-  applySql,
-  applySqlFile,
-  applySqlFiles,
-  dumpDb,
-  simulate,
-} from './sim/lib';
-import type {
-  Column,
-  Database,
-  ForeignKey,
-  Index,
-  IndexType,
-  Table,
-} from './sim/types';
+import Column from './sim/Column';
+import Database from './sim/Database';
+import ForeignKey from './sim/ForeignKey';
+import type { IndexType } from './sim/Index';
+import Index from './sim/Index';
+import { applySql, applySqlFile, applySqlFiles, dumpDb, simulate } from './sim/lib';
+import Table from './sim/Table';
 
-export type { Column, Database, ForeignKey, Index, IndexType, Table };
+export type { Column, ForeignKey, Index, IndexType };
 
 export default simulate;
-export { applySql, applySqlFile, applySqlFiles, dumpDb, emptyDb, simulate };
+export { applySql, applySqlFile, applySqlFiles, Database, dumpDb, simulate, Table };

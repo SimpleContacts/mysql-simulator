@@ -6,24 +6,8 @@ import path from 'path';
 import { sortBy } from 'lodash';
 
 import parseSql from '../parser';
-import {
-  addColumn,
-  addForeignKey,
-  addIndex,
-  addPrimaryKey,
-  addTableLike,
-  createTable,
-  dropDefault,
-  dropForeignKey,
-  dropIndex,
-  dropPrimaryKey,
-  emptyDb,
-  removeColumn,
-  removeTable,
-  renameTable,
-  replaceColumn,
-} from './core';
-import type { Column, Database, Table } from './types';
+import Column from './Column';
+import Database from './Database';
 
 // eslint-disable-next-line no-console
 const error = console.error;
@@ -57,30 +41,17 @@ function makeColumn(colName, def): Column {
     }
   }
 
-  return {
-    name: colName,
-    type: def.dataType,
-    nullable,
-    defaultValue,
-    onUpdate,
-    autoIncrement: def.autoIncrement,
-    comment: def.comment,
-  };
+  return new Column(colName, def.dataType, nullable, defaultValue, onUpdate, def.autoIncrement, def.comment);
 }
 
 function handleCreateTable(db: Database, stm): Database {
   const tblName = stm.tblName;
-  db = createTable(db, tblName);
+  db = db.createTable(tblName);
 
   // One-by-one, add the columns to the table
   const columns = stm.definitions.filter(def => def.type === 'COLUMN');
   for (const coldef of columns) {
-    db = addColumn(
-      db,
-      tblName,
-      makeColumn(coldef.colName, coldef.definition),
-      null,
-    );
+    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -88,21 +59,19 @@ function handleCreateTable(db: Database, stm): Database {
 
   const pks = [
     // (1) Explicit PRIMARY KEY definitions
-    ...stm.definitions
-      .filter(def => def.type === 'PRIMARY KEY')
-      .map(def => def.indexColNames.map(def => def.colName)),
+    ...stm.definitions.filter(def => def.type === 'PRIMARY KEY').map(def => def.indexColNames.map(def => def.colName)),
 
     // (2) Primary key can also be defined on a column declaratively
     ...columns.filter(c => c.definition.isPrimary).map(c => [c.colName]),
   ];
 
   for (const pk of pks) {
-    db = addPrimaryKey(db, tblName, pk);
+    db = db.addPrimaryKey(tblName, pk);
   }
 
   // (2) Shorthand syntax to define index on a column directly
   for (const col of columns.filter(c => c.definition.isUnique)) {
-    db = addIndex(db, tblName, null, 'UNIQUE', [col.colName], true);
+    db = db.addIndex(tblName, null, 'UNIQUE', [col.colName], true);
   }
 
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
@@ -116,8 +85,7 @@ function handleCreateTable(db: Database, stm): Database {
   );
   for (const index of indexes) {
     if (index.type === 'FOREIGN KEY') {
-      db = addForeignKey(
-        db,
+      db = db.addForeignKey(
         tblName,
         index.constraint,
         index.indexName,
@@ -126,192 +94,26 @@ function handleCreateTable(db: Database, stm): Database {
         index.reference.indexColNames.map(def => def.colName), // Foreign/target columns
       );
     } else {
-      const type =
-        index.type === 'UNIQUE INDEX'
-          ? 'UNIQUE'
-          : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
-      const $$locked =
-        type === 'NORMAL'
-          ? !!index.indexName
-          : !!(index.constraint || index.indexName);
-      db = addIndex(
-        db,
-        tblName,
-        index.indexName,
-        type,
-        index.indexColNames.map(def => def.colName),
-        $$locked,
-      );
+      const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
+      const $$locked = type === 'NORMAL' ? !!index.indexName : !!(index.constraint || index.indexName);
+      db = db.addIndex(tblName, index.indexName, type, index.indexColNames.map(def => def.colName), $$locked);
     }
   }
 
   return db;
 }
 
-function escape(s: string): string {
-  return `\`${s.replace('`', '\\`')}\``;
-}
-
-function normalizeType(type: string): string {
-  const matches = type.match(/^([^(]+)(?:[(]([^)]+)[)])?(.*)?$/);
-  if (!matches) {
-    throw new Error(`Error parsing data type: ${type}`);
-  }
-
-  let basetype = matches[1];
-  let params = matches[2];
-  let rest = matches[3];
-
-  basetype = basetype.toLowerCase();
-  params = params ? `(${params})` : '';
-  rest = rest ? `${rest.toLowerCase()}` : '';
-  return [basetype, params, rest].join('');
-}
-
-function columnDefinition(col: Column) {
-  let type = normalizeType(col.type);
-  let defaultValue =
-    col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
-
-  // MySQL outputs number constants as strings. No idea why that would make
-  // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-  if (typeof defaultValue === 'number') {
-    if (type.startsWith('decimal')) {
-      defaultValue = `'${defaultValue.toFixed(2)}'`;
-    } else {
-      defaultValue = `'${defaultValue}'`;
-    }
-  } else if (type === 'tinyint(1)') {
-    if (defaultValue === 'FALSE') defaultValue = "'0'";
-    else if (defaultValue === 'TRUE') defaultValue = "'1'";
-  }
-
-  const nullable = !col.nullable
-    ? 'NOT NULL'
-    : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
-      // data types are "NULL" by default, so we omit the explicit NULL, like
-      // MySQL does
-      type === 'timestamp' ? 'NULL' : '';
-
-  defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
-
-  // Special case: MySQL does not omit an explicit DEFAULT NULL for
-  // TEXT/BLOB/JSON columns
-  if (type === 'text' || type === 'blob') {
-    if (defaultValue === 'DEFAULT NULL') {
-      defaultValue = '';
-    }
-  } else if (type === 'int') {
-    type = 'int(11)';
-  } else if (type === 'int unsigned') {
-    type = 'int(10) unsigned';
-  } else if (type === 'tinyint') {
-    type = 'tinyint(4)';
-  } else if (type === 'tinyint unsigned') {
-    type = 'tinyint(3) unsigned';
-  } else if (type === 'smallint') {
-    type = 'smallint(6)';
-  } else if (type === 'smallint unsigned') {
-    type = 'smallint(5) unsigned';
-  }
-
-  return [
-    escape(col.name),
-    type,
-    nullable,
-    defaultValue,
-    col.onUpdate !== null ? `ON UPDATE ${col.onUpdate}` : '',
-    col.autoIncrement ? 'AUTO_INCREMENT' : '',
-    col.comment !== null ? `COMMENT ${col.comment}` : '',
-  ]
-    .filter(x => x)
-    .join(' ');
-}
-
-function tableLines(table: Table): Array<string> {
-  return [
-    ...table.columns.map(col => columnDefinition(col)),
-
-    ...(table.primaryKey
-      ? [`PRIMARY KEY (${table.primaryKey.map(escape).join(',')})`]
-      : []),
-
-    ...sortBy(
-      table.indexes.filter(i => i.type === 'UNIQUE'),
-
-      // MySQL seems to output unique indexes on *NOT* NULL columns first, then
-      // all NULLable unique column indexes. Let's mimick this behaviour in our
-      // output
-      idx => {
-        const colName = idx.columns[0];
-        const column = table.columns.find(c => c.name === colName);
-        return column && !column.nullable ? 0 : 1;
-      },
-    ).map(
-      index =>
-        `UNIQUE KEY ${escape(index.name)} (${index.columns
-          .map(escape)
-          .join(',')})`,
-    ),
-
-    ...table.indexes
-      .filter(i => i.type === 'NORMAL')
-      .map(
-        index =>
-          `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
-      ),
-
-    ...table.indexes
-      .filter(i => i.type === 'FULLTEXT')
-      .map(
-        index =>
-          `FULLTEXT KEY ${escape(index.name)} (${index.columns
-            .map(escape)
-            .join(',')})`,
-      ),
-
-    ...sortBy(table.foreignKeys, fk => fk.name).map(
-      fk =>
-        `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
-          .map(escape)
-          .join(', ')}) REFERENCES ${escape(
-          fk.reference.table,
-        )} (${fk.reference.columns.map(escape).join(', ')})`,
-    ),
-  ];
-}
-
-function* iterDumpTable(table: Table, includeAttrs: boolean) {
-  yield `CREATE TABLE \`${table.name}\` (`;
-  yield tableLines(table)
-    .map(line => `  ${line}`)
-    .join(',\n');
-  if (includeAttrs) {
-    yield `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`;
-  } else {
-    yield `);`;
-  }
-}
-
-function* iterDumpDb(
-  db: Database,
-  tables: Array<string> = [],
-  includeAttrs: boolean = true,
-): Iterable<string> {
-  tables = tables.length > 0 ? tables : sortBy(Object.keys(db.tables));
+function* iterDumpDb(db: Database, tables: Array<string> = []): Iterable<string> {
+  tables = tables.length > 0 ? tables : db.getTables().map(t => t.name);
   for (const tableName of tables) {
     yield '';
-    yield* iterDumpTable(db.tables[tableName], includeAttrs);
+    yield db.getTable(tableName).toString();
   }
   yield '';
 }
 
-export function dumpDb(
-  db: Database,
-  tables: Array<string> = [],
-  includeAttrs: boolean = true,
-): string {
-  return [...iterDumpDb(db, tables, includeAttrs)].join('\n');
+export function dumpDb(db: Database, tables: Array<string> = []): string {
+  return [...iterDumpDb(db, tables)].join('\n');
 }
 
 function applySqlStatements(db: Database, statements: Array<*>): Database {
@@ -324,62 +126,37 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
     if (stm.type === 'CREATE TABLE') {
       db = handleCreateTable(db, stm);
     } else if (stm.type === 'CREATE TABLE LIKE') {
-      db = addTableLike(db, stm.tblName, stm.oldTblName);
+      db = db.cloneTable(stm.oldTblName, stm.tblName);
     } else if (stm.type === 'DROP TABLE') {
-      db = removeTable(db, stm.tblName, stm.ifExists);
+      db = db.removeTable(stm.tblName, stm.ifExists);
     } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
       const changes = sortBy(stm.changes, change => order.indexOf(change.type));
       for (const change of changes) {
         if (change.type === 'RENAME TABLE') {
-          db = renameTable(db, stm.tblName, change.newTblName);
+          db = db.renameTable(stm.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
           const column = makeColumn(change.colName, change.definition);
-          db = addColumn(db, stm.tblName, column, change.position);
+          db = db.addColumn(stm.tblName, column, change.position);
           if (change.definition.isPrimary) {
-            db = addPrimaryKey(db, stm.tblName, [change.colName]);
+            db = db.addPrimaryKey(stm.tblName, [change.colName]);
           } else if (change.definition.isUnique) {
-            db = addIndex(
-              db,
-              stm.tblName,
-              null,
-              'UNIQUE',
-              [change.colName],
-              true,
-            );
+            db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
           }
         } else if (change.type === 'CHANGE COLUMN') {
           const column = makeColumn(change.newColName, change.definition);
-          db = replaceColumn(
-            db,
-            stm.tblName,
-            change.oldColName,
-            column,
-            change.position,
-          );
+          db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
-            db = addIndex(
-              db,
-              stm.tblName,
-              null,
-              'UNIQUE',
-              [change.newColName],
-              true,
-            );
+            db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);
           }
         } else if (change.type === 'DROP COLUMN') {
-          db = removeColumn(db, stm.tblName, change.colName);
+          db = db.removeColumn(stm.tblName, change.colName);
         } else if (change.type === 'ADD PRIMARY KEY') {
-          db = addPrimaryKey(
-            db,
-            stm.tblName,
-            change.indexColNames.map(col => col.colName),
-          );
+          db = db.addPrimaryKey(stm.tblName, change.indexColNames.map(col => col.colName));
         } else if (change.type === 'DROP PRIMARY KEY') {
-          db = dropPrimaryKey(db, stm.tblName);
+          db = db.dropPrimaryKey(stm.tblName);
         } else if (change.type === 'ADD FOREIGN KEY') {
-          db = addForeignKey(
-            db,
+          db = db.addForeignKey(
             stm.tblName,
             change.constraint,
             change.indexName,
@@ -388,8 +165,7 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
             change.reference.indexColNames.map(def => def.colName),
           );
         } else if (change.type === 'ADD UNIQUE INDEX') {
-          db = addIndex(
-            db,
+          db = db.addIndex(
             stm.tblName,
             change.constraint || change.indexName,
             'UNIQUE',
@@ -398,8 +174,7 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
           );
         } else if (change.type === 'ADD FULLTEXT INDEX') {
           const $$locked = !!change.constraint;
-          db = addIndex(
-            db,
+          db = db.addIndex(
             stm.tblName,
             change.constraint || change.indexName,
             'FULLTEXT',
@@ -408,8 +183,7 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
           );
         } else if (change.type === 'ADD INDEX') {
           const $$locked = !!change.indexName;
-          db = addIndex(
-            db,
+          db = db.addIndex(
             stm.tblName,
             change.indexName,
             'NORMAL',
@@ -417,11 +191,11 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
             $$locked,
           );
         } else if (change.type === 'DROP INDEX') {
-          db = dropIndex(db, stm.tblName, change.indexName);
+          db = db.dropIndex(stm.tblName, change.indexName);
         } else if (change.type === 'DROP FOREIGN KEY') {
-          db = dropForeignKey(db, stm.tblName, change.symbol);
+          db = db.dropForeignKey(stm.tblName, change.symbol);
         } else if (change.type === 'DROP DEFAULT') {
-          db = dropDefault(db, stm.tblName, change.colName);
+          db = db.dropDefault(stm.tblName, change.colName);
         } else {
           // Log details to the console (useful for debugging)
           error(`Unknown change type: ${change.type}`);
@@ -432,19 +206,12 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
         }
       }
     } else if (stm.type === 'RENAME TABLE') {
-      db = renameTable(db, stm.tblName, stm.newName);
+      db = db.renameTable(stm.tblName, stm.newName);
     } else if (stm.type === 'CREATE INDEX') {
       const $$locked = !!stm.indexName;
-      db = addIndex(
-        db,
-        stm.tblName,
-        stm.indexName,
-        stm.indexKind,
-        stm.indexColNames.map(def => def.colName),
-        $$locked,
-      );
+      db = db.addIndex(stm.tblName, stm.indexName, stm.indexKind, stm.indexColNames.map(def => def.colName), $$locked);
     } else if (stm.type === 'DROP INDEX') {
-      db = dropIndex(db, stm.tblName, stm.indexName);
+      db = db.dropIndex(stm.tblName, stm.indexName);
     } else if (stm.type === 'CREATE FUNCTION') {
       // Ignore
     } else if (stm.type === 'CREATE TRIGGER') {
@@ -484,9 +251,7 @@ function* expandInputFiles(paths: Array<string>): Iterable<string> {
     if (fs.statSync(inputPath).isDirectory()) {
       // Naturally sort files before processing -- order is crucial!
       let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
-      files = sortBy(files, f => parseInt(f, 10)).map(f =>
-        path.join(inputPath, f),
-      );
+      files = sortBy(files, f => parseInt(f, 10)).map(f => path.join(inputPath, f));
       yield* files;
     } else {
       yield inputPath;
@@ -513,5 +278,5 @@ export function applySqlFiles(db: Database, ...paths: Array<string>): Database {
  * collect a naturally-sorted list of *.sql files.
  */
 export function simulate(...paths: Array<string>): Database {
-  return applySqlFiles(emptyDb(), ...paths);
+  return applySqlFiles(new Database(), ...paths);
 }
