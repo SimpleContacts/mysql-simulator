@@ -104,7 +104,7 @@ function handleCreateTable(db: Database, stm): Database {
 }
 
 function* iterDumpDb(db: Database, tables: Array<string> = []): Iterable<string> {
-  tables = tables.length > 0 ? tables : db.tables().map(t => t.name);
+  tables = tables.length > 0 ? tables : db.getTables().map(t => t.name);
   for (const tableName of tables) {
     yield '';
     yield db.getTable(tableName).toString();

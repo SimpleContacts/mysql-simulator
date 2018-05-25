@@ -34,9 +34,9 @@ export default class Database {
     this._tables = _tables;
   }
 
-  tables = () => {
+  getTables(): Array<Table> {
     return sortBy(values(this._tables), t => t.name.toLowerCase());
-  };
+  }
 
   has(name: string) {
     return this._tables[name] !== undefined;
@@ -122,7 +122,7 @@ export default class Database {
    * over every table in the database.
    */
   mapTables(mapper: Table => Table): Database {
-    const newTables = this.tables().map(mapper);
+    const newTables = this.getTables().map(mapper);
     return new Database(indexBy(newTables, table => table.name));
   }
 
