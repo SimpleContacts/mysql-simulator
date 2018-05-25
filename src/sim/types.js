@@ -2,16 +2,6 @@
 
 export type IndexType = 'NORMAL' | 'UNIQUE' | 'FULLTEXT';
 
-export type Column = {|
-  +name: string,
-  +type: string,
-  +nullable: boolean,
-  +defaultValue: null | string,
-  +onUpdate: null | string,
-  +autoIncrement: boolean,
-  +comment: null | string,
-|};
-
 export type Index = {|
   +name: string,
   +columns: Array<string>,

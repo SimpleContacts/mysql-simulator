@@ -2,7 +2,8 @@
 
 import { flatten, maxBy, sortBy } from 'lodash';
 
-import type { Column, ForeignKey, Index, IndexType } from './types';
+import Column from './Column';
+import type { ForeignKey, Index, IndexType } from './types';
 
 function* iterInsert(arr, pos, item) {
   yield* arr.slice(0, pos);
@@ -16,82 +17,6 @@ function insert(arr, pos, item) {
 
 function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
-}
-
-function normalizeType(type: string): string {
-  const matches = type.match(/^([^(]+)(?:[(]([^)]+)[)])?(.*)?$/);
-  if (!matches) {
-    throw new Error(`Error parsing data type: ${type}`);
-  }
-
-  let basetype = matches[1];
-  let params = matches[2];
-  let rest = matches[3];
-
-  basetype = basetype.toLowerCase();
-  params = params ? `(${params})` : '';
-  rest = rest ? `${rest.toLowerCase()}` : '';
-  return [basetype, params, rest].join('');
-}
-
-// TODO: Make Column a class by itself and put this on there
-function columnDefinition(col: Column) {
-  let type = normalizeType(col.type);
-  let defaultValue = col.defaultValue !== null ? col.defaultValue : col.nullable ? 'NULL' : null;
-
-  // MySQL outputs number constants as strings. No idea why that would make
-  // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-  if (typeof defaultValue === 'number') {
-    if (type.startsWith('decimal')) {
-      defaultValue = `'${defaultValue.toFixed(2)}'`;
-    } else {
-      defaultValue = `'${defaultValue}'`;
-    }
-  } else if (type === 'tinyint(1)') {
-    if (defaultValue === 'FALSE') defaultValue = "'0'";
-    else if (defaultValue === 'TRUE') defaultValue = "'1'";
-  }
-
-  const nullable = !col.nullable
-    ? 'NOT NULL'
-    : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
-      // data types are "NULL" by default, so we omit the explicit NULL, like
-      // MySQL does
-      type === 'timestamp' ? 'NULL' : '';
-
-  defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
-
-  // Special case: MySQL does not omit an explicit DEFAULT NULL for
-  // TEXT/BLOB/JSON columns
-  if (type === 'text' || type === 'blob') {
-    if (defaultValue === 'DEFAULT NULL') {
-      defaultValue = '';
-    }
-  } else if (type === 'int') {
-    type = 'int(11)';
-  } else if (type === 'int unsigned') {
-    type = 'int(10) unsigned';
-  } else if (type === 'tinyint') {
-    type = 'tinyint(4)';
-  } else if (type === 'tinyint unsigned') {
-    type = 'tinyint(3) unsigned';
-  } else if (type === 'smallint') {
-    type = 'smallint(6)';
-  } else if (type === 'smallint unsigned') {
-    type = 'smallint(5) unsigned';
-  }
-
-  return [
-    escape(col.name),
-    type,
-    nullable,
-    defaultValue,
-    col.onUpdate !== null ? `ON UPDATE ${col.onUpdate}` : '',
-    col.autoIncrement ? 'AUTO_INCREMENT' : '',
-    col.comment !== null ? `COMMENT ${col.comment}` : '',
-  ]
-    .filter(x => x)
-    .join(' ');
 }
 
 export default class Table {
@@ -249,15 +174,7 @@ export default class Table {
         return column;
       }
 
-      return {
-        name: newName, // <-- Update happens here
-        autoIncrement: column.autoIncrement,
-        comment: column.comment,
-        defaultValue: column.defaultValue,
-        type: column.type,
-        nullable: column.nullable,
-        onUpdate: column.onUpdate,
-      };
+      return column.patch({ name: newName });
     });
 
     // Replace all references to this column if they're used in any of the
@@ -316,15 +233,7 @@ export default class Table {
    */
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
-    const newColumn = {
-      name: column.name,
-      type: column.type,
-      nullable: column.nullable,
-      defaultValue: null, // <-- Updating here!
-      onUpdate: column.onUpdate,
-      autoIncrement: column.autoIncrement,
-      comment: column.comment,
-    };
+    const newColumn = column.patch({ defaultValue: null });
     const columns = this.columns.map(c => (c.name === colName ? newColumn : c));
     return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
@@ -375,20 +284,11 @@ export default class Table {
     columnNames.forEach(name => this.getColumn(name));
 
     // MySQL implicitly converts columns used in PKs to NOT NULL
-    const newColumns = this.columns.map(c => {
+    const newColumns = this.columns.map((c: Column) => {
       if (!columnNames.includes(c.name)) {
         return c;
       }
-
-      return {
-        name: c.name,
-        type: c.type,
-        nullable: false, // <-- This is what we're changing
-        defaultValue: c.defaultValue,
-        onUpdate: c.onUpdate,
-        autoIncrement: c.autoIncrement,
-        comment: c.comment,
-      };
+      return c.patch({ nullable: false });
     });
 
     return new Table(
@@ -599,7 +499,7 @@ export default class Table {
 
   serializeDefinitions(): Array<string> {
     return [
-      ...this.columns.map(col => columnDefinition(col)),
+      ...this.columns.map(col => col.toString()),
 
       // TODO: Make these Indexes separate classes and put .toString() methods on them
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),

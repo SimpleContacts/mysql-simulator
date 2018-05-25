@@ -6,9 +6,8 @@ import path from 'path';
 import { sortBy } from 'lodash';
 
 import parseSql from '../parser';
+import Column from './Column';
 import Database from './Database';
-import Table from './Table';
-import type { Column } from './types';
 
 // eslint-disable-next-line no-console
 const error = console.error;
@@ -42,15 +41,7 @@ function makeColumn(colName, def): Column {
     }
   }
 
-  return {
-    name: colName,
-    type: def.dataType,
-    nullable,
-    defaultValue,
-    onUpdate,
-    autoIncrement: def.autoIncrement,
-    comment: def.comment,
-  };
+  return new Column(colName, def.dataType, nullable, defaultValue, onUpdate, def.autoIncrement, def.comment);
 }
 
 function handleCreateTable(db: Database, stm): Database {

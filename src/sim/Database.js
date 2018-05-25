@@ -3,8 +3,9 @@
 
 import { sortBy } from 'lodash';
 
+import Column from './Column';
 import Table from './Table';
-import type { Column, IndexType } from './types';
+import type { IndexType } from './types';
 
 type LUT<+T> = { +[string]: T };
 
