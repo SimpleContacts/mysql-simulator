@@ -16,16 +16,6 @@ const indexBy = <T>(items: Iterable<T>, keyFn: T => string): LUT<T> => {
   return lut;
 };
 
-function* iterInsert(arr, pos, item) {
-  yield* arr.slice(0, pos);
-  yield item;
-  yield* arr.slice(pos);
-}
-
-function insert(arr, pos, item) {
-  return [...iterInsert(arr, pos, item)];
-}
-
 /**
  * Converts a LUT to a list-of-values, all typed.
  * Think of this as a drop-in replacement for Object.values(), but where the

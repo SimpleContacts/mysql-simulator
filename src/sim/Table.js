@@ -1,5 +1,4 @@
 // @flow
-/* eslint-disable no-underscore-dangle */
 
 import { flatten, maxBy } from 'lodash';
 
