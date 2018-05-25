@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/SimpleContacts/mysql-tools.svg?token=aq9GGFeH6P9dKDFz65um&branch=master)](https://travis-ci.com/SimpleContacts/mysql-tools)
+[![Build Status](https://travis-ci.com/SimpleContacts/mysql-simulator.svg?token=aq9GGFeH6P9dKDFz65um&branch=master)](https://travis-ci.com/SimpleContacts/mysql-simulator)
 
 # Usage
 
