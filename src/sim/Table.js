@@ -3,9 +3,9 @@
 import { flatten, maxBy, sortBy } from 'lodash';
 
 import Column from './Column';
+import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
-import type { ForeignKey } from './types';
 import { escape, insert } from './utils';
 
 export default class Table {
@@ -86,11 +86,7 @@ export default class Table {
         // Don't change
         return fk;
       }
-      return {
-        name: `${newName}${fk.name.substring(oldName.length)}`,
-        columns: fk.columns,
-        reference: fk.reference,
-      };
+      return fk.patch({ name: `${newName}${fk.name.substring(oldName.length)}` });
     });
 
     return new Table(newName, this.columns, this.primaryKey, this.indexes, foreignKeys);
@@ -106,14 +102,11 @@ export default class Table {
         return fk;
       }
 
-      return {
-        name: fk.name,
-        columns: fk.columns,
-        reference: {
-          columns: fk.reference.columns,
-          table: newRefName,
-        },
+      const reference = {
+        columns: fk.reference.columns,
+        table: newRefName,
       };
+      return fk.patch({ reference });
     });
 
     return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
@@ -170,11 +163,11 @@ export default class Table {
     // indexes
     const renamer = (name: string) => (name === oldName ? newName : name);
     const primaryKey = this.primaryKey ? this.primaryKey.map(renamer) : null;
-    const foreignKeys = this.foreignKeys.map((fk: ForeignKey) => ({
-      name: fk.name,
-      reference: fk.reference,
-      columns: fk.columns.map(renamer),
-    }));
+    const foreignKeys = this.foreignKeys.map(fk =>
+      fk.patch({
+        columns: fk.columns.map(renamer),
+      }),
+    );
 
     // TODO: Make this a method on the Index: .renameReference()
     const indexes = this.indexes.map((index: Index) =>
@@ -353,14 +346,10 @@ export default class Table {
     }
 
     constraintName = constraintName || this.generateForeignKeyName();
-    const fk: ForeignKey = {
-      name: constraintName,
-      columns: localColumns,
-      reference: {
-        table: targetTblName,
-        columns: targetColumns,
-      },
-    };
+    const fk = new ForeignKey(constraintName, localColumns, {
+      table: targetTblName,
+      columns: targetColumns,
+    });
     const foreignKeys = [...table.foreignKeys, fk];
 
     return new Table(table.name, table.columns, table.primaryKey, table.indexes, foreignKeys);
@@ -476,14 +465,7 @@ export default class Table {
       ...this.getUniqueIndexes().map(index => index.toString()),
       ...this.getNormalIndexes().map(index => index.toString()),
       ...this.getFullTextIndexes().map(index => index.toString()),
-
-      // TODO: Make ForeignKey a separate class and put .toString() method on it
-      ...this.getForeignKeys().map(
-        fk =>
-          `CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns.map(escape).join(', ')}) REFERENCES ${escape(
-            fk.reference.table,
-          )} (${fk.reference.columns.map(escape).join(', ')})`,
-      ),
+      ...this.getForeignKeys().map(fk => fk.toString()),
     ];
   }
 

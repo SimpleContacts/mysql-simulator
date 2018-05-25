@@ -20,12 +20,12 @@ export function normalizeType(type: string): string {
   return [basetype, params, rest].join('');
 }
 
-function* iterInsert(arr, pos, item) {
+function* iterInsert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Iterable<T> {
   yield* arr.slice(0, pos);
   yield item;
   yield* arr.slice(pos);
 }
 
-export function insert(arr, pos, item) {
+export function insert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Array<T> {
   return [...iterInsert(arr, pos, item)];
 }
