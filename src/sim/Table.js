@@ -3,21 +3,10 @@
 import { flatten, maxBy, sortBy } from 'lodash';
 
 import Column from './Column';
-import type { ForeignKey, Index, IndexType } from './types';
-
-function* iterInsert(arr, pos, item) {
-  yield* arr.slice(0, pos);
-  yield item;
-  yield* arr.slice(pos);
-}
-
-function insert(arr, pos, item) {
-  return [...iterInsert(arr, pos, item)];
-}
-
-function escape(s: string): string {
-  return `\`${s.replace('`', '\\`')}\``;
-}
+import type { IndexType } from './Index';
+import Index from './Index';
+import type { ForeignKey } from './types';
+import { escape, insert } from './utils';
 
 export default class Table {
   +name: string;
@@ -186,12 +175,13 @@ export default class Table {
       reference: fk.reference,
       columns: fk.columns.map(renamer),
     }));
-    const indexes = this.indexes.map((index: Index) => ({
-      name: index.name,
-      type: index.type,
-      $$locked: index.$$locked,
-      columns: index.columns.map(renamer),
-    }));
+
+    // TODO: Make this a method on the Index: .renameReference()
+    const indexes = this.indexes.map((index: Index) =>
+      index.patch({
+        columns: index.columns.map(renamer),
+      }),
+    );
 
     return new Table(this.name, columns, primaryKey, indexes, foreignKeys);
   }
@@ -250,15 +240,11 @@ export default class Table {
 
     const columns = this.columns.filter(c => c.name !== colName);
 
+    // TODO: Make this a method on the Index: .removeReference()
     const indexes = this.indexes
       // Implicitly remove this column from any multi-column indexes that
       // contain it
-      .map(index => ({
-        name: index.name,
-        type: index.type,
-        $$locked: index.$$locked,
-        columns: index.columns.filter(name => name !== colName),
-      }))
+      .map(index => index.patch({ columns: index.columns.filter(name => name !== colName) }))
       // If this leads to "empty" indexes, drop 'em entirely
       .filter(index => index.columns.length > 0);
 
@@ -360,12 +346,7 @@ export default class Table {
           ...this.indexes.slice(0, pos),
           ...this.indexes.slice(pos + 1), // Cut out the index at pos
           // Update & push it at the end
-          {
-            name: indexName,
-            columns: origIndex.columns,
-            type: origIndex.type,
-            $$locked: origIndex.$$locked,
-          },
+          new Index(indexName, origIndex.columns, origIndex.type, origIndex.$$locked),
         ];
         table = new Table(table.name, table.columns, table.primaryKey, indexes, table.foreignKeys);
       }
@@ -432,20 +413,10 @@ export default class Table {
       indexes = [
         ...this.indexes.slice(0, pos),
         ...this.indexes.slice(pos + 1),
-        {
-          name: indexName,
-          columns,
-          type,
-          $$locked,
-        },
+        new Index(indexName, columns, type, $$locked),
       ];
     } else {
-      const index: Index = {
-        name: indexName,
-        type,
-        columns,
-        $$locked,
-      };
+      const index: Index = new Index(indexName, columns, type, $$locked);
       indexes = [...indexes, index];
     }
 
@@ -500,16 +471,11 @@ export default class Table {
   serializeDefinitions(): Array<string> {
     return [
       ...this.columns.map(col => col.toString()),
-
-      // TODO: Make these Indexes separate classes and put .toString() methods on them
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
-      ...this.getUniqueIndexes().map(
-        index => `UNIQUE KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
-      ),
-      ...this.getNormalIndexes().map(index => `KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`),
-      ...this.getFullTextIndexes().map(
-        index => `FULLTEXT KEY ${escape(index.name)} (${index.columns.map(escape).join(',')})`,
-      ),
+
+      ...this.getUniqueIndexes().map(index => index.toString()),
+      ...this.getNormalIndexes().map(index => index.toString()),
+      ...this.getFullTextIndexes().map(index => index.toString()),
 
       // TODO: Make ForeignKey a separate class and put .toString() method on it
       ...this.getForeignKeys().map(

@@ -19,3 +19,13 @@ export function normalizeType(type: string): string {
   rest = rest ? `${rest.toLowerCase()}` : '';
   return [basetype, params, rest].join('');
 }
+
+function* iterInsert(arr, pos, item) {
+  yield* arr.slice(0, pos);
+  yield item;
+  yield* arr.slice(pos);
+}
+
+export function insert(arr, pos, item) {
+  return [...iterInsert(arr, pos, item)];
+}
