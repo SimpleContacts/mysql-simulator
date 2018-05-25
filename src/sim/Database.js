@@ -142,7 +142,28 @@ export default class Database {
    * definition.
    */
   replaceColumn(tblName: string, colName: string, column: Column, position: string | null): Database {
-    return this.swapTable(tblName, table => table.replaceColumn(colName, column, position));
+    let table = this;
+    table = table.swapTable(tblName, table => table.replaceColumn(colName, column, position));
+
+    // If it's a rename, we may need to update any FKs pointing to it
+    if (colName !== column.name) {
+      table = table.mapTables(table =>
+        table.mapForeignKeys(fk => {
+          if (fk.reference.table !== tblName || !fk.reference.columns.includes(colName)) {
+            // Not affected
+            return fk;
+          }
+
+          const reference = {
+            table: fk.reference.table,
+            columns: fk.reference.columns.map(ref => (ref === colName ? column.name : ref)),
+          };
+          return fk.patch({ reference });
+        }),
+      );
+    }
+
+    return table;
   }
 
   /**

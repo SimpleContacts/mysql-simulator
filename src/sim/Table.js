@@ -371,6 +371,14 @@ export default class Table {
     return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
+  mapForeignKeys(mapper: ForeignKey=>ForeignKey): Table {
+    return new Table(
+      this.name,
+      this.columns,this.primaryKey,this.indexes,
+      this.foreignKeys.map(mapper),
+    );
+  }
+
   /**
    * Returns a new Table with the requested Index added.
    */
