@@ -31,6 +31,11 @@ export type TextDataType = {
   collate: string, // e.g. 'utf8_general_ci'
 };
 
+export type BinaryDataType = {
+  baseType: 'blob' | 'binary' | 'varbinary',
+  length: number | null,
+};
+
 export type EnumDataType = {
   baseType: 'enum',
   values: Array<string>,
@@ -43,7 +48,14 @@ export type OtherDataType = {
   baseType: 'date' | 'year' | 'tinyblob' | 'mediumblob' | 'longblob' | 'json',
 };
 
-export type TypeInfo = IntDataType | RealDataType | DateTimeDataType | TextDataType | EnumDataType | OtherDataType;
+export type TypeInfo =
+  | IntDataType
+  | RealDataType
+  | DateTimeDataType
+  | TextDataType
+  | BinaryDataType
+  | EnumDataType
+  | OtherDataType;
 
 const DEFAULT_INT_LENGTHS = {
   bigint: 20,
@@ -117,6 +129,21 @@ function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: strin
   return { baseType, length, characterSet, collate };
 }
 
+function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: string): BinaryDataType {
+  let length = null;
+  if (params) {
+    length = parseInt(params, 10);
+  }
+
+  // Sanitization / sanity checks
+  if (baseType === 'varbinary' && !length) {
+    // VARBINARY without a length is invalid MySQL
+    throw new Error('VARBINARY must have valid length, please use VARBINARY(n)');
+  }
+
+  return { baseType, length };
+}
+
 function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: string /* options: string */): EnumDataType {
   if (!params) {
     throw new Error('ENUMs must have at least one value');
@@ -176,6 +203,11 @@ export function parseDataType(type: string): TypeInfo {
     case 'text':
       return asText(baseType, params /* , options */);
 
+    case 'binary':
+    case 'varbinary':
+    case 'blob':
+      return asBinary(baseType, params);
+
     case 'enum':
       return asEnum(baseType, params /* , options */);
 
@@ -232,6 +264,12 @@ export function formatDataType(info: TypeInfo): string {
     case 'text':
       params = info.length || '';
       // TODO: Output CHARACTER SET and COLLATEs here too
+      break;
+
+    case 'binary':
+    case 'varbinary':
+    case 'blob':
+      params = info.length || '';
       break;
 
     case 'enum':
