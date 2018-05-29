@@ -1,4 +1,7 @@
-// @flow
+// @flow strict
+
+// $FlowFixMe - the parser isn't type-annotated
+import { parse as rawParseSql } from '../parser/mysql';
 
 export function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
@@ -12,4 +15,35 @@ function* iterInsert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Iterable<
 
 export function insert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Array<T> {
   return [...iterInsert(arr, pos, item)];
+}
+
+/**
+ * Unquotes a string literal (from SQL parsing output).
+ */
+export function unquote(quoted: string): string {
+  return quoted.substring(1, quoted.length - 1).replace("''", "'");
+}
+
+/**
+ * Quotes a string literal.
+ */
+export function quote(s: string): string {
+  return `'${s.replace("'", "''")}'`;
+}
+
+/**
+ * Parses an ENUM definition, like
+ *
+ *     'Fo,o', 'B''ar','Qux\''
+ *
+ * into:
+ *
+ *     ['Fo,o', "B'ar", "Qux'"]
+ */
+export function parseEnumValues(enumString: string): Array<string> {
+  const values = rawParseSql(enumString, {
+    startRule: 'StringList',
+  });
+  // Dequote to make them JavaScript string literals
+  return values.map(unquote);
 }

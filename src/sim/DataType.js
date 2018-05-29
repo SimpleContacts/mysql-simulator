@@ -1,5 +1,7 @@
 // @flow strict
 
+import { parseEnumValues, quote } from './utils';
+
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
   length: number,
@@ -149,9 +151,7 @@ function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: strin
     throw new Error('ENUMs must have at least one value');
   }
 
-  // TODO: No parsing happening here. If the emum values contain comma's, this
-  // will break.  Can be fixed relatively simply later.
-  const values = params.split(',');
+  const values = parseEnumValues(params);
 
   // TODO: Parse the CHARACTER SET and COLLATE sections from the options
   const characterSet = 'utf8';
@@ -273,7 +273,7 @@ export function formatDataType(info: TypeInfo): string {
       break;
 
     case 'enum':
-      params = info.values.join(',');
+      params = info.values.map(quote).join(',');
       break;
 
     default:
