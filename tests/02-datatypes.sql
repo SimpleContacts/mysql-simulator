@@ -21,6 +21,6 @@ CREATE TABLE aaa (
   c16 TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
   -- ENUMs
-  c17 ENUM('A', 'B', 'C'),
-  c18 ENUM('Strings \'with quotes\' are fine!')
+  c17 ENUM('A''B', "B", "C"),
+  c18 ENUM('Strings \'with quotes\', or comma\'s,,, are fine!', '''', """")
 );
