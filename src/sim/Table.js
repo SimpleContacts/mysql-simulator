@@ -225,6 +225,9 @@ export default class Table {
    * Returns a new Table with the given column removed.
    */
   removeColumn(colName: string): Table {
+    // Make sure the column exists
+    this.getColumn(colName);
+
     // Check if any of the columns that are being removed are used in any of
     // the FK definitions.  If so, we cannot remove it.
     if (this.isUsedInForeignKey(colName)) {
