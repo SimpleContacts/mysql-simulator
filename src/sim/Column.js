@@ -1,6 +1,8 @@
 // @flow
 
-import { escape, normalizeType } from './utils';
+import { formatDataType, parseDataType } from './DataType';
+import type { TypeInfo } from './DataType';
+import { escape } from './utils';
 
 export default class Column {
   +name: string;
@@ -53,19 +55,23 @@ export default class Column {
     );
   }
 
+  getTypeInfo(): TypeInfo {
+    return parseDataType(this.type);
+  }
+
   toString(): string {
-    let type = normalizeType(this.type);
+    const typeInfo = this.getTypeInfo();
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
     // MySQL outputs number constants as strings. No idea why that would make
     // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
     if (typeof defaultValue === 'number') {
-      if (type.startsWith('decimal')) {
+      if (typeInfo.baseType === 'decimal') {
         defaultValue = `'${defaultValue.toFixed(2)}'`;
       } else {
         defaultValue = `'${defaultValue}'`;
       }
-    } else if (type === 'tinyint(1)') {
+    } else if (typeInfo.baseType === 'tinyint' && typeInfo.length === '1') {
       if (defaultValue === 'FALSE') defaultValue = "'0'";
       else if (defaultValue === 'TRUE') defaultValue = "'1'";
     }
@@ -75,33 +81,21 @@ export default class Column {
       : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
         // data types are "NULL" by default, so we omit the explicit NULL, like
         // MySQL does
-        type === 'timestamp' ? 'NULL' : '';
+        typeInfo.baseType === 'timestamp' && !typeInfo.fsp ? 'NULL' : '';
 
     defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
-    if (type === 'text' || type === 'blob') {
+    if (typeInfo.baseType === 'text' || typeInfo.baseType === 'blob') {
       if (defaultValue === 'DEFAULT NULL') {
         defaultValue = '';
       }
-    } else if (type === 'int') {
-      type = 'int(11)';
-    } else if (type === 'int unsigned') {
-      type = 'int(10) unsigned';
-    } else if (type === 'tinyint') {
-      type = 'tinyint(4)';
-    } else if (type === 'tinyint unsigned') {
-      type = 'tinyint(3) unsigned';
-    } else if (type === 'smallint') {
-      type = 'smallint(6)';
-    } else if (type === 'smallint unsigned') {
-      type = 'smallint(5) unsigned';
     }
 
     return [
       escape(this.name),
-      type,
+      formatDataType(typeInfo),
       nullable,
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
