@@ -1,13 +1,11 @@
 #!/usr/bin/env babel-node
 // @flow
 
-import fs from 'fs';
 import path from 'path';
 
 import program from 'commander';
-import { sortBy } from 'lodash';
 
-import { applySqlFile, dumpDb } from './core';
+import { applySqlFile, dumpDb, expandInputFiles } from './core';
 import Database from './Database';
 
 // eslint-disable-next-line no-console
@@ -27,23 +25,10 @@ function printDb(db: Database, tables: Array<string> = []) {
   log(dumpDb(db, tables));
 }
 
-function* iterInputFiles(paths: Array<string>): Iterable<string> {
-  for (const inputPath of paths) {
-    if (fs.statSync(inputPath).isDirectory()) {
-      // Naturally sort files before processing -- order is crucial!
-      let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
-      files = sortBy(files, f => parseInt(f, 10)).map(f => path.join(inputPath, f));
-      yield* files;
-    } else {
-      yield inputPath;
-    }
-  }
-}
-
 function runWithOptions(options: Options) {
   let db: Database = new Database();
 
-  let files = [...iterInputFiles(options.args)];
+  let files = [...expandInputFiles(options.args)];
   if (options.limit) {
     files = files.slice(0, options.limit);
   }

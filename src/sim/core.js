@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { sortBy } from 'lodash';
+import { maxBy, minBy, sortBy } from 'lodash';
 
 import parseSql from '../parser';
 import Column from './Column';
@@ -246,11 +246,60 @@ export function applySqlFile(db: Database, path: string): Database {
   return applySql(db, sql, path);
 }
 
-function* expandInputFiles(paths: Array<string>): Iterable<string> {
+function duplicates<T: number | string>(things: Array<T>): Array<T> {
+  const seen = new Set();
+  const outputted = new Set();
+  const result: Array<T> = [];
+  for (const x of things) {
+    if (seen.has(x)) {
+      if (!outputted.has(x)) {
+        outputted.add(x);
+        result.push(x);
+      }
+    }
+    seen.add(x);
+  }
+  return result;
+}
+
+/**
+ * Fails if the given list of numbers is not fully consecutive. A list if
+ * considered fully consecutive if every natural number from the lowest to the
+ * highest is present in the list, without holes or duplicates.
+ */
+function ensureConsecutive(numbers: Array<number>): void {
+  if (numbers.length < 2) return;
+
+  const uniqs = new Set(numbers);
+  if (uniqs.size !== numbers.length) {
+    throw new Error(
+      `Duplicate migrations found: ${duplicates(numbers)
+        .map(n => n.toString())
+        .join(', ')}`,
+    );
+  }
+
+  const min = minBy(numbers);
+  const max = maxBy(numbers);
+  const expectedCount = max - min + 1;
+  if (numbers.length !== expectedCount) {
+    const missing = [];
+    // eslint-disable-next-line no-plusplus
+    for (let i = min; i <= max; ++i) {
+      if (!numbers.includes(i)) {
+        missing.push(i);
+      }
+    }
+    throw new Error(`Missing migrations: ${missing.map(n => n.toString()).join(', ')}`);
+  }
+}
+
+export function* expandInputFiles(paths: Array<string>): Iterable<string> {
   for (const inputPath of paths) {
     if (fs.statSync(inputPath).isDirectory()) {
       // Naturally sort files before processing -- order is crucial!
       let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
+      ensureConsecutive(files.map(f => parseInt(f, 10)));
       files = sortBy(files, f => parseInt(f, 10)).map(f => path.join(inputPath, f));
       yield* files;
     } else {
