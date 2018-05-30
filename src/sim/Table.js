@@ -3,6 +3,7 @@
 import { flatten, maxBy, sortBy } from 'lodash';
 
 import Column from './Column';
+import Database from './Database';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
@@ -63,6 +64,25 @@ export default class Table {
       throw new Error(`Column "${colName}" does not exist in table "${this.name}"`);
     }
     return index;
+  }
+
+  /**
+   * Get a list of all FKs in the given Database that are pointing to this
+   * table.
+   */
+  getIncomingForeignKeys(db: Database): Array<{ table: string, foreignKey: ForeignKey }> {
+    const results: Array<{ table: string, foreignKey: ForeignKey }> = [];
+    for (const table of db.getTables()) {
+      for (const fk of table.foreignKeys) {
+        if (fk.reference.table === this.name) {
+          results.push({
+            table: table.name,
+            foreignKey: fk,
+          });
+        }
+      }
+    }
+    return results;
   }
 
   /**
