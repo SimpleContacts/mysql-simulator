@@ -1,6 +1,7 @@
 // @flow
 
 import Column from './sim/Column';
+import { applySql, applySqlFile, applySqlFiles, dumpDb, simulate } from './sim/core';
 import Database from './sim/Database';
 import type {
   BinaryDataType,
@@ -15,7 +16,6 @@ import type {
 import ForeignKey from './sim/ForeignKey';
 import Index from './sim/Index';
 import type { IndexType } from './sim/Index';
-import { applySql, applySqlFile, applySqlFiles, dumpDb, simulate } from './sim/lib';
 import Table from './sim/Table';
 
 export type {

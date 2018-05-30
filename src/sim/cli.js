@@ -7,8 +7,8 @@ import path from 'path';
 import program from 'commander';
 import { sortBy } from 'lodash';
 
+import { applySqlFile, dumpDb } from './core';
 import Database from './Database';
-import { applySqlFile, dumpDb } from './lib';
 
 // eslint-disable-next-line no-console
 const log = console.log;
