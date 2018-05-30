@@ -114,7 +114,7 @@ function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: strin
   }
 
   // Sanitization / sanity checks
-  if (baseType === 'char') {
+  if (baseType === 'char' && length === null) {
     // CHAR means CHAR(1)
     length = 1;
   }
