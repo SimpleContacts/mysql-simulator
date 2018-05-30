@@ -55,6 +55,16 @@ export default class Column {
     );
   }
 
+  /**
+   * Get the normalized type, not the raw type for this column.
+   */
+  getType(): string {
+    // TODO: Note that it might be better to "unify" this type in the
+    // constructor.  That way, there simply won't be a way of distinguishing
+    // between them, i.e. column.type === column.getType(), always.
+    return formatDataType(parseDataType(this.type));
+  }
+
   getTypeInfo(): TypeInfo {
     return parseDataType(this.type);
   }
