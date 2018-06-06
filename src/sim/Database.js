@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable no-underscore-dangle */
 
-import { sortBy } from 'lodash';
+import { sortBy, zip } from 'lodash';
 
 import Column from './Column';
 import type { IndexType } from './Index';
@@ -193,8 +193,30 @@ export default class Database {
     targetTblName: string,
     targetColumns: Array<string>,
   ): Database {
-    // Makes sure the target table exists
-    this.getTable(targetTblName);
+    // Makes sure the tables exist
+    const localTable = this.getTable(tblName);
+    const foreignTable = this.getTable(targetTblName);
+
+    // Make sure number of source/target columns match
+    if (localColumns.length !== targetColumns.length) {
+      throw new Error('Foreign key must have an equal number of local/foreign columns');
+    }
+
+    // Make sure the target columns exist and are of equal types
+    for (const [localColName, foreignColName] of zip(localColumns, targetColumns)) {
+      const localColumn = localTable.getColumn(localColName);
+      const foreignColumn = foreignTable.getColumn(foreignColName);
+
+      const ltype = localColumn.getType();
+      const ftype = foreignColumn.getType();
+      if (ltype !== ftype) {
+        const lname = `${localTable.name}.${localColumn.name}`;
+        const fname = `${foreignTable.name}.${foreignColumn.name}`;
+        throw new Error(
+          `Type mismatch in foreign key: local/foreign columns have different types. Local column \`${lname}\` is \`${ltype}\`, but \`${fname}\` is \`${ftype}\`.`,
+        );
+      }
+    }
 
     return this.swapTable(tblName, table =>
       table.addForeignKey(constraintName, indexName, localColumns, targetTblName, targetColumns),
