@@ -81,7 +81,7 @@ export default class Column {
       } else {
         defaultValue = `'${defaultValue}'`;
       }
-    } else if (typeInfo.baseType === 'tinyint' && typeInfo.length === '1') {
+    } else if (typeInfo.baseType === 'tinyint' && typeInfo.length === 1) {
       if (defaultValue === 'FALSE') defaultValue = "'0'";
       else if (defaultValue === 'TRUE') defaultValue = "'1'";
     }

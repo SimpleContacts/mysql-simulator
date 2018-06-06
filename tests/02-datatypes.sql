@@ -22,5 +22,8 @@ CREATE TABLE aaa (
 
   -- ENUMs
   c17 ENUM('A''B', "B", "C"),
-  c18 ENUM('Strings \'with quotes\', or comma\'s,,, are fine!', '''', """")
+  c18 ENUM('Strings \'with quotes\', or comma\'s,,, are fine!', '''', """"),
+
+  -- BOOLEANs are really just TINYINT(1)s
+  enabled BOOLEAN NOT NULL DEFAULT FALSE
 );
