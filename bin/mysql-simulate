@@ -1,1 +1,10 @@
-../src/sim/cli.js
+#!/bin/sh
+set -e
+
+if [ ! -f ./dist/sim/cli.js ]; then
+    # Compile it now
+    babel --minified --compact true -d dist src
+fi
+
+# Run it through node
+exec node ./dist/sim/cli.js "$@"
