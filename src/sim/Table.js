@@ -251,7 +251,7 @@ export default class Table {
     // Check if any of the columns that are being removed are used in any of
     // the FK definitions.  If so, we cannot remove it.
     if (this.isUsedInForeignKey(colName)) {
-      throw new Error("Cannot drop column because it's used by a FK");
+      throw new Error(`Cannot drop column "${colName}" because it's used by a FK`);
     }
 
     const columns = this.columns.filter(c => c.name !== colName);
