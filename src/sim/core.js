@@ -116,6 +116,7 @@ export function dumpDb(db: Database, tables: Array<string> = []): string {
   return [...iterDumpDb(db, tables)].join('\n');
 }
 
+// $FlowFixMe - avoid using `*`
 function applySqlStatements(db: Database, statements: Array<*>): Database {
   for (const stm of statements) {
     if (stm === null) {
@@ -233,6 +234,7 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
  * Does not modify the original input DB state.
  */
 export function applySql(db: Database, sql: string, srcFile: string): Database {
+  // $FlowFixMe - avoid using `*`
   const ast: Array<*> = parseSql(sql, srcFile);
   return applySqlStatements(db, ast);
 }

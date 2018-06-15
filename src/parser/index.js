@@ -47,6 +47,7 @@ const printErr = (filename, input, e: Error) => {
  * with much better error reporting, showing source line position where it
  * failed.
  */
+// $FlowFixMe - avoid using `*`
 export default function parse(inputSql: string, filename: string = ''): Array<*> {
   try {
     return rawParseSql(inputSql);
