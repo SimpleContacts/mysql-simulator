@@ -92,14 +92,14 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-"@simple-contacts/babel-preset-sc@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@simple-contacts/babel-preset-sc/-/babel-preset-sc-1.0.0.tgz#4b9edea72f6a26c626e571e22f882cd80f76635d"
+"@simple-contacts/babel-preset-sc@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@simple-contacts/babel-preset-sc/-/babel-preset-sc-1.0.3.tgz#453f4ac11abff9c8d08aebf90db5ee5bdbc881f8"
   dependencies:
     babel-plugin-dynamic-import-node "^1.2.0"
     babel-plugin-dynamic-import-webpack "^1.0.2"
-    babel-plugin-flow-runtime "^0.15.0"
-    babel-plugin-module-resolver "^3.0.0"
+    babel-plugin-flow-runtime "^0.17.0"
+    babel-plugin-module-resolver "^3.1.1"
     babel-plugin-runtime "^1.0.7"
     babel-plugin-syntax-dynamic-import "^6.18.0"
     babel-plugin-transform-class-properties "^6.24.1"
@@ -109,6 +109,7 @@
     babel-plugin-transform-runtime "^6.23.0"
     babel-plugin-transform-strict-mode "^6.24.1"
     babel-preset-env "^1.6.1"
+    yarn.lock "0.0.1-security"
 
 "@simple-contacts/eslint-config@^0.1.9":
   version "0.1.9"
@@ -653,9 +654,9 @@ babel-plugin-dynamic-import-webpack@^1.0.2:
     babel-plugin-syntax-dynamic-import "^6.18.0"
     babel-template "^6.26.0"
 
-babel-plugin-flow-runtime@^0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-flow-runtime/-/babel-plugin-flow-runtime-0.15.0.tgz#fb2b427a75c1ba1cef7f0ee52111fdb8c265b992"
+babel-plugin-flow-runtime@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-flow-runtime/-/babel-plugin-flow-runtime-0.17.0.tgz#51d7b2e6a526edc48fad8d8eed45bf7cc32ffc08"
   dependencies:
     babel-generator "^6.21.0"
     babel-traverse "^6.20.0"
@@ -689,9 +690,9 @@ babel-plugin-jest-hoist@^23.0.1:
   version "23.0.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-23.0.1.tgz#eaa11c964563aea9c21becef2bdf7853f7f3c148"
 
-babel-plugin-module-resolver@^3.0.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-module-resolver/-/babel-plugin-module-resolver-3.1.0.tgz#cf7868bd2c1818f855aede16141009b87dd1f95b"
+babel-plugin-module-resolver@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-module-resolver/-/babel-plugin-module-resolver-3.1.1.tgz#881cf67e3d4b8400d5eaaefc1be44d2dc1fe404f"
   dependencies:
     find-babel-config "^1.1.0"
     glob "^7.1.2"
@@ -5916,3 +5917,7 @@ yargs@~3.10.0:
     cliui "^2.1.0"
     decamelize "^1.0.0"
     window-size "0.1.0"
+
+yarn.lock@0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/yarn.lock/-/yarn.lock-0.0.1-security.tgz#8e7117924bfe916671b21f14212ba1bb49dfe0c7"
