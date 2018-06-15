@@ -16,6 +16,7 @@ before_install:
   - sudo service mysql restart
 
 script:
+  - yarn build
   - yarn test
 
 after_script:
