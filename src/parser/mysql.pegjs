@@ -470,9 +470,20 @@ CreateDefinition
       }
     }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
-  / PrimaryKeyDefinition
+  / PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
+    return {
+      type: 'PRIMARY KEY',
+      indexColNames,
+    }
+  }
   // / {INDEX|KEY} [index_name] [index_type] (index_col_name, ...)
-  / IndexDefinition
+  / ( INDEX / KEY ) indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
+    return {
+      type: 'INDEX',
+      indexName,
+      indexColNames,
+    }
+  }
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
   / constraint:NamedConstraint?
     UNIQUE (INDEX / KEY)? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
@@ -655,22 +666,6 @@ ValueList
 
 Value
   = Constant
-
-PrimaryKeyDefinition = PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
-  return {
-    type: 'PRIMARY KEY',
-    indexColNames,
-  }
-}
-
-IndexDefinition =
-  ( INDEX / KEY ) indexName:Identifier LPAREN indexColNames:IndexColNames RPAREN {
-    return {
-      type: 'INDEX',
-      indexName,
-      indexColNames,
-    }
-  }
 
 /* System functions */
 
