@@ -17,9 +17,9 @@ echo "All good!" >&2
 else
   echo "Uh-oh! There were differences!" >&2
   if [ -n "$TRAVIS" ]; then
-    diff -U8 tests/real tests/simulated
+    diff -U8 tests/simulated tests/real
   else
-    colordiff -U8 tests/real tests/simulated
+    colordiff -U8 tests/simulated tests/real
   fi
   exit 2
 fi
