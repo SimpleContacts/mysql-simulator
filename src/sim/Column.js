@@ -69,7 +69,10 @@ export default class Column {
     return parseDataType(this.type);
   }
 
-  toString(): string {
+  /**
+   * Get the full-blown column definition, without the name.
+   */
+  getDefinition(): string {
     const typeInfo = this.getTypeInfo();
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
@@ -106,7 +109,6 @@ export default class Column {
     }
 
     return [
-      escape(this.name),
       formatDataType(typeInfo),
       nullable,
       defaultValue,
@@ -116,5 +118,9 @@ export default class Column {
     ]
       .filter(x => x)
       .join(' ');
+  }
+
+  toString(): string {
+    return `${escape(this.name)} ${this.getDefinition()}`;
   }
 }
