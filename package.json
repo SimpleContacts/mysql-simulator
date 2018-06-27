@@ -1,6 +1,6 @@
 {
   "name": "@simple-contacts/mysql-simulator",
-  "version": "1.2.14",
+  "version": "1.2.15",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
