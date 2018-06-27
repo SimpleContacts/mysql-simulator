@@ -215,8 +215,23 @@ export default class Table {
   replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
     // If this is a rename, make sure to do that now first
     let table = this;
+    const oldColumn = table.getColumn(oldColName);
     if (oldColName !== newColumn.name) {
       table = table.renameColumn(oldColName, newColumn.name);
+    }
+
+    if (table.isUsedInForeignKey(oldColName)) {
+      // If the type changes, some MySQL servers might throw
+      // a ER_FK_COLUMN_CANNOT_CHANGE error.  Therefore, throw a warning.
+      const oldType = oldColumn.getDefinition();
+      const newType = newColumn.getDefinition();
+      if (oldType !== newType) {
+        console.warn(
+          `Warning! Changing the type of "${
+            table.name
+          }.${oldColName}" (from "${oldType}" to "${newType}") might cause a ER_FK_COLUMN_CANNOT_CHANGE error, depending on MySQL is configured.`,
+        );
+      }
     }
 
     // Replace the column
