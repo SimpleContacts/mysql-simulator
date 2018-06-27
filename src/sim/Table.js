@@ -399,6 +399,23 @@ export default class Table {
   }
 
   /**
+   * Generate an index name that will be unique.
+   */
+  generateIndexName(idealName: string): string {
+    let indexName = idealName;
+
+    // ...but attempt to add a counter value to avoid name clashes
+    const existingIndexNames = new Set(this.indexes.map(i => i.name));
+    let counter = 1;
+    while (existingIndexNames.has(indexName)) {
+      // eslint-disable-next-line no-plusplus
+      indexName = `${idealName}_${++counter}`;
+    }
+
+    return indexName;
+  }
+
+  /**
    * Returns a new Table with the requested Index added.
    */
   addIndex(indexName: string | null, type: IndexType, columns: Array<string>, $$locked: boolean): Table {
@@ -408,16 +425,7 @@ export default class Table {
     // If indexName is null, auto-generate it
     if (!indexName) {
       // Try to name it after the first column in the columns list...
-      const idealName = columns[0];
-      indexName = idealName;
-
-      // ...but attempt to add a counter value to avoid name clashes
-      const existingIndexNames = new Set(this.indexes.map(i => i.name));
-      let counter = 1;
-      while (existingIndexNames.has(indexName)) {
-        // eslint-disable-next-line no-plusplus
-        indexName = `${idealName}_${++counter}`;
-      }
+      indexName = this.generateIndexName(columns[0]);
     }
 
     // If an index already exists for this column combination, reuse it (don't

@@ -95,7 +95,7 @@ function handleCreateTable(db: Database, stm): Database {
       );
     } else {
       const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
-      const $$locked = type === 'NORMAL' ? !!index.indexName : !!(index.constraint || index.indexName);
+      const $$locked = true;
       db = db.addIndex(tblName, index.indexName, type, index.indexColNames.map(def => def.colName), $$locked);
     }
   }
