@@ -1,6 +1,6 @@
 // @flow
 
-import { flatten, maxBy, sortBy } from 'lodash';
+import { maxBy, sortBy } from 'lodash';
 
 import Column from './Column';
 import Database from './Database';
