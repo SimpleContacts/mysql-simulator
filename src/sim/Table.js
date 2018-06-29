@@ -37,11 +37,15 @@ export default class Table {
     return this.columns.findIndex(c => c.name === colName) >= 0;
   }
 
+  getForeignKeysUsing(colName: string): Array<ForeignKey> {
+    return this.foreignKeys.filter(fk => fk.columns.includes(colName));
+  }
+
   /**
    * Returns whether the given Column is used in any of the foreign keys.
    */
   isUsedInForeignKey(colName: string) {
-    return new Set(flatten(this.foreignKeys.map(fk => fk.columns))).has(colName);
+    return this.getForeignKeysUsing(colName).length > 0;
   }
 
   assertColumnDoesNotExist(colName: string) {
