@@ -224,17 +224,45 @@ export default class Table {
       table = table.renameColumn(oldColName, newColumn.name);
     }
 
-    if (table.isUsedInForeignKey(oldColName)) {
+    const fks = this.getForeignKeysUsing(oldColName);
+    if (fks.length > 0) {
       // If the type changes, some MySQL servers might throw
       // a ER_FK_COLUMN_CANNOT_CHANGE error.  Therefore, throw a warning.
       const oldType = oldColumn.getDefinition();
       const newType = newColumn.getDefinition();
       if (oldType !== newType) {
-        console.warn(
-          `Warning! Changing the type of "${
-            table.name
-          }.${oldColName}" (from "${oldType}" to "${newType}") might cause a ER_FK_COLUMN_CANNOT_CHANGE error, depending on MySQL is configured.`,
-        );
+        /* eslint-disable no-console */
+        console.warn('');
+        console.warn(`WARNING: Column type change detected on column "${table.name}.${oldColName}" used in FK:`);
+        for (const fk of fks) {
+          console.warn(`    ${fk.name}`);
+        }
+        console.warn('');
+        console.warn(`The attempted type change:`);
+        console.warn(`    -${oldType}`);
+        console.warn(`    +${newType}`);
+        console.warn('');
+        console.warn(`This might cause a ER_FK_COLUMN_CANNOT_CHANGE error, depending on how MySQL is configured.`);
+        console.warn('');
+        console.warn(`Consider wrapping the column type change in:`);
+        console.warn('');
+        console.warn(`    LOCK TABLES ${escape(table.name)} WRITE;`);
+        for (const fk of fks) {
+          console.warn(`    ALTER TABLE ${escape(table.name)} DROP FOREIGN KEY ${escape(fk.name)};`);
+        }
+        console.warn('    ...');
+        for (const fk of fks) {
+          console.warn(
+            `    ALTER TABLE ${escape(table.name)} ADD CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
+              .map(name => escape(name))
+              .join(', ')}) REFERENCES ${escape(fk.reference.table)} (${fk.reference.columns
+              .map(name => escape(name))
+              .join(', ')});`,
+          );
+        }
+        console.warn(`    UNLOCK TABLES;`);
+        console.warn('');
+        /* eslint-enable no-console */
       }
     }
 
