@@ -43,7 +43,7 @@
     "@simple-contacts/sc-scripts": "^0.4.13",
     "eslint-plugin-flowtype": "^2.49.3",
     "flow-bin": "^0.75.0",
-    "flow-copy-source": "^2.0.0",
+    "flow-copy-source": "^2.0.1",
     "flow-typed": "^2.4.0",
     "import-sort-cli": "^5.0.0",
     "import-sort-parser-babylon": "^5.0.0",
