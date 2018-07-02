@@ -56,7 +56,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "commander": "^2.15.1",
+    "commander": "^2.16.0",
     "lodash": "^4.17.10"
   }
 }
