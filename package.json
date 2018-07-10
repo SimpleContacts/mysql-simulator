@@ -41,7 +41,7 @@
     "@simple-contacts/babel-preset-sc": "^1.0.3",
     "@simple-contacts/eslint-config": "^0.1.9",
     "@simple-contacts/sc-scripts": "^0.4.13",
-    "eslint-plugin-flowtype": "^2.49.3",
+    "eslint-plugin-flowtype": "^2.50.0",
     "flow-bin": "^0.75.0",
     "flow-copy-source": "^2.0.1",
     "flow-typed": "^2.5.1",
