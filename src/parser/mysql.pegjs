@@ -606,7 +606,7 @@ DataType
   / BoolDataType
   / DateDataType
   / PrecisionDataType
-  / type:TextDataType ignore:(COLLATE CollationName)? { return type }
+  / type:TextDataType ignore1:(CHARACTER SET CharsetName)? ignore2:(COLLATE CollationName)? { return type }
   / JSON
   / ENUM LPAREN values:StringList RPAREN {
       return `ENUM(${values.join(',')})`;
