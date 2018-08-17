@@ -42,7 +42,7 @@
     "@simple-contacts/eslint-config": "^0.1.9",
     "@simple-contacts/sc-scripts": "^0.4.13",
     "eslint-plugin-flowtype": "^2.50.0",
-    "flow-bin": "^0.75.0",
+    "flow-bin": "^0.79.0",
     "flow-copy-source": "^2.0.2",
     "flow-typed": "^2.5.1",
     "import-sort-cli": "^5.2.0",
