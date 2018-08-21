@@ -40,7 +40,7 @@
   "devDependencies": {
     "@simple-contacts/babel-preset-sc": "^1.0.3",
     "@simple-contacts/eslint-config": "^0.1.9",
-    "@simple-contacts/sc-scripts": "^0.4.13",
+    "@simple-contacts/sc-scripts": "^0.5.1",
     "eslint-plugin-flowtype": "^2.50.0",
     "flow-bin": "^0.75.0",
     "flow-copy-source": "^2.0.2",
