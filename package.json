@@ -41,8 +41,8 @@
     "@simple-contacts/babel-preset-sc": "^1.0.3",
     "@simple-contacts/eslint-config": "^0.1.9",
     "@simple-contacts/sc-scripts": "^0.4.13",
-    "eslint-plugin-flowtype": "^2.50.3",
-    "flow-bin": "^0.82.0",
+    "eslint-plugin-flowtype": "^3.0.0",
+    "flow-bin": "^0.83.0",
     "flow-copy-source": "^2.0.2",
     "flow-typed": "^2.5.1",
     "import-sort-cli": "^5.2.0",
@@ -51,12 +51,12 @@
     "import-sort-style-module": "^5.0.0",
     "in-publish": "^2.0.0",
     "jest-cli": "^23.6.0",
-    "onchange": "^4.1.0",
+    "onchange": "^5.0.2",
     "pegjs": "^0.10.0",
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "commander": "^2.18.0",
+    "commander": "^2.19.0",
     "lodash": "^4.17.11"
   }
 }
