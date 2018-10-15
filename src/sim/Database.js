@@ -93,8 +93,29 @@ export default class Database {
    * Returns a new DB with the Table removed.
    */
   removeTable(name: string, ifExists: boolean = false): Database {
-    if (!ifExists) {
-      this.getTable(name); // Will fail if table does not exist
+    let maybeTable;
+    try {
+      maybeTable = this.getTable(name);
+    } catch (e) {
+      if (ifExists) {
+        maybeTable = null;
+      } else {
+        throw e;
+      }
+    }
+
+    if (maybeTable) {
+      // Double-check that this table isn't pointed to by any FK in another
+      // table
+      const table = maybeTable;
+      const otherTables = this.getTables().filter(t => t.name !== table.name);
+      for (const other of otherTables) {
+        for (const fk of other.getForeignKeys()) {
+          if (fk.reference.table === table.name) {
+            throw new Error(`Cannot drop table. Still used by FK ${fk.name}`);
+          }
+        }
+      }
     }
 
     const newTables = { ...this._tables };
