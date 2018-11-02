@@ -1,10 +1,10 @@
 // @flow
-/* eslint-disable no-underscore-dangle */
 
 import { sortBy, zip } from 'lodash';
 
 import Column from './Column';
 import type { IndexType } from './Index';
+// eslint-disable-next-line import/no-cycle
 import Table from './Table';
 
 type LUT<+T> = { +[string]: T };

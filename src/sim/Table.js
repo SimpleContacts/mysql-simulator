@@ -3,6 +3,7 @@
 import { maxBy, sortBy } from 'lodash';
 
 import Column from './Column';
+// eslint-disable-next-line import/no-cycle
 import Database from './Database';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
@@ -455,7 +456,6 @@ export default class Table {
     const existingIndexNames = new Set(this.indexes.map(i => i.name));
     let counter = 1;
     while (existingIndexNames.has(indexName)) {
-      // eslint-disable-next-line no-plusplus
       indexName = `${idealName}_${++counter}`;
     }
 

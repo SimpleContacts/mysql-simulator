@@ -120,7 +120,6 @@ export function dumpDb(db: Database, tables: Array<string> = []): string {
 function applySqlStatements(db: Database, statements: Array<*>): Database {
   for (const stm of statements) {
     if (stm === null) {
-      // eslint-disable-next-line no-continue
       continue;
     }
 
@@ -286,7 +285,6 @@ function ensureConsecutive(numbers: Array<number>): void {
   const expectedCount = max - min + 1;
   if (numbers.length !== expectedCount) {
     const missing = [];
-    // eslint-disable-next-line no-plusplus
     for (let i = min; i <= max; ++i) {
       if (!numbers.includes(i)) {
         missing.push(i);
