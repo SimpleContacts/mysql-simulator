@@ -51,7 +51,7 @@
     "import-sort-style-module": "^5.0.0",
     "in-publish": "^2.0.0",
     "jest-cli": "^23.6.0",
-    "onchange": "^5.0.2",
+    "onchange": "^5.1.0",
     "pegjs": "^0.10.0",
     "rimraf": "^2.6.2"
   },
