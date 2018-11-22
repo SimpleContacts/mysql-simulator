@@ -4729,10 +4729,10 @@ once@^1.3.0, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-onchange@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/onchange/-/onchange-5.1.0.tgz#b169503f974ce4fc92e8f1eb17d5af79d16b7a07"
-  integrity sha512-6yGckiTlwkxPgq6YW/lSUgJEnQbuED+BW3K/fq4h/H2DjWYKoLkrvsHnkyL93FC8rYNd1TF3puLX82HylxRvQA==
+onchange@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/onchange/-/onchange-5.1.1.tgz#c480e9854f8f9205a742d82d7f910d58c97c9a05"
+  integrity sha512-7Od3xrXS+ciR7aW98eRNY0i5ec9KYkhoSKBDyIQNM8oAJeMTbFjogWHNHTkaSHwaIgiW+1JcUa21ZblneiCU4A==
   dependencies:
     "@blakeembrey/deque" "^1.0.3"
     arrify "^1.0.1"
