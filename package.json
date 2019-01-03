@@ -53,7 +53,7 @@
     "jest-cli": "^23.6.0",
     "onchange": "^5.2.0",
     "pegjs": "^0.10.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.3"
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
