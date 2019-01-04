@@ -1,7 +1,8 @@
-// @flow
+// @flow strict
 
 // $FlowFixMe - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
+import type { ColumnDefinition, CreateTableStatement, Statement } from './ast';
 
 const indent = (text: string): string =>
   text
@@ -47,8 +48,7 @@ const printErr = (filename, input, e: Error) => {
  * with much better error reporting, showing source line position where it
  * failed.
  */
-// $FlowFixMe - avoid using `*`
-export default function parse(inputSql: string, filename: string = ''): Array<*> {
+export default function parse(inputSql: string, filename: string = ''): Array<Statement> {
   try {
     return rawParseSql(inputSql);
   } catch (e) {
@@ -56,3 +56,5 @@ export default function parse(inputSql: string, filename: string = ''): Array<*>
     throw e;
   }
 }
+
+export type { ColumnDefinition, CreateTableStatement, Statement };
