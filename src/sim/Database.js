@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import { sortBy, zip } from 'lodash';
 
@@ -78,8 +78,9 @@ export default class Database {
   renameTable(from: string, to: string): Database {
     this.assertTableDoesNotExist(to);
 
-    return this.mapTables(table => {
+    return this.mapTables(table_ => {
       // Rename the table itself
+      let table = table_;
       if (table.name === from) {
         table = table.rename(to);
       }

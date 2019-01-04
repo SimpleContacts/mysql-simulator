@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import { maxBy, sortBy } from 'lodash';
 
@@ -381,8 +381,8 @@ export default class Table {
    * Adds a foreign key to a table
    */
   addForeignKey(
-    constraintName: string | null,
-    indexName: string | null,
+    constraintName_: string | null,
+    indexName_: string | null,
     localColumns: Array<string>,
     targetTblName: string,
     targetColumns: Array<string>,
@@ -393,7 +393,7 @@ export default class Table {
     // TODO: Register this foreign key name globally
 
     let table = this;
-    indexName = indexName || constraintName;
+    const indexName = indexName_ || constraintName_;
 
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
@@ -416,7 +416,7 @@ export default class Table {
       }
     }
 
-    constraintName = constraintName || this.generateForeignKeyName();
+    const constraintName = constraintName_ || this.generateForeignKeyName();
     const fk = new ForeignKey(constraintName, localColumns, {
       table: targetTblName,
       columns: targetColumns,
@@ -465,15 +465,15 @@ export default class Table {
   /**
    * Returns a new Table with the requested Index added.
    */
-  addIndex(indexName: string | null, type: IndexType, columns: Array<string>, $$locked: boolean): Table {
+  addIndex(indexName_: string | null, type: IndexType, columns: Array<string>, $$locked: boolean): Table {
     // Make sure to check if all the columns exist
     columns.map(colName => this.getColumn(colName));
 
     // If indexName is null, auto-generate it
-    if (!indexName) {
-      // Try to name it after the first column in the columns list...
-      indexName = this.generateIndexName(columns[0]);
-    }
+    const indexName = !indexName_
+      ? // Try to name it after the first column in the columns list...
+        this.generateIndexName(columns[0])
+      : indexName_;
 
     // If an index already exists for this column combination, reuse it (don't
     // create a new one).  An index will also be reused if the new index

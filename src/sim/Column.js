@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';

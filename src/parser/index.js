@@ -1,8 +1,42 @@
 // @flow strict
 
+import type {
+  AlterAddColumn,
+  AlterAddForeignKey,
+  AlterAddFullTextIndex,
+  AlterAddIndex,
+  AlterAddPrimaryKey,
+  AlterAddUniqueIndex,
+  AlterChangeColumn,
+  AlterDropColumn,
+  AlterDropDefault,
+  AlterDropForeignKey,
+  AlterDropIndex,
+  AlterRenameIndex,
+  AlterRenameTable,
+  AlterSpec,
+  AlterTableStatement,
+  ColumnDefinition,
+  ConstantExpr,
+  CreateIndexStatement,
+  CreateTableDefinition,
+  CreateTableLikeStatement,
+  CreateTableStatement,
+  CreateTriggerStatement,
+  DropIndexStatement,
+  DropTableStatement,
+  Identifier,
+  IndexColName,
+  IndexType,
+  NamedConstraint,
+  ReferenceDefinition,
+  ReferenceOption,
+  RenameTableStatement,
+  Statement,
+  TableOptions,
+} from './ast';
 // $FlowFixMe - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
-import type { ColumnDefinition, CreateTableStatement, Statement } from './ast';
 
 const indent = (text: string): string =>
   text
@@ -57,4 +91,38 @@ export default function parse(inputSql: string, filename: string = ''): Array<St
   }
 }
 
-export type { ColumnDefinition, CreateTableStatement, Statement };
+export type {
+  AlterAddColumn,
+  AlterAddForeignKey,
+  AlterAddFullTextIndex,
+  AlterAddIndex,
+  AlterAddPrimaryKey,
+  AlterAddUniqueIndex,
+  AlterChangeColumn,
+  AlterDropColumn,
+  AlterDropDefault,
+  AlterDropForeignKey,
+  AlterDropIndex,
+  AlterRenameIndex,
+  AlterRenameTable,
+  AlterSpec,
+  AlterTableStatement,
+  ColumnDefinition,
+  ConstantExpr,
+  CreateIndexStatement,
+  CreateTableDefinition,
+  CreateTableLikeStatement,
+  CreateTableStatement,
+  CreateTriggerStatement,
+  DropIndexStatement,
+  DropTableStatement,
+  Identifier,
+  IndexColName,
+  IndexType,
+  NamedConstraint,
+  ReferenceDefinition,
+  ReferenceOption,
+  RenameTableStatement,
+  Statement,
+  TableOptions,
+};

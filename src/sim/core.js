@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import fs from 'fs';
 import path from 'path';
@@ -6,13 +6,14 @@ import path from 'path';
 import { maxBy, minBy, sortBy } from 'lodash';
 
 import parseSql from '../parser';
+import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
 
 // eslint-disable-next-line no-console
 const error = console.error;
 
-function makeColumn(colName, def): Column {
+function makeColumn(colName, def: ColumnDefinition): Column {
   const type = def.dataType.toLowerCase();
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
@@ -44,12 +45,12 @@ function makeColumn(colName, def): Column {
   return new Column(colName, def.dataType, nullable, defaultValue, onUpdate, def.autoIncrement, def.comment);
 }
 
-function handleCreateTable(db: Database, stm): Database {
+function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  db = db.createTable(tblName);
+  let db = db_.createTable(tblName);
 
   // One-by-one, add the columns to the table
-  const columns = stm.definitions.filter(def => def.type === 'COLUMN');
+  const columns = stm.definitions.map(def => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
     db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
   }
@@ -59,7 +60,9 @@ function handleCreateTable(db: Database, stm): Database {
 
   const pks = [
     // (1) Explicit PRIMARY KEY definitions
-    ...stm.definitions.filter(def => def.type === 'PRIMARY KEY').map(def => def.indexColNames.map(def => def.colName)),
+    ...stm.definitions
+      .map(def => (def.type === 'PRIMARY KEY' ? def.indexColNames.map(def => def.colName) : null))
+      .filter(Boolean),
 
     // (2) Primary key can also be defined on a column declaratively
     ...columns.filter(c => c.definition.isPrimary).map(c => [c.colName]),
@@ -76,13 +79,17 @@ function handleCreateTable(db: Database, stm): Database {
 
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
   // a column directly (2).
-  const indexes = stm.definitions.filter(
-    def =>
-      def.type === 'FOREIGN KEY' ||
-      def.type === 'FULLTEXT INDEX' ||
-      def.type === 'UNIQUE INDEX' ||
-      def.type === 'INDEX',
-  );
+  const indexes = stm.definitions
+    .map(
+      def =>
+        def.type === 'FOREIGN KEY' ||
+        def.type === 'FULLTEXT INDEX' ||
+        def.type === 'UNIQUE INDEX' ||
+        def.type === 'INDEX'
+          ? def
+          : null,
+    )
+    .filter(Boolean);
   for (const index of indexes) {
     if (index.type === 'FOREIGN KEY') {
       db = db.addForeignKey(
@@ -96,15 +103,15 @@ function handleCreateTable(db: Database, stm): Database {
     } else {
       const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
       const $$locked = true;
-      db = db.addIndex(tblName, index.indexName, type, index.indexColNames.map(def => def.colName), $$locked);
+      db = db.addIndex(tblName, index.indexName || null, type, index.indexColNames.map(def => def.colName), $$locked);
     }
   }
 
   return db;
 }
 
-function* iterDumpDb(db: Database, tables: Array<string> = []): Iterable<string> {
-  tables = tables.length > 0 ? tables : db.getTables().map(t => t.name);
+function* iterDumpDb(db: Database, tables_: Array<string> = []): Iterable<string> {
+  const tables = tables_.length > 0 ? tables_ : db.getTables().map(t => t.name);
   for (const tableName of tables) {
     yield '';
     yield db.getTable(tableName).toString();
@@ -116,8 +123,9 @@ export function dumpDb(db: Database, tables: Array<string> = []): string {
   return [...iterDumpDb(db, tables)].join('\n');
 }
 
-// $FlowFixMe - avoid using `*`
-function applySqlStatements(db: Database, statements: Array<*>): Database {
+function applySqlStatements(db_: Database, statements: Array<Statement>): Database {
+  let db = db_; // So we can keep re-assigning this variable
+
   for (const stm of statements) {
     if (stm === null) {
       continue;
@@ -173,10 +181,10 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
             true, // UNIQUE indexes are always explicit
           );
         } else if (change.type === 'ADD FULLTEXT INDEX') {
-          const $$locked = !!change.constraint;
+          const $$locked = false;
           db = db.addIndex(
             stm.tblName,
-            change.constraint || change.indexName,
+            change.indexName,
             'FULLTEXT',
             change.indexColNames.map(def => def.colName),
             $$locked,
@@ -233,8 +241,7 @@ function applySqlStatements(db: Database, statements: Array<*>): Database {
  * Does not modify the original input DB state.
  */
 export function applySql(db: Database, sql: string, srcFile: string): Database {
-  // $FlowFixMe - avoid using `*`
-  const ast: Array<*> = parseSql(sql, srcFile);
+  const ast: Array<Statement> = parseSql(sql, srcFile);
   return applySqlStatements(db, ast);
 }
 
@@ -314,7 +321,8 @@ export function* expandInputFiles(paths: Array<string>): Iterable<string> {
  * a naturally-sorted list of *.sql files.  Does not modify the original input
  * DB state.
  */
-export function applySqlFiles(db: Database, ...paths: Array<string>): Database {
+export function applySqlFiles(db_: Database, ...paths: Array<string>): Database {
+  let db = db_; // So we can keep re-assigning this variable
   for (const path of expandInputFiles(paths)) {
     db = applySqlFile(db, path);
   }
