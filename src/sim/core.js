@@ -280,8 +280,8 @@ function ensureConsecutive(numbers: Array<number>): void {
     );
   }
 
-  const min = minBy(numbers);
-  const max = maxBy(numbers);
+  const min = minBy(numbers) || 0;
+  const max = maxBy(numbers) || 0;
   const expectedCount = max - min + 1;
   if (numbers.length !== expectedCount) {
     const missing = [];
