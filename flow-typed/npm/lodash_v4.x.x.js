@@ -1,5 +1,5 @@
-// flow-typed signature: cdafc513ba81412d8ae5e68b73f8e091
-// flow-typed version: 0c27d3bc32/lodash_v4.x.x/flow_>=v0.63.x
+// flow-typed signature: 485dd3660399d57af4b492ae38a40556
+// flow-typed version: c52db29730/lodash_v4.x.x/flow_>=v0.63.x
 
 declare module "lodash" {
   declare type __CurriedFunction1<A, R, AA: A> = (...r: [AA]) => R;
@@ -438,9 +438,9 @@ declare module "lodash" {
       a4: $ReadOnlyArray<T>,
       comparator?: Comparator<T>
     ): Array<T>;
-    uniq<T>(array?: ?Array<T>): Array<T>;
-    uniqBy<T>(array?: ?Array<T>, iteratee?: ?ValueOnlyIteratee<T>): Array<T>;
-    uniqWith<T>(array?: ?Array<T>, comparator?: ?Comparator<T>): Array<T>;
+    uniq<T>(array?: ?$ReadOnlyArray<T>): Array<T>;
+    uniqBy<T>(array?: ?$ReadOnlyArray<T>, iteratee?: ?ValueOnlyIteratee<T>): Array<T>;
+    uniqWith<T>(array?: ?$ReadOnlyArray<T>, comparator?: ?Comparator<T>): Array<T>;
     unzip<T>(array?: ?Array<T>): Array<T>;
     unzipWith<T>(array: ?Array<T>, iteratee?: ?Iteratee<T>): Array<T>;
     without<T>(array?: ?$ReadOnlyArray<T>, ...values?: Array<?T>): Array<T>;
@@ -680,7 +680,7 @@ declare module "lodash" {
       orders?: $ReadOnlyArray<"asc" | "desc"> | string
     ): Array<V>;
     partition<T>(
-      array?: ?Array<T>,
+      array?: ?$ReadOnlyArray<T>,
       predicate?: ?Predicate<T>
     ): [Array<T>, Array<T>];
     partition<V, A, T: { [id: any]: A }>(
@@ -948,7 +948,7 @@ declare module "lodash" {
     round(number: number, precision?: number): number;
     subtract(minuend: number, subtrahend: number): number;
     sum(array: Array<*>): number;
-    sumBy<T>(array: Array<T>, iteratee?: Iteratee<T>): number;
+    sumBy<T>(array: $ReadOnlyArray<T>, iteratee?: Iteratee<T>): number;
 
     // number
     clamp(number?: number, lower?: ?number, upper?: ?number): number;
