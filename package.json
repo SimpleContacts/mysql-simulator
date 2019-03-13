@@ -50,7 +50,7 @@
     "import-sort-style-eslint": "^6.0.0",
     "import-sort-style-module": "^6.0.0",
     "in-publish": "^2.0.0",
-    "jest-cli": "^24.4.0",
+    "jest-cli": "^24.5.0",
     "onchange": "^5.2.0",
     "pegjs": "^0.10.0",
     "rimraf": "^2.6.3"
