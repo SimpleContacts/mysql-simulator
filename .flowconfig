@@ -1,5 +1,5 @@
 [version]
-0.92.1
+0.95.1
 
 [libs]
 flow-typed/
@@ -12,6 +12,7 @@ flow-typed/
 
 [lints]
 all=error
+dynamic-export=off
 sketchy-null-bool=off
 sketchy-null-mixed=off
 sketchy-null-number=off
