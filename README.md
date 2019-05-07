@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/SimpleContacts/mysql-simulator.svg?token=aq9GGFeH6P9dKDFz65um&branch=master)](https://travis-ci.com/SimpleContacts/mysql-simulator)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=SimpleContacts/mysql-simulator&identifier=114779554)](https://dependabot.com)
 
 # Usage
 
