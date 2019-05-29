@@ -1,6 +1,6 @@
 {
   "name": "@simple-contacts/mysql-simulator",
-  "version": "1.2.20",
+  "version": "1.2.21",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
@@ -23,7 +23,7 @@
     "test": "./test.sh && yarn run -s check && yarn run -s flow && jest src",
     "flow": "flow --include-warnings",
     "prepublish": "in-publish && yarn run actually-prepublish || not-in-publish",
-    "actually-prepublish": "yarn run build && yarn run test && yarn run build"
+    "actually-prepublish": "yarn run build && yarn run build"
   },
   "homepage": "https://github.com/SimpleContacts/mysql-simulator",
   "repository": {
