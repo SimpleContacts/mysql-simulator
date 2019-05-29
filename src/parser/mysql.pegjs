@@ -655,6 +655,7 @@ EngineName
 
 CharsetName
   = _ 'utf8'i !IdentifierStart _ { return 'utf8' }
+  / _ 'latin1'i !IdentifierStart _ { return 'latin1' }
 
 CollationName
   = _ 'utf8_general_ci'i !IdentifierStart _ { return 'utf8_general_ci' }
