@@ -281,8 +281,8 @@ AlterTable
   }
 
 AlterSpecs
-  = first:AlterSpec COMMA rest:AlterSpecs { return [first, ...rest] }
-  / only:AlterSpec { return [only] }
+  = first:AlterSpec COMMA rest:AlterSpecs { return [first, ...rest].filter(Boolean) }
+  / only:AlterSpec { return [only].filter(Boolean) }
 
 /**
  * See https://dev.mysql.com/doc/refman/5.7/en/alter-table.html
@@ -414,6 +414,7 @@ AlterSpec
         newTblName,
       }
     }
+  / LOCK EQ? ( DEFAULT / NONE / SHARED / EXCLUSIVE ) { return null; }
 
 NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol }
 
@@ -751,6 +752,7 @@ ELSEIF            = _ 'ELSEIF'i            !IdentifierChar _ { return 'ELSEIF' }
 END               = _ 'END'i               !IdentifierChar _ { return 'END' }
 ENGINE            = _ 'ENGINE'i            !IdentifierChar _ { return 'ENGINE' }
 ENUM              = _ 'ENUM'i              !IdentifierChar _ { return 'ENUM' }
+EXCLUSIVE         = _ 'EXCLUSIVE'i         !IdentifierChar _ { return 'EXCLUSIVE' }
 EXISTS            = _ 'EXISTS'i            !IdentifierChar _ { return 'EXISTS' }
 FALSE             = _ 'FALSE'i             !IdentifierChar _ { return 'FALSE' }
 FIRST             = _ 'FIRST'i             !IdentifierChar _ { return 'FIRST' }
@@ -776,6 +778,7 @@ MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierChar _ { return 'MEDIUMINT
 MODIFY            = _ 'MODIFY'i            !IdentifierChar _ { return 'MODIFY' }
 NEW               = _ 'NEW'i               !IdentifierChar _ { return 'NEW' }
 NO                = _ 'NO'i                !IdentifierChar _ { return 'NO' }
+NONE              = _ 'NONE'i              !IdentifierChar _ { return 'NONE' }
 NOT               = _ 'NOT'i               !IdentifierChar _ { return 'NOT' }
 NOW               = _ 'NOW'i               !IdentifierChar _ { return 'NOW' }
 NULL              = _ 'NULL'i              !IdentifierChar _ { return 'NULL' }
@@ -794,6 +797,7 @@ RETURNS           = _ 'RETURNS'i           !IdentifierChar _ { return 'RETURNS' 
 ROW               = _ 'ROW'i               !IdentifierChar _ { return 'ROW' }
 SELECT            = _ 'SELECT'i            !IdentifierChar _ { return 'SELECT' }
 SET               = _ 'SET'i               !IdentifierChar _ { return 'SET' }
+SHARED            = _ 'SHARED'i            !IdentifierChar _ { return 'SHARED' }
 SIMPLE            = _ 'SIMPLE'i            !IdentifierChar _ { return 'SIMPLE' }
 SMALLINT          = _ 'SMALLINT'i          !IdentifierChar _ { return 'SMALLINT' }
 TABLE             = _ 'TABLE'i             !IdentifierChar _ { return 'TABLE' }
