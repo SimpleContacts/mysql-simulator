@@ -57,7 +57,7 @@
     "rimraf": "^2.6.3"
   },
   "dependencies": {
-    "@babel/runtime": "^7.4.5",
+    "@babel/runtime": "^7.5.0",
     "commander": "^2.20.0",
     "lodash": "^4.17.11"
   }
