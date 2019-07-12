@@ -1146,10 +1146,10 @@
     babel-plugin-root-import "^6.1.0"
     yarn.lock "0.0.1-security"
 
-"@simple-contacts/eslint-config@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@simple-contacts/eslint-config/-/eslint-config-2.2.0.tgz#d5021192591e1570ca2f16422b4341c3b19865ba"
-  integrity sha512-aTFEdn7mMdDrtgmGZ40rI8bWsWwooUXWaG0Iu3fhbEUKGd8i/nGfTyWrzNntS5DlQZTOGwxF+SL3KafqwLzUfw==
+"@simple-contacts/eslint-config@^2.3.2":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@simple-contacts/eslint-config/-/eslint-config-2.3.2.tgz#f1de085bdcb92b957ef7cfee8ed044704636cd9a"
+  integrity sha512-nQrEAE069NTw+huKvLjd3smf5z05TeJaDL2fF+Viyyme+Kavy8FvyyDxlMRr1qnTnnNETM1A6xXhjavCfwHmtw==
   dependencies:
     babel-eslint "^10.0.1"
     eslint-config-prettier "^4.1.0"
