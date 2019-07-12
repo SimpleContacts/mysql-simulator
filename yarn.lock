@@ -1132,10 +1132,10 @@
     universal-user-agent "^2.0.0"
     url-template "^2.0.8"
 
-"@simple-contacts/babel-preset-sc@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@simple-contacts/babel-preset-sc/-/babel-preset-sc-2.2.0.tgz#35e8b4f9c2b4d9245e83fa7203dbc1dfc19a9d7d"
-  integrity sha512-Txfldyhj2Kjf0wxDp4WdZpwDyq7j5icHDB5aLQj8toNZlWh4Mw/Gz0cQci20ap1nMpLmLJ9xVOAfgsLDvxRE9A==
+"@simple-contacts/babel-preset-sc@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@simple-contacts/babel-preset-sc/-/babel-preset-sc-2.3.1.tgz#48613055b9e7515d6861b7676d6d4bd4f73602c5"
+  integrity sha512-hCc3z1zXTn55WwALCNUQ1hjoSpWmMD/FmPkdMFX+9/fIRakiOfEtfrjchn34yHGLmThBiQcy65hncK/m+g8IwQ==
   dependencies:
     "@babel/core" "^7.2.x"
     "@babel/plugin-proposal-class-properties" "^7.2.x"
