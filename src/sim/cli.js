@@ -28,7 +28,7 @@ function printDb(db: Database, tables: Array<string> = []) {
 function runWithOptions(options: Options) {
   let db: Database = new Database();
 
-  let files = [...expandInputFiles(options.args)];
+  let files = Array.from(expandInputFiles(options.args));
   if (options.limit) {
     files = files.slice(0, options.limit);
   }

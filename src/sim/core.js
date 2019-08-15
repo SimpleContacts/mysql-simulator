@@ -120,7 +120,7 @@ function* iterDumpDb(db: Database, tables_: Array<string> = []): Iterable<string
 }
 
 export function dumpDb(db: Database, tables: Array<string> = []): string {
-  return [...iterDumpDb(db, tables)].join('\n');
+  return Array.from(iterDumpDb(db, tables)).join('\n');
 }
 
 function applySqlStatements(db_: Database, statements: Array<Statement>): Database {

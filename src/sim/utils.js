@@ -14,7 +14,7 @@ function* iterInsert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Iterable<
 }
 
 export function insert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Array<T> {
-  return [...iterInsert(arr, pos, item)];
+  return Array.from(iterInsert(arr, pos, item));
 }
 
 /**
