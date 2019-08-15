@@ -80,14 +80,10 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
   // a column directly (2).
   const indexes = stm.definitions
-    .map(
-      def =>
-        def.type === 'FOREIGN KEY' ||
-        def.type === 'FULLTEXT INDEX' ||
-        def.type === 'UNIQUE INDEX' ||
-        def.type === 'INDEX'
-          ? def
-          : null,
+    .map(def =>
+      def.type === 'FOREIGN KEY' || def.type === 'FULLTEXT INDEX' || def.type === 'UNIQUE INDEX' || def.type === 'INDEX'
+        ? def
+        : null,
     )
     .filter(Boolean);
   for (const index of indexes) {

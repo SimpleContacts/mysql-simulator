@@ -367,11 +367,13 @@ export default class Table {
    */
   generateForeignKeyName() {
     const prefix = `${this.name}_ibfk_`;
-    const autoFKs = this.foreignKeys.filter(fk => fk.name.startsWith(prefix)).map(fk => {
-      const parts = fk.name.split('_');
-      const num = parts[parts.length - 1];
-      return parseInt(num, 10);
-    });
+    const autoFKs = this.foreignKeys
+      .filter(fk => fk.name.startsWith(prefix))
+      .map(fk => {
+        const parts = fk.name.split('_');
+        const num = parts[parts.length - 1];
+        return parseInt(num, 10);
+      });
 
     const max = autoFKs.length > 0 ? maxBy(autoFKs) : 0;
     return `${prefix}${max + 1}`;
