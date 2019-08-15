@@ -12,7 +12,7 @@ language: node_js
 node_js: '8'
 cache: yarn
 before_install:
-  - sudo mysql_upgrade
+  # - sudo mysql_upgrade
   - sudo service mysql restart
 
 script:
