@@ -1,0 +1,39 @@
+name: test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+
+    steps:
+      - name: Set up MySQL client
+        run: |
+          # This just happens to be the default user/passwd for the MySQL
+          # service, apparently ¯\_(ツ)_/¯
+          # By writing these credentials to the ~/.my.cnf, we make it easy to
+          # just run the command line utilities like `mysql`, `mysqldump`, etc.
+          # without having to specify command line arguments.
+          echo "[client]" > ~/.my.cnf
+          echo "user=root" >> ~/.my.cnf
+          echo "password=root" >> ~/.my.cnf
+
+      - name: Checkout source code
+        uses: actions/checkout@v1
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build dist
+        run: yarn build
+
+      - name: Run tests
+        run: yarn test
