@@ -1,5 +1,4 @@
 [![Build Status](https://github.com/SimpleContacts/mysql-simulator/workflows/test/badge.svg)](https://github.com/SimpleContacts/mysql-simulator/actions)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=SimpleContacts/mysql-simulator&identifier=114779554)](https://dependabot.com)
 
 # Usage
 
