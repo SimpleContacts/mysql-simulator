@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.6.2",
-    "commander": "^3.0.1",
+    "commander": "^3.0.2",
     "lodash": "^4.17.15"
   }
 }
