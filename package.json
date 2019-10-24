@@ -45,7 +45,7 @@
     "eslint-plugin-flowtype": "^4.3.0",
     "flow-bin": "^0.110.0",
     "flow-copy-source": "^2.0.8",
-    "flow-typed": "^2.6.1",
+    "flow-typed": "^2.6.2",
     "import-sort-cli": "^6.0.0",
     "import-sort-parser-babylon": "^6.0.0",
     "import-sort-style-eslint": "^6.0.0",
