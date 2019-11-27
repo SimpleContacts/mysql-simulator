@@ -1,9 +1,3 @@
-{
-  function escape(s) {
-    return "'" + s.replace("'", "''") + "'"
-  }
-}
-
 start = StatementList
 
 StatementList

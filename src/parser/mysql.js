@@ -14722,12 +14722,6 @@ function peg$parse(input, options) {
     return s0;
   }
 
-
-    function escape(s) {
-      return "'" + s.replace("'", "''") + "'"
-    }
-
-
   peg$result = peg$startRuleFunction();
 
   if (peg$result !== peg$FAILED && peg$currPos === input.length) {
