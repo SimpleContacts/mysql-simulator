@@ -42,7 +42,16 @@ function makeColumn(colName, def: ColumnDefinition): Column {
     }
   }
 
-  return new Column(colName, def.dataType, nullable, defaultValue, onUpdate, def.autoIncrement, def.comment);
+  return new Column(
+    colName,
+    def.dataType,
+    nullable,
+    defaultValue,
+    onUpdate,
+    def.autoIncrement,
+    def.comment,
+    def.generated,
+  );
 }
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {

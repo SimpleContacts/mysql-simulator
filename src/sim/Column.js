@@ -4,6 +4,8 @@ import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
 import { escape } from './utils';
 
+type Generated = {| mode: 'STORED' | 'VIRTUAL' |};
+
 export default class Column {
   +name: string;
   +type: string;
@@ -12,6 +14,7 @@ export default class Column {
   +onUpdate: null | string;
   +autoIncrement: boolean;
   +comment: null | string;
+  +generated: null | Generated;
 
   constructor(
     name: string,
@@ -21,6 +24,7 @@ export default class Column {
     onUpdate: null | string,
     autoIncrement: boolean,
     comment: null | string,
+    generated: null | Generated,
   ) {
     this.name = name;
     this.type = type;
@@ -29,6 +33,7 @@ export default class Column {
     this.onUpdate = onUpdate;
     this.autoIncrement = autoIncrement;
     this.comment = comment;
+    this.generated = generated;
   }
 
   /**
@@ -43,6 +48,7 @@ export default class Column {
     +onUpdate?: null | string,
     +autoIncrement?: boolean,
     +comment?: null | string,
+    +generated?: null | Generated,
   |}): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
@@ -52,6 +58,7 @@ export default class Column {
       record.onUpdate !== undefined ? record.onUpdate : this.onUpdate,
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
+      record.generated !== undefined ? record.generated : this.generated,
     );
   }
 
@@ -115,6 +122,7 @@ export default class Column {
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
+      this.generated !== null ? `GENERATED ALWAYS AS (...) ${this.generated.mode}` : '',
     ]
       .filter(x => x)
       .join(' ');
