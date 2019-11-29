@@ -61,12 +61,12 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = Expression$ ( ( PLUS / MINUS ) Expression )?
+  = op1:Expression$ op2:( ( PLUS / MINUS ) Expression )? { return op2 !== null ? [op1, op2] : op1 }
 
 Expression$
   = MemberExpression
   / CallExpression
-  / Identifier { return null }
+  / id:Identifier { return { 'type': 'Identifier', id } }
   / Constant
 
 CallExpression
@@ -846,6 +846,6 @@ LT         = _ '<' _
 LTE        = _ '<=' _
 MINUS      = _ '-' _
 NE         = _ '<=>' _
-PLUS       = _ '+' _
+PLUS       = _ '+' _ { return '+' }
 RPAREN     = _ ')' _
 SEMICOLON  = _ ';' _
