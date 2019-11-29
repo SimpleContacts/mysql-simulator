@@ -508,6 +508,9 @@ CreateDefinition
     }
   // / CHECK (expr)
 
+
+  // ALTER .... ... ....  COMMENT '123';
+
 ColumnDefinition
   = dataType:DataType
     nullableClause:( NULL / NOT_NULL )?
@@ -516,9 +519,10 @@ ColumnDefinition
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
     isPrimary2:( PRIMARY KEY )?
-    comment:( COMMENT value:StringLiteral { return value } )?
+    comment:( COMMENT value: StringLiteral { return value } )?
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
+    generated:( GENERATED ALWAYS AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL ) { return { expr, mode } } )?
     {
       let nullable = null;
       if (nullableClause === 'NULL') {
@@ -536,6 +540,7 @@ ColumnDefinition
         autoIncrement: !!autoIncrement,
         comment,
         reference,
+        generated,
       }
     }
 
