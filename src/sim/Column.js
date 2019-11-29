@@ -4,7 +4,10 @@ import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
 import { escape } from './utils';
 
-type Generated = {| mode: 'STORED' | 'VIRTUAL' |};
+type Generated = {|
+  expr: string,
+  mode: 'STORED' | 'VIRTUAL',
+|};
 
 export default class Column {
   +name: string;
@@ -105,7 +108,9 @@ export default class Column {
       ? 'NULL'
       : '';
 
-    defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
+    defaultValue =
+      // Generated columns won't have a default value
+      !this.generated && defaultValue ? `DEFAULT ${defaultValue}` : '';
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
@@ -122,7 +127,9 @@ export default class Column {
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
-      this.generated !== null ? `GENERATED ALWAYS AS (...) ${this.generated.mode}` : '',
+      this.generated !== null
+        ? `GENERATED ALWAYS AS (${JSON.stringify(this.generated.expr)}) ${this.generated.mode}`
+        : '',
     ]
       .filter(x => x)
       .join(' ');

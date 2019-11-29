@@ -26,7 +26,7 @@ export type ReferenceDefinition = {|
 |};
 
 export type GeneratedDefinition = {|
-  // expr: ???
+  expr: string,
   mode: GeneratedMode,
 |};
 
