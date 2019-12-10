@@ -25,28 +25,23 @@ export type ReferenceDefinition = {|
   onUpdate: ReferenceOption | null,
 |};
 
-export type ColumnDefinition =
-  | {|
-      dataType: string,
-      nullable: boolean,
-      defaultValue: ConstantExpr | null,
-      onUpdate: ConstantExpr | null, // only applies to TIMESTAMP/DATETIME columns
-      isUnique: boolean,
-      isPrimary: boolean,
-      autoIncrement: boolean,
-      comment: string | null,
-      reference: ReferenceDefinition | null,
-    |}
-  | {|
-      dataType: string,
-      nullable: boolean | null,
-      generatedMode: GeneratedMode,
-      generatedExpr: string,
-      isUnique: boolean,
-      isPrimary: boolean,
-      comment: string | null,
-      reference: ReferenceDefinition | null,
-    |};
+export type GeneratedDefinition = {|
+  expr: string,
+  mode: GeneratedMode,
+|};
+
+export type ColumnDefinition = {|
+  dataType: string,
+  nullable: boolean | null,
+  defaultValue: ConstantExpr | null,
+  onUpdate: ConstantExpr | null,
+  isUnique: boolean,
+  isPrimary: boolean,
+  autoIncrement: boolean,
+  comment: string | null,
+  reference: ReferenceDefinition | null,
+  generated: GeneratedDefinition | null,
+|};
 
 export type CreateTableDefinition =
   | {| type: 'COLUMN', colName: Identifier, definition: ColumnDefinition |}
