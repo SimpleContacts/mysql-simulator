@@ -50,6 +50,34 @@ SetStatement = SET [^;]* { return null; }
 LockStatement = LOCK [^;]* { return null; }
 UnlockStatement = UNLOCK [^;]* { return null; }
 
+
+Expression
+  = NOT Expression
+  / BooleanPrimary 
+
+BooleanPrimary
+  = head:BitExpression 
+    tail:(( EQ / NE / LTE / GTE / LT / GT ) BitExpression)+ {
+      return tail.reduce(function (acc, i) {
+        return { op:i[0], left:acc, right:i[1] };
+      }, head)
+    }
+
+BitExpression
+  = head:SimpleExpression
+    tail:((PLUS / MINUS) SimpleExpression)* { 
+      return tail.reduce(function (acc, i) {
+        return { op:i[0], left:acc, right:i[1] };
+      }, head)
+    }
+
+SimpleExpression
+  = Constant
+  / id:Identifier { return { 'type': 'Identifier', name: id } }
+  / CallExpression
+  / MemberExpression
+  / LPAREN ExpressionList RPAREN 
+
 Condition
   = BooleanLiteral
   / NOT Condition
@@ -59,15 +87,6 @@ Condition
 ExpressionList
   = first:Expression COMMA rest:ExpressionList { return [first, ...rest] }
   / only:Expression { return [only] }
-
-Expression
-  = op1:Expression$ op2:( ( PLUS / MINUS ) Expression )? { return op2 !== null ? [op1, op2] : op1 }
-
-Expression$
-  = MemberExpression
-  / CallExpression
-  / id:Identifier { return { 'type': 'Identifier', id } }
-  / Constant
 
 CallExpression
   = FunctionName LPAREN ExpressionList RPAREN
@@ -512,6 +531,39 @@ CreateDefinition
   // ALTER .... ... ....  COMMENT '123';
 
 ColumnDefinition
+  = GeneratedColumnDefinition
+  / DataColumnDefinition
+
+GeneratedColumnDefinition
+  = dataType:DataType
+    ( GENERATED ALWAYS )? 
+    AS LPAREN generatedExpr:Expression RPAREN 
+    generatedMode: ( STORED / VIRTUAL )?
+    nullableClause:( NULL / NOT_NULL )?
+    isUnique:( UNIQUE KEY? )?
+    isPrimary:( PRIMARY? KEY )?
+    comment:( COMMENT value: StringLiteral { return value } )?
+    reference:ReferenceDefinition?
+    {
+      let nullable = null;
+      if (nullableClause === 'NULL') {
+        nullable = true;
+      } else  if (nullableClause === 'NOT NULL') {
+        nullable = false;
+      };
+      return {
+        dataType,
+        generatedMode, 
+        generatedExpr,
+        nullable,
+        isUnique: !!isUnique,
+        isPrimary: !!isPrimary,
+        comment, 
+        reference,
+      }
+    }
+
+DataColumnDefinition
   = dataType:DataType
     nullableClause:( NULL / NOT_NULL )?
     defaultValue:( DEFAULT value:ConstantExpr { return value } )?
@@ -522,7 +574,6 @@ ColumnDefinition
     comment:( COMMENT value: StringLiteral { return value } )?
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
-    generated:( GENERATED ALWAYS AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL ) { return { expr, mode } } )?
     {
       let nullable = null;
       if (nullableClause === 'NULL') {
@@ -540,10 +591,8 @@ ColumnDefinition
         autoIncrement: !!autoIncrement,
         comment,
         reference,
-        generated,
       }
     }
-
 
 Len
   = LPAREN number:NumberLiteral RPAREN { return number }
@@ -715,6 +764,7 @@ ADD               = _ 'ADD'i               !IdentifierChar _ { return 'ADD' }
 AFTER             = _ 'AFTER'i             !IdentifierChar _ { return 'AFTER' }
 ALTER             = _ 'ALTER'i             !IdentifierChar _ { return 'ALTER' }
 ALWAYS            = _ 'ALWAYS'i            !IdentifierChar _ { return 'ALWAYS' }
+AND               = _ 'AND'i               !IdentifierChar _ { return 'AND' }
 AS                = _ 'AS'i                !IdentifierChar _ { return 'AS' }
 ASC               = _ 'ASC'i               !IdentifierChar _ { return 'ASC' }
 AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierChar _ { return 'AUTO_INCREMENT' }
@@ -786,6 +836,7 @@ NULL              = _ 'NULL'i              !IdentifierChar _ { return 'NULL' }
 NUMERIC           = _ 'NUMERIC'i           !IdentifierChar _ { return 'NUMERIC' }
 OLD               = _ 'OLD'i               !IdentifierChar _ { return 'OLD' }
 ON                = _ 'ON'i                !IdentifierChar _ { return 'ON' }
+OR                = _ 'OR'i                !IdentifierChar _ { return 'OR' }
 PARTIAL           = _ 'PARTIAL'i           !IdentifierChar _ { return 'PARTIAL' }
 PRECEDES          = _ 'PRECEDES'i          !IdentifierChar _ { return 'PRECEDES' }
 PRIMARY           = _ 'PRIMARY'i           !IdentifierChar _ { return 'PRIMARY' }
@@ -837,15 +888,18 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 // Tokens
 // ====================================================
 
-COMMA      = _ ',' _
-EQ         = _ '=' _
-GT         = _ '>' _
-GTE        = _ '>=' _
-LPAREN     = _ '(' _
-LT         = _ '<' _
-LTE        = _ '<=' _
-MINUS      = _ '-' _
-NE         = _ '<=>' _
+
+COMMA      = _ ',' _ { return ',' }
+EQ         = _ '=' _ { return '=' }
+GT         = _ '>' _ { return '>' }
+GTE        = _ '>=' _ { return '>=' }
+LPAREN     = _ '(' _ { return '(' }
+LT         = _ '<' _ { return '<' }
+LTE        = _ '<=' _ { return '<=' }
+MINUS      = _ '-' _ { return '-' }
+NE         = _ '<=>' _ { return '<=> ' }
 PLUS       = _ '+' _ { return '+' }
-RPAREN     = _ ')' _
-SEMICOLON  = _ ';' _
+RPAREN     = _ ')' _ { return ')' }
+SEMICOLON  = _ ';' _ { return ';' }
+ARROW      = _ '->' _ { return '->' }
+DARROW     = _ '->>' _ { return '->>' }

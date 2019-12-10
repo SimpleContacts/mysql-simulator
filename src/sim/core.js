@@ -13,47 +13,6 @@ import Database from './Database';
 // eslint-disable-next-line no-console
 const error = console.error;
 
-function makeColumn(colName, def: ColumnDefinition): Column {
-  const type = def.dataType.toLowerCase();
-  let defaultValue = def.defaultValue;
-  let onUpdate = def.onUpdate;
-
-  // Whether a definition is "NOT NULL" or "NULL" by default, depends on the
-  // data type.  MySQL's TIMESTAMP columns are NOT NULL unless explicitly
-  // specified.  All other types are NULL unless explicitly specified.
-  let nullable = def.nullable;
-  if (nullable === null) {
-    nullable = type !== 'timestamp';
-  }
-
-  if (type === 'timestamp') {
-    if (!nullable && defaultValue === null) {
-      // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      defaultValue = 'CURRENT_TIMESTAMP';
-      onUpdate = 'CURRENT_TIMESTAMP';
-    }
-
-    if (defaultValue === 'NOW()') {
-      defaultValue = 'CURRENT_TIMESTAMP';
-    }
-
-    if (onUpdate === 'NOW()') {
-      onUpdate = 'CURRENT_TIMESTAMP';
-    }
-  }
-
-  return new Column(
-    colName,
-    def.dataType,
-    nullable,
-    defaultValue,
-    onUpdate,
-    def.autoIncrement,
-    def.comment,
-    def.generated,
-  );
-}
-
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
   let db = db_.createTable(tblName);
@@ -61,7 +20,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map(def => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
-    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
+    db = db.addColumn(tblName, new Column(coldef.colName, coldef.definition), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -149,7 +108,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         if (change.type === 'RENAME TABLE') {
           db = db.renameTable(stm.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
-          const column = makeColumn(change.colName, change.definition);
+          const column = new Column(change.colName, change.definition);
           db = db.addColumn(stm.tblName, column, change.position);
           if (change.definition.isPrimary) {
             db = db.addPrimaryKey(stm.tblName, [change.colName]);
@@ -157,7 +116,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
           }
         } else if (change.type === 'CHANGE COLUMN') {
-          const column = makeColumn(change.newColName, change.definition);
+          const column = new Column(change.newColName, change.definition);
           db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);

@@ -181,7 +181,7 @@ export default class Table {
         return column;
       }
 
-      return column.patch({ name: newName });
+      return column.rename(newName);
     });
 
     // Replace all references to this column if they're used in any of the
@@ -284,7 +284,7 @@ export default class Table {
    */
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
-    const newColumn = column.patch({ defaultValue: null });
+    const newColumn = column.dropDefault();
     const columns = this.columns.map(c => (c.name === colName ? newColumn : c));
     return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
@@ -338,7 +338,7 @@ export default class Table {
       if (!columnNames.includes(c.name)) {
         return c;
       }
-      return c.patch({ nullable: false });
+      return c.setNotNullable();
     });
 
     return new Table(
@@ -535,7 +535,7 @@ export default class Table {
       idx => {
         const colName = idx.columns[0];
         const column = this.columns.find(c => c.name === colName);
-        return column && !column.nullable ? 0 : 1;
+        return column && !column.isNullable() ? 0 : 1;
       },
     );
   }
