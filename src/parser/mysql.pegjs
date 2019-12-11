@@ -145,7 +145,7 @@ FunctionName
 // ====================================================
 
 NullLiteral
-  = NULL
+  = NULL { return (null) }
 
 BooleanLiteral
   = TRUE
