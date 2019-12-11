@@ -122,7 +122,7 @@ export default class Column {
 
     return [
       formatDataType(typeInfo),
-      nullable,
+      this.generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
@@ -130,6 +130,7 @@ export default class Column {
       this.generated !== null
         ? `GENERATED ALWAYS AS (${JSON.stringify(this.generated.expr)}) ${this.generated.mode}`
         : '',
+      this.generated !== null ? nullable : '',
     ]
       .filter(x => x)
       .join(' ');

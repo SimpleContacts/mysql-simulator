@@ -522,12 +522,13 @@ ColumnDefinition
     comment:( COMMENT value: StringLiteral { return value } )?
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
-    generated:( GENERATED ALWAYS AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL ) { return { expr, mode } } )?
+    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )? { return { expr, mode: mode || 'VIRTUAL' } } )?
+    nullableClause2:( NULL / NOT_NULL )?
     {
       let nullable = null;
-      if (nullableClause === 'NULL') {
+      if (nullableClause === 'NULL' || nullableClause2 === 'NULL') {
         nullable = true;
-      } else  if (nullableClause === 'NOT NULL') {
+      } else if (nullableClause === 'NOT NULL' || nullableClause2 === 'NOT NULL') {
         nullable = false;
       };
       return {
