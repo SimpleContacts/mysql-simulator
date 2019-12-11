@@ -12,7 +12,7 @@
   "scripts": {
     "build": "yarn run build:clean && yarn run build:parser && yarn run build:dist && yarn run build:flow",
     "build:clean": "rimraf dist",
-    "build:parser": "pegjs --allowed-start-rules start,StringList --cache src/parser/mysql.pegjs",
+    "build:parser": "pegjs --allowed-start-rules start,StringLiteralList --cache src/parser/mysql.pegjs",
     "build:flow": "flow-copy-source -v -i '**/__tests__/**' -i '**/*.spec.*' src dist",
     "build:dist": "babel -d dist src --ignore '**/__tests__/**' --ignore '**/*.spec.*'",
     "check": "yarn run check:eslint && yarn run check:prettier && yarn run check:import-sort",

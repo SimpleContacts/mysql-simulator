@@ -3,6 +3,15 @@
 /**
  * Helper functions to more succinctly produce nodes
  */
+const invariant = require('invariant');
+
+function identifier(name) {
+  return {
+    type: 'identifier',
+    name,
+    id: name,   // Deprecate in favor of `name`
+  }
+}
 
 function literal(value) {
   return { type: 'literal', value }
@@ -10,6 +19,79 @@ function literal(value) {
 
 function unary(op, expr) {
   return { type: 'unary', op, expr }
+}
+
+function callExpression(name, args) {
+  invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
+  return { type: 'callExpression', name, args }
+}
+
+function builtinFunction(name) {
+  return { type: 'builtinFunction', name }
+}
+
+function generated(expr, mode) {
+  return { type: 'generated', expr, mode }
+}
+
+//
+// HACK: Using this for now, because the Simulator internals aren't aware of
+// Nodes, so we'll have to convert this to strings before we pass it on.
+// However, it would be nice if they _would_ work with AST nodes instead, so
+// eventually™ we should remove this serialize*() helper family here.
+//
+
+function serialize(node) {
+  switch (node.type) {
+    case 'callExpression':
+      return serializeCallExpression(node)
+    case 'literal':
+      return node.value
+    case 'identifier':
+      return node.name
+    case 'builtinFunction':
+      return node.name
+    default:
+      throw new Error(`Don't know how to serialize ${node.type} nodes yet.  Please tell me.`);
+  }
+}
+
+//
+// HACK:
+// This is a huge hack because the defaultValue that the simulator expects vary
+// in types, and it's superinconsistent.
+//
+// - String literals are sent as quoted strings "'foobar'"
+// - Function calls are sent as strings, e.g. "CURRENT_TIMESTAMP"
+// - Booleans are sent as booleans literals, e.g. "FALSE"
+// - Numbers are sent as true numbers, e.g. 0
+// - `null` is sent as the string "NULL"
+//
+// 🙈
+//
+function serializeDefaultValue_HACK(node) {
+  switch (node.type) {
+    case 'literal':
+      return node.value === null
+        ? 'NULL'
+        : node.value === true
+        ? 'TRUE'
+        : node.value === false
+        ? 'FALSE'
+        : node.value
+    default:
+      // Defer to "normal" serializer
+      return serialize(node);
+  }
+}
+
+function serializeCallExpression(node) {
+  invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
+  let f = serialize(node.name)
+  if (node.args !== undefined) {
+    f += `(${node.args.map(serialize).join(', ')})`;
+  }
+  return f;
 }
 
 }
@@ -77,7 +159,15 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = op1:SimpleExpr op2:( ( PLUS / MINUS ) Expression )? { return op2 !== null ? [op1, op2] : op1 }
+  = op1:SimpleExpr op2:( ( PLUS / MINUS ) Expression )? {
+    return op2 !== null
+      ? [
+        // HACK during refactoring
+        op1.type === 'literal' ? op1.value : op1,
+        op2
+      ]
+      : op1
+    }
 
 /* ArithmeticOperator */
 /*   = PLUS */
@@ -103,7 +193,7 @@ Expression
 
 SimpleExpr
   = Literal
-  / id:Identifier { return { 'type': 'Identifier', id } }
+  / name:Identifier { return identifier(name) }
   / FunctionCall
   / MemberAccess  // Not sure where this one fits
   // / simple_expr COLLATE collation_name
@@ -145,7 +235,7 @@ FunctionName
 // ====================================================
 
 NullLiteral
-  = NULL { return (null) }
+  = NULL { return literal(null) }
 
 BooleanLiteral
   = TRUE  { return literal(true) }
@@ -156,23 +246,27 @@ NumberLiteral
   / DecimalNumberLiteral
 
 DecimalNumberLiteral
-  = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
+  = digits:[0-9]+ { return literal(parseInt(digits.join(''), 10)) }
 
 HexNumberLiteral
-  = '0x' digits:[0-9a-fA-F]+ { return parseInt(digits.join(''), 16) }
+  = '0x' digits:[0-9a-fA-F]+ { return literal(parseInt(digits.join(''), 16)) }
 
 StringLiteral
   = SingleQuotedStringLiteral
   / DoubleQuotedStringLiteral
 
 SingleQuotedStringLiteral
-  = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" { return `'${seq.join('')}'` }
+  = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" {
+    return literal(`'${seq.join('')}'`)
+  }
 
 DoubleQuotedStringLiteral
-  = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' { return `'${seq.join('')}'` }
+  = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' {
+    return literal(`'${seq.join('')}'`)
+  }
 
-StringList
-  = first:StringLiteral COMMA rest:StringList { return [first, ...rest] }
+StringLiteralList
+  = first:StringLiteral COMMA rest:StringLiteralList { return [first, ...rest] }
   / only:StringLiteral { return [only] }
 
 Literal
@@ -570,15 +664,15 @@ CreateDefinition
 ColumnDefinition
   = dataType:DataType
     nullableClause:( NULL / NOT_NULL )?
-    defaultValue:( DEFAULT value:ConstantExpr { return value } )?
+    defaultValue:( DEFAULT value:DefaultValueExpr { return value } )?
     isPrimary1:( PRIMARY KEY )?
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
     isPrimary2:( PRIMARY KEY )?
-    comment:( COMMENT value: StringLiteral { return value } )?
+    comment:( COMMENT value:StringLiteral { return value.value } )?
     reference:ReferenceDefinition?
-    onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
-    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )? { return { expr, mode: mode || 'VIRTUAL' } } )?
+    onUpdate:( ON UPDATE expr:DefaultValueExpr { return expr } )?
+    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )? { return generated(expr, mode || 'VIRTUAL') } )?
     nullableClause2:( NULL / NOT_NULL )?
     {
       let nullable = null;
@@ -587,6 +681,14 @@ ColumnDefinition
       } else if (nullableClause === 'NOT NULL' || nullableClause2 === 'NOT NULL') {
         nullable = false;
       };
+
+      // Unpack the defaultValue / onUpdate AST nodes into a string version for
+      // now.  We changed the parser's output to produce better ASTs, but the
+      // internal simulator data structures aren't aware and capable of
+      // handling those yet.
+      defaultValue = defaultValue === null ? null : serializeDefaultValue_HACK(defaultValue)
+      onUpdate = onUpdate === null ? null : serializeDefaultValue_HACK(onUpdate)
+
       return {
         dataType,
         nullable,
@@ -603,10 +705,10 @@ ColumnDefinition
 
 
 Len
-  = LPAREN number:NumberLiteral RPAREN { return number }
+  = LPAREN number:NumberLiteral RPAREN { return number.value }
 
 PrecisionSpec
-  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length, decimals] }
+  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length.value, decimals.value] }
 
 BoolTypeName
   = BOOLEAN
@@ -665,8 +767,8 @@ DataType
   / PrecisionDataType
   / type:TextDataType ignore1:(CHARACTER SET CharsetName)? ignore2:(COLLATE CollationName)? { return type }
   / JSON
-  / ENUM LPAREN values:StringList RPAREN {
-      return `ENUM(${values.join(',')})`;
+  / ENUM LPAREN literals:StringLiteralList RPAREN {
+      return `ENUM(${literals.map(str => str.value).join(',')})`;
     }
 
 IndexColNames
@@ -723,20 +825,22 @@ ValueList
   / only:Value { return [only] }
 
 Value
-  = Literal
+  = lit:Literal { return lit.value }
 
 /* System functions */
 
-ConstantExpr
+DefaultValueExpr
   = Literal
   / CurrentTimestamp
   / NowCall
 
 CurrentTimestamp
-  = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
+  = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? {
+    return callExpression(builtinFunction(value), precision ? [precision] : undefined)
+  }
 
 NowCall
-  = NOW LPAREN RPAREN { return 'NOW()' }
+  = NOW LPAREN RPAREN { return callExpression(builtinFunction('NOW'), []) }
 
 // ====================================================
 // Util

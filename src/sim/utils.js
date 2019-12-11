@@ -42,8 +42,8 @@ export function quote(s: string): string {
  */
 export function parseEnumValues(enumString: string): Array<string> {
   const values = rawParseSql(enumString, {
-    startRule: 'StringList',
+    startRule: 'StringLiteralList',
   });
   // Dequote to make them JavaScript string literals
-  return values.map(unquote);
+  return values.map(lit => unquote(lit.value));
 }

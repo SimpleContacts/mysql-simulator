@@ -3,6 +3,7 @@
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
 import { escape } from './utils';
+import { serialize } from './serialize';
 
 type Generated = {|
   expr: string,
@@ -127,9 +128,7 @@ export default class Column {
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
-      this.generated !== null
-        ? `GENERATED ALWAYS AS (${JSON.stringify(this.generated.expr)}) ${this.generated.mode}`
-        : '',
+      this.generated !== null ? `GENERATED ALWAYS AS (${serialize(this.generated.expr)}) ${this.generated.mode}` : '',
       this.generated !== null ? nullable : '',
     ]
       .filter(x => x)
