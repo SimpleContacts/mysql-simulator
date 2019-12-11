@@ -1,3 +1,19 @@
+{
+
+/**
+ * Helper functions to more succinctly produce nodes
+ */
+
+function literal(value) {
+  return { type: 'literal', value }
+}
+
+function unary(op, expr) {
+  return { type: 'unary', op, expr }
+}
+
+}
+
 start = StatementList
 
 StatementList
