@@ -61,18 +61,19 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = op1:Expression$ op2:( ( PLUS / MINUS ) Expression )? { return op2 !== null ? [op1, op2] : op1 }
+  = op1:SimpleExpr op2:( ( PLUS / MINUS ) Expression )? { return op2 !== null ? [op1, op2] : op1 }
 
-Expression$
-  = MemberExpression
-  / CallExpression
+SimpleExpr
+  = Literal
+  / MemberAccess
+  / FunctionCall
   / id:Identifier { return { 'type': 'Identifier', id } }
-  / Literal
 
-CallExpression
+FunctionCall
   = FunctionName LPAREN ExpressionList RPAREN
 
-MemberExpression
+// Not sure where we can find this syntax in the MySQL manual, or what this is named
+MemberAccess
   = object:Identifier '.' property:Identifier { return null }
 
 FunctionName
