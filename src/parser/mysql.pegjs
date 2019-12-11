@@ -251,8 +251,8 @@ BitExprOp2
 SimpleExpr
   = Literal
   / FunctionCall
-  / name:Identifier { return identifier(name) }
   / MemberAccess  // Not sure where this one fits
+  / name:Identifier { return identifier(name) }
   // / simple_expr COLLATE collation_name
   // / param_marker
   // / variable
