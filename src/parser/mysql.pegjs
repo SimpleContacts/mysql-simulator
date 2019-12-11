@@ -21,6 +21,10 @@ function unary(op, expr) {
   return { type: 'unary', op, expr }
 }
 
+function binary(op, expr1, expr2) {
+  return { type: 'binary', op, expr1, expr2 }
+}
+
 function callExpression(name, args) {
   invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
   return { type: 'callExpression', name, args }
@@ -159,15 +163,28 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = op1:SimpleExpr op2:( ( PLUS / MINUS ) Expression )? {
-    return op2 !== null
-      ? [
-        // HACK during refactoring
-        op1.type === 'literal' ? op1.value : op1,
-        op2
-      ]
-      : op1
+  = BooleanPrimary
+
+BooleanPrimary
+  = Predicate
+
+Predicate
+  = BitExpr
+
+BitExpr
+  // Mostly expressed like this to fight left-recursion in the grammer
+  = expr1:SimpleExpr rest:( op:BitExprOp expr2:BitExpr { return { op, expr2 } } )? {
+      return rest !== null ? binary(rest.op, expr1, rest.expr2) : expr1
     }
+
+BitExprOp
+  = MULT
+  / DIVIDE
+  / DIV
+  / PERCENTAGE
+  / MOD { return '%' }
+  / PLUS
+  / MINUS
 
 /* ArithmeticOperator */
 /*   = PLUS */
@@ -904,6 +921,7 @@ DEFAULT           = _ 'DEFAULT'i           !IdentifierChar _ { return 'DEFAULT' 
 DELETE            = _ 'DELETE'i            !IdentifierChar _ { return 'DELETE' }
 DESC              = _ 'DESC'i              !IdentifierChar _ { return 'DESC' }
 DETERMINISTIC     = _ 'DETERMINISTIC'i     !IdentifierChar _ { return 'DETERMINISTIC' }
+DIV               = _ 'DIV'i               !IdentifierChar _ { return 'DIV' }
 DO                = _ 'DO'i                !IdentifierChar _ { return 'DO' }
 DOUBLE            = _ 'DOUBLE'i            !IdentifierChar _ { return 'DOUBLE' }
 DROP              = _ 'DROP'i              !IdentifierChar _ { return 'DROP' }
@@ -937,6 +955,7 @@ LIKE              = _ 'LIKE'i              !IdentifierChar _ { return 'LIKE' }
 LOCK              = _ 'LOCK'i              !IdentifierChar _ { return 'LOCK' }
 MATCH             = _ 'MATCH'i             !IdentifierChar _ { return 'MATCH' }
 MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierChar _ { return 'MEDIUMINT' }
+MOD               = _ 'MOD'i               !IdentifierChar _ { return 'MOD' }
 MODIFY            = _ 'MODIFY'i            !IdentifierChar _ { return 'MODIFY' }
 NEW               = _ 'NEW'i               !IdentifierChar _ { return 'NEW' }
 NO                = _ 'NO'i                !IdentifierChar _ { return 'NO' }
@@ -1000,6 +1019,7 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 
 BANG       = _ '!' _   { return '+' }
 COMMA      = _ ',' _   { return ',' }
+DIVIDE     = _ '/' _   { return '/' }
 EQ         = _ '=' _   { return '=' }
 GT         = _ '>' _   { return '>' }
 GTE        = _ '>=' _  { return '>=' }
@@ -1007,7 +1027,9 @@ LPAREN     = _ '(' _   { return '(' }
 LT         = _ '<' _   { return '<' }
 LTE        = _ '<=' _  { return '<=' }
 MINUS      = _ '-' _   { return '-' }
+MULT       = _ '*' _   { return '*' }
 NE         = _ '<=>' _ { return '<=>' }
+PERCENTAGE = _ '%' _   { return '%' }
 PLUS       = _ '+' _   { return '+' }
 RPAREN     = _ ')' _   { return ')' }
 SEMICOLON  = _ ';' _   { return ';' }

@@ -4,6 +4,8 @@ import invariant from 'invariant';
 import { quoteInExpressionContext, unquote } from './utils';
 
 export function serialize(node) {
+  invariant(node, 'expected a node');
+
   if (Array.isArray(node)) {
     return node.map(serialize).join(', ');
   }
@@ -32,6 +34,9 @@ export function serialize(node) {
 
       // "Normal" cases
       return `${node.op}(${serialize(node.expr)})`;
+
+    case 'binary':
+      return `(${serialize(node.expr1)} ${node.op} ${serialize(node.expr2)})`;
 
     case 'identifier':
       return node.name;
