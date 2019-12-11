@@ -169,22 +169,38 @@ BooleanPrimary
   = Predicate
 
 Predicate
-  = BitExpr
+  = BitExpr1
 
-BitExpr
+BitExpr1
   // Mostly expressed like this to fight left-recursion in the grammer
-  = expr1:SimpleExpr rest:( op:BitExprOp expr2:BitExpr { return { op, expr2 } } )? {
-      return rest !== null ? binary(rest.op, expr1, rest.expr2) : expr1
+  = expr1:BitExpr2 rest:( op:BitExprOp1 expr2:BitExpr2 { return { op, expr2 } } )* {
+      return rest.reduce(
+        (acc, cur) => binary(cur.op, acc, cur.expr2),
+        expr1
+      )
     }
 
-BitExprOp
+BitExpr2
+  // Mostly expressed like this to fight left-recursion in the grammer
+  = expr1:SimpleExpr rest:( op:BitExprOp2 expr2:SimpleExpr { return { op, expr2 } } )* {
+      return rest.reduce(
+        (acc, cur) => binary(cur.op, acc, cur.expr2),
+        expr1
+      )
+    }
+
+// Binary operators with weak binding
+BitExprOp1
+  = PLUS
+  / MINUS
+
+// Binary operators with strong binding
+BitExprOp2
   = MULT
   / DIVIDE
   / DIV
   / PERCENTAGE
   / MOD { return '%' }
-  / PLUS
-  / MINUS
 
 /* ArithmeticOperator */
 /*   = PLUS */
