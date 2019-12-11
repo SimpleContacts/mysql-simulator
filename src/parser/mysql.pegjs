@@ -52,7 +52,7 @@ function serialize(node) {
     case 'builtinFunction':
       return node.name
     default:
-      throw new Error(`Don't know how to serialize ${node.type} nodes yet.  Please tell me.`);
+      throw new Error(`Don't know how to serialize ${node} nodes yet.  Please tell me.`);
   }
 }
 
@@ -200,12 +200,12 @@ SimpleExpr
   // / param_marker
   // / variable
   // / simple_expr || simple_expr
-  // / + simple_expr
-  // / - simple_expr
+  / PLUS expr:SimpleExpr { return unary('+', expr) }
+  / MINUS expr:SimpleExpr { return unary('-', expr) }
   // / ~ simple_expr
-  // / ! simple_expr
+  / BANG expr:SimpleExpr { return unary('!', expr) }
   // / BINARY simple_expr
-  // / (expr [, expr] ...)
+  / LPAREN exprs:ExpressionList RPAREN { return exprs }
   // / ROW (expr, expr [, expr] ...)
   // / (subquery)
   // / EXISTS (subquery)
@@ -998,15 +998,16 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 // Tokens
 // ====================================================
 
-COMMA      = _ ',' _
-EQ         = _ '=' _
-GT         = _ '>' _
-GTE        = _ '>=' _
-LPAREN     = _ '(' _
-LT         = _ '<' _
-LTE        = _ '<=' _
-MINUS      = _ '-' _
-NE         = _ '<=>' _
-PLUS       = _ '+' _ { return '+' }
-RPAREN     = _ ')' _
-SEMICOLON  = _ ';' _
+BANG       = _ '!' _   { return '+' }
+COMMA      = _ ',' _   { return ',' }
+EQ         = _ '=' _   { return '=' }
+GT         = _ '>' _   { return '>' }
+GTE        = _ '>=' _  { return '>=' }
+LPAREN     = _ '(' _   { return '(' }
+LT         = _ '<' _   { return '<' }
+LTE        = _ '<=' _  { return '<=' }
+MINUS      = _ '-' _   { return '-' }
+NE         = _ '<=>' _ { return '<=>' }
+PLUS       = _ '+' _   { return '+' }
+RPAREN     = _ ')' _   { return ')' }
+SEMICOLON  = _ ';' _   { return ';' }
