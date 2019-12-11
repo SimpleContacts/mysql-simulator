@@ -163,10 +163,34 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = BooleanPrimary
+  = expr1:BooleanPrimary op:BooleanOp expr2:BooleanPrimary { return binary(op, expr1, expr2) }
+  / BooleanPrimary
+
+BooleanOp
+  = AND
+  / OR
+  / XOR
 
 BooleanPrimary
-  = Predicate
+  = pred:Predicate IS check:( NULL / NOT_NULL ) {
+      // #lolmysql
+      if (check === 'NULL') {
+        return callExpression(builtinFunction('isnull'), [pred])
+      } else {
+        return unary('is not null', pred)
+      }
+    }
+  / pred1:Predicate op:CmpOp pred2:Predicate { return binary(op, pred1, pred2) }
+  / Predicate
+
+CmpOp
+  = EQ
+  / NE1
+  / NE2
+  / GTE
+  / GT
+  / LTE
+  / LT
 
 Predicate
   = BitExpr1
@@ -226,8 +250,8 @@ BitExprOp2
 
 SimpleExpr
   = Literal
-  / name:Identifier { return identifier(name) }
   / FunctionCall
+  / name:Identifier { return identifier(name) }
   / MemberAccess  // Not sure where this one fits
   // / simple_expr COLLATE collation_name
   // / param_marker
@@ -248,7 +272,22 @@ SimpleExpr
   // / interval_expr
 
 FunctionCall
-  = FunctionName LPAREN ExpressionList RPAREN
+  = name:FunctionName LPAREN exprs:ExpressionList RPAREN {
+      return callExpression(builtinFunction(name), exprs)
+    }
+
+  / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
+      return callExpression(builtinFunction(ident), exprs)
+    }
+
+  // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
+  / ident:Identifier arrow:( ARROWW / ARROW ) lit:StringLiteral {
+      let rv = callExpression(builtinFunction('JSON_EXTRACT'), [identifier(ident), lit])
+      if (arrow === '->>') {
+        rv = callExpression(builtinFunction('JSON_UNQUOTE'), [rv])
+      }
+      return rv
+    }
 
 // Not sure where we can find this syntax in the MySQL manual, or what this is named
 MemberAccess
@@ -884,6 +923,7 @@ Whitespace
   = [ \t\r\n]
   / Comment
 
+// TODO: Let this return identifier() nodes
 Identifier
   = QuotedIdentifier
   / NonQuotedIdentifier
@@ -909,6 +949,7 @@ ADD               = _ 'ADD'i               !IdentifierChar _ { return 'ADD' }
 AFTER             = _ 'AFTER'i             !IdentifierChar _ { return 'AFTER' }
 ALTER             = _ 'ALTER'i             !IdentifierChar _ { return 'ALTER' }
 ALWAYS            = _ 'ALWAYS'i            !IdentifierChar _ { return 'ALWAYS' }
+AND               = _ 'AND'i               !IdentifierChar _ { return 'AND' }
 AS                = _ 'AS'i                !IdentifierChar _ { return 'AS' }
 ASC               = _ 'ASC'i               !IdentifierChar _ { return 'ASC' }
 AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierChar _ { return 'AUTO_INCREMENT' }
@@ -965,6 +1006,7 @@ INDEX             = _ 'INDEX'i             !IdentifierChar _ { return 'INDEX' }
 INSERT            = _ 'INSERT'i            !IdentifierChar _ { return 'INSERT' }
 INT               = _ 'INT'i               !IdentifierChar _ { return 'INT' }
 INTEGER           = _ 'INTEGER'i           !IdentifierChar _ { return 'INTEGER' }
+IS                = _ 'IS'i                !IdentifierChar _ { return 'IS' }
 JSON              = _ 'JSON'i              !IdentifierChar _ { return 'JSON' }
 KEY               = _ 'KEY'i               !IdentifierChar _ { return 'KEY' }
 LIKE              = _ 'LIKE'i              !IdentifierChar _ { return 'LIKE' }
@@ -982,6 +1024,7 @@ NULL              = _ 'NULL'i              !IdentifierChar _ { return 'NULL' }
 NUMERIC           = _ 'NUMERIC'i           !IdentifierChar _ { return 'NUMERIC' }
 OLD               = _ 'OLD'i               !IdentifierChar _ { return 'OLD' }
 ON                = _ 'ON'i                !IdentifierChar _ { return 'ON' }
+OR                = _ 'OR'i                !IdentifierChar _ { return 'OR' }
 PARTIAL           = _ 'PARTIAL'i           !IdentifierChar _ { return 'PARTIAL' }
 PRECEDES          = _ 'PRECEDES'i          !IdentifierChar _ { return 'PRECEDES' }
 PRIMARY           = _ 'PRIMARY'i           !IdentifierChar _ { return 'PRIMARY' }
@@ -1016,6 +1059,7 @@ VARBINARY         = _ 'VARBINARY'i         !IdentifierChar _ { return 'VARBINARY
 VARCHAR           = _ 'VARCHAR'i           !IdentifierChar _ { return 'VARCHAR' }
 VIRTUAL           = _ 'VIRTUAL'i           !IdentifierChar _ { return 'VIRTUAL' }
 WHILE             = _ 'WHILE'i             !IdentifierChar _ { return 'WHILE' }
+XOR               = _ 'XOR'i               !IdentifierChar _ { return 'XOR' }
 
 // Reserved built-in functions
 // TODO: Complete this list
@@ -1033,19 +1077,23 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 // Tokens
 // ====================================================
 
-BANG       = _ '!' _   { return '+' }
-COMMA      = _ ',' _   { return ',' }
-DIVIDE     = _ '/' _   { return '/' }
-EQ         = _ '=' _   { return '=' }
-GT         = _ '>' _   { return '>' }
-GTE        = _ '>=' _  { return '>=' }
-LPAREN     = _ '(' _   { return '(' }
-LT         = _ '<' _   { return '<' }
-LTE        = _ '<=' _  { return '<=' }
-MINUS      = _ '-' _   { return '-' }
-MULT       = _ '*' _   { return '*' }
-NE         = _ '<=>' _ { return '<=>' }
-PERCENTAGE = _ '%' _   { return '%' }
-PLUS       = _ '+' _   { return '+' }
-RPAREN     = _ ')' _   { return ')' }
-SEMICOLON  = _ ';' _   { return ';' }
+ARROW      = _ '->' _   { return '->' }
+ARROWW     = _ '->>' _  { return '->>' }
+BANG       = _ '!' _    { return '+' }
+COMMA      = _ ',' _    { return ',' }
+DIVIDE     = _ '/' _    { return '/' }
+EQ         = _ '=' _    { return '=' }
+GT         = _ '>' _    { return '>' }
+GTE        = _ '>=' _   { return '>=' }
+LPAREN     = _ '(' _    { return '(' }
+LT         = _ '<' _    { return '<' }
+LTE        = _ '<=' _   { return '<=' }
+MINUS      = _ '-' _    { return '-' }
+MULT       = _ '*' _    { return '*' }
+NE         = _ '<=>' _  { return '<=>' }
+NE1        = _ '<>' _   { return '<>' }
+NE2        = _ '!=' _   { return '<>' }
+PERCENTAGE = _ '%' _    { return '%' }
+PLUS       = _ '+' _    { return '+' }
+RPAREN     = _ ')' _    { return ')' }
+SEMICOLON  = _ ';' _    { return ';' }

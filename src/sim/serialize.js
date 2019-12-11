@@ -1,7 +1,7 @@
 // @flow strict
 
 import invariant from 'invariant';
-import { quoteInExpressionContext, unquote } from './utils';
+import { escape, quoteInExpressionContext, unquote } from './utils';
 
 export function serialize(node) {
   invariant(node, 'expected a node');
@@ -24,7 +24,10 @@ export function serialize(node) {
         : node.value;
 
     case 'unary':
-      if (node.op === '!') {
+      if (node.op === 'is not null') {
+        // #lolmysql, go home
+        return `(${serialize(node.expr)} is not null)`;
+      } else if (node.op === '!') {
         // #lolmysql, extra wrapping in parens
         return `(not(${serialize(node.expr)}))`;
       } else if (node.op === '+') {
@@ -36,13 +39,21 @@ export function serialize(node) {
       return `${node.op}(${serialize(node.expr)})`;
 
     case 'binary':
-      return `(${serialize(node.expr1)} ${node.op} ${serialize(node.expr2)})`;
+      let op = node.op;
+
+      // #lolmysql, for some reason it only lowercases these op names, but not
+      // others...
+      if (['AND', 'OR', 'XOR'].includes(op)) {
+        op = op.toLowerCase();
+      }
+
+      return `(${serialize(node.expr1)} ${op} ${serialize(node.expr2)})`;
 
     case 'identifier':
-      return node.name;
+      return escape(node.name);
 
     case 'builtinFunction':
-      return node.name;
+      return node.name.toLowerCase();
 
     default:
       throw new Error(`Don't know how to serialize ${node.type} nodes yet.  Please tell me.`);
@@ -53,7 +64,7 @@ function serializeCallExpression(node) {
   invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
   let f = serialize(node.name);
   if (node.args !== undefined) {
-    f += `(${node.args.map(serialize).join(', ')})`;
+    f += `(${node.args.map(serialize).join(',')})`;
   }
   return f;
 }
