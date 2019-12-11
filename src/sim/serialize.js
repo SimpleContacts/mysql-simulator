@@ -1,13 +1,20 @@
 // @flow strict
 
 import invariant from 'invariant';
+import { quoteInExpressionContext, unquote } from './utils';
 
 export function serialize(node) {
   switch (node.type) {
     case 'callExpression':
       return serializeCallExpression(node);
     case 'literal':
-      return node.value;
+      return node.value === true
+        ? 'TRUE'
+        : node.value === false
+        ? 'FALSE'
+        : typeof node.value === 'string'
+        ? quoteInExpressionContext(unquote(node.value))
+        : node.value;
     case 'identifier':
       return node.name;
     case 'builtinFunction':
