@@ -2,8 +2,8 @@
 
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
-import { escape } from './utils';
 import { serialize } from './serialize';
+import { escape } from './utils';
 
 type Generated = {|
   expr: string,
@@ -85,6 +85,7 @@ export default class Column {
    */
   getDefinition(): string {
     const typeInfo = this.getTypeInfo();
+    const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
     // MySQL outputs number constants as strings. No idea why that would make
@@ -111,7 +112,7 @@ export default class Column {
 
     defaultValue =
       // Generated columns won't have a default value
-      !this.generated && defaultValue ? `DEFAULT ${defaultValue}` : '';
+      !generated && defaultValue ? `DEFAULT ${defaultValue}` : '';
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
@@ -123,13 +124,13 @@ export default class Column {
 
     return [
       formatDataType(typeInfo),
-      this.generated === null ? nullable : '',
+      generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
-      this.generated !== null ? `GENERATED ALWAYS AS (${serialize(this.generated.expr)}) ${this.generated.mode}` : '',
-      this.generated !== null ? nullable : '',
+      generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr)}) ${generated.mode}` : '',
+      generated !== null ? nullable : '',
     ]
       .filter(x => x)
       .join(' ');

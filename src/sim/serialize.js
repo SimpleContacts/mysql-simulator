@@ -1,6 +1,7 @@
-// @flow strict
+/* eslint-disable import/prefer-default-export, no-use-before-define, no-else-return */
 
 import invariant from 'invariant';
+
 import { escape, quoteInExpressionContext, unquote } from './utils';
 
 export function serialize(node) {
@@ -38,7 +39,7 @@ export function serialize(node) {
       // "Normal" cases
       return `${node.op}(${serialize(node.expr)})`;
 
-    case 'binary':
+    case 'binary': {
       let op = node.op;
 
       // #lolmysql, for some reason it only lowercases these op names, but not
@@ -48,6 +49,7 @@ export function serialize(node) {
       }
 
       return `(${serialize(node.expr1)} ${op} ${serialize(node.expr2)})`;
+    }
 
     case 'identifier':
       return escape(node.name);
