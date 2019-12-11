@@ -2019,17 +2019,17 @@ function peg$parse(input, options) {
 
     s0 = peg$parseLiteral();
     if (s0 === peg$FAILED) {
-      s0 = peg$parseMemberAccess();
+      s0 = peg$currPos;
+      s1 = peg$parseIdentifier();
+      if (s1 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s1 = peg$c21(s1);
+      }
+      s0 = s1;
       if (s0 === peg$FAILED) {
         s0 = peg$parseFunctionCall();
         if (s0 === peg$FAILED) {
-          s0 = peg$currPos;
-          s1 = peg$parseIdentifier();
-          if (s1 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s1 = peg$c21(s1);
-          }
-          s0 = s1;
+          s0 = peg$parseMemberAccess();
         }
       }
     }

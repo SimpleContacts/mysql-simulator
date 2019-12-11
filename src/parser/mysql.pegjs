@@ -63,11 +63,50 @@ ExpressionList
 Expression
   = op1:SimpleExpr op2:( ( PLUS / MINUS ) Expression )? { return op2 !== null ? [op1, op2] : op1 }
 
+/* ArithmeticOperator */
+/*   = PLUS */
+/*   / MINUS */
+  // |
+  // &
+  // <<
+  // >>
+  // +
+  // -
+  // *
+  // /
+  // DIV
+  // MOD
+  // %
+  // ^
+  // +
+  // -
+
+/* BitExpr */
+/*   = BitExpr ArithmeticOperator BitExpr */
+/*   / SimpleExpr */
+
 SimpleExpr
   = Literal
-  / MemberAccess
-  / FunctionCall
   / id:Identifier { return { 'type': 'Identifier', id } }
+  / FunctionCall
+  / MemberAccess  // Not sure where this one fits
+  // / simple_expr COLLATE collation_name
+  // / param_marker
+  // / variable
+  // / simple_expr || simple_expr
+  // / + simple_expr
+  // / - simple_expr
+  // / ~ simple_expr
+  // / ! simple_expr
+  // / BINARY simple_expr
+  // / (expr [, expr] ...)
+  // / ROW (expr, expr [, expr] ...)
+  // / (subquery)
+  // / EXISTS (subquery)
+  // / {identifier expr}
+  // / match_expr
+  // / case_expr
+  // / interval_expr
 
 FunctionCall
   = FunctionName LPAREN ExpressionList RPAREN
