@@ -148,8 +148,8 @@ NullLiteral
   = NULL { return (null) }
 
 BooleanLiteral
-  = TRUE
-  / FALSE
+  = TRUE  { return literal(true) }
+  / FALSE { return literal(false) }
 
 NumberLiteral
   = HexNumberLiteral
