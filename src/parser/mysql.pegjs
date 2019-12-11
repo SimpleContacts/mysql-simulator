@@ -67,7 +67,7 @@ Expression$
   = MemberExpression
   / CallExpression
   / id:Identifier { return { 'type': 'Identifier', id } }
-  / Constant
+  / Literal
 
 CallExpression
   = FunctionName LPAREN ExpressionList RPAREN
@@ -119,7 +119,7 @@ StringList
   = first:StringLiteral COMMA rest:StringList { return [first, ...rest] }
   / only:StringLiteral { return [only] }
 
-Constant
+Literal
   = NullLiteral
   / BooleanLiteral
   / NumberLiteral
@@ -666,12 +666,12 @@ ValueList
   / only:Value { return [only] }
 
 Value
-  = Constant
+  = Literal
 
 /* System functions */
 
 ConstantExpr
-  = Constant
+  = Literal
   / CurrentTimestamp
   / NowCall
 
