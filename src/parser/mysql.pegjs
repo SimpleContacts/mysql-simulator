@@ -1,7 +1,103 @@
 {
-  function escape(s) {
-    return "'" + s.replace("'", "''") + "'"
+
+/**
+ * Helper functions to more succinctly produce nodes
+ */
+const invariant = require('invariant');
+
+function identifier(name) {
+  return {
+    type: 'identifier',
+    name,
+    id: name,   // Deprecate in favor of `name`
   }
+}
+
+function literal(value) {
+  return { type: 'literal', value }
+}
+
+function unary(op, expr) {
+  return { type: 'unary', op, expr }
+}
+
+function binary(op, expr1, expr2) {
+  return { type: 'binary', op, expr1, expr2 }
+}
+
+function callExpression(name, args) {
+  invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
+  return { type: 'callExpression', name, args }
+}
+
+function builtinFunction(name) {
+  return { type: 'builtinFunction', name }
+}
+
+function generated(expr, mode) {
+  return { type: 'generated', expr, mode }
+}
+
+//
+// HACK: Using this for now, because the Simulator internals aren't aware of
+// Nodes, so we'll have to convert this to strings before we pass it on.
+// However, it would be nice if they _would_ work with AST nodes instead, so
+// eventually™ we should remove this serialize*() helper family here.
+//
+
+function serialize(node) {
+  switch (node.type) {
+    case 'callExpression':
+      return serializeCallExpression(node)
+    case 'literal':
+      return node.value
+    case 'identifier':
+      return node.name
+    case 'builtinFunction':
+      return node.name
+    default:
+      throw new Error(`Don't know how to serialize ${node} nodes yet.  Please tell me.`);
+  }
+}
+
+//
+// HACK:
+// This is a huge hack because the defaultValue that the simulator expects vary
+// in types, and it's superinconsistent.
+//
+// - String literals are sent as quoted strings "'foobar'"
+// - Function calls are sent as strings, e.g. "CURRENT_TIMESTAMP"
+// - Booleans are sent as booleans literals, e.g. "FALSE"
+// - Numbers are sent as true numbers, e.g. 0
+// - `null` is sent as the string "NULL"
+//
+// 🙈
+//
+function serializeDefaultValue_HACK(node) {
+  switch (node.type) {
+    case 'literal':
+      return node.value === null
+        ? 'NULL'
+        : node.value === true
+        ? 'TRUE'
+        : node.value === false
+        ? 'FALSE'
+        : node.value
+    default:
+      // Defer to "normal" serializer
+      return serialize(node);
+  }
+}
+
+function serializeCallExpression(node) {
+  invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
+  let f = serialize(node.name)
+  if (node.args !== undefined) {
+    f += `(${node.args.map(serialize).join(', ')})`;
+  }
+  return f;
+}
+
 }
 
 start = StatementList
@@ -67,18 +163,134 @@ ExpressionList
   / only:Expression { return [only] }
 
 Expression
-  = Expression$ ( ( PLUS / MINUS ) Expression )?
+  = expr1:BooleanPrimary op:BooleanOp expr2:BooleanPrimary { return binary(op, expr1, expr2) }
+  / BooleanPrimary
 
-Expression$
-  = MemberExpression
-  / CallExpression
-  / Identifier { return null }
-  / Constant
+BooleanOp
+  = AND
+  / OR
+  / XOR
 
-CallExpression
-  = FunctionName LPAREN ExpressionList RPAREN
+BooleanPrimary
+  = pred:Predicate IS check:( NULL / NOT_NULL ) {
+      // #lolmysql
+      if (check === 'NULL') {
+        return callExpression(builtinFunction('isnull'), [pred])
+      } else {
+        return unary('is not null', pred)
+      }
+    }
+  / pred1:Predicate op:CmpOp pred2:Predicate { return binary(op, pred1, pred2) }
+  / Predicate
 
-MemberExpression
+CmpOp
+  = EQ
+  / NE1
+  / NE2
+  / GTE
+  / GT
+  / LTE
+  / LT
+
+Predicate
+  = BitExpr1
+
+BitExpr1
+  // Mostly expressed like this to fight left-recursion in the grammer
+  = expr1:BitExpr2 rest:( op:BitExprOp1 expr2:BitExpr2 { return { op, expr2 } } )* {
+      return rest.reduce(
+        (acc, cur) => binary(cur.op, acc, cur.expr2),
+        expr1
+      )
+    }
+
+BitExpr2
+  // Mostly expressed like this to fight left-recursion in the grammer
+  = expr1:SimpleExpr rest:( op:BitExprOp2 expr2:SimpleExpr { return { op, expr2 } } )* {
+      return rest.reduce(
+        (acc, cur) => binary(cur.op, acc, cur.expr2),
+        expr1
+      )
+    }
+
+// Binary operators with weak binding
+BitExprOp1
+  = PLUS
+  / MINUS
+
+// Binary operators with strong binding
+BitExprOp2
+  = MULT
+  / DIVIDE
+  / DIV
+  / PERCENTAGE
+  / MOD { return '%' }
+
+/* ArithmeticOperator */
+/*   = PLUS */
+/*   / MINUS */
+  // |
+  // &
+  // <<
+  // >>
+  // +
+  // -
+  // *
+  // /
+  // DIV
+  // MOD
+  // %
+  // ^
+  // +
+  // -
+
+/* BitExpr */
+/*   = BitExpr ArithmeticOperator BitExpr */
+/*   / SimpleExpr */
+
+SimpleExpr
+  = Literal
+  / FunctionCall
+  / MemberAccess  // Not sure where this one fits
+  / name:Identifier { return identifier(name) }
+  // / simple_expr COLLATE collation_name
+  // / param_marker
+  // / variable
+  // / simple_expr || simple_expr
+  / PLUS expr:SimpleExpr { return unary('+', expr) }
+  / MINUS expr:SimpleExpr { return unary('-', expr) }
+  // / ~ simple_expr
+  / BANG expr:SimpleExpr { return unary('!', expr) }
+  // / BINARY simple_expr
+  / LPAREN exprs:ExpressionList RPAREN { return exprs }
+  // / ROW (expr, expr [, expr] ...)
+  // / (subquery)
+  // / EXISTS (subquery)
+  // / {identifier expr}
+  // / match_expr
+  // / case_expr
+  // / interval_expr
+
+FunctionCall
+  = name:FunctionName LPAREN exprs:ExpressionList RPAREN {
+      return callExpression(builtinFunction(name), exprs)
+    }
+
+  / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
+      return callExpression(builtinFunction(ident), exprs)
+    }
+
+  // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
+  / ident:Identifier arrow:( ARROWW / ARROW ) lit:StringLiteral {
+      let rv = callExpression(builtinFunction('JSON_EXTRACT'), [identifier(ident), lit])
+      if (arrow === '->>') {
+        rv = callExpression(builtinFunction('JSON_UNQUOTE'), [rv])
+      }
+      return rv
+    }
+
+// Not sure where we can find this syntax in the MySQL manual, or what this is named
+MemberAccess
   = object:Identifier '.' property:Identifier { return null }
 
 FunctionName
@@ -95,37 +307,41 @@ FunctionName
 // ====================================================
 
 NullLiteral
-  = NULL
+  = NULL { return literal(null) }
 
 BooleanLiteral
-  = TRUE
-  / FALSE
+  = TRUE  { return literal(true) }
+  / FALSE { return literal(false) }
 
 NumberLiteral
   = HexNumberLiteral
   / DecimalNumberLiteral
 
 DecimalNumberLiteral
-  = digits:[0-9]+ { return parseInt(digits.join(''), 10) }
+  = digits:[0-9]+ { return literal(parseInt(digits.join(''), 10)) }
 
 HexNumberLiteral
-  = '0x' digits:[0-9a-fA-F]+ { return parseInt(digits.join(''), 16) }
+  = '0x' digits:[0-9a-fA-F]+ { return literal(parseInt(digits.join(''), 16)) }
 
 StringLiteral
   = SingleQuotedStringLiteral
   / DoubleQuotedStringLiteral
 
 SingleQuotedStringLiteral
-  = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" { return `'${seq.join('')}'` }
+  = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" {
+    return literal(`'${seq.join('')}'`)
+  }
 
 DoubleQuotedStringLiteral
-  = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' { return `'${seq.join('')}'` }
+  = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' {
+    return literal(`'${seq.join('')}'`)
+  }
 
-StringList
-  = first:StringLiteral COMMA rest:StringList { return [first, ...rest] }
+StringLiteralList
+  = first:StringLiteral COMMA rest:StringLiteralList { return [first, ...rest] }
   / only:StringLiteral { return [only] }
 
-Constant
+Literal
   = NullLiteral
   / BooleanLiteral
   / NumberLiteral
@@ -514,24 +730,37 @@ CreateDefinition
     }
   // / CHECK (expr)
 
+
+  // ALTER .... ... ....  COMMENT '123';
+
 ColumnDefinition
   = dataType:DataType
     nullableClause:( NULL / NOT_NULL )?
-    defaultValue:( DEFAULT value:ConstantExpr { return value } )?
+    defaultValue:( DEFAULT value:DefaultValueExpr { return value } )?
     isPrimary1:( PRIMARY KEY )?
     autoIncrement:AUTO_INCREMENT?
     isUnique:( UNIQUE KEY? )?
     isPrimary2:( PRIMARY KEY )?
-    comment:( COMMENT value:StringLiteral { return value } )?
+    comment:( COMMENT value:StringLiteral { return value.value } )?
     reference:ReferenceDefinition?
-    onUpdate:( ON UPDATE expr:ConstantExpr { return expr } )?
+    onUpdate:( ON UPDATE expr:DefaultValueExpr { return expr } )?
+    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )? { return generated(expr, mode || 'VIRTUAL') } )?
+    nullableClause2:( NULL / NOT_NULL )?
     {
       let nullable = null;
-      if (nullableClause === 'NULL') {
+      if (nullableClause === 'NULL' || nullableClause2 === 'NULL') {
         nullable = true;
-      } else  if (nullableClause === 'NOT NULL') {
+      } else if (nullableClause === 'NOT NULL' || nullableClause2 === 'NOT NULL') {
         nullable = false;
       };
+
+      // Unpack the defaultValue / onUpdate AST nodes into a string version for
+      // now.  We changed the parser's output to produce better ASTs, but the
+      // internal simulator data structures aren't aware and capable of
+      // handling those yet.
+      defaultValue = defaultValue === null ? null : serializeDefaultValue_HACK(defaultValue)
+      onUpdate = onUpdate === null ? null : serializeDefaultValue_HACK(onUpdate)
+
       return {
         dataType,
         nullable,
@@ -542,15 +771,16 @@ ColumnDefinition
         autoIncrement: !!autoIncrement,
         comment,
         reference,
+        generated,
       }
     }
 
 
 Len
-  = LPAREN number:NumberLiteral RPAREN { return number }
+  = LPAREN number:NumberLiteral RPAREN { return number.value }
 
 PrecisionSpec
-  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length, decimals] }
+  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length.value, decimals.value] }
 
 BoolTypeName
   = BOOLEAN
@@ -609,8 +839,8 @@ DataType
   / PrecisionDataType
   / type:TextDataType ignore1:(CHARACTER SET CharsetName)? ignore2:(COLLATE CollationName)? { return type }
   / JSON
-  / ENUM LPAREN values:StringList RPAREN {
-      return `ENUM(${values.join(',')})`;
+  / ENUM LPAREN literals:StringLiteralList RPAREN {
+      return `ENUM(${literals.map(str => str.value).join(',')})`;
     }
 
 IndexColNames
@@ -667,20 +897,22 @@ ValueList
   / only:Value { return [only] }
 
 Value
-  = Constant
+  = lit:Literal { return lit.value }
 
 /* System functions */
 
-ConstantExpr
-  = Constant
+DefaultValueExpr
+  = Literal
   / CurrentTimestamp
   / NowCall
 
 CurrentTimestamp
-  = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? { return precision ? `${value}(${precision})` : value }
+  = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? {
+    return callExpression(builtinFunction(value), precision ? [precision] : undefined)
+  }
 
 NowCall
-  = NOW LPAREN RPAREN { return 'NOW()' }
+  = NOW LPAREN RPAREN { return callExpression(builtinFunction('NOW'), []) }
 
 // ====================================================
 // Util
@@ -691,6 +923,7 @@ Whitespace
   = [ \t\r\n]
   / Comment
 
+// TODO: Let this return identifier() nodes
 Identifier
   = QuotedIdentifier
   / NonQuotedIdentifier
@@ -715,6 +948,8 @@ ACTION            = _ 'ACTION'i            !IdentifierChar _ { return 'ACTION' }
 ADD               = _ 'ADD'i               !IdentifierChar _ { return 'ADD' }
 AFTER             = _ 'AFTER'i             !IdentifierChar _ { return 'AFTER' }
 ALTER             = _ 'ALTER'i             !IdentifierChar _ { return 'ALTER' }
+ALWAYS            = _ 'ALWAYS'i            !IdentifierChar _ { return 'ALWAYS' }
+AND               = _ 'AND'i               !IdentifierChar _ { return 'AND' }
 AS                = _ 'AS'i                !IdentifierChar _ { return 'AS' }
 ASC               = _ 'ASC'i               !IdentifierChar _ { return 'ASC' }
 AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierChar _ { return 'AUTO_INCREMENT' }
@@ -743,6 +978,7 @@ DEFAULT           = _ 'DEFAULT'i           !IdentifierChar _ { return 'DEFAULT' 
 DELETE            = _ 'DELETE'i            !IdentifierChar _ { return 'DELETE' }
 DESC              = _ 'DESC'i              !IdentifierChar _ { return 'DESC' }
 DETERMINISTIC     = _ 'DETERMINISTIC'i     !IdentifierChar _ { return 'DETERMINISTIC' }
+DIV               = _ 'DIV'i               !IdentifierChar _ { return 'DIV' }
 DO                = _ 'DO'i                !IdentifierChar _ { return 'DO' }
 DOUBLE            = _ 'DOUBLE'i            !IdentifierChar _ { return 'DOUBLE' }
 DROP              = _ 'DROP'i              !IdentifierChar _ { return 'DROP' }
@@ -763,18 +999,21 @@ FOREIGN           = _ 'FOREIGN'i           !IdentifierChar _ { return 'FOREIGN' 
 FULL              = _ 'FULL'i              !IdentifierChar _ { return 'FULL' }
 FULLTEXT          = _ 'FULLTEXT'i          !IdentifierChar _ { return 'FULLTEXT' }
 FUNCTION          = _ 'FUNCTION'i          !IdentifierChar _ { return 'FUNCTION' }
+GENERATED         = _ 'GENERATED'i         !IdentifierChar _ { return 'GENERATED' }
 HASH              = _ 'HASH'i              !IdentifierChar _ { return 'HASH' }
 IF                = _ 'IF'i                !IdentifierChar _ { return 'IF' }
 INDEX             = _ 'INDEX'i             !IdentifierChar _ { return 'INDEX' }
 INSERT            = _ 'INSERT'i            !IdentifierChar _ { return 'INSERT' }
 INT               = _ 'INT'i               !IdentifierChar _ { return 'INT' }
 INTEGER           = _ 'INTEGER'i           !IdentifierChar _ { return 'INTEGER' }
+IS                = _ 'IS'i                !IdentifierChar _ { return 'IS' }
 JSON              = _ 'JSON'i              !IdentifierChar _ { return 'JSON' }
 KEY               = _ 'KEY'i               !IdentifierChar _ { return 'KEY' }
 LIKE              = _ 'LIKE'i              !IdentifierChar _ { return 'LIKE' }
 LOCK              = _ 'LOCK'i              !IdentifierChar _ { return 'LOCK' }
 MATCH             = _ 'MATCH'i             !IdentifierChar _ { return 'MATCH' }
 MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierChar _ { return 'MEDIUMINT' }
+MOD               = _ 'MOD'i               !IdentifierChar _ { return 'MOD' }
 MODIFY            = _ 'MODIFY'i            !IdentifierChar _ { return 'MODIFY' }
 NEW               = _ 'NEW'i               !IdentifierChar _ { return 'NEW' }
 NO                = _ 'NO'i                !IdentifierChar _ { return 'NO' }
@@ -785,6 +1024,7 @@ NULL              = _ 'NULL'i              !IdentifierChar _ { return 'NULL' }
 NUMERIC           = _ 'NUMERIC'i           !IdentifierChar _ { return 'NUMERIC' }
 OLD               = _ 'OLD'i               !IdentifierChar _ { return 'OLD' }
 ON                = _ 'ON'i                !IdentifierChar _ { return 'ON' }
+OR                = _ 'OR'i                !IdentifierChar _ { return 'OR' }
 PARTIAL           = _ 'PARTIAL'i           !IdentifierChar _ { return 'PARTIAL' }
 PRECEDES          = _ 'PRECEDES'i          !IdentifierChar _ { return 'PRECEDES' }
 PRIMARY           = _ 'PRIMARY'i           !IdentifierChar _ { return 'PRIMARY' }
@@ -800,6 +1040,7 @@ SET               = _ 'SET'i               !IdentifierChar _ { return 'SET' }
 SHARED            = _ 'SHARED'i            !IdentifierChar _ { return 'SHARED' }
 SIMPLE            = _ 'SIMPLE'i            !IdentifierChar _ { return 'SIMPLE' }
 SMALLINT          = _ 'SMALLINT'i          !IdentifierChar _ { return 'SMALLINT' }
+STORED            = _ 'STORED'i            !IdentifierChar _ { return 'STORED' }
 TABLE             = _ 'TABLE'i             !IdentifierChar _ { return 'TABLE' }
 TEXT              = _ 'TEXT'i              !IdentifierChar _ { return 'TEXT' }
 THEN              = _ 'THEN'i              !IdentifierChar _ { return 'THEN' }
@@ -816,7 +1057,9 @@ UPDATE            = _ 'UPDATE'i            !IdentifierChar _ { return 'UPDATE' }
 USING             = _ 'USING'i             !IdentifierChar _ { return 'USING' }
 VARBINARY         = _ 'VARBINARY'i         !IdentifierChar _ { return 'VARBINARY' }
 VARCHAR           = _ 'VARCHAR'i           !IdentifierChar _ { return 'VARCHAR' }
+VIRTUAL           = _ 'VIRTUAL'i           !IdentifierChar _ { return 'VIRTUAL' }
 WHILE             = _ 'WHILE'i             !IdentifierChar _ { return 'WHILE' }
+XOR               = _ 'XOR'i               !IdentifierChar _ { return 'XOR' }
 
 // Reserved built-in functions
 // TODO: Complete this list
@@ -834,15 +1077,23 @@ NOT_NULL = NOT NULL { return 'NOT NULL' }
 // Tokens
 // ====================================================
 
-COMMA      = _ ',' _
-EQ         = _ '=' _
-GT         = _ '>' _
-GTE        = _ '>=' _
-LPAREN     = _ '(' _
-LT         = _ '<' _
-LTE        = _ '<=' _
-MINUS      = _ '-' _
-NE         = _ '<=>' _
-PLUS       = _ '+' _
-RPAREN     = _ ')' _
-SEMICOLON  = _ ';' _
+ARROW      = _ '->' _   { return '->' }
+ARROWW     = _ '->>' _  { return '->>' }
+BANG       = _ '!' _    { return '+' }
+COMMA      = _ ',' _    { return ',' }
+DIVIDE     = _ '/' _    { return '/' }
+EQ         = _ '=' _    { return '=' }
+GT         = _ '>' _    { return '>' }
+GTE        = _ '>=' _   { return '>=' }
+LPAREN     = _ '(' _    { return '(' }
+LT         = _ '<' _    { return '<' }
+LTE        = _ '<=' _   { return '<=' }
+MINUS      = _ '-' _    { return '-' }
+MULT       = _ '*' _    { return '*' }
+NE         = _ '<=>' _  { return '<=>' }
+NE1        = _ '<>' _   { return '<>' }
+NE2        = _ '!=' _   { return '<>' }
+PERCENTAGE = _ '%' _    { return '%' }
+PLUS       = _ '+' _    { return '+' }
+RPAREN     = _ ')' _    { return ')' }
+SEMICOLON  = _ ';' _    { return ';' }

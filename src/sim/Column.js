@@ -2,7 +2,13 @@
 
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
+import { serialize } from './serialize';
 import { escape } from './utils';
+
+type Generated = {|
+  expr: string,
+  mode: 'STORED' | 'VIRTUAL',
+|};
 
 export default class Column {
   +name: string;
@@ -12,6 +18,7 @@ export default class Column {
   +onUpdate: null | string;
   +autoIncrement: boolean;
   +comment: null | string;
+  +generated: null | Generated;
 
   constructor(
     name: string,
@@ -21,6 +28,7 @@ export default class Column {
     onUpdate: null | string,
     autoIncrement: boolean,
     comment: null | string,
+    generated: null | Generated,
   ) {
     this.name = name;
     this.type = type;
@@ -29,6 +37,7 @@ export default class Column {
     this.onUpdate = onUpdate;
     this.autoIncrement = autoIncrement;
     this.comment = comment;
+    this.generated = generated;
   }
 
   /**
@@ -43,6 +52,7 @@ export default class Column {
     +onUpdate?: null | string,
     +autoIncrement?: boolean,
     +comment?: null | string,
+    +generated?: null | Generated,
   |}): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
@@ -52,6 +62,7 @@ export default class Column {
       record.onUpdate !== undefined ? record.onUpdate : this.onUpdate,
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
+      record.generated !== undefined ? record.generated : this.generated,
     );
   }
 
@@ -74,6 +85,7 @@ export default class Column {
    */
   getDefinition(): string {
     const typeInfo = this.getTypeInfo();
+    const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
     // MySQL outputs number constants as strings. No idea why that would make
@@ -98,7 +110,9 @@ export default class Column {
       ? 'NULL'
       : '';
 
-    defaultValue = defaultValue ? `DEFAULT ${defaultValue}` : '';
+    defaultValue =
+      // Generated columns won't have a default value
+      !generated && defaultValue ? `DEFAULT ${defaultValue}` : '';
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
@@ -110,11 +124,13 @@ export default class Column {
 
     return [
       formatDataType(typeInfo),
-      nullable,
+      generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
+      generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr)}) ${generated.mode}` : '',
+      generated !== null ? nullable : '',
     ]
       .filter(x => x)
       .join(' ');

@@ -32,6 +32,14 @@ export function quote(s: string): string {
 }
 
 /**
+ * ...and of course MySQL has another quoting strategy when in an expression
+ * context.  Le sigh.
+ */
+export function quoteInExpressionContext(s: string): string {
+  return `'${s.replace("'", "\\'")}'`;
+}
+
+/**
  * Parses an ENUM definition, like
  *
  *     'Fo,o', 'B''ar','Qux\''
@@ -42,8 +50,8 @@ export function quote(s: string): string {
  */
 export function parseEnumValues(enumString: string): Array<string> {
   const values = rawParseSql(enumString, {
-    startRule: 'StringList',
+    startRule: 'StringLiteralList',
   });
   // Dequote to make them JavaScript string literals
-  return values.map(unquote);
+  return values.map(lit => unquote(lit.value));
 }

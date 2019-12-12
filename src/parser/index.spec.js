@@ -28,6 +28,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -43,6 +44,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -58,6 +60,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -73,6 +76,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
         ],
@@ -114,6 +118,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -129,6 +134,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -144,6 +150,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -159,6 +166,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
           },
           {
@@ -223,6 +231,7 @@ describe('Read documentation', () => {
               reference: null,
               onUpdate: null,
               comment: null,
+              generated: null,
             },
             position: null,
           },

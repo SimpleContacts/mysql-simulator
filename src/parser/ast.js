@@ -9,6 +9,7 @@ export type NamedConstraint = string;
 export type Direction = 'ASC' | 'DESC';
 export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
 export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
+export type GeneratedMode = 'STORED' | 'VIRTUAL';
 
 export type IndexColName = {|
   colName: Identifier,
@@ -24,6 +25,11 @@ export type ReferenceDefinition = {|
   onUpdate: ReferenceOption | null,
 |};
 
+export type GeneratedDefinition = {|
+  expr: string,
+  mode: GeneratedMode,
+|};
+
 export type ColumnDefinition = {|
   dataType: string,
   nullable: boolean | null,
@@ -34,6 +40,7 @@ export type ColumnDefinition = {|
   autoIncrement: boolean,
   comment: string | null,
   reference: ReferenceDefinition | null,
+  generated: GeneratedDefinition | null,
 |};
 
 export type CreateTableDefinition =
