@@ -29,5 +29,8 @@ CREATE TABLE t2 (
     x3 VARCHAR(20) AS (c1 + c1 -> '$.type'),
     x4 VARCHAR(20) AS (c1 + (c1 -> '$.type')),
     x5 VARCHAR(20) AS (c1 ->> '$.type'),
-    x6 BOOLEAN AS (c1 ->> '$.type' = 'CONTACTS')
+    x6 BOOLEAN AS (c1 ->> '$.type' = 'CONTACTS'),
+
+    y1 VARCHAR(12) AS (IF(c1 IS NOT NULL, 'foo', 'bar')),
+    y2 VARCHAR(12) AS (IF(c1, NULL, 'bar'))
 );

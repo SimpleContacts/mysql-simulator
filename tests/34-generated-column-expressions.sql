@@ -27,3 +27,7 @@ CREATE TABLE t3 (
   -- time when the wounds on my forehead are healed.
   -- s8 TINYINT(1) AS ('''I am quoted, too'', said someone else''s cat')
 );
+
+CREATE TABLE t4 (
+  c1 TINYINT(1) AS (NULL)
+);

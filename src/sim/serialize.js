@@ -20,6 +20,8 @@ export function serialize(node) {
         ? 'TRUE'
         : node.value === false
         ? 'FALSE'
+        : node.value === null
+        ? 'NULL'
         : typeof node.value === 'string'
         ? quoteInExpressionContext(unquote(node.value))
         : node.value;
