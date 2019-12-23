@@ -504,7 +504,13 @@ AlterSpecs
  * See https://dev.mysql.com/doc/refman/5.7/en/alter-table.html
  */
 AlterSpec
-  = ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition
+  = options:TableOptions {
+      return {
+        type: 'CHANGE TABLE OPTIONS',
+        options,
+      }
+    }
+  / ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition
     position:(
       AFTER ident:Identifier { return `AFTER ${ident}` }
       / FIRST { return 'FIRST' }

@@ -209,6 +209,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           db = db.dropForeignKey(stm.tblName, change.symbol);
         } else if (change.type === 'DROP DEFAULT') {
           db = db.dropDefault(stm.tblName, change.colName);
+        } else if (change.type === 'CHANGE TABLE OPTIONS') {
+          // Ignore
         } else {
           // Log details to the console (useful for debugging)
           error(`Unknown change type: ${change.type}`);
