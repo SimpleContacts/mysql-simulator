@@ -1,3 +1,8 @@
+# v1.4.0
+
+* Add support for `LIKE`, `REGEXP`, and `RLIKE` syntax in conditions
+
+
 # v1.3.3
 
 * Accept table options syntax in ALTER TABLE statements
