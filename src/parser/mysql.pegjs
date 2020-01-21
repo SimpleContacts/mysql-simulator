@@ -191,6 +191,10 @@ CmpOp
   / GT
   / LTE
   / LT
+  / LIKE
+  / REGEXP
+  / RLIKE  // RLIKE is a synonym for REGEXP
+    { return 'REGEXP' }
 
 Predicate
   = BitExpr1
@@ -1036,10 +1040,12 @@ PRECEDES          = _ 'PRECEDES'i          !IdentifierChar _ { return 'PRECEDES'
 PRIMARY           = _ 'PRIMARY'i           !IdentifierChar _ { return 'PRIMARY' }
 REAL              = _ 'REAL'i              !IdentifierChar _ { return 'REAL' }
 REFERENCES        = _ 'REFERENCES'i        !IdentifierChar _ { return 'REFERENCES' }
+REGEXP            = _ 'REGEXP'i            !IdentifierChar _ { return 'REGEXP' }
 RENAME            = _ 'RENAME'i            !IdentifierChar _ { return 'RENAME' }
 RESTRICT          = _ 'RESTRICT'i          !IdentifierChar _ { return 'RESTRICT' }
 RETURN            = _ 'RETURN'i            !IdentifierChar _ { return 'RETURN' }
 RETURNS           = _ 'RETURNS'i           !IdentifierChar _ { return 'RETURNS' }
+RLIKE             = _ 'RLIKE'i             !IdentifierChar _ { return 'RLIKE' }
 ROW               = _ 'ROW'i               !IdentifierChar _ { return 'ROW' }
 SELECT            = _ 'SELECT'i            !IdentifierChar _ { return 'SELECT' }
 SET               = _ 'SET'i               !IdentifierChar _ { return 'SET' }

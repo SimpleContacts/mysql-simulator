@@ -46,7 +46,7 @@ export function serialize(node) {
 
       // #lolmysql, for some reason it only lowercases these op names, but not
       // others...
-      if (['AND', 'OR', 'XOR'].includes(op)) {
+      if (['AND', 'OR', 'XOR', 'LIKE', 'REGEXP'].includes(op)) {
         op = op.toLowerCase();
       }
 
