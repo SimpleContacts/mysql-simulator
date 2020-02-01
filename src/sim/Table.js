@@ -110,7 +110,9 @@ export default class Table {
         // Don't change
         return fk;
       }
-      return fk.patch({ name: `${newName}${fk.name.substring(oldName.length)}` });
+      return fk.patch({
+        name: `${newName}${fk.name.substring(oldName.length)}`,
+      });
     });
 
     return new Table(newName, this.columns, this.primaryKey, this.indexes, foreignKeys);
@@ -252,11 +254,11 @@ export default class Table {
         console.warn('    ...');
         for (const fk of fks) {
           console.warn(
-            `    ALTER TABLE ${escape(table.name)} ADD CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
-              .map(name => escape(name))
-              .join(', ')}) REFERENCES ${escape(fk.reference.table)} (${fk.reference.columns
-              .map(name => escape(name))
-              .join(', ')});`,
+            `    ALTER TABLE ${escape(table.name)} ADD CONSTRAINT ${escape(
+              fk.name,
+            )} FOREIGN KEY (${fk.columns.map(name => escape(name)).join(', ')}) REFERENCES ${escape(
+              fk.reference.table,
+            )} (${fk.reference.columns.map(name => escape(name)).join(', ')});`,
           );
         }
         console.warn(`    UNLOCK TABLES;`);
@@ -305,7 +307,11 @@ export default class Table {
     const indexes = this.indexes
       // Implicitly remove this column from any multi-column indexes that
       // contain it
-      .map(index => index.patch({ columns: index.columns.filter(name => name !== colName) }))
+      .map(index =>
+        index.patch({
+          columns: index.columns.filter(name => name !== colName),
+        }),
+      )
       // If this leads to "empty" indexes, drop 'em entirely
       .filter(index => index.columns.length > 0);
 

@@ -46,14 +46,22 @@ export type ColumnDefinition = {|
 export type CreateTableDefinition =
   | {| type: 'COLUMN', colName: Identifier, definition: ColumnDefinition |}
   | {| type: 'PRIMARY KEY', indexColNames: Array<IndexColName> |}
-  | {| type: 'INDEX', indexName: Identifier | null, indexColNames: Array<IndexColName> |}
+  | {|
+      type: 'INDEX',
+      indexName: Identifier | null,
+      indexColNames: Array<IndexColName>,
+    |}
   | {|
       type: 'UNIQUE INDEX',
       constraint: NamedConstraint | null,
       indexName: Identifier | null,
       indexColNames: Array<IndexColName>,
     |}
-  | {| type: 'FULLTEXT INDEX', indexName: Identifier | null, indexColNames: Array<IndexColName> |}
+  | {|
+      type: 'FULLTEXT INDEX',
+      indexName: Identifier | null,
+      indexColNames: Array<IndexColName>,
+    |}
   | {|
       type: 'FOREIGN KEY',
       constraint: NamedConstraint | null,

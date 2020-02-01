@@ -107,7 +107,13 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
     } else {
       const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
       const $$locked = true;
-      db = db.addIndex(tblName, index.indexName || null, type, index.indexColNames.map(def => def.colName), $$locked);
+      db = db.addIndex(
+        tblName,
+        index.indexName || null,
+        type,
+        index.indexColNames.map(def => def.colName),
+        $$locked,
+      );
     }
   }
 
@@ -164,7 +170,10 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'DROP COLUMN') {
           db = db.removeColumn(stm.tblName, change.colName);
         } else if (change.type === 'ADD PRIMARY KEY') {
-          db = db.addPrimaryKey(stm.tblName, change.indexColNames.map(col => col.colName));
+          db = db.addPrimaryKey(
+            stm.tblName,
+            change.indexColNames.map(col => col.colName),
+          );
         } else if (change.type === 'DROP PRIMARY KEY') {
           db = db.dropPrimaryKey(stm.tblName);
         } else if (change.type === 'ADD FOREIGN KEY') {
@@ -223,7 +232,13 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
       db = db.renameTable(stm.tblName, stm.newName);
     } else if (stm.type === 'CREATE INDEX') {
       const $$locked = !!stm.indexName;
-      db = db.addIndex(stm.tblName, stm.indexName, stm.indexKind, stm.indexColNames.map(def => def.colName), $$locked);
+      db = db.addIndex(
+        stm.tblName,
+        stm.indexName,
+        stm.indexKind,
+        stm.indexColNames.map(def => def.colName),
+        $$locked,
+      );
     } else if (stm.type === 'DROP INDEX') {
       db = db.dropIndex(stm.tblName, stm.indexName);
     } else if (stm.type === 'CREATE FUNCTION') {
