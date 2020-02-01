@@ -1,5 +1,5 @@
 {
-  "name": "@simple-contacts/mysql-simulator",
+  "name": "@simplehealth/mysql-simulator",
   "version": "1.4.0",
   "main": "dist/index.js",
   "license": "MIT",

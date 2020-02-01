@@ -6,7 +6,7 @@ This MySQL simulator offers a super easy API that, at the highest level, looks
 like:
 
 ```javascript
-import simulate from '@simple-contacts/mysql-simulator';
+import simulate from '@simplehealth/mysql-simulator';
 
 const db = simulate('./path/to/migrations');
 ```
