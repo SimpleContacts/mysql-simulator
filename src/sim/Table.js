@@ -3,7 +3,6 @@
 import { maxBy, sortBy } from 'lodash';
 
 import Column from './Column';
-// eslint-disable-next-line import/no-cycle
 import Database from './Database';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
@@ -232,7 +231,6 @@ export default class Table {
       const oldType = oldColumn.getDefinition();
       const newType = newColumn.getDefinition();
       if (oldType !== newType) {
-        /* eslint-disable no-console */
         console.warn('');
         console.warn(`WARNING: Column type change detected on column "${table.name}.${oldColName}" used in FK:`);
         for (const fk of fks) {
@@ -263,7 +261,6 @@ export default class Table {
         }
         console.warn(`    UNLOCK TABLES;`);
         console.warn('');
-        /* eslint-enable no-console */
       }
     }
 

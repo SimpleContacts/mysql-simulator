@@ -10,7 +10,6 @@ import type { ColumnDefinition, CreateTableStatement, Statement } from '../parse
 import Column from './Column';
 import Database from './Database';
 
-// eslint-disable-next-line no-console
 const error = console.error;
 
 function makeColumn(colName, def: ColumnDefinition): Column {

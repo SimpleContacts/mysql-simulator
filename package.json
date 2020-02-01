@@ -42,6 +42,7 @@
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-flow": "^7.8.3",
+    "babel-eslint": "^10.0.3",
     "colordiff": "1.0.4",
     "eslint": "^6.8.0",
     "eslint-plugin-flowtype": "^4.6.0",

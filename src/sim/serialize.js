@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export, no-use-before-define, no-else-return */
-
 import invariant from 'invariant';
 
 import { escape, quoteInExpressionContext, unquote } from './utils';

@@ -8,9 +8,7 @@ import program from 'commander';
 import { applySqlFile, dumpDb, expandInputFiles } from './core';
 import Database from './Database';
 
-// eslint-disable-next-line no-console
 const log = console.log;
-// eslint-disable-next-line no-console
 const error = console.error;
 
 type Options = {

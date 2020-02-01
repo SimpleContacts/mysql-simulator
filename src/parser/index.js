@@ -47,7 +47,6 @@ const indent = (text: string): string =>
 const NUM_CONTEXT_LINES_BEFORE = 4;
 const NUM_CONTEXT_LINES_AFTER = 3;
 
-// eslint-disable-next-line no-console
 const error = console.error;
 
 /**

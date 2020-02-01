@@ -1,6 +1,7 @@
 {
   "env": {
     "es6": true,
+    "node": true,
     "jest": true
   },
   "extends": [
@@ -46,7 +47,6 @@
     "eqeqeq": [ "error", "always" ],
     "linebreak-style": [ "error", "unix" ],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_+$" }],
-    "quotes": [ "error", "single", { "avoidEscape": true } ],
     "semi": [ "error", "always" ],
     "flowtype/boolean-style": [ 2, "boolean" ],
     "flowtype/define-flow-type": 1,
