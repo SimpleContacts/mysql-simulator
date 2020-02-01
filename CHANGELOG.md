@@ -1,3 +1,9 @@
+# v1.4.1
+
+* First public release
+* Removed runtime dependencies on SimpleHealth internal/private packages
+
+
 # v1.4.0
 
 * Add support for `LIKE`, `REGEXP`, and `RLIKE` syntax in conditions
