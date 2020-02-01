@@ -47,12 +47,16 @@ apply some migrations and output the resulting table definitions:
 
     $ bin/mysql-simulate <path>
 
-To run it on all the migrations in the Simple Contacts main repo:
+This assumes a directory of `*.sql` files containing SQL statements, which are
+numbered sequentially, for example: `0001-create-table.sql`,
+`0002-change-field.sql`, etc.
 
-    $ bin/mysql-simulate ../simplecontacts/migrations
+To run it on all `*.sql` migration files in a directory:
+
+    $ bin/mysql-simulate path/to/migrations
 
 This will simulate running the migrations found in that directory sequentially.
-At the end, the DB's state is outputted as a SQL table definition dump.
+At the end, the DB's state is outputted as a single SQL table definition dump.
 
 
 # For developers
