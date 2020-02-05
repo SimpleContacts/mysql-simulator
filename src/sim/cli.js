@@ -51,8 +51,7 @@ function collect(val, memo) {
 
 function run() {
   program
-    .version('0.0.1')
-    .usage('[options] <path> [<path> ...]')
+    .usage('mysql-simulate [options] <path> [<path> ...]')
     // .command('command <inputs>')
     .description('Parses SQL migration files and outputs the resulting DB state.')
     .option('--step', 'Dump table after every alteration')
