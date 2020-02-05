@@ -1,3 +1,8 @@
+# v1.5.0 (not released yet)
+
+* Removed `--limit` and `--step` command line flags
+
+
 # v1.4.1
 
 * First public release
