@@ -268,9 +268,16 @@ export default class Database {
   toString(tableNames_: Array<string> = []): string {
     const tableNames = tableNames_.length > 0 ? tableNames_ : this.getTables().map(t => t.name);
     const dumps = [];
+
+    // To keep the output byte-by-byte the same as MySQL's dump output, we'll
+    // emit an empty line at the start.
+    dumps.push('');
+
     for (const tableName of tableNames) {
       dumps.push(this.getTable(tableName).toString());
+      dumps.push('');
     }
-    return dumps.join('\n\n');
+
+    return dumps.join('\n');
   }
 }
