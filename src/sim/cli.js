@@ -12,8 +12,6 @@ const error = console.error;
 type Options = {
   args: Array<string>,
   verbose: boolean,
-  limit: number,
-  step: boolean,
   tables: Array<string>,
 };
 
@@ -25,20 +23,12 @@ function runWithOptions(options: Options) {
   let db: Database = new Database();
 
   let files = Array.from(expandInputFiles(options.args));
-  if (options.limit) {
-    files = files.slice(0, options.limit);
-  }
-
   for (const fullpath of files) {
     const file = path.basename(fullpath);
     if (options.verbose) {
       error(`===> ${file}`);
     }
     db = applySqlFile(db, fullpath);
-
-    if (options.step) {
-      printDb(db, options.tables);
-    }
   }
 
   printDb(db, options.tables);
@@ -55,8 +45,6 @@ function run() {
     .name('mysql-simulate')
     .usage('[options] <path> [<path> ...]')
     .description('Parses SQL migration files and outputs the resulting DB state.')
-    .option('--step', 'Dump table after every alteration')
-    .option('--limit <n>', 'Run only the first N migrations', parseInt)
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('-v, --verbose', 'Be verbose')
     .parse(process.argv);
@@ -66,8 +54,8 @@ function run() {
     program.help();
   } else {
     // $FlowFixMe - options monkey-patched on program are invisible to Flow
-    const { args, verbose, limit, step, table } = program;
-    const options = { args, verbose, limit, step, tables: table };
+    const { args, verbose, table } = program;
+    const options = { args, verbose, tables: table };
     runWithOptions(options);
   }
 }
