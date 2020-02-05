@@ -1,10 +1,9 @@
 // @flow strict
 
 import { sortBy, zip } from 'lodash';
-
 import Column from './Column';
-import type { IndexType } from './Index';
 import Table from './Table';
+import type { IndexType } from './Index';
 
 type LUT<+T> = { +[string]: T };
 
@@ -263,5 +262,15 @@ export default class Database {
 
   dropIndex(tblName: string, indexName: string): Database {
     return this.swapTable(tblName, table => table.dropIndex(indexName));
+  }
+
+  // The optional subset of tables to print
+  toString(tableNames_: Array<string> = []): string {
+    const tableNames = tableNames_.length > 0 ? tableNames_ : this.getTables().map(t => t.name);
+    const dumps = [];
+    for (const tableName of tableNames) {
+      dumps.push(this.getTable(tableName).toString());
+    }
+    return dumps.join('\n\n');
   }
 }

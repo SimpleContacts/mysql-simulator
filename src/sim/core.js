@@ -120,19 +120,6 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   return db;
 }
 
-function* iterDumpDb(db: Database, tables_: Array<string> = []): Iterable<string> {
-  const tables = tables_.length > 0 ? tables_ : db.getTables().map(t => t.name);
-  for (const tableName of tables) {
-    yield '';
-    yield db.getTable(tableName).toString();
-  }
-  yield '';
-}
-
-export function dumpDb(db: Database, tables: Array<string> = []): string {
-  return Array.from(iterDumpDb(db, tables)).join('\n');
-}
-
 function applySqlStatements(db_: Database, statements: Array<Statement>): Database {
   let db = db_; // So we can keep re-assigning this variable
 

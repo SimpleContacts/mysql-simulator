@@ -2,10 +2,8 @@
 // @flow strict
 
 import path from 'path';
-
 import program from 'commander';
-
-import { applySqlFile, dumpDb, expandInputFiles } from './core';
+import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
 
 const log = console.log;
@@ -20,7 +18,7 @@ type Options = {
 };
 
 function printDb(db: Database, tables: Array<string> = []) {
-  log(dumpDb(db, tables));
+  log(db.toString(tables));
 }
 
 function runWithOptions(options: Options) {
