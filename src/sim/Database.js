@@ -1,9 +1,10 @@
 // @flow strict
 
 import { sortBy, zip } from 'lodash';
+
 import Column from './Column';
-import Table from './Table';
 import type { IndexType } from './Index';
+import Table from './Table';
 
 type LUT<+T> = { +[string]: T };
 

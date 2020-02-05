@@ -2,7 +2,9 @@
 // @flow strict
 
 import path from 'path';
+
 import program from 'commander';
+
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
 
