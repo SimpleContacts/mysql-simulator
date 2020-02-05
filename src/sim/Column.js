@@ -1,5 +1,8 @@
 // @flow strict
 
+import t from 'rule-of-law/types';
+import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
+
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
 import { serialize } from './serialize';
@@ -134,6 +137,62 @@ export default class Column {
     ]
       .filter(x => x)
       .join(' ');
+  }
+
+  toSchemaBaseType(): ROLTypeInfo {
+    const info = this.getTypeInfo();
+
+    // NOTE: MySQL represents boolean columns with TINYINT(1) specifically
+    if (info.baseType === 'tinyint' && info.length === 1) {
+      return t.Bool();
+    }
+
+    switch (info.baseType) {
+      case 'boolean':
+        return t.Bool();
+
+      case 'tinyint':
+      case 'smallint':
+      case 'mediumint':
+      case 'int':
+      case 'bigint':
+      case 'float':
+      case 'double':
+      case 'decimal':
+        return t.Int();
+
+      case 'char':
+      case 'varchar':
+      case 'text':
+      case 'enum':
+        return t.String();
+
+      case 'time':
+      case 'timestamp':
+      case 'datetime':
+      case 'date':
+      case 'year':
+        return t.Date();
+
+      case 'blob':
+      case 'binary':
+      case 'varbinary':
+      case 'tinyblob':
+      case 'mediumblob':
+      case 'longblob':
+      case 'json':
+        throw new Error('Not yet supported');
+
+      default:
+        throw new Error(
+          `Don't know how to translate base type ${info.baseType} to rule-of-law compatible type info yet`,
+        );
+    }
+  }
+
+  toSchema(): ROLTypeInfo {
+    const baseType = this.toSchemaBaseType();
+    return this.nullable ? t.Nullable(baseType) : baseType;
   }
 
   toString(): string {

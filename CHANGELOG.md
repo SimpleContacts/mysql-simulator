@@ -1,6 +1,8 @@
 # v1.5.0 (not released yet)
 
 * Removed `--limit` and `--step` command line flags
+* Add `--as-rol-schema` command line flag, which can output the table dump in
+  [Rule of Law](https://github.com/nvie/rule-of-law) compatible schema format
 
 
 # v1.4.1
