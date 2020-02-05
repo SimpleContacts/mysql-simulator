@@ -1,7 +1,7 @@
 // @flow strict
 
 import Column from './sim/Column';
-import { applySql, applySqlFile, applySqlFiles, dumpDb, simulate } from './sim/core';
+import { applySql, applySqlFile, applySqlFiles, simulate } from './sim/core';
 import Database from './sim/Database';
 import type {
   BinaryDataType,
@@ -29,5 +29,5 @@ export type {
   TextDataType,
   TypeInfo,
 };
-export { applySql, applySqlFile, applySqlFiles, dumpDb, simulate, Column, Database, ForeignKey, Index, Table };
+export { applySql, applySqlFile, applySqlFiles, simulate, Column, Database, ForeignKey, Index, Table };
 export default simulate;
