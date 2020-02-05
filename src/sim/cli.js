@@ -51,7 +51,9 @@ function collect(val, memo) {
 
 function run() {
   program
-    .usage('mysql-simulate [options] <path> [<path> ...]')
+    // $FlowFixMe - ugh commander
+    .name('mysql-simulate')
+    .usage('[options] <path> [<path> ...]')
     // .command('command <inputs>')
     .description('Parses SQL migration files and outputs the resulting DB state.')
     .option('--step', 'Dump table after every alteration')
