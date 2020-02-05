@@ -54,7 +54,6 @@ function run() {
     // $FlowFixMe - ugh commander
     .name('mysql-simulate')
     .usage('[options] <path> [<path> ...]')
-    // .command('command <inputs>')
     .description('Parses SQL migration files and outputs the resulting DB state.')
     .option('--step', 'Dump table after every alteration')
     .option('--limit <n>', 'Run only the first N migrations', parseInt)
