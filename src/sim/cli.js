@@ -4,6 +4,7 @@
 import path from 'path';
 
 import program from 'commander';
+import { dumpSchema } from 'rule-of-law';
 
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
@@ -15,11 +16,8 @@ type Options = {
   args: Array<string>,
   verbose: boolean,
   tables: Array<string>,
+  asROLSchema: boolean,
 };
-
-function printDb(db: Database, tables: Array<string> = []) {
-  log(db.toString(tables));
-}
 
 function runWithOptions(options: Options) {
   let db: Database = new Database();
@@ -33,7 +31,11 @@ function runWithOptions(options: Options) {
     db = applySqlFile(db, fullpath);
   }
 
-  printDb(db, options.tables);
+  if (options.asROLSchema) {
+    log(dumpSchema(db.toSchema()));
+  } else {
+    log(db.toString(options.tables));
+  }
 }
 
 function collect(val, memo) {
@@ -48,6 +50,7 @@ function run() {
     .usage('[options] <path> [<path> ...]')
     .description('Parses SQL migration files and outputs the resulting DB state.')
     .option('--table <table>', 'Dump only these tables', collect, [])
+    .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
     .parse(process.argv);
 
@@ -56,8 +59,8 @@ function run() {
     program.help();
   } else {
     // $FlowFixMe - options monkey-patched on program are invisible to Flow
-    const { args, verbose, table } = program;
-    const options = { args, verbose, tables: table };
+    const { args, verbose, table, asRolSchema } = program;
+    const options = { args, verbose, tables: table, asROLSchema: !!asRolSchema };
     runWithOptions(options);
   }
 }

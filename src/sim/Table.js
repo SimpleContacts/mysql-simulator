@@ -1,6 +1,8 @@
 // @flow strict
 
 import { maxBy, sortBy } from 'lodash';
+import t from 'rule-of-law/types';
+import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
@@ -557,6 +559,22 @@ export default class Table {
       ...this.getFullTextIndexes().map(index => index.toString()),
       ...this.getForeignKeys().map(fk => fk.toString()),
     ];
+  }
+
+  toSchema(): ROLRecordTypeInfo {
+    const record = {};
+    for (const col of this.columns) {
+      try {
+        record[col.name] = col.toSchema();
+      } catch (e) {
+        if (/Not yet supported/.test(e.message)) {
+          // Just skip it for now
+        } else {
+          throw e;
+        }
+      }
+    }
+    return t.Record(record, this.name);
   }
 
   toString(): string {

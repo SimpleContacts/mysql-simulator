@@ -1,6 +1,7 @@
 // @flow strict
 
 import { sortBy, zip } from 'lodash';
+import type { Schema as ROLSchema } from 'rule-of-law/types';
 
 import Column from './Column';
 import type { IndexType } from './Index';
@@ -263,6 +264,14 @@ export default class Database {
 
   dropIndex(tblName: string, indexName: string): Database {
     return this.swapTable(tblName, table => table.dropIndex(indexName));
+  }
+
+  toSchema(): ROLSchema {
+    const schema = {};
+    for (const table of this.getTables()) {
+      schema[table.name] = table.toSchema();
+    }
+    return schema;
   }
 
   // The optional subset of tables to print
