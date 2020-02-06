@@ -1,4 +1,4 @@
-# v1.5.0 (not released yet)
+# v1.5.0-beta1
 
 * Removed `--limit` and `--step` command line flags
 * Add `--as-rol-schema` command line flag, which can output the table dump in
