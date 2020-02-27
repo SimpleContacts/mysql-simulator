@@ -5058,10 +5058,10 @@ rsvp@^4.8.4:
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.8.5.tgz#c8f155311d167f68f21e168df71ec5b083113734"
   integrity sha512-nfMOlASu9OnRJo1mbEk2cz0D56a1MBNrJ7orjRZQG10XDyuvwksKbuXNp6qa+kbn839HwjwhBzhFmdsaEAfauA==
 
-rule-of-law@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/rule-of-law/-/rule-of-law-0.0.5.tgz#748eceb595c147657a431733f02b943e5ba5f71e"
-  integrity sha512-PLJ9jQL16UBCaZEItJzvO7BJ4RrasRsKHNGFFi0li4tKSrJWA4Tuc21MGghu49rnDNMBmU4+2nnW7qgHUXiUkg==
+rule-of-law@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/rule-of-law/-/rule-of-law-0.0.9.tgz#d36f2f41c8a36900d6c0b43f18dffb589897255b"
+  integrity sha512-sStEgCJ/vgj66niYwQiB9+jNK7LVx8G3AAd1kWmajafjT9ROVYhxHrEP7ZoEQJQsexdzp1a3GATeNTeLb+9OBw==
   dependencies:
     "@babel/runtime" "^7.8.3"
     colors "^1.4.0"
