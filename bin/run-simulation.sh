@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+mysql_version="$1"
+if [ -z "$mysql_version" ]; then
+  echo "Please specify MySQL version" >&2
+  exit 2
+fi
+shift 1
+
 testdb=foobarqux
 input_dir=tests
 output_dir=tests/simulated
@@ -24,7 +31,7 @@ if [ $# -gt 0 ]; then
 fi
 
 dump() {
-  sim_args=
+  sim_args="--mysql-version $mysql_version"
   if [ -n "$charset" ]; then
     sim_args="$sim_args --charset $charset"
   fi

@@ -72,7 +72,7 @@ function run() {
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
-    .option('--mysql-version', 'The MySQL version to simulate: "5.7" or "8.x" (default: 5.7)')
+    .option('--mysql-version <version>', 'The MySQL version to simulate: "5.7" or "8.x" (default: 5.7)')
     .parse(process.argv);
 
   if (program.args.length < 1) {

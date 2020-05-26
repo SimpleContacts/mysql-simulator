@@ -8,12 +8,12 @@ jobs:
 
     strategy:
       matrix:
-        mysql: ['mysql:5.7', 'mysql:8.0']
+        mysql: ['5.7', '8.0']
         node: [14.x] # 16.x
 
     services:
       mysql:
-        image: ${{ matrix.mysql }}
+        image: mysql:${{ matrix.mysql }}
         ports:
           - 3306:3306
         env:
@@ -51,7 +51,7 @@ jobs:
         run: yarn build
 
       - name: Run tests
-        run: ./test.sh
+        run: ./test.sh ${{ matrix.mysql }}
 
       - name: Flow
         run: yarn run -s flow

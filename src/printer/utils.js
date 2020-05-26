@@ -1,6 +1,6 @@
 // @flow strict
 
-export type MySQLVersion = '5.7' | '8.x';
+export type MySQLVersion = '5.7' | '8.0';
 
 export function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
