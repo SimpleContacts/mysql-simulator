@@ -177,9 +177,16 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
   if (target >= '8.0') {
     // Under MySQL 8.0, default lengths for specific column types are no longer
     // emitted as part of the output
-    // $FlowFixMe
-    const defLength = DEFAULT_INT_LENGTHS[baseType];
-    if (defLength !== undefined && defLength === info.length) {
+    const DEFAULT_INT_LENGTHS = {
+      bigint: 20,
+      int: 11,
+      mediumint: 9,
+      smallint: 6,
+      tinyint: 4,
+    };
+    const stdLength = DEFAULT_INT_LENGTHS[baseType];
+    const length = typeof dataType.length === 'number' ? dataType.length : null;
+    if (stdLength !== undefined && length !== null && stdLength === length + (dataType.unsigned ? 1 : 0)) {
       params = '';
     }
   }
