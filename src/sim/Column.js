@@ -7,6 +7,7 @@ import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
 import { serialize } from './serialize';
 import { escape } from './utils';
+import type { MySQLVersion } from './utils';
 
 type Generated = {|
   expr: string,
@@ -72,11 +73,11 @@ export default class Column {
   /**
    * Get the normalized type, not the raw type for this column.
    */
-  getType(): string {
+  getType(target: MySQLVersion): string {
     // TODO: Note that it might be better to "unify" this type in the
     // constructor.  That way, there simply won't be a way of distinguishing
     // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(parseDataType(this.type));
+    return formatDataType(parseDataType(this.type), target);
   }
 
   getTypeInfo(): TypeInfo {
@@ -86,7 +87,7 @@ export default class Column {
   /**
    * Get the full-blown column definition, without the name.
    */
-  getDefinition(): string {
+  getDefinition(target: MySQLVersion): string {
     const typeInfo = this.getTypeInfo();
     const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
@@ -126,7 +127,7 @@ export default class Column {
     }
 
     return [
-      formatDataType(typeInfo),
+      formatDataType(typeInfo, target),
       generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
@@ -195,7 +196,7 @@ export default class Column {
     return this.nullable ? t.Nullable(baseType) : baseType;
   }
 
-  toString(): string {
-    return `${escape(this.name)} ${this.getDefinition()}`;
+  toString(target: MySQLVersion): string {
+    return `${escape(this.name)} ${this.getDefinition(target)}`;
   }
 }

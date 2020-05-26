@@ -3,6 +3,8 @@
 // $FlowFixMe - the parser isn't type-annotated
 import { parse as rawParseSql } from '../parser/mysql';
 
+export type MySQLVersion = '5.7' | '8.x';
+
 export function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
 }

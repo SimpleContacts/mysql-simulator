@@ -1,6 +1,7 @@
 // @flow strict
 
 import { parseEnumValues, quote } from './utils';
+import type { MySQLVersion } from './utils';
 
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
@@ -227,7 +228,7 @@ export function parseDataType(type: string): TypeInfo {
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo): string {
+export function formatDataType(info: TypeInfo, target: MySQLVersion): string {
   const baseType = info.baseType;
   let params = '';
   let options = '';

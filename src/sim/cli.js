@@ -21,7 +21,11 @@ type Options = {
 };
 
 function runWithOptions(options: Options) {
-  let db: Database = new Database(options.mysqlVersion ? { version: options.mysqlVersion } : undefined);
+  const version = options.mysqlVersion;
+  if (version !== undefined && version !== '5.7' && version !== '8.x') {
+    throw new Error('Unrecognized MySQL version: ' + version);
+  }
+  let db: Database = new Database(version ? { version } : undefined);
   let files = Array.from(expandInputFiles(options.args));
   for (const fullpath of files) {
     const file = path.basename(fullpath);

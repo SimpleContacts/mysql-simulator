@@ -6,12 +6,13 @@ import type { Schema as ROLSchema } from 'rule-of-law/types';
 import Column from './Column';
 import type { IndexType } from './Index';
 import Table from './Table';
+import type { MySQLVersion } from './utils';
 
 export type Options = {|
-  version: string,
+  version: MySQLVersion,
 |};
 
-const DEFAULT_OPTIONS = { version: '5.7' };
+const DEFAULT_OPTIONS: Options = { version: '5.7' };
 
 type LUT<+T> = { +[string]: T };
 
@@ -39,9 +40,6 @@ export default class Database {
 
   constructor(options?: Options, _tables: LUT<Table> = {}) {
     this.options = options || DEFAULT_OPTIONS;
-    if (this.options.version !== '5.7' && this.options.version !== '8.x') {
-      throw new Error('Unrecognized MySQL version: ' + this.options.version);
-    }
     this._tables = _tables;
   }
 
@@ -176,7 +174,7 @@ export default class Database {
    */
   replaceColumn(tblName: string, colName: string, column: Column, position: string | null): Database {
     let db = this;
-    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position));
+    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position, this.options.version));
 
     // If it's a rename, we may need to update any FKs pointing to it
     if (colName !== column.name) {
@@ -240,8 +238,8 @@ export default class Database {
       const localColumn = localTable.getColumn(localColName);
       const foreignColumn = foreignTable.getColumn(foreignColName);
 
-      const ltype = localColumn.getType();
-      const ftype = foreignColumn.getType();
+      const ltype = localColumn.getType(this.options.version);
+      const ftype = foreignColumn.getType(this.options.version);
       if (ltype !== ftype) {
         const lname = `${localTable.name}.${localColumn.name}`;
         const fname = `${foreignTable.name}.${foreignColumn.name}`;
@@ -295,7 +293,7 @@ export default class Database {
     dumps.push('');
 
     for (const tableName of tableNames) {
-      dumps.push(this.getTable(tableName).toString());
+      dumps.push(this.getTable(tableName).toString(this.options.version));
       dumps.push('');
     }
 
