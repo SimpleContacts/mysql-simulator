@@ -282,7 +282,11 @@ export function formatDataType(info: TypeInfo, target: MySQLVersion): string {
       break;
   }
 
-  params = params ? `(${params})` : '';
+  if (target === '5.7') {
+    params = params ? `(${params})` : '';
+  } else {
+    params = '';
+  }
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
 }
