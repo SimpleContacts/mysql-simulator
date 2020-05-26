@@ -10,6 +10,8 @@ import { makeEncoding } from '../ast/encodings';
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
 
+const DEFAULT_MYSQL_VERSION = '5.7';
+
 const log = console.log;
 const error = console.error;
 
@@ -21,12 +23,16 @@ type Options = {
   asROLSchema: boolean,
   charset?: string,
   collate?: string,
+  mysqlVersion?: string,
 };
 
 function runWithOptions(options: Options) {
-  const serverEncoding = makeEncoding(options.charset, options.collate);
-  let db: Database = new Database(serverEncoding);
-
+  const defaultEncoding = makeEncoding(options.charset, options.collate);
+  const dbOptions = {
+    defaultEncoding,
+    version: options.mysqlVersion ?? DEFAULT_MYSQL_VERSION,
+  };
+  let db: Database = new Database(dbOptions);
   let files = Array.from(expandInputFiles(options.args));
   for (const fullpath of files) {
     const file = path.basename(fullpath);
@@ -65,6 +71,7 @@ function run() {
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
+    .option('--mysql-version', 'The MySQL version to simulate: "5.7" or "8.x" (default: 5.7)')
     .parse(process.argv);
 
   if (program.args.length < 1) {
@@ -81,6 +88,8 @@ function run() {
       charset: opts.charset,
       // $FlowFixMe[incompatible-type]: mixed != (string | void)
       collate: opts.collate,
+      // $FlowFixMe[incompatible-type]: mixed != (string | void)
+      mysqlVersion: opts.mysqlVersion,
       foreignKeysLast: !!opts.foreignKeysLast,
     };
     runWithOptions(options);
