@@ -7,6 +7,12 @@ import Column from './Column';
 import type { IndexType } from './Index';
 import Table from './Table';
 
+export type Options = {|
+  version: string,
+|};
+
+const DEFAULT_OPTIONS = { version: '5.7' };
+
 type LUT<+T> = { +[string]: T };
 
 const indexBy = <T>(items: Iterable<T>, keyFn: (T) => string): LUT<T> => {
@@ -28,9 +34,14 @@ function values<T>(things: LUT<T>): Array<T> {
 }
 
 export default class Database {
+  +options: Options;
   +_tables: LUT<Table>; // TODO: Just make this an Array, it's way easier to work with
 
-  constructor(_tables: LUT<Table> = {}) {
+  constructor(options?: Options, _tables: LUT<Table> = {}) {
+    this.options = options || DEFAULT_OPTIONS;
+    if (this.options.version !== '5.7' && this.options.version !== '8.x') {
+      throw new Error('Unrecognized MySQL version: ' + this.options.version);
+    }
     this._tables = _tables;
   }
 
@@ -69,7 +80,7 @@ export default class Database {
   addTable(table: Table): Database {
     const name = table.name;
     this.assertTableDoesNotExist(name);
-    return new Database({ ...this._tables, [name]: table });
+    return new Database(this.options, { ...this._tables, [name]: table });
   }
 
   /**
@@ -121,7 +132,7 @@ export default class Database {
 
     const newTables = { ...this._tables };
     delete newTables[name];
-    return new Database(newTables);
+    return new Database(this.options, newTables);
   }
 
   /**
@@ -133,10 +144,7 @@ export default class Database {
     if (newTable.name !== tblName) {
       throw new Error('Database.swapTable() cannot be used to change the name of the table.');
     }
-    return new Database({
-      ...this._tables,
-      [tblName]: newTable,
-    });
+    return new Database(this.options, { ...this._tables, [tblName]: newTable });
   }
 
   /**
@@ -145,7 +153,10 @@ export default class Database {
    */
   mapTables(mapper: (Table) => Table): Database {
     const newTables = this.getTables().map(mapper);
-    return new Database(indexBy(newTables, (table) => table.name));
+    return new Database(
+      this.options,
+      indexBy(newTables, (table) => table.name),
+    );
   }
 
   /**

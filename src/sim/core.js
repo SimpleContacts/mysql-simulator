@@ -9,6 +9,7 @@ import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
+import type { Options } from './Database';
 
 const error = console.error;
 
@@ -342,6 +343,7 @@ export function applySqlFiles(db_: Database, ...paths: Array<string>): Database 
  * a collection of file or directory names.  For every directory given, it will
  * collect a naturally-sorted list of *.sql files.
  */
-export function simulate(...paths: Array<string>): Database {
-  return applySqlFiles(new Database(), ...paths);
+export function simulate(pathOrPaths: string | Array<string>, options?: Options): Database {
+  const paths = typeof pathOrPaths === 'string' ? [pathOrPaths] : pathOrPaths;
+  return applySqlFiles(new Database(options), ...paths);
 }
