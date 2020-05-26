@@ -173,10 +173,15 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
       break;
   }
 
-  if (target === '5.7') {
-    params = params ? `(${params})` : '';
-  } else {
-    params = '';
+  params = params ? `(${params})` : '';
+  if (target >= '8.0') {
+    // Under MySQL 8.0, default lengths for specific column types are no longer
+    // emitted as part of the output
+    // $FlowFixMe
+    const defLength = DEFAULT_INT_LENGTHS[baseType];
+    if (defLength !== undefined && defLength === info.length) {
+      params = '';
+    }
   }
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
