@@ -8,12 +8,20 @@ jobs:
 
     strategy:
       matrix:
-        mysql: ["mysql:5.7", "mysql:8.0"]
-        node: [10.x, 12.x, 13.x]
+        mysql: ["mysql:5.7"]  # "mysql:8.0"
+        node: [10.x, 12.x, 13.x, 14.x]
 
     services:
       mysql:
         image: ${{ matrix.mysql }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: yes
+          MYSQL_ONETIME_PASSWORD: yes
+          MYSQL_DATABASE: foobarqux
+          MYSQL_USER: simplehealth
+          MYSQL_PASSWORD: justsomepassword
 
     steps:
       - name: Set up MySQL client
@@ -24,8 +32,9 @@ jobs:
           # just run the command line utilities like `mysql`, `mysqldump`, etc.
           # without having to specify command line arguments.
           echo "[client]" > ~/.my.cnf
-          echo "user=root" >> ~/.my.cnf
-          echo "password=root" >> ~/.my.cnf
+          echo "protocol=tcp" >> ~/.my.cnf
+          echo "user=simplehealth" >> ~/.my.cnf
+          echo "password=justsomepassword" >> ~/.my.cnf
 
       - name: Checkout source code
         uses: actions/checkout@v1
