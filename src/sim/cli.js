@@ -22,7 +22,7 @@ type Options = {
 
 function runWithOptions(options: Options) {
   const version = options.mysqlVersion;
-  if (version !== undefined && version !== '5.7' && version !== '8.x') {
+  if (version !== undefined && version !== '5.7' && version !== '8.0') {
     throw new Error('Unrecognized MySQL version: ' + version);
   }
   let db: Database = new Database(version ? { version } : undefined);
@@ -56,7 +56,7 @@ function run() {
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
-    .option('--mysql-version', 'The MySQL version to simulate: "5.7" or "8.x" (default: 5.7)')
+    .option('--mysql-version <version>', 'The MySQL version to simulate: "5.7" or "8.x" (default: 5.7)')
     .parse(process.argv);
 
   // $FlowFixMe - options monkey-patched on program are invisible to Flow

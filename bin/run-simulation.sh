@@ -1,12 +1,19 @@
 #!/bin/sh
 set -e
 
+mysql_version="$1"
+if [ -z "$mysql_version" ]; then
+  echo "Please specify MySQL version" >&2
+  exit 2
+fi
+shift 1
+
 testdb=foobarqux
 input_dir=tests
 output_dir=tests/simulated
 
 dump() {
-  bin/mysql-simulate -v $limit_args $@
+  bin/mysql-simulate -v --mysql-version "$mysql_version" "$@"
 }
 
 to_outfile() {
