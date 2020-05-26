@@ -9,7 +9,7 @@ import Table from './Table';
 
 type LUT<+T> = { +[string]: T };
 
-const indexBy = <T>(items: Iterable<T>, keyFn: T => string): LUT<T> => {
+const indexBy = <T>(items: Iterable<T>, keyFn: (T) => string): LUT<T> => {
   const lut = {};
   for (const item of items) {
     lut[keyFn(item)] = item;
@@ -24,7 +24,7 @@ const indexBy = <T>(items: Iterable<T>, keyFn: T => string): LUT<T> => {
  */
 function values<T>(things: LUT<T>): Array<T> {
   const keys: Array<string> = Object.keys(things);
-  return keys.map(key => things[key]);
+  return keys.map((key) => things[key]);
 }
 
 export default class Database {
@@ -35,7 +35,7 @@ export default class Database {
   }
 
   getTables(): Array<Table> {
-    return sortBy(values(this._tables), t => t.name.toLowerCase());
+    return sortBy(values(this._tables), (t) => t.name.toLowerCase());
   }
 
   has(name: string) {
@@ -78,7 +78,7 @@ export default class Database {
   renameTable(from: string, to: string): Database {
     this.assertTableDoesNotExist(to);
 
-    return this.mapTables(table_ => {
+    return this.mapTables((table_) => {
       // Rename the table itself
       let table = table_;
       if (table.name === from) {
@@ -109,7 +109,7 @@ export default class Database {
       // Double-check that this table isn't pointed to by any FK in another
       // table
       const table = maybeTable;
-      const otherTables = this.getTables().filter(t => t.name !== table.name);
+      const otherTables = this.getTables().filter((t) => t.name !== table.name);
       for (const other of otherTables) {
         for (const fk of other.getForeignKeys()) {
           if (fk.reference.table === table.name) {
@@ -128,7 +128,7 @@ export default class Database {
    * Helper method that returns a new DB instance that has the given Table
    * replaced with the output of the mapper function.
    */
-  swapTable(tblName: string, mapper: Table => Table): Database {
+  swapTable(tblName: string, mapper: (Table) => Table): Database {
     const newTable = mapper(this.getTable(tblName));
     if (newTable.name !== tblName) {
       throw new Error('Database.swapTable() cannot be used to change the name of the table.');
@@ -143,20 +143,20 @@ export default class Database {
    * Helper function that returns a new Database by applying a mapper function
    * over every table in the database.
    */
-  mapTables(mapper: Table => Table): Database {
+  mapTables(mapper: (Table) => Table): Database {
     const newTables = this.getTables().map(mapper);
-    return new Database(indexBy(newTables, table => table.name));
+    return new Database(indexBy(newTables, (table) => table.name));
   }
 
   /**
    * Returns a new DB with the given column added to the given table.
    */
   addColumn(tblName: string, column: Column, position: string | null): Database {
-    return this.swapTable(tblName, table => table.addColumn(column, position));
+    return this.swapTable(tblName, (table) => table.addColumn(column, position));
   }
 
   dropDefault(tblName: string, colName: string): Database {
-    return this.swapTable(tblName, table => table.dropDefault(colName));
+    return this.swapTable(tblName, (table) => table.dropDefault(colName));
   }
 
   /**
@@ -165,12 +165,12 @@ export default class Database {
    */
   replaceColumn(tblName: string, colName: string, column: Column, position: string | null): Database {
     let db = this;
-    db = db.swapTable(tblName, table => table.replaceColumn(colName, column, position));
+    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position));
 
     // If it's a rename, we may need to update any FKs pointing to it
     if (colName !== column.name) {
-      db = db.mapTables(table =>
-        table.mapForeignKeys(fk => {
+      db = db.mapTables((table) =>
+        table.mapForeignKeys((fk) => {
           if (fk.reference.table !== tblName || !fk.reference.columns.includes(colName)) {
             // Not affected
             return fk;
@@ -178,7 +178,7 @@ export default class Database {
 
           const reference = {
             table: fk.reference.table,
-            columns: fk.reference.columns.map(ref => (ref === colName ? column.name : ref)),
+            columns: fk.reference.columns.map((ref) => (ref === colName ? column.name : ref)),
           };
           return fk.patch({ reference });
         }),
@@ -192,7 +192,7 @@ export default class Database {
    * Returns a new DB with the column in the given table removed.
    */
   removeColumn(tblName: string, colName: string): Database {
-    return this.swapTable(tblName, table => table.removeColumn(colName));
+    return this.swapTable(tblName, (table) => table.removeColumn(colName));
   }
 
   /**
@@ -200,11 +200,11 @@ export default class Database {
    * table.
    */
   addPrimaryKey(tblName: string, columnNames: Array<string>): Database {
-    return this.swapTable(tblName, table => table.addPrimaryKey(columnNames));
+    return this.swapTable(tblName, (table) => table.addPrimaryKey(columnNames));
   }
 
   dropPrimaryKey(tblName: string): Database {
-    return this.swapTable(tblName, table => table.dropPrimaryKey());
+    return this.swapTable(tblName, (table) => table.dropPrimaryKey());
   }
 
   addForeignKey(
@@ -240,13 +240,13 @@ export default class Database {
       }
     }
 
-    return this.swapTable(tblName, table =>
+    return this.swapTable(tblName, (table) =>
       table.addForeignKey(constraintName, indexName, localColumns, targetTblName, targetColumns),
     );
   }
 
   dropForeignKey(tblName: string, symbol: string): Database {
-    return this.swapTable(tblName, table => table.dropForeignKey(symbol));
+    return this.swapTable(tblName, (table) => table.dropForeignKey(symbol));
   }
 
   /**
@@ -259,11 +259,11 @@ export default class Database {
     columns: Array<string>,
     $$locked: boolean,
   ): Database {
-    return this.swapTable(tblName, table => table.addIndex(indexName, type, columns, $$locked));
+    return this.swapTable(tblName, (table) => table.addIndex(indexName, type, columns, $$locked));
   }
 
   dropIndex(tblName: string, indexName: string): Database {
-    return this.swapTable(tblName, table => table.dropIndex(indexName));
+    return this.swapTable(tblName, (table) => table.dropIndex(indexName));
   }
 
   toSchema(): ROLSchema {
@@ -276,7 +276,7 @@ export default class Database {
 
   // The optional subset of tables to print
   toString(tableNames_: Array<string> = []): string {
-    const tableNames = tableNames_.length > 0 ? tableNames_ : this.getTables().map(t => t.name);
+    const tableNames = tableNames_.length > 0 ? tableNames_ : this.getTables().map((t) => t.name);
     const dumps = [];
 
     // To keep the output byte-by-byte the same as MySQL's dump output, we'll

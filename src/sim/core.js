@@ -58,7 +58,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   let db = db_.createTable(tblName);
 
   // One-by-one, add the columns to the table
-  const columns = stm.definitions.map(def => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
+  const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
     db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
   }
@@ -69,11 +69,11 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const pks = [
     // (1) Explicit PRIMARY KEY definitions
     ...stm.definitions
-      .map(def => (def.type === 'PRIMARY KEY' ? def.indexColNames.map(def => def.colName) : null))
+      .map((def) => (def.type === 'PRIMARY KEY' ? def.indexColNames.map((def) => def.colName) : null))
       .filter(Boolean),
 
     // (2) Primary key can also be defined on a column declaratively
-    ...columns.filter(c => c.definition.isPrimary).map(c => [c.colName]),
+    ...columns.filter((c) => c.definition.isPrimary).map((c) => [c.colName]),
   ];
 
   for (const pk of pks) {
@@ -81,14 +81,14 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   }
 
   // (2) Shorthand syntax to define index on a column directly
-  for (const col of columns.filter(c => c.definition.isUnique)) {
+  for (const col of columns.filter((c) => c.definition.isUnique)) {
     db = db.addIndex(tblName, null, 'UNIQUE', [col.colName], true);
   }
 
   // Add indexes, if any. Indexes can be added explicitly (1), or defined on
   // a column directly (2).
   const indexes = stm.definitions
-    .map(def =>
+    .map((def) =>
       def.type === 'FOREIGN KEY' || def.type === 'FULLTEXT INDEX' || def.type === 'UNIQUE INDEX' || def.type === 'INDEX'
         ? def
         : null,
@@ -100,9 +100,9 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
         tblName,
         index.constraint,
         index.indexName,
-        index.indexColNames.map(def => def.colName), // Local columns
+        index.indexColNames.map((def) => def.colName), // Local columns
         index.reference.tblName, // Foreign/target table
-        index.reference.indexColNames.map(def => def.colName), // Foreign/target columns
+        index.reference.indexColNames.map((def) => def.colName), // Foreign/target columns
       );
     } else {
       const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
@@ -111,7 +111,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
         tblName,
         index.indexName || null,
         type,
-        index.indexColNames.map(def => def.colName),
+        index.indexColNames.map((def) => def.colName),
         $$locked,
       );
     }
@@ -136,7 +136,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
       db = db.removeTable(stm.tblName, stm.ifExists);
     } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
-      const changes = sortBy(stm.changes, change => order.indexOf(change.type));
+      const changes = sortBy(stm.changes, (change) => order.indexOf(change.type));
       for (const change of changes) {
         if (change.type === 'RENAME TABLE') {
           db = db.renameTable(stm.tblName, change.newTblName);
@@ -159,7 +159,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'ADD PRIMARY KEY') {
           db = db.addPrimaryKey(
             stm.tblName,
-            change.indexColNames.map(col => col.colName),
+            change.indexColNames.map((col) => col.colName),
           );
         } else if (change.type === 'DROP PRIMARY KEY') {
           db = db.dropPrimaryKey(stm.tblName);
@@ -168,16 +168,16 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             stm.tblName,
             change.constraint,
             change.indexName,
-            change.indexColNames.map(def => def.colName),
+            change.indexColNames.map((def) => def.colName),
             change.reference.tblName,
-            change.reference.indexColNames.map(def => def.colName),
+            change.reference.indexColNames.map((def) => def.colName),
           );
         } else if (change.type === 'ADD UNIQUE INDEX') {
           db = db.addIndex(
             stm.tblName,
             change.constraint || change.indexName,
             'UNIQUE',
-            change.indexColNames.map(def => def.colName),
+            change.indexColNames.map((def) => def.colName),
             true, // UNIQUE indexes are always explicit
           );
         } else if (change.type === 'ADD FULLTEXT INDEX') {
@@ -186,7 +186,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             stm.tblName,
             change.indexName,
             'FULLTEXT',
-            change.indexColNames.map(def => def.colName),
+            change.indexColNames.map((def) => def.colName),
             $$locked,
           );
         } else if (change.type === 'ADD INDEX') {
@@ -195,7 +195,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             stm.tblName,
             change.indexName,
             'NORMAL',
-            change.indexColNames.map(def => def.colName),
+            change.indexColNames.map((def) => def.colName),
             $$locked,
           );
         } else if (change.type === 'DROP INDEX') {
@@ -223,7 +223,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         stm.tblName,
         stm.indexName,
         stm.indexKind,
-        stm.indexColNames.map(def => def.colName),
+        stm.indexColNames.map((def) => def.colName),
         $$locked,
       );
     } else if (stm.type === 'DROP INDEX') {
@@ -290,7 +290,7 @@ function ensureConsecutive(numbers: Array<number>): void {
   if (uniqs.size !== numbers.length) {
     throw new Error(
       `Duplicate migrations found: ${duplicates(numbers)
-        .map(n => n.toString())
+        .map((n) => n.toString())
         .join(', ')}`,
     );
   }
@@ -305,7 +305,7 @@ function ensureConsecutive(numbers: Array<number>): void {
         missing.push(i);
       }
     }
-    throw new Error(`Missing migrations: ${missing.map(n => n.toString()).join(', ')}`);
+    throw new Error(`Missing migrations: ${missing.map((n) => n.toString()).join(', ')}`);
   }
 }
 
@@ -313,9 +313,9 @@ export function* expandInputFiles(paths: Array<string>): Iterable<string> {
   for (const inputPath of paths) {
     if (fs.statSync(inputPath).isDirectory()) {
       // Naturally sort files before processing -- order is crucial!
-      let files = fs.readdirSync(inputPath).filter(f => f.endsWith('.sql'));
-      ensureConsecutive(files.map(f => parseInt(f, 10)));
-      files = sortBy(files, f => parseInt(f, 10)).map(f => path.join(inputPath, f));
+      let files = fs.readdirSync(inputPath).filter((f) => f.endsWith('.sql'));
+      ensureConsecutive(files.map((f) => parseInt(f, 10)));
+      files = sortBy(files, (f) => parseInt(f, 10)).map((f) => path.join(inputPath, f));
       yield* files;
     } else {
       yield inputPath;

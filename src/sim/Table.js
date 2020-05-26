@@ -36,11 +36,11 @@ export default class Table {
    * Returns whether the given Column name exists in the Table.
    */
   has(colName: string) {
-    return this.columns.findIndex(c => c.name === colName) >= 0;
+    return this.columns.findIndex((c) => c.name === colName) >= 0;
   }
 
   getForeignKeysUsing(colName: string): Array<ForeignKey> {
-    return this.foreignKeys.filter(fk => fk.columns.includes(colName));
+    return this.foreignKeys.filter((fk) => fk.columns.includes(colName));
   }
 
   /**
@@ -57,7 +57,7 @@ export default class Table {
   }
 
   getColumn(colName: string): Column {
-    const column = this.columns.find(c => c.name === colName);
+    const column = this.columns.find((c) => c.name === colName);
     if (!column) {
       throw new Error(`Column "${colName}" does not exist in table "${this.name}"`);
     }
@@ -65,7 +65,7 @@ export default class Table {
   }
 
   getColumnIndex(colName: string): number {
-    const index = this.columns.findIndex(c => c.name === colName);
+    const index = this.columns.findIndex((c) => c.name === colName);
     if (index < 0) {
       throw new Error(`Column "${colName}" does not exist in table "${this.name}"`);
     }
@@ -107,7 +107,7 @@ export default class Table {
     const oldName = this.name;
 
     // Consistency
-    const foreignKeys = this.foreignKeys.map(fk => {
+    const foreignKeys = this.foreignKeys.map((fk) => {
       if (!fk.name.startsWith(`${oldName}_ibfk_`)) {
         // Don't change
         return fk;
@@ -159,7 +159,7 @@ export default class Table {
    */
   moveColumn(colName: string, position: string): Table {
     const column = this.getColumn(colName);
-    let columns = this.columns.filter(c => c.name !== column.name);
+    let columns = this.columns.filter((c) => c.name !== column.name);
     if (position.startsWith('AFTER ')) {
       const afterColName = position.substring('AFTER '.length);
       const pos = this.getColumnIndex(afterColName);
@@ -179,7 +179,7 @@ export default class Table {
    * referencing this table won't be updated by this function.
    */
   renameColumn(oldName: string, newName: string): Table {
-    const columns = this.columns.map(column => {
+    const columns = this.columns.map((column) => {
       if (column.name !== oldName) {
         return column;
       }
@@ -191,7 +191,7 @@ export default class Table {
     // indexes
     const renamer = (name: string) => (name === oldName ? newName : name);
     const primaryKey = this.primaryKey ? this.primaryKey.map(renamer) : null;
-    const foreignKeys = this.foreignKeys.map(fk =>
+    const foreignKeys = this.foreignKeys.map((fk) =>
       fk.patch({
         columns: fk.columns.map(renamer),
       }),
@@ -211,12 +211,12 @@ export default class Table {
    * Helper method that returns a new Table instance that has the given column
    * replaced with the output of the mapper function.
    */
-  swapColumn(colName: string, mapper: Column => Column): Table {
+  swapColumn(colName: string, mapper: (Column) => Column): Table {
     const newColumn = mapper(this.getColumn(colName));
     if (newColumn.name !== colName) {
       throw new Error('Table.swapColumn() cannot be used to change the name of the column.');
     }
-    const columns = this.columns.map(column => (column.name === colName ? newColumn : column));
+    const columns = this.columns.map((column) => (column.name === colName ? newColumn : column));
     return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
@@ -258,9 +258,9 @@ export default class Table {
           console.warn(
             `    ALTER TABLE ${escape(table.name)} ADD CONSTRAINT ${escape(
               fk.name,
-            )} FOREIGN KEY (${fk.columns.map(name => escape(name)).join(', ')}) REFERENCES ${escape(
+            )} FOREIGN KEY (${fk.columns.map((name) => escape(name)).join(', ')}) REFERENCES ${escape(
               fk.reference.table,
-            )} (${fk.reference.columns.map(name => escape(name)).join(', ')});`,
+            )} (${fk.reference.columns.map((name) => escape(name)).join(', ')});`,
           );
         }
         console.warn(`    UNLOCK TABLES;`);
@@ -286,7 +286,7 @@ export default class Table {
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
     const newColumn = column.patch({ defaultValue: null });
-    const columns = this.columns.map(c => (c.name === colName ? newColumn : c));
+    const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
     return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
@@ -303,24 +303,24 @@ export default class Table {
       throw new Error(`Cannot drop column "${colName}" because it's used by a FK`);
     }
 
-    const columns = this.columns.filter(c => c.name !== colName);
+    const columns = this.columns.filter((c) => c.name !== colName);
 
     // TODO: Make this a method on the Index: .removeReference()
     const indexes = this.indexes
       // Implicitly remove this column from any multi-column indexes that
       // contain it
-      .map(index =>
+      .map((index) =>
         index.patch({
-          columns: index.columns.filter(name => name !== colName),
+          columns: index.columns.filter((name) => name !== colName),
         }),
       )
       // If this leads to "empty" indexes, drop 'em entirely
-      .filter(index => index.columns.length > 0);
+      .filter((index) => index.columns.length > 0);
 
     // Remove this column from any PKs that contain it
     let primaryKey = this.primaryKey;
     if (primaryKey) {
-      primaryKey = primaryKey.filter(name => name !== colName);
+      primaryKey = primaryKey.filter((name) => name !== colName);
       primaryKey = primaryKey.length > 0 ? primaryKey : null;
     }
 
@@ -336,7 +336,7 @@ export default class Table {
     }
 
     // Make sure all the referenced columns actually exist
-    columnNames.forEach(name => this.getColumn(name));
+    columnNames.forEach((name) => this.getColumn(name));
 
     // MySQL implicitly converts columns used in PKs to NOT NULL
     const newColumns = this.columns.map((c: Column) => {
@@ -373,8 +373,8 @@ export default class Table {
   generateForeignKeyName() {
     const prefix = `${this.name}_ibfk_`;
     const autoFKs = this.foreignKeys
-      .filter(fk => fk.name.startsWith(prefix))
-      .map(fk => {
+      .filter((fk) => fk.name.startsWith(prefix))
+      .map((fk) => {
         const parts = fk.name.split('_');
         const num = parts[parts.length - 1];
         return parseInt(num, 10);
@@ -404,13 +404,13 @@ export default class Table {
 
     // Add implicit local index for given columns if no such index exists yet
     const needle = localColumns.join('+');
-    if (!this.indexes.some(index => index.columns.join('+').startsWith(needle))) {
+    if (!this.indexes.some((index) => index.columns.join('+').startsWith(needle))) {
       // Don't add if a primary key already exists
       if (!(this.primaryKey && this.primaryKey.join('+').startsWith(needle))) {
         table = table.addIndex(indexName, 'NORMAL', localColumns, false);
       }
     } else if (indexName) {
-      const pos = this.indexes.findIndex(i => i.columns.join('+') === needle && !i.$$locked);
+      const pos = this.indexes.findIndex((i) => i.columns.join('+') === needle && !i.$$locked);
       if (pos >= 0) {
         const origIndex = table.indexes[pos];
         const indexes = [
@@ -437,19 +437,19 @@ export default class Table {
    * Returns a new Table with the given FK dropped.
    */
   dropForeignKey(symbol: string): Table {
-    if (!this.foreignKeys.some(fk => fk.name === symbol)) {
+    if (!this.foreignKeys.some((fk) => fk.name === symbol)) {
       throw new Error(
         `Foreign key "${symbol}" does not exist on table "${this.name}". These do: ${this.foreignKeys
-          .map(fk => fk.name)
+          .map((fk) => fk.name)
           .join(', ')}`,
       );
     }
 
-    const foreignKeys = this.foreignKeys.filter(fk => fk.name !== symbol);
+    const foreignKeys = this.foreignKeys.filter((fk) => fk.name !== symbol);
     return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
-  mapForeignKeys(mapper: ForeignKey => ForeignKey): Table {
+  mapForeignKeys(mapper: (ForeignKey) => ForeignKey): Table {
     return new Table(this.name, this.columns, this.primaryKey, this.indexes, this.foreignKeys.map(mapper));
   }
 
@@ -460,7 +460,7 @@ export default class Table {
     let indexName = idealName;
 
     // ...but attempt to add a counter value to avoid name clashes
-    const existingIndexNames = new Set(this.indexes.map(i => i.name));
+    const existingIndexNames = new Set(this.indexes.map((i) => i.name));
     let counter = 1;
     while (existingIndexNames.has(indexName)) {
       indexName = `${idealName}_${++counter}`;
@@ -474,7 +474,7 @@ export default class Table {
    */
   addIndex(indexName_: string | null, type: IndexType, columns: Array<string>, $$locked: boolean): Table {
     // Make sure to check if all the columns exist
-    columns.map(colName => this.getColumn(colName));
+    columns.map((colName) => this.getColumn(colName));
 
     // If indexName is null, auto-generate it
     const indexName = !indexName_
@@ -487,7 +487,7 @@ export default class Table {
     // definition is more specific (user_id, foo) will replace an existing
     // index on (user_id).
     const needle = columns.join('+');
-    const pos = this.indexes.findIndex(i => needle.startsWith(i.columns.join('+')) && !i.$$locked);
+    const pos = this.indexes.findIndex((i) => needle.startsWith(i.columns.join('+')) && !i.$$locked);
     let indexes = this.indexes;
     if (pos >= 0) {
       // Change the name and move it to the end of the indexes array
@@ -510,54 +510,54 @@ export default class Table {
     // MySQL fails with "Cannot drop index \'user_id\': needed in a foreign key
     // constraint" here.
 
-    if (!this.indexes.some(index => index.name === indexName)) {
+    if (!this.indexes.some((index) => index.name === indexName)) {
       throw new Error(
         `Index "${indexName}" does not exist on table "${this.name}". These do: ${this.indexes
-          .map(index => index.name)
+          .map((index) => index.name)
           .join(', ')}`,
       );
     }
 
-    const indexes = this.indexes.filter(index => index.name !== indexName);
+    const indexes = this.indexes.filter((index) => index.name !== indexName);
     return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   getNormalIndexes(): Array<Index> {
-    return this.indexes.filter(i => i.type === 'NORMAL');
+    return this.indexes.filter((i) => i.type === 'NORMAL');
   }
 
   getFullTextIndexes(): Array<Index> {
-    return this.indexes.filter(i => i.type === 'FULLTEXT');
+    return this.indexes.filter((i) => i.type === 'FULLTEXT');
   }
 
   getUniqueIndexes(): Array<Index> {
     return sortBy(
-      this.indexes.filter(i => i.type === 'UNIQUE'),
+      this.indexes.filter((i) => i.type === 'UNIQUE'),
 
       // MySQL seems to output unique indexes on *NOT* NULL columns first, then
       // all NULLable unique column indexes. Let's mimick this behaviour in our
       // output
-      idx => {
+      (idx) => {
         const colName = idx.columns[0];
-        const column = this.columns.find(c => c.name === colName);
+        const column = this.columns.find((c) => c.name === colName);
         return column && !column.nullable ? 0 : 1;
       },
     );
   }
 
   getForeignKeys(): Array<ForeignKey> {
-    return sortBy(this.foreignKeys, fk => fk.name);
+    return sortBy(this.foreignKeys, (fk) => fk.name);
   }
 
   serializeDefinitions(): Array<string> {
     return [
-      ...this.columns.map(col => col.toString()),
+      ...this.columns.map((col) => col.toString()),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
 
-      ...this.getUniqueIndexes().map(index => index.toString()),
-      ...this.getNormalIndexes().map(index => index.toString()),
-      ...this.getFullTextIndexes().map(index => index.toString()),
-      ...this.getForeignKeys().map(fk => fk.toString()),
+      ...this.getUniqueIndexes().map((index) => index.toString()),
+      ...this.getNormalIndexes().map((index) => index.toString()),
+      ...this.getFullTextIndexes().map((index) => index.toString()),
+      ...this.getForeignKeys().map((fk) => fk.toString()),
     ];
   }
 
@@ -581,9 +581,7 @@ export default class Table {
     const indent = (line: string) => `  ${line}`;
     return [
       `CREATE TABLE \`${this.name}\` (`,
-      this.serializeDefinitions()
-        .map(indent)
-        .join(',\n'),
+      this.serializeDefinitions().map(indent).join(',\n'),
       `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`,
     ].join('\n');
   }

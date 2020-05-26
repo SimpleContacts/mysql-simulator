@@ -41,7 +41,7 @@ import { parse as rawParseSql } from './mysql';
 const indent = (text: string): string =>
   text
     .split('\n')
-    .map(s => `    ${s}`)
+    .map((s) => `    ${s}`)
     .join('\n');
 
 const NUM_CONTEXT_LINES_BEFORE = 4;
