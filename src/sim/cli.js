@@ -7,10 +7,11 @@ import program from 'commander';
 import { dumpSchema } from 'rule-of-law';
 
 import { makeEncoding } from '../ast/encodings';
+import type { MySQLVersion } from '../printer/utils';
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
 
-const DEFAULT_MYSQL_VERSION = '5.7';
+const DEFAULT_MYSQL_VERSION: MySQLVersion = '5.7';
 
 const log = console.log;
 const error = console.error;
@@ -23,14 +24,14 @@ type Options = {
   asROLSchema: boolean,
   charset?: string,
   collate?: string,
-  mysqlVersion?: string,
+  mysqlVersion?: MySQLVersion,
 };
 
 function runWithOptions(options: Options) {
   const defaultEncoding = makeEncoding(options.charset, options.collate);
   const dbOptions = {
     defaultEncoding,
-    version: options.mysqlVersion ?? DEFAULT_MYSQL_VERSION,
+    mysqlVersion: options.mysqlVersion ?? DEFAULT_MYSQL_VERSION,
   };
   let db: Database = new Database(dbOptions);
   let files = Array.from(expandInputFiles(options.args));

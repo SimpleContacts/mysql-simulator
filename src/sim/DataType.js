@@ -2,12 +2,13 @@
 
 import invariant from 'invariant';
 
-import type { DataType, Textual, TextualOrEnum } from '../ast';
 import ast from '../ast';
+import type { DataType, Textual, TextualOrEnum } from '../ast';
 import type { Charset, Collation, Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
 import { isWider } from '../ast/encodings';
 import { quote } from '../printer';
+import type { MySQLVersion } from '../printer/utils';
 
 export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): T {
   switch (dataType._kind) {
@@ -99,7 +100,7 @@ function formatEncoding(tableEncoding: Encoding | void, columnEncoding: Encoding
  * provided, it will conditionally output the encoding information, like MySQL
  * does, depending on whether it's equal to the table default encoding or not.
  */
-export function formatDataType(dataType: DataType, tableEncoding?: Encoding): string {
+export function formatDataType(dataType: DataType, target: MySQLVersion, tableEncoding?: Encoding): string {
   const baseType = dataType._kind.toLowerCase();
   let params = '';
   let options = '';

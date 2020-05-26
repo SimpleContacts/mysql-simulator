@@ -1,5 +1,7 @@
 // @flow strict
 
+export type MySQLVersion = '5.7' | '8.x';
+
 export function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
 }

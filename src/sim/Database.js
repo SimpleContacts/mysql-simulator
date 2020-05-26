@@ -5,6 +5,7 @@ import type { Schema as ROLSchema } from 'rule-of-law/types';
 
 import { makeEncoding } from '../ast/encodings';
 import type { Encoding } from '../ast/encodings';
+import type { MySQLVersion } from '../printer/utils';
 import Column from './Column';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
@@ -12,7 +13,7 @@ import Table from './Table';
 
 export type Options = {|
   +defaultEncoding: Encoding,
-  +mysqlVersion: string,
+  +mysqlVersion: MySQLVersion,
 |};
 
 type LUT<+T> = { +[string]: T };
@@ -188,7 +189,7 @@ export default class Database {
    */
   replaceColumn(tblName: string, colName: string, column: Column, position: string | null): Database {
     let db = this;
-    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position));
+    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position, this.options.mysqlVersion));
 
     // If it's a rename, we may need to update any FKs pointing to it
     if (colName !== column.name) {
@@ -254,8 +255,8 @@ export default class Database {
       const localColumn = localTable.getColumn(localColName);
       const foreignColumn = foreignTable.getColumn(foreignColName);
 
-      const ltype = localColumn.getType();
-      const ftype = foreignColumn.getType();
+      const ltype = localColumn.getType(this.options.mysqlVersion);
+      const ftype = foreignColumn.getType(this.options.mysqlVersion);
       if (ltype !== ftype) {
         const lname = `${localTable.name}.${localColumn.name}`;
         const fname = `${foreignTable.name}.${foreignColumn.name}`;
@@ -332,17 +333,18 @@ export default class Database {
     // emit an empty line at the start.
     dumps.push('');
 
+    const target = this.options.mysqlVersion;
     for (const tableName of tableNames) {
       const table = this.getTable(tableName);
       if (options.foreignKeysLast) {
-        dumps.push(table.toString({ includeForeignKeys: false }));
+        dumps.push(table.toString({ includeForeignKeys: false, target }));
         const fks = table.printFKs();
         if (fks) {
           footer.push(fks);
           footer.push('');
         }
       } else {
-        dumps.push(table.toString());
+        dumps.push(table.toString({ target }));
       }
       dumps.push('');
     }

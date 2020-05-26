@@ -8,6 +8,7 @@ import ast from '../ast';
 import type { CurrentTimestamp, DataType, DefaultValue, GeneratedDefinition } from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { escape, quote, serializeCurrentTimestamp, serializeExpression } from '../printer';
+import type { MySQLVersion } from '../printer/utils';
 import { formatDataType } from './DataType';
 
 export default class Column {
@@ -71,8 +72,8 @@ export default class Column {
    * Get the normalized type, not the raw type for this column.
    * e.g. returns "int(11)" or "varchar(16) CHARACTER SET utf8"
    */
-  getType(): string {
-    return formatDataType(this.dataType);
+  getType(target: MySQLVersion): string {
+    return formatDataType(this.dataType, target);
   }
 
   /**
@@ -81,7 +82,7 @@ export default class Column {
    * encodings of text columns, based on whether they differ from the table or
    * not.
    */
-  getDefinition(tableEncoding?: Encoding): string {
+  getDefinition(tableEncoding: Encoding, target: MySQLVersion): string {
     const dataType = this.dataType;
     const generated = this.generated;
 
@@ -147,7 +148,7 @@ export default class Column {
     }
 
     return [
-      formatDataType(dataType, tableEncoding),
+      formatDataType(dataType, target, tableEncoding),
       generated === null ? nullable : undefined,
       // Generated columns won't have a default value
       !generated ? defaultValueClause : undefined,
@@ -223,7 +224,7 @@ export default class Column {
     return this.nullable ? t.Nullable(baseType) : baseType;
   }
 
-  toString(tableEncoding: Encoding): string {
-    return `${escape(this.name)} ${this.getDefinition(tableEncoding)}`;
+  toString(tableEncoding: Encoding, target: MySQLVersion): string {
+    return `${escape(this.name)} ${this.getDefinition(tableEncoding, target)}`;
   }
 }

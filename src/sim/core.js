@@ -7,16 +7,15 @@ import invariant from 'invariant';
 import { maxBy, minBy, sortBy } from 'lodash';
 
 import ast from '../ast';
-import { makeEncoding, MYSQL_57_DEFAULTS } from '../ast/encodings';
+import type { DataType } from '../ast';
+import { MYSQL_57_DEFAULTS, makeEncoding } from '../ast/encodings';
+import type { Encoding } from '../ast/encodings';
 import parseSql from '../parser';
+import type { AlterSpec, AlterTableStatement, ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
-import { setEncoding } from './DataType';
-
-import type { AlterSpec, AlterTableStatement, ColumnDefinition, CreateTableStatement, Statement } from '../parser';
-import type { DataType } from '../ast';
-import type { Encoding } from '../ast/encodings';
 import type { Options } from './Database';
+import { setEncoding } from './DataType';
 
 const DEFAULT_OPTIONS = {
   defaultEncoding: MYSQL_57_DEFAULTS,
@@ -137,7 +136,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   if (stm.options?.CHARSET || stm.options?.COLLATE) {
     encoding = makeEncoding(stm.options.CHARSET ?? undefined, stm.options.COLLATE ?? undefined);
   } else {
-    encoding = db_.defaultEncoding;
+    encoding = db_.options.defaultEncoding;
   }
 
   let db = db_.createTable(tblName, encoding);
@@ -346,7 +345,7 @@ function applyStatement(db: Database, statement: Statement): Database {
     case 'AlterDatabaseStatement': {
       const charset = statement.options.CHARSET ?? undefined;
       const collate = statement.options.COLLATE ?? undefined;
-      const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
+      const encoding = charset || collate ? makeEncoding(charset, collate) : db.options.defaultEncoding;
       return db.setEncoding(encoding);
     }
 

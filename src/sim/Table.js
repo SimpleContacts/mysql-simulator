@@ -8,6 +8,7 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 import type { Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
 import { escape, insert } from '../printer';
+import type { MySQLVersion } from '../printer/utils';
 import Column from './Column';
 import Database from './Database';
 import { convertToEncoding, dealiasCharset, dealiasCollate, setEncoding } from './DataType';
@@ -292,7 +293,7 @@ export default class Table {
     return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
-  replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
+  replaceColumn(oldColName: string, newColumn: Column, position: string | null, target: MySQLVersion): Table {
     // If this is a rename, make sure to do that now first
     let table = this;
     const oldColumn = table.getColumn(oldColName);
@@ -304,8 +305,8 @@ export default class Table {
     if (fks.length > 0) {
       // If the type changes, some MySQL servers might throw
       // a ER_FK_COLUMN_CANNOT_CHANGE error.  Therefore, throw a warning.
-      const oldType = oldColumn.getDefinition(table.defaultEncoding);
-      const newType = newColumn.getDefinition(table.defaultEncoding);
+      const oldType = oldColumn.getDefinition(table.defaultEncoding, target);
+      const newType = newColumn.getDefinition(table.defaultEncoding, target);
       if (oldType !== newType) {
         console.warn('');
         console.warn(`WARNING: Column type change detected on column "${table.name}.${oldColName}" used in FK:`);
@@ -672,10 +673,10 @@ export default class Table {
     return sortBy(this.foreignKeys, (fk) => fk.name);
   }
 
-  serializeDefinitions(printOptions?: {| includeForeignKeys?: boolean |}): Array<string> {
-    const includeFKs = printOptions?.includeForeignKeys ?? true;
+  serializeDefinitions(printOptions: {| includeForeignKeys?: boolean, target: MySQLVersion |}): Array<string> {
+    const includeFKs = printOptions.includeForeignKeys ?? true;
     return [
-      ...this.columns.map((col) => col.toString(this.defaultEncoding)),
+      ...this.columns.map((col) => col.toString(this.defaultEncoding, printOptions.target)),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
 
       ...this.getUniqueIndexes().map((index) => index.toString()),
@@ -718,7 +719,8 @@ export default class Table {
     );
   }
 
-  toString(printOptions?: {| includeForeignKeys?: boolean |}): string {
+  toString(printOptions: {| includeForeignKeys?: boolean, target: MySQLVersion |}): string {
+    const indent = (line: string) => `  ${line}`;
     const options = [
       'ENGINE=InnoDB',
       `DEFAULT CHARSET=${dealiasCharset(this.defaultEncoding.charset)}`,
