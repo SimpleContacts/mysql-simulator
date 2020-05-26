@@ -89,7 +89,7 @@ function asReal(baseType: $PropertyType<RealDataType, 'baseType'>, params: strin
 
   let precision = null;
   if (params) {
-    const [first, second] = params.split(',').map(s => s.trim());
+    const [first, second] = params.split(',').map((s) => s.trim());
     const length = parseInt(first, 10);
     const decimals = second ? parseInt(second, 10) : 0;
     precision = { length, decimals };

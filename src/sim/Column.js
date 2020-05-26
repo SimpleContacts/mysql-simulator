@@ -135,7 +135,7 @@ export default class Column {
       generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr)}) ${generated.mode}` : '',
       generated !== null ? nullable : '',
     ]
-      .filter(x => x)
+      .filter((x) => x)
       .join(' ');
   }
 

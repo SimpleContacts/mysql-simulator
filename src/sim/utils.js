@@ -53,5 +53,5 @@ export function parseEnumValues(enumString: string): Array<string> {
     startRule: 'StringLiteralList',
   });
   // Dequote to make them JavaScript string literals
-  return values.map(lit => unquote(lit.value));
+  return values.map((lit) => unquote(lit.value));
 }
