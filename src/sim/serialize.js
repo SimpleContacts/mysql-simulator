@@ -1,13 +1,17 @@
 import invariant from 'invariant';
 
 import { escape, quoteInExpressionContext, unquote } from './utils';
+import type { MySQLVersion } from './utils';
 
-export function serialize(node) {
+export function serialize(node, target: MySQLVersion) {
   invariant(node, 'expected a node');
 
   if (Array.isArray(node)) {
     return node.map(serialize).join(', ');
   }
+
+  const TRUE = target === '5.7' ? 'TRUE' : 'true';
+  const FALSE = target === '5.7' ? 'FALSE' : 'false';
 
   switch (node.type) {
     case 'callExpression':
@@ -15,13 +19,13 @@ export function serialize(node) {
 
     case 'literal':
       return node.value === true
-        ? 'TRUE'
+        ? TRUE
         : node.value === false
-        ? 'FALSE'
+        ? FALSE
         : node.value === null
         ? 'NULL'
         : typeof node.value === 'string'
-        ? quoteInExpressionContext(unquote(node.value))
+        ? quoteInExpressionContext(unquote(node.value), target)
         : node.value;
 
     case 'unary':
