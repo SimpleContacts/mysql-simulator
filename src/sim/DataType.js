@@ -24,7 +24,7 @@ export type DateTimeDataType = {
   // NOTE: "DATE" does not belong here! It's an OtherDataType, as it does not
   // have any parameters!
   baseType: 'time' | 'timestamp' | 'datetime',
-  fsp: number | null,
+  fsp: number | null, // From the MySQL spec: fractional seconds precision
 };
 
 export type TextDataType = {
