@@ -3,11 +3,12 @@ import invariant from 'invariant';
 import { escape, quoteInExpressionContext, unquote } from './utils';
 import type { MySQLVersion } from './utils';
 
-export function serialize(node, target: MySQLVersion) {
+export function serialize(node, target) {
   invariant(node, 'expected a node');
+  invariant(target === '5.7' || target === '8.0', `Expected a valid MySQL version as the target, but got: ${target}`);
 
   if (Array.isArray(node)) {
-    return node.map(serialize).join(', ');
+    return node.map((v) => serialize(v, target)).join(', ');
   }
 
   const TRUE = target === '5.7' ? 'TRUE' : 'true';
@@ -15,7 +16,7 @@ export function serialize(node, target: MySQLVersion) {
 
   switch (node.type) {
     case 'callExpression':
-      return serializeCallExpression(node);
+      return serializeCallExpression(node, target);
 
     case 'literal':
       return node.value === true
@@ -30,20 +31,28 @@ export function serialize(node, target: MySQLVersion) {
 
     case 'unary':
       if (node.op === 'is null') {
-        // #lolmysql, go home
-        return `isnull(${serialize(node.expr)})`;
+        if (target === '5.7') {
+          // #lolmysql-5.7, go home
+          return `isnull(${serialize(node.expr, target)})`;
+        } else {
+          return `(${serialize(node.expr, target)} is null)`;
+        }
       } else if (node.op === 'is not null') {
-        return `(${serialize(node.expr)} is not null)`;
+        return `(${serialize(node.expr, target)} is not null)`;
       } else if (node.op === '!') {
-        // #lolmysql, extra wrapping in parens
-        return `(not(${serialize(node.expr)}))`;
+        if (target === '5.7') {
+          // #lolmysql, extra wrapping in parens
+          return `(not(${serialize(node.expr, target)}))`;
+        } else {
+          return `(0 = ${serialize(node.expr, target)})`;
+        }
       } else if (node.op === '+') {
         // #lolmysql, explicitly stripping the wrapping
-        return serialize(node.expr);
+        return serialize(node.expr, target);
       }
 
       // "Normal" cases
-      return `${node.op}(${serialize(node.expr)})`;
+      return `${node.op}(${serialize(node.expr, target)})`;
 
     case 'binary': {
       let op = node.op;
@@ -54,7 +63,7 @@ export function serialize(node, target: MySQLVersion) {
         op = op.toLowerCase();
       }
 
-      return `(${serialize(node.expr1)} ${op} ${serialize(node.expr2)})`;
+      return `(${serialize(node.expr1, target)} ${op} ${serialize(node.expr2, target)})`;
     }
 
     case 'identifier':
@@ -68,11 +77,11 @@ export function serialize(node, target: MySQLVersion) {
   }
 }
 
-function serializeCallExpression(node) {
+function serializeCallExpression(node, target) {
   invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
-  let f = serialize(node.name);
+  let f = serialize(node.name, target);
   if (node.args !== undefined) {
-    f += `(${node.args.map(serialize).join(',')})`;
+    f += `(${node.args.map((v) => serialize(v, target)).join(',')})`;
   }
   return f;
 }

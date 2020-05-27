@@ -133,7 +133,7 @@ export default class Column {
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
-      generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr)}) ${generated.mode}` : '',
+      generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr, target)}) ${generated.mode}` : '',
       generated !== null ? nullable : '',
     ]
       .filter((x) => x)
