@@ -103,15 +103,15 @@ export default class Column {
         // DECIMAL fields explicitly output a fixed-digit number according to
         // their precision
         if (dataType._kind === 'Decimal') {
-          return serializeExpression(ast.Literal(Number(value).toFixed(dataType.precision.decimals)));
+          return serializeExpression(ast.Literal(Number(value).toFixed(dataType.precision.decimals)), { target });
         }
 
         if (typeof value === 'string') {
-          return serializeExpression(node);
+          return serializeExpression(node, { target });
         } else if (typeof value === 'number') {
           // MySQL outputs number constants as strings. No idea why that would
           // make sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-          return serializeExpression(ast.Literal(String(value)));
+          return serializeExpression(ast.Literal(String(value)), { target });
         }
       } else if (node._kind === 'CurrentTimestamp') {
         return serializeCurrentTimestamp(node);
@@ -162,7 +162,7 @@ export default class Column {
             // expressions, functions are getting lowercased and strings with
             // quote characters will get serialized differently. Beats me as to
             // why.
-            { context: 'EXPRESSION' },
+            { context: 'EXPRESSION', target },
           )}) ${generated.mode}`
         : undefined,
       generated !== null ? nullable : undefined,

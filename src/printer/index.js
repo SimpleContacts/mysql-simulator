@@ -4,6 +4,7 @@ import invariant from 'invariant';
 
 import type { CurrentTimestamp, Expression } from '../ast';
 import { escape, insert, quote, quoteInExpressionContext } from './utils';
+import type { MySQLVersion } from './utils';
 
 //
 // NOTE:
@@ -19,7 +20,8 @@ import { escape, insert, quote, quoteInExpressionContext } from './utils';
 // Absolutely no clue why.
 //
 type FormattingOptions = {|
-  context: 'EXPRESSION' | 'DEFAULT',
+  context?: 'EXPRESSION' | 'DEFAULT',
+  target: MySQLVersion,
 |};
 
 export { escape, insert, quote };
@@ -32,7 +34,7 @@ export function serializeCurrentTimestamp(node: CurrentTimestamp): string {
   }
 }
 
-export function serializeExpression(node: Expression, options?: FormattingOptions): string {
+export function serializeExpression(node: Expression, options: FormattingOptions): string {
   invariant(node, 'expected a node');
 
   // Helper to make recursing with the same options context easier
@@ -42,10 +44,16 @@ export function serializeExpression(node: Expression, options?: FormattingOption
     return node.map(recurse).join(', ');
   }
 
+  const target = options.target;
+  const TRUE = target === '5.7' ? 'TRUE' : 'true';
+  const FALSE = target === '5.7' ? 'FALSE' : 'false';
+
+  const serializeString = options.context === 'EXPRESSION' ? (s) => quoteInExpressionContext(s, target) : quote;
+
   switch (node._kind) {
     case 'CallExpression': {
       let func = node.callee.name;
-      if (options?.context === 'EXPRESSION') {
+      if (options.context === 'EXPRESSION') {
         func = func.toLowerCase();
       }
 
@@ -56,11 +64,10 @@ export function serializeExpression(node: Expression, options?: FormattingOption
     }
 
     case 'Literal': {
-      const serializeString = options?.context === 'EXPRESSION' ? quoteInExpressionContext : quote;
       return node.value === true
-        ? 'TRUE'
+        ? TRUE
         : node.value === false
-        ? 'FALSE'
+        ? FALSE
         : node.value === null
         ? 'NULL'
         : typeof node.value === 'string'

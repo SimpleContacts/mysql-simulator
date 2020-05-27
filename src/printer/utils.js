@@ -27,6 +27,10 @@ export function quote(s: string): string {
  * ...and of course MySQL has another quoting strategy when in an expression
  * context.  Le sigh.
  */
-export function quoteInExpressionContext(s: string): string {
-  return `'${s.replace("'", "\\'")}'`;
+export function quoteInExpressionContext(s: string, target: MySQLVersion): string {
+  if (target === '5.7') {
+    return `'${s.replace("'", "\\'")}'`;
+  } else {
+    return `_utf8mb3'${s.replace("'", "\\'")}'`;
+  }
 }
