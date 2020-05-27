@@ -79,13 +79,21 @@ export function serializeExpression(node: Expression, options: FormattingOptions
 
     case 'UnaryExpression':
       if (node.op === 'is null') {
-        // #lolmysql, go home
-        return `isnull(${recurse(node.expr)})`;
+        if (target === '5.7') {
+          // #lolmysql-5.7, go home
+          return `isnull(${recurse(node.expr)})`;
+        } else {
+          return `(${recurse(node.expr)} is null)`;
+        }
       } else if (node.op === 'is not null') {
         return `(${recurse(node.expr)} is not null)`;
       } else if (node.op === '!') {
-        // #lolmysql, extra wrapping in parens
-        return `(not(${recurse(node.expr)}))`;
+        if (target === '5.7') {
+          // #lolmysql, extra wrapping in parens
+          return `(not(${recurse(node.expr)}))`;
+        } else {
+          return `(0 = ${recurse(node.expr)})`;
+        }
       } else if (node.op === '+') {
         // #lolmysql, explicitly stripping the wrapping
         return recurse(node.expr);
