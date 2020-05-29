@@ -63,7 +63,7 @@ export function serialize(node, target) {
         op = op.toLowerCase();
       }
 
-      if (target === '5.7' || !['AND', 'OR', 'XOR'].includes(op)) {
+      if (target === '5.7' || !['and', 'or', 'xor'].includes(op)) {
         return `(${serialize(node.expr1, target)} ${op} ${serialize(node.expr2, target)})`;
       } else {
         // #lolmysql-8.0 - wtf? for boolean operators, the operands are "truth"ed by comparing them against 0?
