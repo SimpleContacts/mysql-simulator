@@ -168,9 +168,8 @@ function peg$parse(input, options) {
       peg$c19 = function() { return null; },
       peg$c20 = function(expr1, op, expr2) { return binary(op, expr1, expr2) },
       peg$c21 = function(pred, check) {
-            // #lolmysql
             if (check === 'NULL') {
-              return callExpression(builtinFunction('isnull'), [pred])
+              return unary('is null', pred)
             } else {
               return unary('is not null', pred)
             }

@@ -173,9 +173,8 @@ BooleanOp
 
 BooleanPrimary
   = pred:Predicate IS check:( NULL / NOT_NULL ) {
-      // #lolmysql
       if (check === 'NULL') {
-        return callExpression(builtinFunction('isnull'), [pred])
+        return unary('is null', pred)
       } else {
         return unary('is not null', pred)
       }

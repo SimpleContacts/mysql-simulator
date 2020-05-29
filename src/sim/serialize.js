@@ -25,8 +25,10 @@ export function serialize(node) {
         : node.value;
 
     case 'unary':
-      if (node.op === 'is not null') {
+      if (node.op === 'is null') {
         // #lolmysql, go home
+        return `isnull(${serialize(node.expr)})`;
+      } else if (node.op === 'is not null') {
         return `(${serialize(node.expr)} is not null)`;
       } else if (node.op === '!') {
         // #lolmysql, extra wrapping in parens
