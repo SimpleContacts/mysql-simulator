@@ -23,6 +23,7 @@ CREATE TABLE t2 (
     b1 BOOLEAN AS (c1 IS NOT NULL AND c2 IS NOT NULL),
     b2 BOOLEAN AS (c1 IS NULL OR c2 IS NOT NULL),
     b3 BOOLEAN AS (c1 XOR c2),
+    b4 BOOLEAN AS (COALESCE(c1, 'foo') XOR COALESCE(c2, 'bar')),
 
     x1 VARCHAR(20) AS (JSON_EXTRACT(c1, '$.type')),
     x2 VARCHAR(20) AS (c1 -> '$.type'),
