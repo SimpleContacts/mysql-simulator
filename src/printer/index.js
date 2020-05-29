@@ -111,6 +111,14 @@ export function serializeExpression(node: Expression, options: FormattingOptions
         op = op.toLowerCase();
       }
 
+      //
+      // XXX FIXME: THIS IS BROKEN
+      // It seems that we'll need to look at both expr1 and expr2 and check to
+      // see if those are "known boolean nodes".  Either constants, or boolean
+      // operators themselves will be "known booleans". In those cases, the
+      // extra "truth wrapping" (aka the "(0 <> x)" wrapping) won't happen.
+      // Otherwise, it happens.
+      //
       if (target === '5.7' || !['and', 'or', 'xor'].includes(op)) {
         return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
       } else {
