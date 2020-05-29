@@ -111,7 +111,7 @@ export function serializeExpression(node: Expression, options: FormattingOptions
         op = op.toLowerCase();
       }
 
-      if (target === '5.7' || !['AND', 'OR', 'XOR'].includes(op)) {
+      if (target === '5.7' || !['and', 'or', 'xor'].includes(op)) {
         return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
       } else {
         // #lolmysql-8.0 - wtf? for boolean operators, the operands are "truth"ed by comparing them against 0?
