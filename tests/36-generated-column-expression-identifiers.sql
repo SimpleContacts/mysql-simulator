@@ -27,7 +27,7 @@ CREATE TABLE t2 (
     b5 BOOLEAN AS (true XOR false),
     b6 BOOLEAN AS (1 XOR 0),
     b7 BOOLEAN AS ('true' XOR 'false'),
-    b8 BOOLEAN AS (null XOR ''),
+    b8 BOOLEAN AS (null XOR (1=1)),
 
     x1 VARCHAR(20) AS (JSON_EXTRACT(c1, '$.type')),
     x2 VARCHAR(20) AS (c1 -> '$.type'),
