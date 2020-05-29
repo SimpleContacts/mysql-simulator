@@ -63,7 +63,11 @@ export function serialize(node, target) {
         op = op.toLowerCase();
       }
 
-      return `(${serialize(node.expr1, target)} ${op} ${serialize(node.expr2, target)})`;
+      if (target === '5.7') {
+        return `(${serialize(node.expr1, target)} ${op} ${serialize(node.expr2, target)})`;
+      } else {
+        return `((0 <> ${serialize(node.expr1, target)}) ${op} (0 <> ${serialize(node.expr2, target)}))`;
+      }
     }
 
     case 'identifier':
