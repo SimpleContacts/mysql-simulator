@@ -111,7 +111,11 @@ export function serializeExpression(node: Expression, options: FormattingOptions
         op = op.toLowerCase();
       }
 
-      return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
+      if (target === '5.7') {
+        return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
+      } else {
+        return `((0 <> ${recurse(node.expr1)}) ${op} (0 <> ${recurse(node.expr2)}))`;
+      }
     }
 
     case 'Identifier':
