@@ -1,7 +1,6 @@
 import invariant from 'invariant';
 
 import { escape, quoteInExpressionContext, unquote } from './utils';
-import type { MySQLVersion } from './utils';
 
 export function serialize(node, target) {
   invariant(node, 'expected a node');
