@@ -34,6 +34,33 @@ export function serializeCurrentTimestamp(node: CurrentTimestamp): string {
   }
 }
 
+function takesBooleanOperands(op: string): boolean {
+  return ['and', 'or', 'xor'].includes(op.toLowerCase());
+}
+
+function isBooleanOp(op: string): boolean {
+  return ['and', 'or', 'xor', '=', '<>', '<=', '>=', '<', '>', 'like', 'ilike', 'regexp'].includes(op.toLowerCase());
+}
+
+/**
+ * Like serialize, this will output a SQL expression, but if the nodes that are
+ * being serialized here are not "known boolean values", the entire resulting
+ * expression will get wrapped in a comparison against zero, e.g. "0 <>
+ * (expr)", which is MySQL's way of expressing a "truthy" value.
+ */
+export function serializeTruthExpr(node: Expression, options: FormattingOptions): string {
+  if (
+    node._kind === 'Literal' ||
+    node._kind === 'UnaryExpression' ||
+    (node._kind === 'BinaryExpression' && isBooleanOp(node.op))
+  ) {
+    return serializeExpression(node, options);
+  }
+
+  // For all other cases, wrap this in a "truthy" assessment expression
+  return `(0 <> ${serializeExpression(node, options)})`;
+}
+
 export function serializeExpression(node: Expression, options: FormattingOptions): string {
   invariant(node, 'expected a node');
 
@@ -111,19 +138,11 @@ export function serializeExpression(node: Expression, options: FormattingOptions
         op = op.toLowerCase();
       }
 
-      //
-      // XXX FIXME: THIS IS BROKEN
-      // It seems that we'll need to look at both expr1 and expr2 and check to
-      // see if those are "known boolean nodes".  Either constants, or boolean
-      // operators themselves will be "known booleans". In those cases, the
-      // extra "truth wrapping" (aka the "(0 <> x)" wrapping) won't happen.
-      // Otherwise, it happens.
-      //
-      if (target === '5.7' || !['and', 'or', 'xor'].includes(op)) {
-        return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
+      // #lolmysql-8.0 - wtf? for boolean operators, the operands are "truth"ed by comparing them against 0?
+      if (takesBooleanOperands(op)) {
+        return `(${serializeTruthExpr(node.expr1, options)} ${op} ${serializeTruthExpr(node.expr2, options)})`;
       } else {
-        // #lolmysql-8.0 - wtf? for boolean operators, the operands are "truth"ed by comparing them against 0?
-        return `((0 <> ${recurse(node.expr1)}) ${op} (0 <> ${recurse(node.expr2)}))`;
+        return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
       }
     }
 
