@@ -23,7 +23,11 @@ export function serializeTruthExpr(node, target) {
     return serialize(node, target);
   }
 
-  if (node.type === 'literal' || node.type === 'unary' || (node.type === 'binary' && isBooleanOp(node.op))) {
+  if (
+    (node.type === 'literal' && typeof node.value === 'boolean') ||
+    node.type === 'unary' ||
+    (node.type === 'binary' && isBooleanOp(node.op))
+  ) {
     return serialize(node, target);
   }
 
