@@ -50,7 +50,7 @@ function isBooleanOp(op: string): boolean {
  */
 export function serializeTruthExpr(node: Expression, options: FormattingOptions): string {
   if (
-    node._kind === 'Literal' ||
+    (node._kind === 'Literal' && typeof node.value === 'boolean') ||
     node._kind === 'UnaryExpression' ||
     (node._kind === 'BinaryExpression' && isBooleanOp(node.op))
   ) {
