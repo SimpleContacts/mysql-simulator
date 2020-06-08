@@ -6,6 +6,13 @@ import type { Schema as ROLSchema } from 'rule-of-law/types';
 import Column from './Column';
 import type { IndexType } from './Index';
 import Table from './Table';
+import type { MySQLVersion } from './utils';
+
+export type Options = {|
+  version: MySQLVersion,
+|};
+
+const DEFAULT_OPTIONS: Options = { version: '5.7' };
 
 type LUT<+T> = { +[string]: T };
 
@@ -28,9 +35,11 @@ function values<T>(things: LUT<T>): Array<T> {
 }
 
 export default class Database {
+  +options: Options;
   +_tables: LUT<Table>; // TODO: Just make this an Array, it's way easier to work with
 
-  constructor(_tables: LUT<Table> = {}) {
+  constructor(options?: Options, _tables: LUT<Table> = {}) {
+    this.options = options || DEFAULT_OPTIONS;
     this._tables = _tables;
   }
 
@@ -69,7 +78,7 @@ export default class Database {
   addTable(table: Table): Database {
     const name = table.name;
     this.assertTableDoesNotExist(name);
-    return new Database({ ...this._tables, [name]: table });
+    return new Database(this.options, { ...this._tables, [name]: table });
   }
 
   /**
@@ -121,7 +130,7 @@ export default class Database {
 
     const newTables = { ...this._tables };
     delete newTables[name];
-    return new Database(newTables);
+    return new Database(this.options, newTables);
   }
 
   /**
@@ -133,10 +142,7 @@ export default class Database {
     if (newTable.name !== tblName) {
       throw new Error('Database.swapTable() cannot be used to change the name of the table.');
     }
-    return new Database({
-      ...this._tables,
-      [tblName]: newTable,
-    });
+    return new Database(this.options, { ...this._tables, [tblName]: newTable });
   }
 
   /**
@@ -145,7 +151,10 @@ export default class Database {
    */
   mapTables(mapper: (Table) => Table): Database {
     const newTables = this.getTables().map(mapper);
-    return new Database(indexBy(newTables, (table) => table.name));
+    return new Database(
+      this.options,
+      indexBy(newTables, (table) => table.name),
+    );
   }
 
   /**
@@ -165,7 +174,7 @@ export default class Database {
    */
   replaceColumn(tblName: string, colName: string, column: Column, position: string | null): Database {
     let db = this;
-    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position));
+    db = db.swapTable(tblName, (table) => table.replaceColumn(colName, column, position, this.options.version));
 
     // If it's a rename, we may need to update any FKs pointing to it
     if (colName !== column.name) {
@@ -229,8 +238,8 @@ export default class Database {
       const localColumn = localTable.getColumn(localColName);
       const foreignColumn = foreignTable.getColumn(foreignColName);
 
-      const ltype = localColumn.getType();
-      const ftype = foreignColumn.getType();
+      const ltype = localColumn.getType(this.options.version);
+      const ftype = foreignColumn.getType(this.options.version);
       if (ltype !== ftype) {
         const lname = `${localTable.name}.${localColumn.name}`;
         const fname = `${foreignTable.name}.${foreignColumn.name}`;
@@ -284,7 +293,7 @@ export default class Database {
     dumps.push('');
 
     for (const tableName of tableNames) {
-      dumps.push(this.getTable(tableName).toString());
+      dumps.push(this.getTable(tableName).toString(this.options.version));
       dumps.push('');
     }
 

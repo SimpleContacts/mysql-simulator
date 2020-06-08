@@ -10,6 +10,7 @@ import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
+import type { MySQLVersion } from './utils';
 
 export default class Table {
   +name: string;
@@ -220,7 +221,7 @@ export default class Table {
     return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
-  replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
+  replaceColumn(oldColName: string, newColumn: Column, position: string | null, target: MySQLVersion): Table {
     // If this is a rename, make sure to do that now first
     let table = this;
     const oldColumn = table.getColumn(oldColName);
@@ -232,8 +233,8 @@ export default class Table {
     if (fks.length > 0) {
       // If the type changes, some MySQL servers might throw
       // a ER_FK_COLUMN_CANNOT_CHANGE error.  Therefore, throw a warning.
-      const oldType = oldColumn.getDefinition();
-      const newType = newColumn.getDefinition();
+      const oldType = oldColumn.getDefinition(target);
+      const newType = newColumn.getDefinition(target);
       if (oldType !== newType) {
         console.warn('');
         console.warn(`WARNING: Column type change detected on column "${table.name}.${oldColName}" used in FK:`);
@@ -549,9 +550,9 @@ export default class Table {
     return sortBy(this.foreignKeys, (fk) => fk.name);
   }
 
-  serializeDefinitions(): Array<string> {
+  serializeDefinitions(target: MySQLVersion): Array<string> {
     return [
-      ...this.columns.map((col) => col.toString()),
+      ...this.columns.map((col) => col.toString(target)),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
 
       ...this.getUniqueIndexes().map((index) => index.toString()),
@@ -577,11 +578,11 @@ export default class Table {
     return t.Record(record, this.name);
   }
 
-  toString(): string {
+  toString(target: MySQLVersion): string {
     const indent = (line: string) => `  ${line}`;
     return [
       `CREATE TABLE \`${this.name}\` (`,
-      this.serializeDefinitions().map(indent).join(',\n'),
+      this.serializeDefinitions(target).map(indent).join(',\n'),
       `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`,
     ].join('\n');
   }

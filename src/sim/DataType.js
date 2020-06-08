@@ -1,6 +1,7 @@
 // @flow strict
 
 import { parseEnumValues, quote } from './utils';
+import type { MySQLVersion } from './utils';
 
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
@@ -23,7 +24,7 @@ export type DateTimeDataType = {
   // NOTE: "DATE" does not belong here! It's an OtherDataType, as it does not
   // have any parameters!
   baseType: 'time' | 'timestamp' | 'datetime',
-  fsp: number | null,
+  fsp: number | null, // From the MySQL spec: fractional seconds precision
 };
 
 export type TextDataType = {
@@ -227,7 +228,7 @@ export function parseDataType(type: string): TypeInfo {
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo): string {
+export function formatDataType(info: TypeInfo, target: MySQLVersion): string {
   const baseType = info.baseType;
   let params = '';
   let options = '';
@@ -282,6 +283,16 @@ export function formatDataType(info: TypeInfo): string {
   }
 
   params = params ? `(${params})` : '';
+  if (target >= '8.0') {
+    // Under MySQL 8.0, default lengths for specific column types are no longer
+    // emitted as part of the output
+    // $FlowFixMe
+    const stdLength = DEFAULT_INT_LENGTHS[baseType];
+    const length = typeof info.length === 'number' ? info.length : null;
+    if (stdLength !== undefined && length !== null && stdLength === length + (info.unsigned ? 1 : 0)) {
+      params = '';
+    }
+  }
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
 }

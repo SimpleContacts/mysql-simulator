@@ -3,6 +3,8 @@
 // $FlowFixMe - the parser isn't type-annotated
 import { parse as rawParseSql } from '../parser/mysql';
 
+export type MySQLVersion = '5.7' | '8.0';
+
 export function escape(s: string): string {
   return `\`${s.replace('`', '\\`')}\``;
 }
@@ -35,8 +37,12 @@ export function quote(s: string): string {
  * ...and of course MySQL has another quoting strategy when in an expression
  * context.  Le sigh.
  */
-export function quoteInExpressionContext(s: string): string {
-  return `'${s.replace("'", "\\'")}'`;
+export function quoteInExpressionContext(s: string, target: MySQLVersion): string {
+  if (target === '5.7') {
+    return `'${s.replace("'", "\\'")}'`;
+  } else {
+    return `_utf8mb3'${s.replace("'", "\\'")}'`;
+  }
 }
 
 /**

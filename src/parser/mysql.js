@@ -188,7 +188,7 @@ function peg$parse(input, options) {
       peg$c28 = function(expr) { return unary('+', expr) },
       peg$c29 = function(expr) { return unary('-', expr) },
       peg$c30 = function(expr) { return unary('!', expr) },
-      peg$c31 = function(exprs) { return exprs },
+      peg$c31 = function(expr) { return expr },
       peg$c32 = function(name, exprs) {
             return callExpression(builtinFunction(name), exprs)
           },
@@ -2529,7 +2529,7 @@ function peg$parse(input, options) {
                   s0 = peg$currPos;
                   s1 = peg$parseLPAREN();
                   if (s1 !== peg$FAILED) {
-                    s2 = peg$parseExpressionList();
+                    s2 = peg$parseExpression();
                     if (s2 !== peg$FAILED) {
                       s3 = peg$parseRPAREN();
                       if (s3 !== peg$FAILED) {
