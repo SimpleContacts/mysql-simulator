@@ -51,4 +51,19 @@ jobs:
         run: yarn build
 
       - name: Run tests
-        run: yarn test
+        run: ./test.sh
+
+      - name: Flow
+        run: yarn run -s flow
+
+      - name: Jest
+        run: yarn run -s jest src
+
+      - name: ESLint
+        run: yarn run -s eslint --report-unused-disable-directives src
+
+      - name: Prettier
+        run: yarn run -s prettier --check 'src/**/*.js' '!src/parser/mysql.js'
+
+      - name: Import-sort
+        run: yarn run -s import-sort --list-different 'src/**/*.js' '!src/parser/mysql.js'
