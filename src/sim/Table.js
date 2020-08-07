@@ -35,7 +35,7 @@ export default class Table {
   /**
    * Returns whether the given Column name exists in the Table.
    */
-  has(colName: string) {
+  has(colName: string): boolean {
     return this.columns.findIndex((c) => c.name === colName) >= 0;
   }
 
@@ -46,7 +46,7 @@ export default class Table {
   /**
    * Returns whether the given Column is used in any of the foreign keys.
    */
-  isUsedInForeignKey(colName: string) {
+  isUsedInForeignKey(colName: string): boolean {
     return this.getForeignKeysUsing(colName).length > 0;
   }
 
@@ -370,7 +370,7 @@ export default class Table {
   /**
    * Generates a name for a new foreign key, based on the table's current state.
    */
-  generateForeignKeyName() {
+  generateForeignKeyName(): string {
     const prefix = `${this.name}_ibfk_`;
     const autoFKs = this.foreignKeys
       .filter((fk) => fk.name.startsWith(prefix))

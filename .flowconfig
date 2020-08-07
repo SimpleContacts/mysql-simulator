@@ -1,5 +1,5 @@
 [version]
-0.127.0
+0.131.0
 
 [libs]
 flow-typed/
@@ -9,10 +9,10 @@ flow-typed/
 *.json
 
 [options]
+well_formed_exports=true
 
 [lints]
 all=error
-dynamic-export=off
 sketchy-null-bool=off
 sketchy-null-mixed=off
 sketchy-null-number=off

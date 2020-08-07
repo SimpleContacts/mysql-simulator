@@ -38,7 +38,7 @@ export default class Database {
     return sortBy(values(this._tables), (t) => t.name.toLowerCase());
   }
 
-  has(name: string) {
+  has(name: string): boolean {
     return this._tables[name] !== undefined;
   }
 
