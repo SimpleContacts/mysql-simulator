@@ -64,7 +64,7 @@
     "@babel/runtime": "^7.9.6",
     "commander": "^6.0.0",
     "invariant": "^2.2.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "rule-of-law": "^0.0.10"
   }
 }
