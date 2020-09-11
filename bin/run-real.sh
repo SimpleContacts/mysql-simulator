@@ -6,7 +6,7 @@ input_dir=tests
 output_dir=tests/real
 
 dump() {
-  mysqldump $testdb --no-data --skip-triggers --compact \
+  mysqldump $testdb --no-data --no-tablespaces --skip-triggers --compact \
     | sed -Ee 's/^[/][*].*$//' | tr -s '\n' | sed -Ee 's/;/;@/' | tr '@' '\n' \
     | sed -Ee 's/([[:space:]]+(CHARACTER SET|COLLATE)[[:space:]=]+[A-Za-z0-9_]+)+//' \
     | sed -Ee 's/[[:space:]]+AUTO_INCREMENT=[0-9]+//'
