@@ -106,12 +106,18 @@ export type CreateTriggerStatement = {|
   tblName: Identifier,
 |};
 
-// export type CreateFunctionStatement = __TODO__;
+export type CreateFunctionStatement = {|
+  type: 'CREATE FUNCTION',
+|};
 
 export type RenameTableStatement = {|
   type: 'RENAME TABLE',
   tblName: Identifier,
   newName: Identifier,
+|};
+
+export type AlterTableOptions = {|
+  type: 'CHANGE TABLE OPTIONS',
 |};
 
 export type AlterAddColumn = {|
@@ -177,6 +183,10 @@ export type AlterDropIndex = {|
   indexName: Identifier,
 |};
 
+export type AlterDropPrimaryKey = {|
+  type: 'DROP PRIMARY KEY',
+|};
+
 export type AlterDropForeignKey = {|
   type: 'DROP FOREIGN KEY',
   symbol: Identifier,
@@ -199,6 +209,7 @@ export type AlterRenameTable = {|
 |};
 
 export type AlterSpec =
+  | AlterTableOptions
   | AlterAddColumn
   | AlterAddIndex
   | AlterAddPrimaryKey
@@ -207,6 +218,7 @@ export type AlterSpec =
   | AlterAddForeignKey
   | AlterDropDefault
   | AlterDropIndex
+  | AlterDropPrimaryKey
   | AlterDropForeignKey
   | AlterDropColumn
   | AlterChangeColumn
@@ -239,7 +251,7 @@ export type Statement =
   | CreateTableLikeStatement
   | CreateIndexStatement
   | CreateTriggerStatement
-  // | CreateFunctionStatement
+  | CreateFunctionStatement
   | RenameTableStatement
   | AlterTableStatement
   | DropTableStatement
