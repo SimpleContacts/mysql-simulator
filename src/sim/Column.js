@@ -148,9 +148,6 @@ export default class Column {
     }
 
     switch (info.baseType) {
-      case 'boolean':
-        return t.Bool();
-
       case 'tinyint':
       case 'smallint':
       case 'mediumint':
