@@ -1,4 +1,9 @@
-# v1.5.0-beta1
+# v1.5.1
+
+* Upgraded to Flow 0.133.0
+
+
+# v1.5.0
 
 * Removed `--limit` and `--step` command line flags
 * Add `--as-rol-schema` command line flag, which can output the table dump in
