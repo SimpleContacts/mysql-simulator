@@ -116,6 +116,10 @@ export type RenameTableStatement = {|
   newName: Identifier,
 |};
 
+export type AlterTableOptions = {|
+  type: 'CHANGE TABLE OPTIONS',
+|};
+
 export type AlterAddColumn = {|
   type: 'ADD COLUMN',
   colName: Identifier,
@@ -205,6 +209,7 @@ export type AlterRenameTable = {|
 |};
 
 export type AlterSpec =
+  | AlterTableOptions
   | AlterAddColumn
   | AlterAddIndex
   | AlterAddPrimaryKey
