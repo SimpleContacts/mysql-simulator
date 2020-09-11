@@ -177,6 +177,10 @@ export type AlterDropIndex = {|
   indexName: Identifier,
 |};
 
+export type AlterDropPrimaryKey = {|
+  type: 'DROP PRIMARY KEY',
+|};
+
 export type AlterDropForeignKey = {|
   type: 'DROP FOREIGN KEY',
   symbol: Identifier,
@@ -207,6 +211,7 @@ export type AlterSpec =
   | AlterAddForeignKey
   | AlterDropDefault
   | AlterDropIndex
+  | AlterDropPrimaryKey
   | AlterDropForeignKey
   | AlterDropColumn
   | AlterChangeColumn
