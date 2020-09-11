@@ -106,7 +106,9 @@ export type CreateTriggerStatement = {|
   tblName: Identifier,
 |};
 
-// export type CreateFunctionStatement = __TODO__;
+export type CreateFunctionStatement = {|
+  type: 'CREATE FUNCTION',
+|};
 
 export type RenameTableStatement = {|
   type: 'RENAME TABLE',
@@ -244,7 +246,7 @@ export type Statement =
   | CreateTableLikeStatement
   | CreateIndexStatement
   | CreateTriggerStatement
-  // | CreateFunctionStatement
+  | CreateFunctionStatement
   | RenameTableStatement
   | AlterTableStatement
   | DropTableStatement
