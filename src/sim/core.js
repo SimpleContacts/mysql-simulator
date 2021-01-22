@@ -204,6 +204,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           db = db.dropForeignKey(stm.tblName, change.symbol);
         } else if (change.type === 'DROP DEFAULT') {
           db = db.dropDefault(stm.tblName, change.colName);
+        } else if (change.type === 'RENAME INDEX') {
+          db = db.renameIndex(stm.tblName, change.oldIndexName, change.newIndexName);
         } else if (change.type === 'CHANGE TABLE OPTIONS') {
           // Ignore
         } else {

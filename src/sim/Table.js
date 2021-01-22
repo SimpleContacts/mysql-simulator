@@ -522,6 +522,25 @@ export default class Table {
     return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
+  renameIndex(oldIndexName: string, newIndexName: string): Table {
+    const index = this.indexes.find((index) => index.name === oldIndexName);
+
+    if (!index) {
+      throw new Error(
+        `Index "${oldIndexName}" does not exist on table "${this.name}". These do: ${this.indexes
+          .map((index) => index.name)
+          .join(', ')}`,
+      );
+    }
+
+    const renamedIndex = index.patch({
+      name: newIndexName,
+    });
+    const otherIndexes = this.indexes.filter((index) => index.name !== oldIndexName);
+
+    return new Table(this.name, this.columns, this.primaryKey, [...otherIndexes, renamedIndex], this.foreignKeys);
+  }
+
   getNormalIndexes(): Array<Index> {
     return this.indexes.filter((i) => i.type === 'NORMAL');
   }
