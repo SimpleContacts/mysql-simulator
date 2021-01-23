@@ -1,5 +1,5 @@
 [version]
-0.133.0
+0.143.1
 
 [libs]
 flow-typed/
@@ -7,9 +7,6 @@ flow-typed/
 [ignore]
 <PROJECT_ROOT>/dist/
 *.json
-
-[options]
-well_formed_exports=true
 
 [lints]
 all=error
