@@ -1,4 +1,4 @@
-// @flow strict
+// @flow
 
 import Column from './sim/Column';
 import { applySql, applySqlFile, applySqlFiles, simulate } from './sim/core';

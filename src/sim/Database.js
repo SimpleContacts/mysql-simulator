@@ -1,4 +1,4 @@
-// @flow strict
+// @flow
 
 import { sortBy, zip } from 'lodash';
 import type { Schema as ROLSchema } from 'rule-of-law/types';

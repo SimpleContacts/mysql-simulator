@@ -1,5 +1,5 @@
 #!/usr/bin/env babel-node
-// @flow strict
+// @flow
 
 import path from 'path';
 
