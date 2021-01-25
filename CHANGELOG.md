@@ -1,3 +1,8 @@
+# v1.6.0
+
+* Add support for `RENAME INDEX`
+
+
 # v1.5.1
 
 * Upgraded to Flow 0.133.0
