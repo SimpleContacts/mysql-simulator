@@ -1,10 +1,11 @@
-// @flow strict
+// @flow
 
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
+// $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
 

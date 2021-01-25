@@ -1,6 +1,6 @@
 // @flow strict
 
-// $FlowFixMe - the parser isn't type-annotated
+// $FlowFixMe[untyped-import] the parser isn't type-annotated
 import { parse as rawParseSql } from '../parser/mysql';
 
 export function escape(s: string): string {

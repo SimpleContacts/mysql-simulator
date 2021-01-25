@@ -35,7 +35,7 @@ import type {
   Statement,
   TableOptions,
 } from './ast';
-// $FlowFixMe - the parser isn't type-annotated
+// $FlowFixMe[untyped-import] - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
 
 const indent = (text: string): string =>
@@ -53,7 +53,7 @@ const error = console.error;
  * Prints parser errors nicely
  */
 const printErr = (filename, input, e: Error) => {
-  // $FlowFixMe
+  // $FlowFixMe[prop-missing]
   const loc = e.location;
   if (!loc) {
     // Likely not a parser error

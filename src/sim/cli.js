@@ -45,7 +45,7 @@ function collect(val, memo) {
 
 function run() {
   program
-    // $FlowFixMe - ugh commander
+    // $FlowFixMe[incompatible-call] - ugh commander
     .name('mysql-simulate')
     .usage('[options] <path> [<path> ...]')
     .description('Parses SQL migration files and outputs the resulting DB state.')
@@ -54,11 +54,11 @@ function run() {
     .option('-v, --verbose', 'Be verbose')
     .parse(process.argv);
 
-  // $FlowFixMe - options monkey-patched on program are invisible to Flow
+  // $FlowFixMe[incompatible-use] - options monkey-patched on program are invisible to Flow
   if (program.args.length < 1) {
     program.help();
   } else {
-    // $FlowFixMe - options monkey-patched on program are invisible to Flow
+    // $FlowFixMe[incompatible-use] - options monkey-patched on program are invisible to Flow
     const { args, verbose, table, asRolSchema } = program;
     const options = { args, verbose, tables: table, asROLSchema: !!asRolSchema };
     runWithOptions(options);
