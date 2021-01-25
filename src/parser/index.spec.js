@@ -210,7 +210,8 @@ describe('Read documentation', () => {
         DROP COLUMN name,
         DROP \`brand\`,
         ADD COLUMN \`foobar\` INT,
-        ADD FOREIGN KEY (product_id) REFERENCES products(id);`),
+        ADD FOREIGN KEY (product_id) REFERENCES products(id),
+        RENAME INDEX \`foobar_uniq\` TO \`boofar_uniq\`;`),
     ).toEqual([
       {
         type: 'ALTER TABLE',
@@ -259,6 +260,11 @@ describe('Read documentation', () => {
               onDelete: null,
               onUpdate: null,
             },
+          },
+          {
+            newIndexName: 'boofar_uniq',
+            oldIndexName: 'foobar_uniq',
+            type: 'RENAME INDEX',
           },
         ],
       },

@@ -266,6 +266,10 @@ export default class Database {
     return this.swapTable(tblName, (table) => table.dropIndex(indexName));
   }
 
+  renameIndex(tblName: string, oldIndexName: string, newIndexName: string): Database {
+    return this.swapTable(tblName, (table) => table.renameIndex(oldIndexName, newIndexName));
+  }
+
   toSchema(): ROLSchema {
     const schema = {};
     for (const table of this.getTables()) {
