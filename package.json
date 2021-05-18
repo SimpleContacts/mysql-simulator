@@ -38,33 +38,33 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.10.5",
-    "@babel/plugin-transform-runtime": "^7.11.0",
-    "@babel/preset-env": "^7.11.0",
-    "@babel/preset-flow": "^7.10.4",
+    "@babel/cli": "^7.14.3",
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/preset-env": "^7.14.2",
+    "@babel/preset-flow": "^7.13.13",
     "babel-eslint": "^10.1.0",
-    "colordiff": "1.0.4",
-    "eslint": "^7.18.0",
-    "eslint-plugin-flowtype": "^5.2.0",
-    "flow-bin": "^0.143.1",
+    "colordiff": "^1.0.4",
+    "eslint": "^7.26.0",
+    "eslint-plugin-flowtype": "^5.7.2",
+    "flow-bin": "^0.151.0",
     "flow-copy-source": "^2.0.9",
-    "flow-typed": "^3.2.1",
+    "flow-typed": "^3.3.1",
     "import-sort-cli": "^6.0.0",
     "import-sort-parser-babylon": "^6.0.0",
     "import-sort-style-eslint": "^6.0.0",
     "import-sort-style-module": "^6.0.0",
-    "in-publish": "^2.0.0",
+    "in-publish": "^2.0.1",
     "jest": "^26.6.3",
     "onchange": "^7.1.0",
     "pegjs": "^0.10.0",
-    "prettier": "^2.2.1",
-    "rimraf": "^3.0.0"
+    "prettier": "^2.3.0",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
-    "commander": "^6.0.0",
+    "@babel/runtime": "^7.14.0",
+    "commander": "^7.2.0",
     "invariant": "^2.2.4",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "rule-of-law": "^0.0.10"
   }
 }
