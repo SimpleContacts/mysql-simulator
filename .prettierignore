@@ -1,1 +1,3 @@
 src/parser/mysql.js
+dist/
+flow-typed/
