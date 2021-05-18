@@ -1,51 +1,42 @@
 # v1.6.0
 
-* Add support for `RENAME INDEX`
-
+- Add support for `RENAME INDEX`
 
 # v1.5.1
 
-* Upgraded to Flow 0.133.0
-
+- Upgraded to Flow 0.133.0
 
 # v1.5.0
 
-* Removed `--limit` and `--step` command line flags
-* Add `--as-rol-schema` command line flag, which can output the table dump in
+- Removed `--limit` and `--step` command line flags
+- Add `--as-rol-schema` command line flag, which can output the table dump in
   [Rule of Law](https://github.com/nvie/rule-of-law) compatible schema format
-
 
 # v1.4.1
 
-* First public release
-* Removed runtime dependencies on SimpleHealth internal/private packages
-
+- First public release
+- Removed runtime dependencies on SimpleHealth internal/private packages
 
 # v1.4.0
 
-* Add support for `LIKE`, `REGEXP`, and `RLIKE` syntax in conditions
-
+- Add support for `LIKE`, `REGEXP`, and `RLIKE` syntax in conditions
 
 # v1.3.3
 
-* Accept table options syntax in ALTER TABLE statements
-
+- Accept table options syntax in ALTER TABLE statements
 
 # v1.3.2
 
-* Something went wrong publishing 1.3.1 to NPM.  No functional changes.
-
+- Something went wrong publishing 1.3.1 to NPM. No functional changes.
 
 # v1.3.1
 
-* Fix bug where NULL literals inside expressions didn't get serialized
+- Fix bug where NULL literals inside expressions didn't get serialized
   correctly
-
 
 # v1.3.0
 
-* Support for `GENERATED ALWAYS AS (expr)` syntax on column definitions
-
+- Support for `GENERATED ALWAYS AS (expr)` syntax on column definitions
 
 # v1.2.22
 
