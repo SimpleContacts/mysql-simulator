@@ -134,6 +134,14 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
       db = db.cloneTable(stm.oldTblName, stm.tblName);
     } else if (stm.type === 'DROP TABLE') {
       db = db.removeTable(stm.tblName, stm.ifExists);
+    } else if (stm.type === 'ALTER DATABASE') {
+      for (const option of stm.options) {
+        if (option.CHARSET) {
+          db = db.setCharset(option.CHARSET);
+        } else if (option.COLLATE) {
+          // TODO: Implement me too!
+        }
+      }
     } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
       const changes = sortBy(stm.changes, (change) => order.indexOf(change.type));

@@ -208,6 +208,17 @@ export type AlterRenameTable = {|
   newTblName: Identifier,
 |};
 
+export type AlterDbOption = {|
+  CHARSET?: string,
+  COLLATE?: string,
+|};
+
+export type AlterDatabaseStatement = {|
+  type: 'ALTER DATABASE',
+  dbName: Identifier,
+  options: Array<AlterDbOption>,
+|};
+
 export type AlterSpec =
   | AlterTableOptions
   | AlterAddColumn
@@ -253,6 +264,7 @@ export type Statement =
   | CreateTriggerStatement
   | CreateFunctionStatement
   | RenameTableStatement
+  | AlterDatabaseStatement
   | AlterTableStatement
   | DropTableStatement
   | DropIndexStatement;

@@ -36,6 +36,10 @@ export default class Database {
     this._tables = _tables;
   }
 
+  setCharset(charset: string): Database {
+    return new Database(charset, this._tables);
+  }
+
   getTables(): Array<Table> {
     return sortBy(values(this._tables), (t) => t.name.toLowerCase());
   }
@@ -147,7 +151,10 @@ export default class Database {
    */
   mapTables(mapper: (Table) => Table): Database {
     const newTables = this.getTables().map(mapper);
-    return new Database(this.charset, indexBy(newTables, (table) => table.name));
+    return new Database(
+      this.charset,
+      indexBy(newTables, (table) => table.name),
+    );
   }
 
   /**
