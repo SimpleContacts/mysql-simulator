@@ -113,6 +113,7 @@ Statement
   / CreateFunction
   / RenameTable
   / AlterTable
+  / AlterDatabase
   / DropTable
   / DropIndex
   / SelectStatement
@@ -485,6 +486,13 @@ WhileStatement
   = WHILE Condition DO
       FunctionStatementList
     END WHILE
+
+// ====================================================
+// ALTER DATABASE
+// ====================================================
+
+AlterDatabase
+  = ALTER DATABASE [^;]* { return null; }
 
 // ====================================================
 // ALTER TABLE
@@ -979,6 +987,7 @@ COMMENT           = _ 'COMMENT'i           !IdentifierChar _ { return 'COMMENT' 
 CONSTRAINT        = _ 'CONSTRAINT'i        !IdentifierChar _ { return 'CONSTRAINT' }
 CREATE            = _ 'CREATE'i            !IdentifierChar _ { return 'CREATE' }
 CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
+DATABASE          = _ 'DATABASE'i          !IdentifierChar _ { return 'DATABASE' }
 DATE              = _ 'DATE'i              !IdentifierChar _ { return 'DATE' }
 DATETIME          = _ 'DATETIME'i          !IdentifierChar _ { return 'DATETIME' }
 DECIMAL           = _ 'DECIMAL'i           !IdentifierChar _ { return 'DECIMAL' }
