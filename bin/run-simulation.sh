@@ -6,7 +6,7 @@ input_dir=tests
 output_dir=tests/simulated
 
 dump() {
-  bin/mysql-simulate -v $limit_args $@
+  bin/mysql-simulate -v $@
 }
 
 to_outfile() {
