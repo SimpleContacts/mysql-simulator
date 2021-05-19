@@ -58,8 +58,8 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  const defaults = makeEncoding(stm.options?.CHARSET, stm.options?.COLLATE, db_.defaultEncoding);
-  let db = db_.createTable(tblName, defaults);
+  const encoding = makeEncoding(stm.options?.CHARSET, stm.options?.COLLATE, db_.defaultEncoding);
+  let db = db_.createTable(tblName, encoding);
 
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
