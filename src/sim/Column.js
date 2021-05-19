@@ -83,11 +83,11 @@ export default class Column {
     // TODO: Note that it might be better to "unify" this type in the
     // constructor.  That way, there simply won't be a way of distinguishing
     // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(parseDataType(this.type));
+    return formatDataType(parseDataType(this.type, this.tableDefaultEncoding));
   }
 
   getTypeInfo(): TypeInfo {
-    return parseDataType(this.type);
+    return parseDataType(this.type, this.tableDefaultEncoding);
   }
 
   /**

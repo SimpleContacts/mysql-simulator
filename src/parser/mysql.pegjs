@@ -869,7 +869,13 @@ DataType
   / BoolDataType
   / DateDataType
   / PrecisionDataType
-  / type:TextDataType ignore1:(CHARACTER SET CharsetName)? ignore2:(COLLATE CollationName)? { return type }
+  / type:TextDataType charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
+      return [
+        type,
+        charset ? 'CHARACTER SET ' + charset : null,
+        collate ? 'COLLATE ' + collate : null,
+      ].filter(Boolean).join(' ');
+    }
   / JSON
   / ENUM LPAREN literals:StringLiteralList RPAREN {
       return `ENUM(${literals.map(str => str.value).join(',')})`;
