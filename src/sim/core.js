@@ -58,7 +58,13 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  const encoding = makeEncoding(stm.options?.CHARSET, stm.options?.COLLATE, db_.defaultEncoding);
+  let encoding;
+  if (stm.options?.CHARSET || stm.options?.COLLATE) {
+    encoding = makeEncoding(stm.options.CHARSET, stm.options.COLLATE);
+  } else {
+    encoding = db_.defaultEncoding;
+  }
+
   let db = db_.createTable(tblName, encoding);
 
   // One-by-one, add the columns to the table
@@ -150,7 +156,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           collate = option.COLLATE;
         }
       }
-      const encoding = makeEncoding(charset, collate, db.defaultEncoding);
+      const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
       db = db.setEncoding(encoding);
     } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];

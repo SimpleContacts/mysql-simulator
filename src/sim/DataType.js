@@ -31,8 +31,7 @@ export type DateTimeDataType = {
 export type TextDataType = {
   baseType: 'char' | 'varchar' | 'text',
   length: number | null,
-  charset: string, // e.g. 'utf8mb4'
-  collate: string, // e.g. 'utf8mb4_unicode_ci', or 'utf8mb4_0900_ai_ci'
+  encoding?: Encoding,
 };
 
 export type BinaryDataType = {
@@ -43,8 +42,7 @@ export type BinaryDataType = {
 export type EnumDataType = {
   baseType: 'enum',
   values: Array<string>,
-  charset: string, // e.g. 'utf8mb4'
-  collate: string, // e.g. 'utf8mb4_unicode_ci', or 'utf8mb4_0900_ai_ci'
+  encoding?: Encoding,
 };
 
 // These data types have no params
@@ -109,12 +107,7 @@ function asDateTime(
   return { baseType, fsp };
 }
 
-function asText(
-  baseType: $PropertyType<TextDataType, 'baseType'>,
-  params: string,
-  options: string,
-  tableDefaultEncoding: Encoding,
-): TextDataType {
+function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: string, options: string): TextDataType {
   let length = null;
   if (params) {
     length = parseInt(params, 10);
@@ -131,8 +124,8 @@ function asText(
     throw new Error('VARCHAR must have valid length, please use VARCHAR(n)');
   }
 
-  const { charset, collate } = parseEncodingOptions(options, tableDefaultEncoding);
-  return { baseType, length, charset, collate };
+  const encoding = parseEncodingOptions(options);
+  return { baseType, length, encoding };
 }
 
 function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: string): BinaryDataType {
@@ -151,7 +144,7 @@ function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: s
 }
 
 // TODO: Honestly, why are we not just doing this at the parser level?
-function parseEncodingOptions(options: string, tableDefaultEncoding: Encoding): Encoding {
+function parseEncodingOptions(options: string): Encoding | void {
   let charset;
   let collate;
 
@@ -165,28 +158,27 @@ function parseEncodingOptions(options: string, tableDefaultEncoding: Encoding): 
     collate = matchCollate[1];
   }
 
-  return makeEncoding(charset, collate, tableDefaultEncoding);
+  if (charset || collate) {
+    return makeEncoding(charset, collate);
+  } else {
+    return undefined;
+  }
 }
 
-function asEnum(
-  baseType: $PropertyType<EnumDataType, 'baseType'>,
-  params: string,
-  options: string,
-  tableDefaultEncoding: Encoding,
-): EnumDataType {
+function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: string, options: string): EnumDataType {
   if (!params) {
     throw new Error('ENUMs must have at least one value');
   }
 
   const values = parseEnumValues(params);
-  const { charset, collate } = parseEncodingOptions(options, tableDefaultEncoding);
-  return { baseType, values, charset, collate };
+  const encoding = parseEncodingOptions(options);
+  return { baseType, values, encoding };
 }
 
 /**
  * Parse and return type information for the given type string.
  */
-export function parseDataType(type: string, tableDefaultEncoding: Encoding): TypeInfo {
+export function parseDataType(type: string): TypeInfo {
   const matches = type.match(/^([^ (]+)(?:\s*[(]([^)]+)[)])?(.*)?$/);
   if (!matches) {
     throw new Error(`Error parsing data type: ${type}`);
@@ -224,7 +216,7 @@ export function parseDataType(type: string, tableDefaultEncoding: Encoding): Typ
     case 'char':
     case 'varchar':
     case 'text':
-      return asText(baseType, params, options, tableDefaultEncoding);
+      return asText(baseType, params, options);
 
     case 'binary':
     case 'varbinary':
@@ -232,7 +224,7 @@ export function parseDataType(type: string, tableDefaultEncoding: Encoding): Typ
       return asBinary(baseType, params);
 
     case 'enum':
-      return asEnum(baseType, params, options, tableDefaultEncoding);
+      return asEnum(baseType, params, options);
 
     case 'date':
     case 'year':
@@ -250,7 +242,7 @@ export function parseDataType(type: string, tableDefaultEncoding: Encoding): Typ
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo): string {
+export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): string {
   const baseType = info.baseType;
   let params = '';
   let options = '';
@@ -284,12 +276,19 @@ export function formatDataType(info: TypeInfo): string {
 
     case 'char':
     case 'varchar':
-    case 'text':
+    case 'text': {
       params = info.length || '';
-      options = [info.collate !== getDefaultCollationForCharset(info.charset) ? `COLLATE ${info.collate}` : null]
-        .filter(Boolean)
-        .join(' ');
+      if (info.encoding) {
+        const { charset, collate } = info.encoding;
+        options = [
+          charset !== tableDefaultEncoding.charset ? `CHARACTER SET ${charset}` : null,
+          collate !== getDefaultCollationForCharset(charset) ? `COLLATE ${collate}` : null,
+        ]
+          .filter(Boolean)
+          .join(' ');
+      }
       break;
+    }
 
     case 'binary':
     case 'varbinary':
@@ -299,9 +298,15 @@ export function formatDataType(info: TypeInfo): string {
 
     case 'enum':
       params = info.values.map(quote).join(',');
-      options = [info.collate !== getDefaultCollationForCharset(info.charset) ? `COLLATE ${info.collate}` : null]
-        .filter(Boolean)
-        .join(' ');
+      if (info.encoding) {
+        const { charset, collate } = info.encoding;
+        options = [
+          charset !== tableDefaultEncoding.charset ? `CHARACTER SET ${charset}` : null,
+          collate !== getDefaultCollationForCharset(charset) ? `COLLATE ${collate}` : null,
+        ]
+          .filter(Boolean)
+          .join(' ');
+      }
       break;
 
     default:

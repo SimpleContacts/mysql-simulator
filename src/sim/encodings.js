@@ -34,7 +34,7 @@ export const MYSQL_57_DEFAULTS: Encoding = {
 //   utf8mb4: 'utf8mb4_0900_ai_ci',
 // };
 
-export function makeEncoding(charset?: Charset, collate?: Collation, fallback: Encoding = MYSQL_57_DEFAULTS): Encoding {
+export function makeEncoding(charset?: Charset, collate?: Collation): Encoding {
   // Only charset is provided, the other will get derived
   if (charset && !collate) {
     const newCollate = getDefaultCollationForCharset(charset);
@@ -53,7 +53,7 @@ export function makeEncoding(charset?: Charset, collate?: Collation, fallback: E
     return { charset, collate };
   } else {
     // Neither is set: just return the fallback
-    return fallback;
+    throw new Error('Specify either charset, or collate');
   }
 }
 
