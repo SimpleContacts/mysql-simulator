@@ -29,8 +29,8 @@ export type DateTimeDataType = {
 export type TextDataType = {
   baseType: 'char' | 'varchar' | 'text',
   length: number | null,
-  characterSet: string, // e.g. 'utf8'
-  collate: string, // e.g. 'utf8_general_ci'
+  characterSet: string, // e.g. 'utf8mb4'
+  collate: string, // e.g. 'utf8mb4_unicode_ci', or 'utf8mb4_0900_ai_ci'
 };
 
 export type BinaryDataType = {
@@ -41,8 +41,8 @@ export type BinaryDataType = {
 export type EnumDataType = {
   baseType: 'enum',
   values: Array<string>,
-  characterSet: string, // e.g. 'utf8'
-  collate: string, // e.g. 'utf8_general_ci'
+  characterSet: string, // e.g. 'utf8mb4'
+  collate: string, // e.g. 'utf8mb4_unicode_ci', or 'utf8mb4_0900_ai_ci'
 };
 
 // These data types have no params
