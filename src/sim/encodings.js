@@ -41,17 +41,17 @@ export function makeEncoding(charset?: Charset, collate?: Collation, fallback: E
       return fallback;
     } else {
       const newCollate = getDefaultCollationForCharset(charset);
-      return { ...fallback, collate: newCollate };
+      return { charset, collate: newCollate };
     }
   }
 
   // Only one side if provided, the other will get derived
-  else if (collate && !charset) {
+  else if (!charset && collate) {
     if (fallback.collate === collate) {
       return fallback;
     } else {
       const newCharset = collate.split('_')[0];
-      return { ...fallback, charset: newCharset };
+      return { charset: newCharset, collate };
     }
   }
 

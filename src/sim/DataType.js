@@ -286,7 +286,7 @@ export function formatDataType(info: TypeInfo): string {
     case 'varchar':
     case 'text':
       params = info.length || '';
-      options = [getDefaultCollationForCharset(info.charset) !== info.collate ? `COLLATE ${info.collate}` : null]
+      options = [info.collate !== getDefaultCollationForCharset(info.charset) ? `COLLATE ${info.collate}` : null]
         .filter(Boolean)
         .join(' ');
       break;
@@ -299,7 +299,7 @@ export function formatDataType(info: TypeInfo): string {
 
     case 'enum':
       params = info.values.map(quote).join(',');
-      options = [getDefaultCollationForCharset(info.charset) !== info.collate ? `COLLATE ${info.collate}` : null]
+      options = [info.collate !== getDefaultCollationForCharset(info.charset) ? `COLLATE ${info.collate}` : null]
         .filter(Boolean)
         .join(' ');
       break;
