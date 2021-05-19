@@ -8,6 +8,7 @@ import type { TypeInfo } from './DataType';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
+import type { Defaults as Encoding } from './encodings';
 
 type Generated = {|
   expr: string,
@@ -23,6 +24,7 @@ export default class Column {
   +autoIncrement: boolean;
   +comment: null | string;
   +generated: null | Generated;
+  +tableDefaultEncoding: Encoding;
 
   constructor(
     name: string,
@@ -33,6 +35,7 @@ export default class Column {
     autoIncrement: boolean,
     comment: null | string,
     generated: null | Generated,
+    tableDefaultEncoding: Encoding,
   ) {
     this.name = name;
     this.type = type;
@@ -42,6 +45,7 @@ export default class Column {
     this.autoIncrement = autoIncrement;
     this.comment = comment;
     this.generated = generated;
+    this.tableDefaultEncoding = tableDefaultEncoding;
   }
 
   /**
@@ -57,6 +61,7 @@ export default class Column {
     +autoIncrement?: boolean,
     +comment?: null | string,
     +generated?: null | Generated,
+    +tableDefaultEncoding?: Encoding,
   |}): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
@@ -67,6 +72,7 @@ export default class Column {
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
       record.generated !== undefined ? record.generated : this.generated,
+      record.tableDefaultEncoding !== undefined ? record.tableDefaultEncoding : this.tableDefaultEncoding,
     );
   }
 

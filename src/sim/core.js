@@ -9,10 +9,11 @@ import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
+import type { Defaults as Encoding } from './encodings';
 
 const error = console.error;
 
-function makeColumn(colName, def: ColumnDefinition): Column {
+function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Column {
   const type = def.dataType.toLowerCase();
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
@@ -50,6 +51,7 @@ function makeColumn(colName, def: ColumnDefinition): Column {
     def.autoIncrement,
     def.comment,
     def.generated,
+    tableEncoding,
   );
 }
 
@@ -64,7 +66,8 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
-    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
+    const table = db.getTable(tblName);
+    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaults), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -153,7 +156,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         if (change.type === 'RENAME TABLE') {
           db = db.renameTable(stm.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
-          const column = makeColumn(change.colName, change.definition);
+          const table = db.getTable(stm.tblName);
+          const column = makeColumn(change.colName, change.definition, table.defaults);
           db = db.addColumn(stm.tblName, column, change.position);
           if (change.definition.isPrimary) {
             db = db.addPrimaryKey(stm.tblName, [change.colName]);
@@ -161,7 +165,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
           }
         } else if (change.type === 'CHANGE COLUMN') {
-          const column = makeColumn(change.newColName, change.definition);
+          const table = db.getTable(stm.tblName);
+          const column = makeColumn(change.newColName, change.definition, table.defaults);
           db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);
