@@ -6,6 +6,8 @@ import type { Schema as ROLSchema } from 'rule-of-law/types';
 import Column from './Column';
 import type { IndexType } from './Index';
 import Table from './Table';
+import { MYSQL_57_DEFAULTS } from './encodings';
+import type { Defaults } from './encodings';
 
 type LUT<+T> = { +[string]: T };
 
@@ -26,16 +28,6 @@ function values<T>(things: LUT<T>): Array<T> {
   const keys: Array<string> = Object.keys(things);
   return keys.map((key) => things[key]);
 }
-
-type Defaults = $ReadOnly<{|
-  charset: string,
-  collate: string,
-|}>;
-
-const MYSQL_57_DEFAULTS: Defaults = {
-  charset: 'latin1',
-  collate: 'latin1_swedish_ci',
-};
 
 export default class Database {
   +defaults: Defaults;

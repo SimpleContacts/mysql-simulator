@@ -10,11 +10,8 @@ import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
-
-type Defaults = $ReadOnly<{|
-  charset: string,
-  collate: string,
-|}>;
+import type { Defaults } from './encodings';
+import { getDefaultCollationForCharset } from './encodings';
 
 export default class Table {
   +name: string;
@@ -621,10 +618,20 @@ export default class Table {
 
   toString(): string {
     const indent = (line: string) => `  ${line}`;
+    const options = [
+      'ENGINE=InnoDB',
+      `DEFAULT CHARSET=${this.defaults.charset}`,
+
+      // MySQL only outputs it if it's explicitly different from what it would
+      // use as a default collation for this charset
+      this.defaults.collate !== getDefaultCollationForCharset(this.defaults.charset)
+        ? `COLLATE=${this.defaults.collate}`
+        : null,
+    ];
     return [
       `CREATE TABLE \`${this.name}\` (`,
       this.serializeDefinitions().map(indent).join(',\n'),
-      `) ENGINE=InnoDB DEFAULT CHARSET=${this.defaults.charset};`,
+      `) ${options.filter(Boolean).join(' ')};`,
     ].join('\n');
   }
 }
