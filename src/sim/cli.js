@@ -9,6 +9,14 @@ import { dumpSchema } from 'rule-of-law';
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
 
+// MySQL 5.7 defaults
+const DEFAULT_CHARSET = 'latin1';
+const DEFAULT_COLLATE = 'latin1_swedish_ci';
+
+// In MySQL 8.0, these will be the defaults
+// const DEFAULT_CHARSET = 'utf8mb4';
+// const DEFAULT_COLLATE = 'utf8mb4_0900_ai_ci';
+
 const log = console.log;
 const error = console.error;
 
@@ -17,12 +25,12 @@ type Options = {
   verbose: boolean,
   tables: Array<string>,
   asROLSchema: boolean,
+  charset: string,
+  collate: string,
 };
 
-const DEFAULT_CHARSET = 'utf8';
-
 function runWithOptions(options: Options) {
-  let db: Database = new Database(DEFAULT_CHARSET);
+  let db: Database = new Database(options.charset);
 
   let files = Array.from(expandInputFiles(options.args));
   for (const fullpath of files) {
@@ -51,6 +59,8 @@ function run() {
     .name('mysql-simulate')
     .usage('[options] <path> [<path> ...]')
     .description('Parses SQL migration files and outputs the resulting DB state.')
+    .option('-s, --charset <charset>', 'Set the (initial) default charset for the DB', DEFAULT_CHARSET)
+    .option('-c, --collate <collation>', 'Set the (initial) default collation for the DB', DEFAULT_COLLATE)
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
@@ -61,8 +71,8 @@ function run() {
     program.help();
   } else {
     // $FlowFixMe[incompatible-use] - options monkey-patched on program are invisible to Flow
-    const { verbose, table, asRolSchema } = program.opts();
-    const options = { args: program.args, verbose, tables: table, asROLSchema: !!asRolSchema };
+    const { verbose, table, asRolSchema, charset, collate } = program.opts();
+    const options = { args: program.args, verbose, tables: table, asROLSchema: !!asRolSchema, charset, collate };
     runWithOptions(options);
   }
 }

@@ -5,8 +5,8 @@ rm -rf tests/real/* tests/simulated/*
 rm -rf tests/real/.DS_Store tests/simulated/.DS_Store
 
 # Run in parallel...
-./bin/run-simulation.sh &
-./bin/run-real.sh &
+./bin/run-simulation.sh "$@" &
+./bin/run-real.sh "$@" &
 
 # ...wait for both procs to finish
 wait
