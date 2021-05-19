@@ -16,7 +16,7 @@ if diff -q tests/real tests/simulated > /dev/null; then
 echo "All good!" >&2
 else
   echo "Uh-oh! There were differences!" >&2
-  if [ -n "$TRAVIS" ]; then
+  if [ -n "$CI" ]; then
     diff -U8 tests/simulated tests/real
   else
     colordiff -U8 tests/simulated tests/real
