@@ -1,10 +1,20 @@
--- Just to create _some_ output. The point is that the above query is parsed
--- and accepted.
+--
+-- PURPOSE
+-- =======
+-- This tests the effects of globally changing the default character set and
+-- collation for this database
+--
+
 CREATE TABLE t1 (
   id INT,
-  a VARCHAR(12),
-  b VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_general_ci,
-  c VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  a1 VARCHAR(12),
+  a2 VARCHAR(12) COLLATE latin1_spanish_ci,
+  b1 VARCHAR(12) CHARACTER SET utf8,                                -- Implicit default collation for utf8
+  b2 VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_general_ci,        -- Explicit default collation for utf8
+  b3 VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_unicode_ci,        -- Explicitly non-default collation
+  c1 VARCHAR(12) CHARACTER SET utf8mb4,                             -- Implicit default collation for utf8mb4
+  c2 VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,  -- Explicit default collation for utf8mb4
+  c3 VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,  -- Explicitly non-default collation
   d TEXT,
   e TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci
 );
@@ -13,13 +23,19 @@ ALTER DATABASE __dbname__
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_unicode_ci;
 
--- Just to create _some_ output. The point is that the above query is parsed
--- and accepted.
+-- This is the exact same table definition as t1, but this time the global
+-- encoding have changed for this database, so the outputted results won't be
+-- the same.
 CREATE TABLE t2 (
   id INT,
-  a VARCHAR(12),
-  b VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_general_ci,
-  c VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  a1 VARCHAR(12),
+  a2 VARCHAR(12) COLLATE latin1_spanish_ci,
+  b1 VARCHAR(12) CHARACTER SET utf8,                                -- Implicit default collation for utf8
+  b2 VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_general_ci,        -- Explicit default collation for utf8
+  b3 VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_unicode_ci,        -- Explicitly non-default collation
+  c1 VARCHAR(12) CHARACTER SET utf8mb4,                             -- Implicit default collation for utf8mb4
+  c2 VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,  -- Explicit default collation for utf8mb4
+  c3 VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,  -- Explicitly non-default collation
   d TEXT,
   e TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci
 );
