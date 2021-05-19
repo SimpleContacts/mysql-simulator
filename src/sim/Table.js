@@ -13,6 +13,7 @@ import { escape, insert } from './utils';
 
 export default class Table {
   +name: string;
+  +charset: string;
   +columns: $ReadOnlyArray<Column>;
   +primaryKey: $ReadOnlyArray<string> | null;
   +indexes: $ReadOnlyArray<Index>;
@@ -20,12 +21,14 @@ export default class Table {
 
   constructor(
     name: string,
+    charset: string,
     columns: $ReadOnlyArray<Column> = [],
     primaryKey: $ReadOnlyArray<string> | null = null,
     indexes: $ReadOnlyArray<Index> = [],
     foreignKeys: $ReadOnlyArray<ForeignKey> = [],
   ) {
     this.name = name;
+    this.charset = charset;
     this.columns = columns;
     this.primaryKey = primaryKey;
     this.indexes = indexes;
@@ -96,7 +99,7 @@ export default class Table {
    * keys emptied.
    */
   cloneTo(name: string): Table {
-    return new Table(name, this.columns, this.primaryKey, this.indexes, []);
+    return new Table(name, this.charset, this.columns, this.primaryKey, this.indexes, []);
   }
 
   /**
@@ -117,7 +120,7 @@ export default class Table {
       });
     });
 
-    return new Table(newName, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(newName, this.charset, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -137,7 +140,7 @@ export default class Table {
       return fk.patch({ reference });
     });
 
-    return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(this.name, this.charset, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -147,7 +150,7 @@ export default class Table {
     this.assertColumnDoesNotExist(column.name);
 
     const columns = [...this.columns, column];
-    let table = new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    let table = new Table(this.name, this.charset, columns, this.primaryKey, this.indexes, this.foreignKeys);
     if (position) {
       table = table.moveColumn(column.name, position);
     }
@@ -170,7 +173,7 @@ export default class Table {
       throw new Error(`Unknown position qualifier: ${position}`);
     }
 
-    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -204,7 +207,7 @@ export default class Table {
       }),
     );
 
-    return new Table(this.name, columns, primaryKey, indexes, foreignKeys);
+    return new Table(this.name, this.charset, columns, primaryKey, indexes, foreignKeys);
   }
 
   /**
@@ -217,7 +220,7 @@ export default class Table {
       throw new Error('Table.swapColumn() cannot be used to change the name of the column.');
     }
     const columns = this.columns.map((column) => (column.name === colName ? newColumn : column));
-    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
@@ -287,7 +290,7 @@ export default class Table {
     const column = this.getColumn(colName);
     const newColumn = column.patch({ defaultValue: null });
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
-    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -324,7 +327,7 @@ export default class Table {
       primaryKey = primaryKey.length > 0 ? primaryKey : null;
     }
 
-    return new Table(this.name, columns, primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, columns, primaryKey, indexes, this.foreignKeys);
   }
 
   /**
@@ -348,6 +351,7 @@ export default class Table {
 
     return new Table(
       this.name,
+      this.charset,
       newColumns,
       columnNames, // primaryKey
       this.indexes,
@@ -364,7 +368,7 @@ export default class Table {
     }
 
     const primaryKey = null;
-    return new Table(this.name, this.columns, primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, this.columns, primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -419,7 +423,7 @@ export default class Table {
           // Update & push it at the end
           new Index(indexName, origIndex.columns, origIndex.type, origIndex.$$locked),
         ];
-        table = new Table(table.name, table.columns, table.primaryKey, indexes, table.foreignKeys);
+        table = new Table(table.name, this.charset, table.columns, table.primaryKey, indexes, table.foreignKeys);
       }
     }
 
@@ -430,7 +434,7 @@ export default class Table {
     });
     const foreignKeys = [...table.foreignKeys, fk];
 
-    return new Table(table.name, table.columns, table.primaryKey, table.indexes, foreignKeys);
+    return new Table(table.name, this.charset, table.columns, table.primaryKey, table.indexes, foreignKeys);
   }
 
   /**
@@ -446,11 +450,18 @@ export default class Table {
     }
 
     const foreignKeys = this.foreignKeys.filter((fk) => fk.name !== symbol);
-    return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(this.name, this.charset, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   mapForeignKeys(mapper: (ForeignKey) => ForeignKey): Table {
-    return new Table(this.name, this.columns, this.primaryKey, this.indexes, this.foreignKeys.map(mapper));
+    return new Table(
+      this.name,
+      this.charset,
+      this.columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys.map(mapper),
+    );
   }
 
   /**
@@ -501,7 +512,7 @@ export default class Table {
       indexes = [...indexes, index];
     }
 
-    return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   dropIndex(indexName: string): Table {
@@ -519,7 +530,7 @@ export default class Table {
     }
 
     const indexes = this.indexes.filter((index) => index.name !== indexName);
-    return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.charset, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   renameIndex(oldIndexName: string, newIndexName: string): Table {
@@ -538,7 +549,14 @@ export default class Table {
     });
     const otherIndexes = this.indexes.filter((index) => index.name !== oldIndexName);
 
-    return new Table(this.name, this.columns, this.primaryKey, [...otherIndexes, renamedIndex], this.foreignKeys);
+    return new Table(
+      this.name,
+      this.charset,
+      this.columns,
+      this.primaryKey,
+      [...otherIndexes, renamedIndex],
+      this.foreignKeys,
+    );
   }
 
   getNormalIndexes(): Array<Index> {
@@ -601,7 +619,7 @@ export default class Table {
     return [
       `CREATE TABLE \`${this.name}\` (`,
       this.serializeDefinitions().map(indent).join(',\n'),
-      `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`,
+      `) ENGINE=InnoDB DEFAULT CHARSET=${this.charset};`,
     ].join('\n');
   }
 }
