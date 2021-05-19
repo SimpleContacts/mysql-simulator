@@ -37,22 +37,14 @@ export const MYSQL_57_DEFAULTS: Encoding = {
 export function makeEncoding(charset?: Charset, collate?: Collation, fallback: Encoding = MYSQL_57_DEFAULTS): Encoding {
   // Only charset is provided, the other will get derived
   if (charset && !collate) {
-    if (fallback.charset === charset) {
-      return fallback;
-    } else {
-      const newCollate = getDefaultCollationForCharset(charset);
-      return { charset, collate: newCollate };
-    }
+    const newCollate = getDefaultCollationForCharset(charset);
+    return { charset, collate: newCollate };
   }
 
   // Only one side if provided, the other will get derived
   else if (!charset && collate) {
-    if (fallback.collate === collate) {
-      return fallback;
-    } else {
-      const newCharset = collate.split('_')[0];
-      return { charset: newCharset, collate };
-    }
+    const newCharset = collate.split('_')[0];
+    return { charset: newCharset, collate };
   }
 
   // Both are provided - we need to ensure they match up
