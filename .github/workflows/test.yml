@@ -4,11 +4,11 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
-        mysql: ["mysql:5.7"]  # "mysql:8.0"
+        mysql: ['mysql:5.7'] # "mysql:8.0"
         node: [10.x, 12.x, 13.x, 14.x]
 
     services:

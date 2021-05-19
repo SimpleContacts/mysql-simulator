@@ -256,11 +256,11 @@ export default class Table {
         console.warn('    ...');
         for (const fk of fks) {
           console.warn(
-            `    ALTER TABLE ${escape(table.name)} ADD CONSTRAINT ${escape(
-              fk.name,
-            )} FOREIGN KEY (${fk.columns.map((name) => escape(name)).join(', ')}) REFERENCES ${escape(
-              fk.reference.table,
-            )} (${fk.reference.columns.map((name) => escape(name)).join(', ')});`,
+            `    ALTER TABLE ${escape(table.name)} ADD CONSTRAINT ${escape(fk.name)} FOREIGN KEY (${fk.columns
+              .map((name) => escape(name))
+              .join(', ')}) REFERENCES ${escape(fk.reference.table)} (${fk.reference.columns
+              .map((name) => escape(name))
+              .join(', ')});`,
           );
         }
         console.warn(`    UNLOCK TABLES;`);
