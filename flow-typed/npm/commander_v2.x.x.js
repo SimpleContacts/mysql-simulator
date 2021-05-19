@@ -193,6 +193,8 @@ declare module "commander" {
      */
     opts(): { [key: string]: any };
 
+    args: Array<string>;
+
     /**
      * Set the program version to `str`.
      *

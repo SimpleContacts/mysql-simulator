@@ -59,8 +59,8 @@ function run() {
     program.help();
   } else {
     // $FlowFixMe[incompatible-use] - options monkey-patched on program are invisible to Flow
-    const { args, verbose, table, asRolSchema } = program;
-    const options = { args, verbose, tables: table, asROLSchema: !!asRolSchema };
+    const { verbose, table, asRolSchema } = program.opts();
+    const options = { args: program.args, verbose, tables: table, asROLSchema: !!asRolSchema };
     runWithOptions(options);
   }
 }
