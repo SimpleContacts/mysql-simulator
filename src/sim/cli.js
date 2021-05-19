@@ -10,14 +10,6 @@ import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
 import { makeEncoding } from './encodings';
 
-// MySQL 5.7 defaults
-const DEFAULT_CHARSET = 'latin1';
-const DEFAULT_COLLATE = 'latin1_swedish_ci';
-
-// In MySQL 8.0, these will be the defaults
-// const DEFAULT_CHARSET = 'utf8mb4';
-// const DEFAULT_COLLATE = 'utf8mb4_0900_ai_ci';
-
 const log = console.log;
 const error = console.error;
 

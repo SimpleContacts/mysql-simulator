@@ -8,14 +8,6 @@ output_dir=tests/simulated
 # Create the test DB with the following charset/collate (these need to be
 # passed to the simulator as well)
 
-# These are the defaults for MySQL 5.7
-charset=latin1
-collate=latin1_swedish_ci
-
-# These are the defaults for MySQL 8.0
-# charset=utf8mb4
-# collate=utf8mb4_0900_ai_ci
-
 while getopts s:c: flag; do
   case "$flag" in
     s) charset=$OPTARG ;;
@@ -32,7 +24,14 @@ if [ $# -gt 0 ]; then
 fi
 
 dump() {
-  bin/mysql-simulate -v --charset "$charset" --collate "$collate" $@
+  sim_args=
+  if [ -n "$charset" ]; then
+    sim_args="$sim_args --charset $charset"
+  fi
+  if [ -n "$collate" ]; then
+    sim_args="$sim_args --collate $collate"
+  fi
+  bin/mysql-simulate -v $sim_args "$@"
 }
 
 to_outfile() {

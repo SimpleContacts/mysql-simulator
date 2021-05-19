@@ -5,16 +5,10 @@ testdb=foobarqux
 input_dir=tests
 output_dir=tests/real
 
-# Create the test DB with the following charset/collate (these need to be
-# passed to the simulator as well)
-
-# These are the defaults for MySQL 5.7
-charset=latin1
-collate=latin1_swedish_ci
-
-# These are the defaults for MySQL 8.0
-# charset=utf8mb4
-# collate=utf8mb4_0900_ai_ci
+# Unless explicitly set on the command line, use the server's default values
+# (differ per MySQL version, so watch out!)
+charset=
+collate=
 
 while getopts s:c: flag; do
   case "$flag" in
@@ -40,7 +34,15 @@ dump() {
 resetdb() {
   # Recreate test DB
   echo "DROP DATABASE IF EXISTS $testdb;" | mysql
-  echo "CREATE DATABASE $testdb DEFAULT CHARACTER SET $charset DEFAULT COLLATE $collate;" | mysql
+
+  cmd="CREATE DATABASE $testdb"
+  if [ -n "$charset" ]; then
+    cmd="$cmd DEFAULT CHARACTER SET $charset"
+  fi
+  if [ -n "$collate" ]; then
+    cmd="$cmd DEFAULT COLLATE $collate"
+  fi
+  echo "$cmd;" | mysql
 }
 
 to_outfile() {
