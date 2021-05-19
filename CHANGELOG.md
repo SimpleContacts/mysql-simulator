@@ -1,3 +1,7 @@
+# vNEXT
+
+- Add support for character sets and collations
+
 # v1.6.0
 
 - Add support for `RENAME INDEX`
