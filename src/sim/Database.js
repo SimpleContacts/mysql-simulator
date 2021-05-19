@@ -38,12 +38,8 @@ export default class Database {
     this._tables = _tables;
   }
 
-  setCharset(charset: string): Database {
-    return new Database(makeEncoding(charset, this.defaultEncoding.collate), this._tables);
-  }
-
-  setCollate(collate: string): Database {
-    return new Database(makeEncoding(this.defaultEncoding.charset, collate), this._tables);
+  setEncoding(encoding: Encoding): Database {
+    return new Database(encoding, this._tables);
   }
 
   getTables(): Array<Table> {

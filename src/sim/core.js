@@ -143,13 +143,18 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
     } else if (stm.type === 'DROP TABLE') {
       db = db.removeTable(stm.tblName, stm.ifExists);
     } else if (stm.type === 'ALTER DATABASE') {
+      let charset;
+      let collate;
       for (const option of stm.options) {
         if (option.CHARSET) {
-          db = db.setCharset(option.CHARSET);
-        } else if (option.COLLATE) {
-          // TODO: Implement me too!
+          charset = option.CHARSET;
+        }
+        if (option.COLLATE) {
+          collate = option.COLLATE;
         }
       }
+      const encoding = makeEncoding(charset, collate, db.defaultEncoding);
+      db = db.setEncoding(encoding);
     } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
       const changes = sortBy(stm.changes, (change) => order.indexOf(change.type));

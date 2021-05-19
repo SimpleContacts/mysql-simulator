@@ -26,8 +26,8 @@ type Options = {
   verbose: boolean,
   tables: Array<string>,
   asROLSchema: boolean,
-  charset: string,
-  collate: string,
+  charset?: string,
+  collate?: string,
 };
 
 function runWithOptions(options: Options) {
@@ -61,8 +61,8 @@ function run() {
     .name('mysql-simulate')
     .usage('[options] <path> [<path> ...]')
     .description('Parses SQL migration files and outputs the resulting DB state.')
-    .option('-s, --charset <charset>', 'Set the (initial) default charset for the DB', DEFAULT_CHARSET)
-    .option('-c, --collate <collation>', 'Set the (initial) default collation for the DB', DEFAULT_COLLATE)
+    .option('-s, --charset <charset>', 'Set the (initial) default charset for the DB')
+    .option('-c, --collate <collation>', 'Set the (initial) default collation for the DB')
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
