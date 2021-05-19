@@ -917,12 +917,17 @@ EngineName
   = _ 'InnoDB'i !IdentifierStart _ { return 'InnoDB' }
 
 CharsetName
-  = _ 'utf8'i !IdentifierStart _ { return 'utf8' }
-  / _ 'latin1'i !IdentifierStart _ { return 'latin1' }
+  = _ 'utf8'i    !IdentifierStart _ { return 'utf8' }
+  / _ 'utf8mb4'i !IdentifierStart _ { return 'utf8mb4' }
+  / _ 'latin1'i  !IdentifierStart _ { return 'latin1' }
 
 CollationName
-  = _ 'utf8_general_ci'i !IdentifierStart _ { return 'utf8_general_ci' }
-  / _ 'utf8_bin'i        !IdentifierStart _ { return 'utf8_bin' }
+  = _ 'utf8_bin'i           !IdentifierStart _ { return 'utf8_bin' }
+  / _ 'utf8_general_ci'i    !IdentifierStart _ { return 'utf8_general_ci' }
+  / _ 'utf8_unicode_ci'i    !IdentifierStart _ { return 'utf8_unicode_ci' }
+  / _ 'utf8mb4_general_ci'i !IdentifierStart _ { return 'utf8mb4_general_ci' }
+  / _ 'utf8mb4_unicode_ci'i !IdentifierStart _ { return 'utf8mb4_unicode_ci' }
+  / _ 'latin1_swedish_ci'i  !IdentifierStart _ { return 'latin1_swedish_ci' }
 
 ValueList
   = first:Value COMMA rest:ValueList { return [first, ...rest] }
