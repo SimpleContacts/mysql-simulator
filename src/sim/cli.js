@@ -30,7 +30,11 @@ type Options = {
 };
 
 function runWithOptions(options: Options) {
-  let db: Database = new Database(options.charset);
+  const defaults = {
+    charset: options.charset,
+    collate: options.collate,
+  };
+  let db: Database = new Database(defaults);
 
   let files = Array.from(expandInputFiles(options.args));
   for (const fullpath of files) {

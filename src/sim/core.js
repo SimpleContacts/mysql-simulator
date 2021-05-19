@@ -55,7 +55,7 @@ function makeColumn(colName, def: ColumnDefinition): Column {
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  let db = db_.createTable(tblName, db_.charset);
+  let db = db_.createTable(tblName, db_.defaults);
 
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
@@ -353,6 +353,5 @@ export function applySqlFiles(db_: Database, ...paths: Array<string>): Database 
  * collect a naturally-sorted list of *.sql files.
  */
 export function simulate(...paths: Array<string>): Database {
-  const DEFAULT_CHARSET = 'utf8';
-  return applySqlFiles(new Database(DEFAULT_CHARSET), ...paths);
+  return applySqlFiles(new Database(), ...paths);
 }
