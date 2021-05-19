@@ -29,7 +29,7 @@ run_on_mysql() {
   echo "Real: $(basename "$infile")"
   resetdb
 
-  mysql $testdb < $infile
+  cat $infile | sed -Ee 's/__dbname__/foobarqux/g' | mysql $testdb
   dump > $outfile
 }
 
