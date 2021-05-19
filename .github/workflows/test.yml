@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -35,6 +35,9 @@ jobs:
           echo "protocol=tcp" >> ~/.my.cnf
           echo "user=simplehealth" >> ~/.my.cnf
           echo "password=justsomepassword" >> ~/.my.cnf
+          echo "" >> ~/.my.cnf
+          echo "[mysqldump]" >> ~/.my.cnf
+          echo "column-statistics=0" >> ~/.my.cnf
 
       - name: Checkout source code
         uses: actions/checkout@v1
