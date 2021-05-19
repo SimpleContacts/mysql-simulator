@@ -1,8 +1,8 @@
 // @flow strict
 
 import { parseEnumValues, quote } from './utils';
-import type { Defaults as Encoding } from './encodings';
-import { getDefaultCollationForCharset } from './encodings';
+import type { Encoding } from './encodings';
+import { makeEncoding, getDefaultCollationForCharset } from './encodings';
 
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
@@ -165,7 +165,7 @@ function parseEncodingOptions(options: string, tableDefaultEncoding: Encoding): 
     collate = matchCollate[1];
   }
 
-  return { charset, collate };
+  return makeEncoding(charset, collate);
 }
 
 function asEnum(

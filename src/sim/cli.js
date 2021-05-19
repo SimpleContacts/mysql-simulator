@@ -8,6 +8,7 @@ import { dumpSchema } from 'rule-of-law';
 
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
+import { makeEncoding } from './encodings';
 
 // MySQL 5.7 defaults
 const DEFAULT_CHARSET = 'latin1';
@@ -30,10 +31,7 @@ type Options = {
 };
 
 function runWithOptions(options: Options) {
-  const defaults = {
-    charset: options.charset,
-    collate: options.collate,
-  };
+  const defaults = makeEncoding(options.charset, options.collate);
   let db: Database = new Database(defaults);
 
   let files = Array.from(expandInputFiles(options.args));

@@ -6,8 +6,8 @@ import type { Schema as ROLSchema } from 'rule-of-law/types';
 import Column from './Column';
 import type { IndexType } from './Index';
 import Table from './Table';
-import { MYSQL_57_DEFAULTS } from './encodings';
-import type { Defaults } from './encodings';
+import { MYSQL_57_DEFAULTS, makeEncoding } from './encodings';
+import type { Encoding } from './encodings';
 
 type LUT<+T> = { +[string]: T };
 
@@ -30,20 +30,20 @@ function values<T>(things: LUT<T>): Array<T> {
 }
 
 export default class Database {
-  +defaults: Defaults;
+  +defaultEncoding: Encoding;
   +_tables: LUT<Table>; // TODO: Just make this an Array, it's way easier to work with
 
-  constructor(defaults: Defaults = MYSQL_57_DEFAULTS, _tables: LUT<Table> = {}) {
-    this.defaults = defaults;
+  constructor(defaultEncoding: Encoding = MYSQL_57_DEFAULTS, _tables: LUT<Table> = {}) {
+    this.defaultEncoding = defaultEncoding;
     this._tables = _tables;
   }
 
   setCharset(charset: string): Database {
-    return new Database({ ...this.defaults, charset }, this._tables);
+    return new Database(makeEncoding(charset, this.defaultEncoding.collate), this._tables);
   }
 
   setCollate(collate: string): Database {
-    return new Database({ ...this.defaults, collate }, this._tables);
+    return new Database(makeEncoding(this.defaultEncoding.charset, collate), this._tables);
   }
 
   getTables(): Array<Table> {
@@ -68,8 +68,8 @@ export default class Database {
     }
   }
 
-  createTable(name: string, defaults: Defaults): Database {
-    return this.addTable(new Table(name, defaults));
+  createTable(name: string, defaultEncoding: Encoding): Database {
+    return this.addTable(new Table(name, defaultEncoding));
   }
 
   cloneTable(tblName: string, newTblName: string): Database {
@@ -81,7 +81,7 @@ export default class Database {
   addTable(table: Table): Database {
     const name = table.name;
     this.assertTableDoesNotExist(name);
-    return new Database(this.defaults, { ...this._tables, [name]: table });
+    return new Database(this.defaultEncoding, { ...this._tables, [name]: table });
   }
 
   /**
@@ -133,7 +133,7 @@ export default class Database {
 
     const newTables = { ...this._tables };
     delete newTables[name];
-    return new Database(this.defaults, newTables);
+    return new Database(this.defaultEncoding, newTables);
   }
 
   /**
@@ -145,7 +145,7 @@ export default class Database {
     if (newTable.name !== tblName) {
       throw new Error('Database.swapTable() cannot be used to change the name of the table.');
     }
-    return new Database(this.defaults, {
+    return new Database(this.defaultEncoding, {
       ...this._tables,
       [tblName]: newTable,
     });
@@ -158,7 +158,7 @@ export default class Database {
   mapTables(mapper: (Table) => Table): Database {
     const newTables = this.getTables().map(mapper);
     return new Database(
-      this.defaults,
+      this.defaultEncoding,
       indexBy(newTables, (table) => table.name),
     );
   }

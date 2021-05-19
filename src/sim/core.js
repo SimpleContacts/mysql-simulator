@@ -9,7 +9,8 @@ import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
-import type { Defaults as Encoding } from './encodings';
+import type { Encoding } from './encodings';
+import { makeEncoding } from './encodings';
 
 const error = console.error;
 
@@ -57,17 +58,17 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  const defaults = {
-    charset: stm.options?.CHARSET ?? db_.defaults.charset,
-    collate: stm.options?.COLLATE ?? db_.defaults.collate,
-  };
+  const defaults = makeEncoding(
+    stm.options?.CHARSET ?? db_.defaultEncoding.charset,
+    stm.options?.COLLATE ?? db_.defaultEncoding.collate,
+  );
   let db = db_.createTable(tblName, defaults);
 
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
     const table = db.getTable(tblName);
-    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaults), null);
+    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaultEncoding), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -157,7 +158,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           db = db.renameTable(stm.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
           const table = db.getTable(stm.tblName);
-          const column = makeColumn(change.colName, change.definition, table.defaults);
+          const column = makeColumn(change.colName, change.definition, table.defaultEncoding);
           db = db.addColumn(stm.tblName, column, change.position);
           if (change.definition.isPrimary) {
             db = db.addPrimaryKey(stm.tblName, [change.colName]);
@@ -166,7 +167,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           }
         } else if (change.type === 'CHANGE COLUMN') {
           const table = db.getTable(stm.tblName);
-          const column = makeColumn(change.newColName, change.definition, table.defaults);
+          const column = makeColumn(change.newColName, change.definition, table.defaultEncoding);
           db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);

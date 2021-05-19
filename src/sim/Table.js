@@ -10,12 +10,12 @@ import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
-import type { Defaults } from './encodings';
+import type { Encoding } from './encodings';
 import { getDefaultCollationForCharset } from './encodings';
 
 export default class Table {
   +name: string;
-  +defaults: Defaults;
+  +defaultEncoding: Encoding;
   +columns: $ReadOnlyArray<Column>;
   +primaryKey: $ReadOnlyArray<string> | null;
   +indexes: $ReadOnlyArray<Index>;
@@ -23,14 +23,14 @@ export default class Table {
 
   constructor(
     name: string,
-    defaults: Defaults,
+    defaultEncoding: Encoding,
     columns: $ReadOnlyArray<Column> = [],
     primaryKey: $ReadOnlyArray<string> | null = null,
     indexes: $ReadOnlyArray<Index> = [],
     foreignKeys: $ReadOnlyArray<ForeignKey> = [],
   ) {
     this.name = name;
-    this.defaults = defaults;
+    this.defaultEncoding = defaultEncoding;
     this.columns = columns;
     this.primaryKey = primaryKey;
     this.indexes = indexes;
@@ -101,7 +101,7 @@ export default class Table {
    * keys emptied.
    */
   cloneTo(name: string): Table {
-    return new Table(name, this.defaults, this.columns, this.primaryKey, this.indexes, []);
+    return new Table(name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, []);
   }
 
   /**
@@ -122,7 +122,7 @@ export default class Table {
       });
     });
 
-    return new Table(newName, this.defaults, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(newName, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -142,7 +142,7 @@ export default class Table {
       return fk.patch({ reference });
     });
 
-    return new Table(this.name, this.defaults, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -152,7 +152,7 @@ export default class Table {
     this.assertColumnDoesNotExist(column.name);
 
     const columns = [...this.columns, column];
-    let table = new Table(this.name, this.defaults, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    let table = new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
     if (position) {
       table = table.moveColumn(column.name, position);
     }
@@ -175,7 +175,7 @@ export default class Table {
       throw new Error(`Unknown position qualifier: ${position}`);
     }
 
-    return new Table(this.name, this.defaults, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -209,7 +209,7 @@ export default class Table {
       }),
     );
 
-    return new Table(this.name, this.defaults, columns, primaryKey, indexes, foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, primaryKey, indexes, foreignKeys);
   }
 
   /**
@@ -222,7 +222,7 @@ export default class Table {
       throw new Error('Table.swapColumn() cannot be used to change the name of the column.');
     }
     const columns = this.columns.map((column) => (column.name === colName ? newColumn : column));
-    return new Table(this.name, this.defaults, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
@@ -292,7 +292,7 @@ export default class Table {
     const column = this.getColumn(colName);
     const newColumn = column.patch({ defaultValue: null });
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
-    return new Table(this.name, this.defaults, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -329,7 +329,7 @@ export default class Table {
       primaryKey = primaryKey.length > 0 ? primaryKey : null;
     }
 
-    return new Table(this.name, this.defaults, columns, primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, primaryKey, indexes, this.foreignKeys);
   }
 
   /**
@@ -353,7 +353,7 @@ export default class Table {
 
     return new Table(
       this.name,
-      this.defaults,
+      this.defaultEncoding,
       newColumns,
       columnNames, // primaryKey
       this.indexes,
@@ -370,7 +370,7 @@ export default class Table {
     }
 
     const primaryKey = null;
-    return new Table(this.name, this.defaults, this.columns, primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -425,7 +425,14 @@ export default class Table {
           // Update & push it at the end
           new Index(indexName, origIndex.columns, origIndex.type, origIndex.$$locked),
         ];
-        table = new Table(table.name, this.defaults, table.columns, table.primaryKey, indexes, table.foreignKeys);
+        table = new Table(
+          table.name,
+          this.defaultEncoding,
+          table.columns,
+          table.primaryKey,
+          indexes,
+          table.foreignKeys,
+        );
       }
     }
 
@@ -436,7 +443,7 @@ export default class Table {
     });
     const foreignKeys = [...table.foreignKeys, fk];
 
-    return new Table(table.name, this.defaults, table.columns, table.primaryKey, table.indexes, foreignKeys);
+    return new Table(table.name, this.defaultEncoding, table.columns, table.primaryKey, table.indexes, foreignKeys);
   }
 
   /**
@@ -452,13 +459,13 @@ export default class Table {
     }
 
     const foreignKeys = this.foreignKeys.filter((fk) => fk.name !== symbol);
-    return new Table(this.name, this.defaults, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   mapForeignKeys(mapper: (ForeignKey) => ForeignKey): Table {
     return new Table(
       this.name,
-      this.defaults,
+      this.defaultEncoding,
       this.columns,
       this.primaryKey,
       this.indexes,
@@ -514,7 +521,7 @@ export default class Table {
       indexes = [...indexes, index];
     }
 
-    return new Table(this.name, this.defaults, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   dropIndex(indexName: string): Table {
@@ -532,7 +539,7 @@ export default class Table {
     }
 
     const indexes = this.indexes.filter((index) => index.name !== indexName);
-    return new Table(this.name, this.defaults, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   renameIndex(oldIndexName: string, newIndexName: string): Table {
@@ -553,7 +560,7 @@ export default class Table {
 
     return new Table(
       this.name,
-      this.defaults,
+      this.defaultEncoding,
       this.columns,
       this.primaryKey,
       [...otherIndexes, renamedIndex],
@@ -620,12 +627,12 @@ export default class Table {
     const indent = (line: string) => `  ${line}`;
     const options = [
       'ENGINE=InnoDB',
-      `DEFAULT CHARSET=${this.defaults.charset}`,
+      `DEFAULT CHARSET=${this.defaultEncoding.charset}`,
 
       // MySQL only outputs it if it's explicitly different from what it would
       // use as a default collation for this charset
-      this.defaults.collate !== getDefaultCollationForCharset(this.defaults.charset)
-        ? `COLLATE=${this.defaults.collate}`
+      this.defaultEncoding.collate !== getDefaultCollationForCharset(this.defaultEncoding.charset)
+        ? `COLLATE=${this.defaultEncoding.collate}`
         : null,
     ];
     return [

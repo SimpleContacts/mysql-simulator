@@ -8,7 +8,7 @@ import type { TypeInfo } from './DataType';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
-import type { Defaults as Encoding } from './encodings';
+import type { Encoding } from './encodings';
 
 type Generated = {|
   expr: string,
