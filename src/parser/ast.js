@@ -73,8 +73,8 @@ export type CreateTableDefinition =
 export type TableOptions = {|
   AUTO_INCREMENT?: string | null,
   ENGINE?: 'InnoDB',
-  CHARSET?: 'utf8',
-  COLLATE?: 'utf8_general_ci' | 'utf8_bin',
+  CHARSET?: string,
+  COLLATE?: string,
 |};
 
 export type CreateTableStatement = {|

@@ -55,7 +55,11 @@ function makeColumn(colName, def: ColumnDefinition): Column {
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  let db = db_.createTable(tblName, db_.defaults);
+  const defaults = {
+    charset: stm.options?.CHARSET ?? db_.defaults.charset,
+    collate: stm.options?.COLLATE ?? db_.defaults.collate,
+  };
+  let db = db_.createTable(tblName, defaults);
 
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
