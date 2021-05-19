@@ -152,8 +152,8 @@ function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: s
 
 // TODO: Honestly, why are we not just doing this at the parser level?
 function parseEncodingOptions(options: string, tableDefaultEncoding: Encoding): Encoding {
-  let charset = tableDefaultEncoding.charset;
-  let collate = tableDefaultEncoding.collate;
+  let charset;
+  let collate;
 
   const matchCharset = options.match(/CHARACTER SET\s+([\w_]+)/i);
   if (matchCharset) {
@@ -165,7 +165,7 @@ function parseEncodingOptions(options: string, tableDefaultEncoding: Encoding): 
     collate = matchCollate[1];
   }
 
-  return makeEncoding(charset, collate);
+  return makeEncoding(charset, collate, tableDefaultEncoding);
 }
 
 function asEnum(
