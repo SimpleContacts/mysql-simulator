@@ -19,8 +19,10 @@ type Options = {
   asROLSchema: boolean,
 };
 
+const DEFAULT_CHARSET = 'utf8';
+
 function runWithOptions(options: Options) {
-  let db: Database = new Database();
+  let db: Database = new Database(DEFAULT_CHARSET);
 
   let files = Array.from(expandInputFiles(options.args));
   for (const fullpath of files) {
