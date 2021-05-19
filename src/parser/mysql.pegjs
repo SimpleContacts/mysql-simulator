@@ -492,7 +492,22 @@ WhileStatement
 // ====================================================
 
 AlterDatabase
-  = ALTER DATABASE [^;]* { return null; }
+  = ALTER DATABASE dbName:Identifier options:AlterDbOption+ {
+      return {
+        type: 'ALTER DATABASE',
+        dbName,
+        options
+      }
+    }
+
+AlterDbOption
+  = DEFAULT? CHARACTER SET EQ? CHARSET:CharsetName {
+      return { CHARSET }
+    }
+
+  / DEFAULT? COLLATE EQ? COLLATE:CollationName {
+      return { COLLATE }
+    }
 
 // ====================================================
 // ALTER TABLE
