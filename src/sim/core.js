@@ -371,5 +371,6 @@ export function applySqlFiles(db_: Database, ...paths: Array<string>): Database 
  * collect a naturally-sorted list of *.sql files.
  */
 export function simulate(...paths: Array<string>): Database {
-  return applySqlFiles(new Database(), ...paths);
+  const defaultEncoding = makeEncoding();
+  return applySqlFiles(new Database(defaultEncoding), ...paths);
 }

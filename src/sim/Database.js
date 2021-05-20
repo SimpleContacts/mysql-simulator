@@ -6,7 +6,6 @@ import type { Schema as ROLSchema } from 'rule-of-law/types';
 import Column from './Column';
 import type { IndexType } from './Index';
 import Table from './Table';
-import { MYSQL_57_DEFAULTS, makeEncoding } from './encodings';
 import type { Encoding } from './encodings';
 
 type LUT<+T> = { +[string]: T };
@@ -33,7 +32,7 @@ export default class Database {
   +defaultEncoding: Encoding;
   +_tables: LUT<Table>; // TODO: Just make this an Array, it's way easier to work with
 
-  constructor(defaultEncoding: Encoding = MYSQL_57_DEFAULTS, _tables: LUT<Table> = {}) {
+  constructor(defaultEncoding: Encoding, _tables: LUT<Table> = {}) {
     this.defaultEncoding = defaultEncoding;
     this._tables = _tables;
   }
