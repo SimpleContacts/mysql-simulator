@@ -165,7 +165,6 @@ declare module "commander" {
     parse(argv: Array<string>): this & {
       args: Array<string>,
       rawArgs: Array<string>,
-      [string]: any,
     };
 
     /**
