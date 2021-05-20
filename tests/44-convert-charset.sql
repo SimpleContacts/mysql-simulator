@@ -34,9 +34,9 @@ ALTER TABLE t1 MODIFY c4 ENUM('foo', 'bar', 'qux') COLLATE latin1_spanish_ci;
 -- Change (default) table options
 ALTER TABLE t2 CHARACTER SET = utf8;
 ALTER TABLE t3 CHARACTER SET = latin1;
--- ALTER TABLE t4 COLLATE = utf8_general_ci;
--- ALTER TABLE t5 COLLATE = latin1_spanish_ci;
--- ALTER TABLE t6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
+ALTER TABLE t4 COLLATE = utf8_general_ci;
+ALTER TABLE t5 COLLATE = latin1_spanish_ci;
+ALTER TABLE t6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 -- Convert the entire table at once
 -- ALTER TABLE t7 CONVERT TO CHARACTER SET utf8;

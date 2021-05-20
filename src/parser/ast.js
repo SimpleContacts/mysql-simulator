@@ -118,6 +118,7 @@ export type RenameTableStatement = {|
 
 export type AlterTableOptions = {|
   type: 'CHANGE TABLE OPTIONS',
+  options: TableOptions,
 |};
 
 export type AlterAddColumn = {|

@@ -311,7 +311,7 @@ function peg$parse(input, options) {
       peg$c82 = function(options) {
             return {
               type: 'CHANGE TABLE OPTIONS',
-              options,
+              options: Object.assign({}, ...options),
             }
           },
       peg$c83 = function(colName, columnDefinition, ident) { return `AFTER ${ident}` },

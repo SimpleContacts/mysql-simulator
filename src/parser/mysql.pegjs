@@ -533,7 +533,7 @@ AlterSpec
   = options:TableOptions {
       return {
         type: 'CHANGE TABLE OPTIONS',
-        options,
+        options: Object.assign({}, ...options),
       }
     }
   / ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition

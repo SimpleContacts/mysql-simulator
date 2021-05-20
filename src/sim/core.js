@@ -233,7 +233,11 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'RENAME INDEX') {
           db = db.renameIndex(stm.tblName, change.oldIndexName, change.newIndexName);
         } else if (change.type === 'CHANGE TABLE OPTIONS') {
-          // Ignore
+          const charset = change.options.CHARSET;
+          const collate = change.options.COLLATE;
+          if (charset || collate) {
+            db = db.setDefaultTableEncoding(stm.tblName, charset, collate);
+          }
         } else {
           // Log details to the console (useful for debugging)
           error(`Unknown change type: ${change.type}`);

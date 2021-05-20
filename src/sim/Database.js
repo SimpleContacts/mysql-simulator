@@ -2,7 +2,7 @@
 
 import { sortBy, zip } from 'lodash';
 import type { Schema as ROLSchema } from 'rule-of-law/types';
-
+import { makeEncoding } from './encodings';
 import Column from './Column';
 import type { Encoding } from './encodings';
 import type { IndexType } from './Index';
@@ -278,6 +278,11 @@ export default class Database {
 
   renameIndex(tblName: string, oldIndexName: string, newIndexName: string): Database {
     return this.swapTable(tblName, (table) => table.renameIndex(oldIndexName, newIndexName));
+  }
+
+  setDefaultTableEncoding(tblName: string, charset?: string, collate?: string): Database {
+    const encoding = makeEncoding(charset, collate);
+    return this.swapTable(tblName, (table) => table.setDefaultEncoding(encoding));
   }
 
   toSchema(): ROLSchema {

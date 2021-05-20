@@ -7,6 +7,7 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 import Column from './Column';
 import Database from './Database';
 import type { Encoding } from './encodings';
+import { formatDataType } from './DataType';
 import { getDefaultCollationForCharset } from './encodings';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
@@ -35,6 +36,65 @@ export default class Table {
     this.primaryKey = primaryKey;
     this.indexes = indexes;
     this.foreignKeys = foreignKeys;
+  }
+
+  setDefaultEncoding(newEncoding: Encoding): Table {
+    // Changing the default encoding should only have effect on _future_
+    // columns that will get created. There should not be any conversion
+    // happening by changing the encoding. However, any columns that don't have
+    // an explicit encoding set should be updated to the old/current encoding
+    // explicitly
+    const columns = this.columns.map((column) => {
+      // TODO: Make explicit
+      const typeInfo = column.getTypeInfo();
+      if (
+        !(
+          typeInfo.baseType === 'char' ||
+          typeInfo.baseType === 'varchar' ||
+          typeInfo.baseType === 'text' ||
+          typeInfo.baseType === 'enum'
+        )
+      ) {
+        return column;
+      }
+
+      if (
+        typeInfo.encoding === undefined ||
+        (typeInfo.encoding.charset === column.tableDefaultEncoding.charset &&
+          typeInfo.encoding.collate === column.tableDefaultEncoding.collate)
+      ) {
+        if (typeInfo.baseType !== 'enum') {
+          return column.patch({
+            type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
+            tableDefaultEncoding: newEncoding,
+          });
+        } else {
+          return column.patch({
+            type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
+            tableDefaultEncoding: newEncoding,
+          });
+        }
+      } else if (
+        typeInfo.encoding !== undefined &&
+        typeInfo.encoding.charset === newEncoding.charset &&
+        typeInfo.encoding.collate === newEncoding.collate
+      ) {
+        if (typeInfo.baseType !== 'enum') {
+          return column.patch({
+            type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
+            tableDefaultEncoding: newEncoding,
+          });
+        } else {
+          return column.patch({
+            type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
+            tableDefaultEncoding: newEncoding,
+          });
+        }
+      } else {
+        return column;
+      }
+    });
+    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
