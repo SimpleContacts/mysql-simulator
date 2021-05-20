@@ -288,7 +288,7 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
 
       if (info.encoding) {
         // -----------------------------------------------
-        // Handles: t17
+        // Handles: t17-t21
         // -----------------------------------------------
 
         console.error({
@@ -300,7 +300,7 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
         // Explicitly set, always output something
         if (encoding.collate === tableEncoding.collate) {
           outputCharset = false;
-          outputCollation = false;
+          outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
         } else if (encoding.charset === tableEncoding.charset) {
           outputCharset = true;
           outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);

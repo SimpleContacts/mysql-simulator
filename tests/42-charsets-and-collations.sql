@@ -53,13 +53,13 @@ CREATE TABLE t16 (a VARCHAR(12)) CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_c
 -- -- ---------------------------------------------------------------------------------
 -- -- Column-level charset/collations
 -- -- ---------------------------------------------------------------------------------
---
--- CREATE TABLE t17 (a VARCHAR(12) CHARACTER SET latin1);
--- CREATE TABLE t18 (a VARCHAR(12) COLLATE latin1_swedish_ci);
--- CREATE TABLE t19 (a VARCHAR(12) COLLATE latin1_spanish_ci);
--- CREATE TABLE t20 (a VARCHAR(12) CHARACTER SET latin1 COLLATE latin1_swedish_ci);
--- CREATE TABLE t21 (a VARCHAR(12) CHARACTER SET latin1 COLLATE latin1_spanish_ci);
---
+
+CREATE TABLE t17 (a VARCHAR(12) CHARACTER SET latin1);
+CREATE TABLE t18 (a VARCHAR(12) COLLATE latin1_swedish_ci);
+CREATE TABLE t19 (a VARCHAR(12) COLLATE latin1_spanish_ci);
+CREATE TABLE t20 (a VARCHAR(12) CHARACTER SET latin1 COLLATE latin1_swedish_ci);
+CREATE TABLE t21 (a VARCHAR(12) CHARACTER SET latin1 COLLATE latin1_spanish_ci);
+
 -- CREATE TABLE t22 (a VARCHAR(12) CHARACTER SET utf8);
 -- CREATE TABLE t23 (a VARCHAR(12) COLLATE utf8_general_ci);
 -- CREATE TABLE t24 (a VARCHAR(12) COLLATE utf8_unicode_ci);
