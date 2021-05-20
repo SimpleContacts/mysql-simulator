@@ -20,7 +20,7 @@
     "check:import-sort": "import-sort --list-different 'src/**/*.js' '!src/parser/mysql.js'",
     "check:prettier": "prettier --list-different 'src/**/*.js' '!src/parser/mysql.js'",
     "tdd": "onchange 'src/**' 'tests/*.sql' -- './test.sh'",
-    "test": "./test.sh && yarn run -s check && yarn run -s flow && jest src",
+    "test": "./test.sh -s utf8 && yarn run -s check && yarn run -s flow && jest src",
     "flow": "flow --include-warnings",
     "prepublish": "in-publish && yarn run actually-prepublish || not-in-publish",
     "actually-prepublish": "yarn run build && yarn run test && yarn run build"
