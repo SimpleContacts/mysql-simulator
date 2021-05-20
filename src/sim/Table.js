@@ -58,6 +58,9 @@ export default class Table {
         return column;
       }
 
+      // NOTE: This implementation is correct, and 100% matches MySQL's
+      // behavior. Still...
+      // TODO: SIMPLIFY THIS!
       if (
         typeInfo.encoding === undefined ||
         (typeInfo.encoding.charset === column.tableDefaultEncoding.charset &&
