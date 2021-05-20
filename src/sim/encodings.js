@@ -52,8 +52,7 @@ export function makeEncoding(charset?: Charset, collate?: Collation): Encoding {
     invariant(collate.startsWith(charset), 'Illegal combination: ' + charset + ' is incompatible with ' + collate);
     return { charset, collate };
   } else {
-    // Neither is set: just return the fallback
-    throw new Error('Specify either charset, or collate');
+    return MYSQL_57_DEFAULTS;
   }
 }
 
