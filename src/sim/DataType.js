@@ -296,7 +296,7 @@ export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): 
       params = info.length || '';
       break;
 
-    case 'enum':
+    case 'enum': {
       params = info.values.map(quote).join(',');
       if (info.encoding) {
         const { charset, collate } = info.encoding;
@@ -308,6 +308,7 @@ export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): 
           .join(' ');
       }
       break;
+    }
 
     default:
       // Nothing
