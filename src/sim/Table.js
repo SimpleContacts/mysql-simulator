@@ -6,12 +6,12 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
+import type { Encoding } from './encodings';
+import { getDefaultCollationForCharset } from './encodings';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
-import type { Encoding } from './encodings';
-import { getDefaultCollationForCharset } from './encodings';
 
 export default class Table {
   +name: string;

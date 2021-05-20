@@ -5,10 +5,10 @@ import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
+import type { Encoding } from './encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
-import type { Encoding } from './encodings';
 
 type Generated = {|
   expr: string,

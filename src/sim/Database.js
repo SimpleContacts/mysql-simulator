@@ -4,9 +4,9 @@ import { sortBy, zip } from 'lodash';
 import type { Schema as ROLSchema } from 'rule-of-law/types';
 
 import Column from './Column';
+import type { Encoding } from './encodings';
 import type { IndexType } from './Index';
 import Table from './Table';
-import type { Encoding } from './encodings';
 
 type LUT<+T> = { +[string]: T };
 

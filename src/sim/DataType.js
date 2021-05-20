@@ -1,8 +1,8 @@
 // @flow strict
 
-import { parseEnumValues, quote } from './utils';
 import type { Encoding } from './encodings';
-import { makeEncoding, getDefaultCollationForCharset } from './encodings';
+import { getDefaultCollationForCharset, makeEncoding } from './encodings';
+import { parseEnumValues, quote } from './utils';
 
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
