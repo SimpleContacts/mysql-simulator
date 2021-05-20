@@ -287,37 +287,18 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
       let outputCollation;
 
       if (info.encoding) {
-        // -----------------------------------------------
-        // Handles: t17-t21
-        // -----------------------------------------------
-
-        console.error({
-          _____________db: globals.serverEncoding,
-          __________table: tableEncoding,
-          column_explicit: info.encoding,
-        });
-
         // Explicitly set, always output something
         if (encoding.collate === tableEncoding.collate) {
           outputCharset = false;
-          outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
-        } else if (encoding.charset === tableEncoding.charset) {
-          outputCharset = true;
-          outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
         } else {
-          outputCharset = true;
-          outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+          if (encoding.charset === tableEncoding.charset) {
+            outputCharset = true;
+          } else {
+            outputCharset = true;
+          }
         }
+        outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
       } else {
-        // -----------------------------------------------
-        // Handles: t01-t16
-        // -----------------------------------------------
-        //
-        // console.error({
-        //   db: globals.serverEncoding,
-        //   table: tableEncoding,
-        //   column_derived: encoding,
-        // });
         outputCharset = charset !== tableEncoding.charset;
         outputCollation = collate !== getDefaultCollationForCharset(charset);
       }
