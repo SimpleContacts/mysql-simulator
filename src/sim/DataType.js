@@ -304,15 +304,21 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
 
     case 'enum': {
       params = info.values.map(quote).join(',');
-      if (info.encoding) {
-        const { charset, collate } = info.encoding;
-        options = [
-          charset !== tableEncoding.charset ? `CHARACTER SET ${charset}` : null,
-          collate !== getDefaultCollationForCharset(charset) ? `COLLATE ${collate}` : null,
-        ]
-          .filter(Boolean)
-          .join(' ');
-      }
+
+      const encoding = info.encoding ?? tableEncoding;
+
+      // NOTE: This is some weird MySQL quirk... if an encoding is set
+      // explicitly, then the *collate* defines what gets displayed, otherwise
+      // the *charset* difference will determine it
+      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
+      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+
+      options = [
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
+      ]
+        .filter(Boolean)
+        .join(' ');
       break;
     }
 
