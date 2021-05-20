@@ -242,7 +242,7 @@ export function parseDataType(type: string): TypeInfo {
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): string {
+export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string {
   const baseType = info.baseType;
   let params = '';
   let options = '';
@@ -278,21 +278,53 @@ export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): 
     case 'varchar':
     case 'text': {
       params = info.length || '';
-      const encoding = info.encoding ?? tableDefaultEncoding;
-      console.error({
-        col: { set: info.encoding, derived: encoding },
-        table: tableDefaultEncoding,
-        server: globals.serverEncoding,
-      });
-      if (encoding) {
-        const { charset, collate } = encoding;
-        options = [
-          charset !== tableDefaultEncoding.charset ? `CHARACTER SET ${charset}` : null,
-          collate !== getDefaultCollationForCharset(charset) ? `COLLATE ${collate}` : null,
-        ]
-          .filter(Boolean)
-          .join(' ');
+
+      const dbEncoding = globals.serverEncoding;
+      const encoding = info.encoding ?? tableEncoding;
+      const { charset, collate } = encoding;
+
+      let outputCharset;
+      let outputCollation;
+
+      if (info.encoding) {
+        // -----------------------------------------------
+        // Handles: t17
+        // -----------------------------------------------
+
+        console.error({
+          _____________db: globals.serverEncoding,
+          __________table: tableEncoding,
+          column_explicit: info.encoding,
+        });
+
+        // Explicitly set, always output something
+        if (encoding.collate === tableEncoding.collate) {
+          outputCharset = false;
+          outputCollation = false;
+        } else if (encoding.charset === tableEncoding.charset) {
+          outputCharset = true;
+          outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+        } else {
+          outputCharset = true;
+          outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+        }
+      } else {
+        // -----------------------------------------------
+        // Handles: t01-t16
+        // -----------------------------------------------
+        //
+        // console.error({
+        //   db: globals.serverEncoding,
+        //   table: tableEncoding,
+        //   column_derived: encoding,
+        // });
+        outputCharset = charset !== tableEncoding.charset;
+        outputCollation = collate !== getDefaultCollationForCharset(charset);
       }
+
+      options = [outputCharset ? `CHARACTER SET ${charset}` : null, outputCollation ? `COLLATE ${collate}` : null]
+        .filter(Boolean)
+        .join(' ');
       break;
     }
 
@@ -307,7 +339,7 @@ export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): 
       if (info.encoding) {
         const { charset, collate } = info.encoding;
         options = [
-          charset !== tableDefaultEncoding.charset ? `CHARACTER SET ${charset}` : null,
+          charset !== tableEncoding.charset ? `CHARACTER SET ${charset}` : null,
           collate !== getDefaultCollationForCharset(charset) ? `COLLATE ${collate}` : null,
         ]
           .filter(Boolean)
