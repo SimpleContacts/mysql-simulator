@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';

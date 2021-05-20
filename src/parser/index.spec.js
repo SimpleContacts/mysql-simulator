@@ -1,3 +1,5 @@
+// @flow strict
+
 import parse from '.';
 
 describe('Read documentation', () => {

@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
