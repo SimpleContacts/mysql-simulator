@@ -23,6 +23,8 @@ export const MYSQL_57_DEFAULTS: Encoding = {
   collate: 'latin1_swedish_ci',
 };
 
+export const globals: {| serverEncoding: Encoding |} = { serverEncoding: MYSQL_57_DEFAULTS };
+
 // const MYSQL_80_DEFAULTS: Defaults = {
 //   charset: 'utf8mb4',
 //   collate: 'utf8mb4_0900_ai_ci',

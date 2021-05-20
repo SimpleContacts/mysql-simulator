@@ -2,7 +2,7 @@
 
 import { parseEnumValues, quote } from './utils';
 import type { Encoding } from './encodings';
-import { makeEncoding, getDefaultCollationForCharset } from './encodings';
+import { globals, makeEncoding, getDefaultCollationForCharset } from './encodings';
 
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
@@ -278,8 +278,14 @@ export function formatDataType(info: TypeInfo, tableDefaultEncoding: Encoding): 
     case 'varchar':
     case 'text': {
       params = info.length || '';
-      if (info.encoding) {
-        const { charset, collate } = info.encoding;
+      const encoding = info.encoding ?? tableDefaultEncoding;
+      console.error({
+        col: { set: info.encoding, derived: encoding },
+        table: tableDefaultEncoding,
+        server: globals.serverEncoding,
+      });
+      if (encoding) {
+        const { charset, collate } = encoding;
         options = [
           charset !== tableDefaultEncoding.charset ? `CHARACTER SET ${charset}` : null,
           collate !== getDefaultCollationForCharset(charset) ? `COLLATE ${collate}` : null,
