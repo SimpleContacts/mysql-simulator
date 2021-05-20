@@ -2,7 +2,7 @@
 
 import { parseEnumValues, quote } from './utils';
 import type { Encoding } from './encodings';
-import { globals, makeEncoding, getDefaultCollationForCharset } from './encodings';
+import { makeEncoding, getDefaultCollationForCharset } from './encodings';
 
 export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
@@ -279,31 +279,18 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
     case 'text': {
       params = info.length || '';
 
-      const dbEncoding = globals.serverEncoding;
       const encoding = info.encoding ?? tableEncoding;
-      const { charset, collate } = encoding;
 
-      let outputCharset;
-      let outputCollation;
+      // NOTE: This is some weird MySQL quirk... if an encoding is set
+      // explicitly, then the *collate* defines what gets displayed, otherwise
+      // the *charset* difference will determine it
+      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
+      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
-      if (info.encoding) {
-        // Explicitly set, always output something
-        if (encoding.collate === tableEncoding.collate) {
-          outputCharset = false;
-        } else {
-          if (encoding.charset === tableEncoding.charset) {
-            outputCharset = true;
-          } else {
-            outputCharset = true;
-          }
-        }
-        outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
-      } else {
-        outputCharset = charset !== tableEncoding.charset;
-        outputCollation = collate !== getDefaultCollationForCharset(charset);
-      }
-
-      options = [outputCharset ? `CHARACTER SET ${charset}` : null, outputCollation ? `COLLATE ${collate}` : null]
+      options = [
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
+      ]
         .filter(Boolean)
         .join(' ');
       break;

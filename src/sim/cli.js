@@ -8,7 +8,7 @@ import { dumpSchema } from 'rule-of-law';
 
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
-import { globals, makeEncoding } from './encodings';
+import { makeEncoding } from './encodings';
 
 const log = console.log;
 const error = console.error;
@@ -24,7 +24,6 @@ type Options = {
 
 function runWithOptions(options: Options) {
   const serverEncoding = makeEncoding(options.charset, options.collate);
-  globals.serverEncoding = serverEncoding;
   let db: Database = new Database(serverEncoding);
 
   let files = Array.from(expandInputFiles(options.args));
