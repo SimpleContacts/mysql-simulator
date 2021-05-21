@@ -244,7 +244,7 @@ export function parseDataType(type: string): TypeInfo {
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string {
+export function formatDataType(info: TypeInfo, tableEncoding: Encoding, fullyResolved: boolean = false): string {
   const baseType = info.baseType;
   let params = '';
   let options = '';
@@ -292,8 +292,8 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
       let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        outputCollation ? `COLLATE ${encoding.collate}` : null,
+        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');
@@ -318,8 +318,8 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
       let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        outputCollation ? `COLLATE ${encoding.collate}` : null,
+        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');

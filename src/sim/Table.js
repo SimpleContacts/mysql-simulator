@@ -126,9 +126,28 @@ export default class Table {
         return column.patch({}, newEncoding);
       }
 
+      // NOTE: The implementation below is correct, and 100% matches MySQL's
+      // behavior. Still...
+      // TODO: SIMPLIFY THIS!
+
+      // Also, if the new encoding is the same as the old one, just wipe it (no
+      // real change is happening here)
+      if (
+        (typeInfo.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
+        (typeInfo.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
+      ) {
+        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+      }
+
+      // Otherwise, some conversion is actually imminent. We can only continue
+      // if this column isn't used in any foreign keys
+      if (this.isUsedInForeignKey(column.name)) {
+        throw new Error(`Cannot convert column "${column.name}" because it's used by a FK`);
+      }
+
       // If no explicit encoding is set for this column, just keep it that way
       if (typeInfo.encoding === undefined) {
-        return column.patch({}, newEncoding);
+        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
       } else {
         if (typeInfo.baseType === 'enum') {
           const newType = { ...typeInfo, encoding: newEncoding };

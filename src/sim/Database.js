@@ -240,8 +240,8 @@ export default class Database {
       const localColumn = localTable.getColumn(localColName);
       const foreignColumn = foreignTable.getColumn(foreignColName);
 
-      const ltype = localColumn.getType();
-      const ftype = foreignColumn.getType();
+      const ltype = localColumn.getType(true);
+      const ftype = foreignColumn.getType(true);
       if (ltype !== ftype) {
         const lname = `${localTable.name}.${localColumn.name}`;
         const fname = `${foreignTable.name}.${foreignColumn.name}`;
