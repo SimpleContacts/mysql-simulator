@@ -14,6 +14,10 @@ sketchy-null-bool=off
 sketchy-null-mixed=off
 sketchy-null-number=off
 sketchy-null-string=off
-unclear-type=warn
-untyped-import=warn
-untyped-type-import=warn
+
+[strict]
+nonstrict-import
+unclear-type
+unsafe-getters-setters
+untyped-import
+untyped-type-import

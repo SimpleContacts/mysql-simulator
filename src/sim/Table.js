@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
@@ -6,6 +6,9 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
+import { formatDataType } from './DataType';
+import type { Encoding } from './encodings';
+import { getDefaultCollationForCharset, isWider } from './encodings';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
@@ -13,6 +16,7 @@ import { escape, insert } from './utils';
 
 export default class Table {
   +name: string;
+  +defaultEncoding: Encoding;
   +columns: $ReadOnlyArray<Column>;
   +primaryKey: $ReadOnlyArray<string> | null;
   +indexes: $ReadOnlyArray<Index>;
@@ -20,16 +24,151 @@ export default class Table {
 
   constructor(
     name: string,
+    defaultEncoding: Encoding,
     columns: $ReadOnlyArray<Column> = [],
     primaryKey: $ReadOnlyArray<string> | null = null,
     indexes: $ReadOnlyArray<Index> = [],
     foreignKeys: $ReadOnlyArray<ForeignKey> = [],
   ) {
     this.name = name;
+    this.defaultEncoding = defaultEncoding;
     this.columns = columns;
     this.primaryKey = primaryKey;
     this.indexes = indexes;
     this.foreignKeys = foreignKeys;
+  }
+
+  setDefaultEncoding(newEncoding: Encoding): Table {
+    // Changing the default encoding should only have effect on _future_
+    // columns that will get created. There should not be any conversion
+    // happening by changing the encoding. However, any columns that don't have
+    // an explicit encoding set should be updated to the old/current encoding
+    // explicitly
+    const columns = this.columns.map((column) => {
+      // TODO: Make explicit
+      const typeInfo = column.getTypeInfo();
+      if (
+        !(
+          typeInfo.baseType === 'char' ||
+          typeInfo.baseType === 'varchar' ||
+          typeInfo.baseType === 'text' ||
+          typeInfo.baseType === 'mediumtext' ||
+          typeInfo.baseType === 'longtext' ||
+          typeInfo.baseType === 'enum'
+        )
+      ) {
+        return column.patch({}, newEncoding);
+      }
+
+      // NOTE: This implementation is correct, and 100% matches MySQL's
+      // behavior. Still...
+      // TODO: SIMPLIFY THIS!
+      if (
+        typeInfo.encoding === undefined ||
+        (typeInfo.encoding.charset === column.tableDefaultEncoding.charset &&
+          typeInfo.encoding.collate === column.tableDefaultEncoding.collate)
+      ) {
+        if (typeInfo.baseType !== 'enum') {
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
+            },
+            newEncoding,
+          );
+        } else {
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
+            },
+            newEncoding,
+          );
+        }
+      } else if (
+        typeInfo.encoding !== undefined &&
+        typeInfo.encoding.charset === newEncoding.charset &&
+        typeInfo.encoding.collate === newEncoding.collate
+      ) {
+        if (typeInfo.baseType !== 'enum') {
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
+            },
+            newEncoding,
+          );
+        } else {
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
+            },
+            newEncoding,
+          );
+        }
+      } else {
+        return column;
+      }
+    });
+    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+  }
+
+  convertToEncoding(newEncoding: Encoding): Table {
+    const columns = this.columns.map((column) => {
+      const typeInfo = column.getTypeInfo();
+      if (
+        !(
+          typeInfo.baseType === 'char' ||
+          typeInfo.baseType === 'varchar' ||
+          typeInfo.baseType === 'text' ||
+          typeInfo.baseType === 'mediumtext' ||
+          typeInfo.baseType === 'longtext' ||
+          typeInfo.baseType === 'enum'
+        )
+      ) {
+        return column.patch({}, newEncoding);
+      }
+
+      // NOTE: The implementation below is correct, and 100% matches MySQL's
+      // behavior. Still...
+      // TODO: SIMPLIFY THIS!
+
+      // Also, if the new encoding is the same as the old one, just wipe it (no
+      // real change is happening here)
+      if (
+        (typeInfo.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
+        (typeInfo.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
+      ) {
+        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+      }
+
+      // Otherwise, some conversion is actually imminent. We can only continue
+      // if this column isn't used in any foreign keys
+      if (this.isUsedInForeignKey(column.name)) {
+        throw new Error(`Cannot convert column "${column.name}" because it's used by a FK`);
+      }
+
+      // If no explicit encoding is set for this column, just keep it that way
+      if (typeInfo.encoding === undefined) {
+        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+      } else {
+        if (typeInfo.baseType === 'enum') {
+          const newType = { ...typeInfo, encoding: newEncoding };
+          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+        } else {
+          const newType = {
+            ...typeInfo,
+            baseType:
+              typeInfo.baseType === 'text' && isWider(newEncoding.charset, typeInfo.encoding.charset)
+                ? // This is by design in MySQL, since converting to another encoding
+                  // can grow the text size, and this explicit conversion helps to
+                  // avoid truncation. See https://bugs.mysql.com/bug.php?id=31291
+                  'mediumtext'
+                : typeInfo.baseType,
+            encoding: newEncoding,
+          };
+          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+        }
+      }
+    });
+    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -96,7 +235,7 @@ export default class Table {
    * keys emptied.
    */
   cloneTo(name: string): Table {
-    return new Table(name, this.columns, this.primaryKey, this.indexes, []);
+    return new Table(name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, []);
   }
 
   /**
@@ -117,7 +256,7 @@ export default class Table {
       });
     });
 
-    return new Table(newName, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(newName, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -137,7 +276,7 @@ export default class Table {
       return fk.patch({ reference });
     });
 
-    return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   /**
@@ -147,7 +286,7 @@ export default class Table {
     this.assertColumnDoesNotExist(column.name);
 
     const columns = [...this.columns, column];
-    let table = new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    let table = new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
     if (position) {
       table = table.moveColumn(column.name, position);
     }
@@ -170,7 +309,7 @@ export default class Table {
       throw new Error(`Unknown position qualifier: ${position}`);
     }
 
-    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -184,7 +323,7 @@ export default class Table {
         return column;
       }
 
-      return column.patch({ name: newName });
+      return column.patch({ name: newName }, column.tableDefaultEncoding);
     });
 
     // Replace all references to this column if they're used in any of the
@@ -204,7 +343,7 @@ export default class Table {
       }),
     );
 
-    return new Table(this.name, columns, primaryKey, indexes, foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, primaryKey, indexes, foreignKeys);
   }
 
   /**
@@ -217,7 +356,7 @@ export default class Table {
       throw new Error('Table.swapColumn() cannot be used to change the name of the column.');
     }
     const columns = this.columns.map((column) => (column.name === colName ? newColumn : column));
-    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   replaceColumn(oldColName: string, newColumn: Column, position: string | null): Table {
@@ -285,9 +424,9 @@ export default class Table {
    */
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
-    const newColumn = column.patch({ defaultValue: null });
+    const newColumn = column.patch({ defaultValue: null }, column.tableDefaultEncoding);
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
-    return new Table(this.name, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -324,7 +463,7 @@ export default class Table {
       primaryKey = primaryKey.length > 0 ? primaryKey : null;
     }
 
-    return new Table(this.name, columns, primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, columns, primaryKey, indexes, this.foreignKeys);
   }
 
   /**
@@ -343,11 +482,12 @@ export default class Table {
       if (!columnNames.includes(c.name)) {
         return c;
       }
-      return c.patch({ nullable: false });
+      return c.patch({ nullable: false }, c.tableDefaultEncoding);
     });
 
     return new Table(
       this.name,
+      this.defaultEncoding,
       newColumns,
       columnNames, // primaryKey
       this.indexes,
@@ -364,7 +504,7 @@ export default class Table {
     }
 
     const primaryKey = null;
-    return new Table(this.name, this.columns, primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, primaryKey, this.indexes, this.foreignKeys);
   }
 
   /**
@@ -419,7 +559,14 @@ export default class Table {
           // Update & push it at the end
           new Index(indexName, origIndex.columns, origIndex.type, origIndex.$$locked),
         ];
-        table = new Table(table.name, table.columns, table.primaryKey, indexes, table.foreignKeys);
+        table = new Table(
+          table.name,
+          this.defaultEncoding,
+          table.columns,
+          table.primaryKey,
+          indexes,
+          table.foreignKeys,
+        );
       }
     }
 
@@ -430,7 +577,7 @@ export default class Table {
     });
     const foreignKeys = [...table.foreignKeys, fk];
 
-    return new Table(table.name, table.columns, table.primaryKey, table.indexes, foreignKeys);
+    return new Table(table.name, this.defaultEncoding, table.columns, table.primaryKey, table.indexes, foreignKeys);
   }
 
   /**
@@ -446,11 +593,18 @@ export default class Table {
     }
 
     const foreignKeys = this.foreignKeys.filter((fk) => fk.name !== symbol);
-    return new Table(this.name, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
   }
 
   mapForeignKeys(mapper: (ForeignKey) => ForeignKey): Table {
-    return new Table(this.name, this.columns, this.primaryKey, this.indexes, this.foreignKeys.map(mapper));
+    return new Table(
+      this.name,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys.map(mapper),
+    );
   }
 
   /**
@@ -501,7 +655,7 @@ export default class Table {
       indexes = [...indexes, index];
     }
 
-    return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   dropIndex(indexName: string): Table {
@@ -519,7 +673,7 @@ export default class Table {
     }
 
     const indexes = this.indexes.filter((index) => index.name !== indexName);
-    return new Table(this.name, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, indexes, this.foreignKeys);
   }
 
   renameIndex(oldIndexName: string, newIndexName: string): Table {
@@ -538,7 +692,14 @@ export default class Table {
     });
     const otherIndexes = this.indexes.filter((index) => index.name !== oldIndexName);
 
-    return new Table(this.name, this.columns, this.primaryKey, [...otherIndexes, renamedIndex], this.foreignKeys);
+    return new Table(
+      this.name,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      [...otherIndexes, renamedIndex],
+      this.foreignKeys,
+    );
   }
 
   getNormalIndexes(): Array<Index> {
@@ -598,10 +759,20 @@ export default class Table {
 
   toString(): string {
     const indent = (line: string) => `  ${line}`;
+    const options = [
+      'ENGINE=InnoDB',
+      `DEFAULT CHARSET=${this.defaultEncoding.charset}`,
+
+      // MySQL only outputs it if it's explicitly different from what it would
+      // use as a default collation for this charset
+      this.defaultEncoding.collate !== getDefaultCollationForCharset(this.defaultEncoding.charset)
+        ? `COLLATE=${this.defaultEncoding.collate}`
+        : null,
+    ];
     return [
       `CREATE TABLE \`${this.name}\` (`,
       this.serializeDefinitions().map(indent).join(',\n'),
-      `) ENGINE=InnoDB DEFAULT CHARSET=utf8;`,
+      `) ${options.filter(Boolean).join(' ')};`,
     ].join('\n');
   }
 }

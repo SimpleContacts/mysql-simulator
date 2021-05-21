@@ -5,8 +5,33 @@ testdb=foobarqux
 input_dir=tests
 output_dir=tests/simulated
 
+# Create the test DB with the following charset/collate (these need to be
+# passed to the simulator as well)
+
+while getopts s:c: flag; do
+  case "$flag" in
+    s) charset=$OPTARG ;;
+    c) collate=$OPTARG ;;
+    *) exit 2 ;;
+  esac
+done
+
+shift "$((OPTIND-1))"
+
+if [ $# -gt 0 ]; then
+  echo "Superfluous arguments: $@"
+  exit 2
+fi
+
 dump() {
-  bin/mysql-simulate -v $@
+  sim_args=
+  if [ -n "$charset" ]; then
+    sim_args="$sim_args --charset $charset"
+  fi
+  if [ -n "$collate" ]; then
+    sim_args="$sim_args --collate $collate"
+  fi
+  bin/mysql-simulate -v $sim_args "$@"
 }
 
 to_outfile() {

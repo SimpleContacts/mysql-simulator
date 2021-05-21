@@ -73,8 +73,8 @@ export type CreateTableDefinition =
 export type TableOptions = {|
   AUTO_INCREMENT?: string | null,
   ENGINE?: 'InnoDB',
-  CHARSET?: 'utf8',
-  COLLATE?: 'utf8_general_ci' | 'utf8_bin',
+  CHARSET?: string,
+  COLLATE?: string,
 |};
 
 export type CreateTableStatement = {|
@@ -118,6 +118,13 @@ export type RenameTableStatement = {|
 
 export type AlterTableOptions = {|
   type: 'CHANGE TABLE OPTIONS',
+  options: TableOptions,
+|};
+
+export type AlterConvertTo = {|
+  type: 'CONVERT TO',
+  charset: string,
+  collate?: string,
 |};
 
 export type AlterAddColumn = {|
@@ -208,8 +215,20 @@ export type AlterRenameTable = {|
   newTblName: Identifier,
 |};
 
+export type AlterDbOption = {|
+  CHARSET?: string,
+  COLLATE?: string,
+|};
+
+export type AlterDatabaseStatement = {|
+  type: 'ALTER DATABASE',
+  dbName: Identifier,
+  options: Array<AlterDbOption>,
+|};
+
 export type AlterSpec =
   | AlterTableOptions
+  | AlterConvertTo
   | AlterAddColumn
   | AlterAddIndex
   | AlterAddPrimaryKey
@@ -253,6 +272,7 @@ export type Statement =
   | CreateTriggerStatement
   | CreateFunctionStatement
   | RenameTableStatement
+  | AlterDatabaseStatement
   | AlterTableStatement
   | DropTableStatement
   | DropIndexStatement;

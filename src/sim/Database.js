@@ -1,9 +1,11 @@
-// @flow
+// @flow strict
 
 import { sortBy, zip } from 'lodash';
 import type { Schema as ROLSchema } from 'rule-of-law/types';
 
 import Column from './Column';
+import { makeEncoding } from './encodings';
+import type { Encoding } from './encodings';
 import type { IndexType } from './Index';
 import Table from './Table';
 
@@ -28,10 +30,16 @@ function values<T>(things: LUT<T>): Array<T> {
 }
 
 export default class Database {
+  +defaultEncoding: Encoding;
   +_tables: LUT<Table>; // TODO: Just make this an Array, it's way easier to work with
 
-  constructor(_tables: LUT<Table> = {}) {
+  constructor(defaultEncoding: Encoding, _tables: LUT<Table> = {}) {
+    this.defaultEncoding = defaultEncoding;
     this._tables = _tables;
+  }
+
+  setEncoding(encoding: Encoding): Database {
+    return new Database(encoding, this._tables);
   }
 
   getTables(): Array<Table> {
@@ -56,8 +64,8 @@ export default class Database {
     }
   }
 
-  createTable(name: string): Database {
-    return this.addTable(new Table(name));
+  createTable(name: string, defaultEncoding: Encoding): Database {
+    return this.addTable(new Table(name, defaultEncoding));
   }
 
   cloneTable(tblName: string, newTblName: string): Database {
@@ -69,7 +77,7 @@ export default class Database {
   addTable(table: Table): Database {
     const name = table.name;
     this.assertTableDoesNotExist(name);
-    return new Database({ ...this._tables, [name]: table });
+    return new Database(this.defaultEncoding, { ...this._tables, [name]: table });
   }
 
   /**
@@ -121,7 +129,7 @@ export default class Database {
 
     const newTables = { ...this._tables };
     delete newTables[name];
-    return new Database(newTables);
+    return new Database(this.defaultEncoding, newTables);
   }
 
   /**
@@ -133,7 +141,7 @@ export default class Database {
     if (newTable.name !== tblName) {
       throw new Error('Database.swapTable() cannot be used to change the name of the table.');
     }
-    return new Database({
+    return new Database(this.defaultEncoding, {
       ...this._tables,
       [tblName]: newTable,
     });
@@ -145,7 +153,10 @@ export default class Database {
    */
   mapTables(mapper: (Table) => Table): Database {
     const newTables = this.getTables().map(mapper);
-    return new Database(indexBy(newTables, (table) => table.name));
+    return new Database(
+      this.defaultEncoding,
+      indexBy(newTables, (table) => table.name),
+    );
   }
 
   /**
@@ -229,8 +240,8 @@ export default class Database {
       const localColumn = localTable.getColumn(localColName);
       const foreignColumn = foreignTable.getColumn(foreignColName);
 
-      const ltype = localColumn.getType();
-      const ftype = foreignColumn.getType();
+      const ltype = localColumn.getType(true);
+      const ftype = foreignColumn.getType(true);
       if (ltype !== ftype) {
         const lname = `${localTable.name}.${localColumn.name}`;
         const fname = `${foreignTable.name}.${foreignColumn.name}`;
@@ -268,6 +279,16 @@ export default class Database {
 
   renameIndex(tblName: string, oldIndexName: string, newIndexName: string): Database {
     return this.swapTable(tblName, (table) => table.renameIndex(oldIndexName, newIndexName));
+  }
+
+  setDefaultTableEncoding(tblName: string, charset?: string, collate?: string): Database {
+    const encoding = makeEncoding(charset, collate);
+    return this.swapTable(tblName, (table) => table.setDefaultEncoding(encoding));
+  }
+
+  convertToEncoding(tblName: string, charset?: string, collate?: string): Database {
+    const encoding = makeEncoding(charset, collate);
+    return this.swapTable(tblName, (table) => table.convertToEncoding(encoding));
   }
 
   toSchema(): ROLSchema {

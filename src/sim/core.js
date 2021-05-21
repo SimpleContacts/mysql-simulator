@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import fs from 'fs';
 import path from 'path';
@@ -9,10 +9,12 @@ import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
+import type { Encoding } from './encodings';
+import { makeEncoding } from './encodings';
 
 const error = console.error;
 
-function makeColumn(colName, def: ColumnDefinition): Column {
+function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Column {
   const type = def.dataType.toLowerCase();
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
@@ -50,17 +52,26 @@ function makeColumn(colName, def: ColumnDefinition): Column {
     def.autoIncrement,
     def.comment,
     def.generated,
+    tableEncoding,
   );
 }
 
 function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
-  let db = db_.createTable(tblName);
+  let encoding;
+  if (stm.options?.CHARSET || stm.options?.COLLATE) {
+    encoding = makeEncoding(stm.options.CHARSET, stm.options.COLLATE);
+  } else {
+    encoding = db_.defaultEncoding;
+  }
+
+  let db = db_.createTable(tblName, encoding);
 
   // One-by-one, add the columns to the table
   const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
-    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition), null);
+    const table = db.getTable(tblName);
+    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaultEncoding), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -134,6 +145,19 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
       db = db.cloneTable(stm.oldTblName, stm.tblName);
     } else if (stm.type === 'DROP TABLE') {
       db = db.removeTable(stm.tblName, stm.ifExists);
+    } else if (stm.type === 'ALTER DATABASE') {
+      let charset;
+      let collate;
+      for (const option of stm.options) {
+        if (option.CHARSET) {
+          charset = option.CHARSET;
+        }
+        if (option.COLLATE) {
+          collate = option.COLLATE;
+        }
+      }
+      const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
+      db = db.setEncoding(encoding);
     } else if (stm.type === 'ALTER TABLE') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
       const changes = sortBy(stm.changes, (change) => order.indexOf(change.type));
@@ -141,7 +165,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         if (change.type === 'RENAME TABLE') {
           db = db.renameTable(stm.tblName, change.newTblName);
         } else if (change.type === 'ADD COLUMN') {
-          const column = makeColumn(change.colName, change.definition);
+          const table = db.getTable(stm.tblName);
+          const column = makeColumn(change.colName, change.definition, table.defaultEncoding);
           db = db.addColumn(stm.tblName, column, change.position);
           if (change.definition.isPrimary) {
             db = db.addPrimaryKey(stm.tblName, [change.colName]);
@@ -149,7 +174,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
           }
         } else if (change.type === 'CHANGE COLUMN') {
-          const column = makeColumn(change.newColName, change.definition);
+          const table = db.getTable(stm.tblName);
+          const column = makeColumn(change.newColName, change.definition, table.defaultEncoding);
           db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);
@@ -207,7 +233,15 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'RENAME INDEX') {
           db = db.renameIndex(stm.tblName, change.oldIndexName, change.newIndexName);
         } else if (change.type === 'CHANGE TABLE OPTIONS') {
-          // Ignore
+          const charset = change.options.CHARSET;
+          const collate = change.options.COLLATE;
+          if (charset || collate) {
+            db = db.setDefaultTableEncoding(stm.tblName, charset, collate);
+          }
+        } else if (change.type === 'CONVERT TO') {
+          const charset = change.charset;
+          const collate = change.collate;
+          db = db.convertToEncoding(stm.tblName, charset, collate);
         } else {
           // Log details to the console (useful for debugging)
           error(`Unknown change type: ${change.type}`);
@@ -345,5 +379,6 @@ export function applySqlFiles(db_: Database, ...paths: Array<string>): Database 
  * collect a naturally-sorted list of *.sql files.
  */
 export function simulate(...paths: Array<string>): Database {
-  return applySqlFiles(new Database(), ...paths);
+  const defaultEncoding = makeEncoding();
+  return applySqlFiles(new Database(defaultEncoding), ...paths);
 }

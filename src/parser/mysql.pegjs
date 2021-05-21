@@ -113,6 +113,7 @@ Statement
   / CreateFunction
   / RenameTable
   / AlterTable
+  / AlterDatabase
   / DropTable
   / DropIndex
   / SelectStatement
@@ -487,6 +488,28 @@ WhileStatement
     END WHILE
 
 // ====================================================
+// ALTER DATABASE
+// ====================================================
+
+AlterDatabase
+  = ALTER DATABASE dbName:Identifier options:AlterDbOption+ {
+      return {
+        type: 'ALTER DATABASE',
+        dbName,
+        options
+      }
+    }
+
+AlterDbOption
+  = DEFAULT? CHARACTER SET EQ? CHARSET:CharsetName {
+      return { CHARSET }
+    }
+
+  / DEFAULT? COLLATE EQ? COLLATE:CollationName {
+      return { COLLATE }
+    }
+
+// ====================================================
 // ALTER TABLE
 // ====================================================
 
@@ -510,7 +533,7 @@ AlterSpec
   = options:TableOptions {
       return {
         type: 'CHANGE TABLE OPTIONS',
-        options,
+        options: Object.assign({}, ...options),
       }
     }
   / ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition
@@ -640,6 +663,15 @@ AlterSpec
       }
     }
   / LOCK EQ? ( DEFAULT / NONE / SHARED / EXCLUSIVE ) { return null; }
+  / CONVERT TO CHARACTER SET
+    charset:CharsetName
+    collate:( COLLATE collate:CollationName { return collate } )? {
+      return {
+        type: 'CONVERT TO',
+        charset,
+        collate,
+      }
+    }
 
 NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol }
 
@@ -839,17 +871,27 @@ TextDataType
   = // Length required
     type:( VARCHAR / VARBINARY ) len:Len { return `${type}(${len})` }
   / // Length required
-    type:( CHAR / BINARY / TEXT ) len:Len? { return len ? `${type}(${len})` : type }
+    type:( CHAR / BINARY / TEXT / MEDIUMTEXT / LONGTEXT ) len:Len? { return len ? `${type}(${len})` : type }
 
 DataType
   = IntDataType
   / BoolDataType
   / DateDataType
   / PrecisionDataType
-  / type:TextDataType ignore1:(CHARACTER SET CharsetName)? ignore2:(COLLATE CollationName)? { return type }
+  / type:TextDataType charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
+      return [
+        type,
+        charset ? 'CHARACTER SET ' + charset : null,
+        collate ? 'COLLATE ' + collate : null,
+      ].filter(Boolean).join(' ');
+    }
   / JSON
-  / ENUM LPAREN literals:StringLiteralList RPAREN {
-      return `ENUM(${literals.map(str => str.value).join(',')})`;
+  / ENUM LPAREN literals:StringLiteralList RPAREN charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
+      return [
+        `ENUM(${literals.map(str => str.value).join(',')})`,
+        charset ? 'CHARACTER SET ' + charset : null,
+        collate ? 'COLLATE ' + collate : null,
+      ].filter(Boolean).join(' ');
     }
 
 IndexColNames
@@ -893,13 +935,23 @@ TableOption
 EngineName
   = _ 'InnoDB'i !IdentifierStart _ { return 'InnoDB' }
 
-CharsetName
-  = _ 'utf8'i !IdentifierStart _ { return 'utf8' }
-  / _ 'latin1'i !IdentifierStart _ { return 'latin1' }
+CharsetName "character set name"
+  = _ charset:(
+        'latin1'
+      / 'utf8mb4'
+      / 'utf8'
+    ) !IdentifierStart _ { return charset }
 
-CollationName
-  = _ 'utf8_general_ci'i !IdentifierStart _ { return 'utf8_general_ci' }
-  / _ 'utf8_bin'i        !IdentifierStart _ { return 'utf8_bin' }
+CollationName "collation name"
+  = _ collation:(
+        'latin1_swedish_ci'
+      / 'latin1_spanish_ci'
+      / 'utf8mb4_general_ci'
+      / 'utf8mb4_unicode_ci'
+      / 'utf8_bin'
+      / 'utf8_general_ci'
+      / 'utf8_unicode_ci'
+    ) !IdentifierStart _ { return collation }
 
 ValueList
   = first:Value COMMA rest:ValueList { return [first, ...rest] }
@@ -977,8 +1029,10 @@ COLLATE           = _ 'COLLATE'i           !IdentifierChar _ { return 'COLLATE' 
 COLUMN            = _ 'COLUMN'i            !IdentifierChar _ { return 'COLUMN' }
 COMMENT           = _ 'COMMENT'i           !IdentifierChar _ { return 'COMMENT' }
 CONSTRAINT        = _ 'CONSTRAINT'i        !IdentifierChar _ { return 'CONSTRAINT' }
+CONVERT           = _ 'CONVERT'i           !IdentifierChar _ { return 'CONVERT' }
 CREATE            = _ 'CREATE'i            !IdentifierChar _ { return 'CREATE' }
 CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
+DATABASE          = _ 'DATABASE'i          !IdentifierChar _ { return 'DATABASE' }
 DATE              = _ 'DATE'i              !IdentifierChar _ { return 'DATE' }
 DATETIME          = _ 'DATETIME'i          !IdentifierChar _ { return 'DATETIME' }
 DECIMAL           = _ 'DECIMAL'i           !IdentifierChar _ { return 'DECIMAL' }
@@ -1020,8 +1074,10 @@ JSON              = _ 'JSON'i              !IdentifierChar _ { return 'JSON' }
 KEY               = _ 'KEY'i               !IdentifierChar _ { return 'KEY' }
 LIKE              = _ 'LIKE'i              !IdentifierChar _ { return 'LIKE' }
 LOCK              = _ 'LOCK'i              !IdentifierChar _ { return 'LOCK' }
+LONGTEXT          = _ 'LONGTEXT'i          !IdentifierChar _ { return 'LONGTEXT' }
 MATCH             = _ 'MATCH'i             !IdentifierChar _ { return 'MATCH' }
 MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierChar _ { return 'MEDIUMINT' }
+MEDIUMTEXT        = _ 'MEDIUMTEXT'i        !IdentifierChar _ { return 'MEDIUMTEXT' }
 MOD               = _ 'MOD'i               !IdentifierChar _ { return 'MOD' }
 MODIFY            = _ 'MODIFY'i            !IdentifierChar _ { return 'MODIFY' }
 NEW               = _ 'NEW'i               !IdentifierChar _ { return 'NEW' }

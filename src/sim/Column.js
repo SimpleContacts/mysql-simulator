@@ -1,10 +1,11 @@
-// @flow
+// @flow strict
 
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import { formatDataType, parseDataType } from './DataType';
 import type { TypeInfo } from './DataType';
+import type { Encoding } from './encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
@@ -24,6 +25,10 @@ export default class Column {
   +comment: null | string;
   +generated: null | Generated;
 
+  // TODO: This should honestly be a property on the "typeInfo" and only apply
+  // to text-based fields
+  +tableDefaultEncoding: Encoding;
+
   constructor(
     name: string,
     type: string,
@@ -33,6 +38,7 @@ export default class Column {
     autoIncrement: boolean,
     comment: null | string,
     generated: null | Generated,
+    tableDefaultEncoding: Encoding,
   ) {
     this.name = name;
     this.type = type;
@@ -42,22 +48,26 @@ export default class Column {
     this.autoIncrement = autoIncrement;
     this.comment = comment;
     this.generated = generated;
+    this.tableDefaultEncoding = tableDefaultEncoding;
   }
 
   /**
    * Helper method that returns a new Column instance with the given fields
    * replaced.
    */
-  patch(record: {|
-    +name?: string,
-    +type?: string,
-    +nullable?: boolean,
-    +defaultValue?: null | string,
-    +onUpdate?: null | string,
-    +autoIncrement?: boolean,
-    +comment?: null | string,
-    +generated?: null | Generated,
-  |}): Column {
+  patch(
+    record: {|
+      +name?: string,
+      +type?: string,
+      +nullable?: boolean,
+      +defaultValue?: null | string,
+      +onUpdate?: null | string,
+      +autoIncrement?: boolean,
+      +comment?: null | string,
+      +generated?: null | Generated,
+    |},
+    tableDefaultEncoding: Encoding,
+  ): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
       record.type !== undefined ? record.type : this.type,
@@ -67,17 +77,18 @@ export default class Column {
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
       record.generated !== undefined ? record.generated : this.generated,
+      tableDefaultEncoding,
     );
   }
 
   /**
    * Get the normalized type, not the raw type for this column.
    */
-  getType(): string {
+  getType(fullyResolved: boolean = false): string {
     // TODO: Note that it might be better to "unify" this type in the
     // constructor.  That way, there simply won't be a way of distinguishing
     // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(parseDataType(this.type));
+    return formatDataType(parseDataType(this.type), this.tableDefaultEncoding, fullyResolved);
   }
 
   getTypeInfo(): TypeInfo {
@@ -120,14 +131,19 @@ export default class Column {
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
-    if (typeInfo.baseType === 'text' || typeInfo.baseType === 'blob') {
+    if (
+      typeInfo.baseType === 'text' ||
+      typeInfo.baseType === 'mediumtext' ||
+      typeInfo.baseType === 'longtext' ||
+      typeInfo.baseType === 'blob'
+    ) {
       if (defaultValue === 'DEFAULT NULL') {
         defaultValue = '';
       }
     }
 
     return [
-      formatDataType(typeInfo),
+      formatDataType(typeInfo, this.tableDefaultEncoding, false),
       generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
@@ -162,6 +178,8 @@ export default class Column {
       case 'char':
       case 'varchar':
       case 'text':
+      case 'mediumtext':
+      case 'longtext':
       case 'enum':
         return t.String();
 

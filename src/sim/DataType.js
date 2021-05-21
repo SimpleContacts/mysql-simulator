@@ -1,5 +1,7 @@
 // @flow strict
 
+import type { Encoding } from './encodings';
+import { getDefaultCollationForCharset, makeEncoding } from './encodings';
 import { parseEnumValues, quote } from './utils';
 
 export type IntDataType = {
@@ -27,10 +29,9 @@ export type DateTimeDataType = {
 };
 
 export type TextDataType = {
-  baseType: 'char' | 'varchar' | 'text',
+  baseType: 'char' | 'varchar' | 'text' | 'mediumtext' | 'longtext',
   length: number | null,
-  characterSet: string, // e.g. 'utf8'
-  collate: string, // e.g. 'utf8_general_ci'
+  encoding?: Encoding,
 };
 
 export type BinaryDataType = {
@@ -41,8 +42,7 @@ export type BinaryDataType = {
 export type EnumDataType = {
   baseType: 'enum',
   values: Array<string>,
-  characterSet: string, // e.g. 'utf8'
-  collate: string, // e.g. 'utf8_general_ci'
+  encoding?: Encoding,
 };
 
 // These data types have no params
@@ -107,7 +107,7 @@ function asDateTime(
   return { baseType, fsp };
 }
 
-function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: string /* options: string */): TextDataType {
+function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: string, options: string): TextDataType {
   let length = null;
   if (params) {
     length = parseInt(params, 10);
@@ -124,11 +124,8 @@ function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: strin
     throw new Error('VARCHAR must have valid length, please use VARCHAR(n)');
   }
 
-  // TODO: Parse the CHARACTER SET and COLLATE sections from the options
-  const characterSet = 'utf8';
-  const collate = 'utf8_general_ci';
-
-  return { baseType, length, characterSet, collate };
+  const encoding = parseEncodingOptions(options);
+  return { baseType, length, encoding };
 }
 
 function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: string): BinaryDataType {
@@ -146,18 +143,36 @@ function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: s
   return { baseType, length };
 }
 
-function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: string /* options: string */): EnumDataType {
+// TODO: Honestly, why are we not just doing this at the parser level?
+function parseEncodingOptions(options: string): Encoding | void {
+  let charset;
+  let collate;
+
+  const matchCharset = options.match(/CHARACTER SET\s+([\w_]+)/i);
+  if (matchCharset) {
+    charset = matchCharset[1];
+  }
+
+  const matchCollate = options.match(/COLLATE\s+([\w_]+)/i);
+  if (matchCollate) {
+    collate = matchCollate[1];
+  }
+
+  if (charset || collate) {
+    return makeEncoding(charset, collate);
+  } else {
+    return undefined;
+  }
+}
+
+function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: string, options: string): EnumDataType {
   if (!params) {
     throw new Error('ENUMs must have at least one value');
   }
 
   const values = parseEnumValues(params);
-
-  // TODO: Parse the CHARACTER SET and COLLATE sections from the options
-  const characterSet = 'utf8';
-  const collate = 'utf8_general_ci';
-
-  return { baseType, values, characterSet, collate };
+  const encoding = parseEncodingOptions(options);
+  return { baseType, values, encoding };
 }
 
 /**
@@ -201,7 +216,9 @@ export function parseDataType(type: string): TypeInfo {
     case 'char':
     case 'varchar':
     case 'text':
-      return asText(baseType, params /* , options */);
+    case 'mediumtext':
+    case 'longtext':
+      return asText(baseType, params, options);
 
     case 'binary':
     case 'varbinary':
@@ -209,7 +226,7 @@ export function parseDataType(type: string): TypeInfo {
       return asBinary(baseType, params);
 
     case 'enum':
-      return asEnum(baseType, params /* , options */);
+      return asEnum(baseType, params, options);
 
     case 'date':
     case 'year':
@@ -227,7 +244,7 @@ export function parseDataType(type: string): TypeInfo {
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo): string {
+export function formatDataType(info: TypeInfo, tableEncoding: Encoding, fullyResolved: boolean = false): string {
   const baseType = info.baseType;
   let params = '';
   let options = '';
@@ -262,9 +279,26 @@ export function formatDataType(info: TypeInfo): string {
     case 'char':
     case 'varchar':
     case 'text':
+    case 'mediumtext':
+    case 'longtext': {
       params = info.length || '';
-      // TODO: Output CHARACTER SET and COLLATEs here too
+
+      const encoding = info.encoding ?? tableEncoding;
+
+      // NOTE: This is some weird MySQL quirk... if an encoding is set
+      // explicitly, then the *collate* defines what gets displayed, otherwise
+      // the *charset* difference will determine it
+      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
+      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+
+      options = [
+        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+      ]
+        .filter(Boolean)
+        .join(' ');
       break;
+    }
 
     case 'binary':
     case 'varbinary':
@@ -272,9 +306,25 @@ export function formatDataType(info: TypeInfo): string {
       params = info.length || '';
       break;
 
-    case 'enum':
+    case 'enum': {
       params = info.values.map(quote).join(',');
+
+      const encoding = info.encoding ?? tableEncoding;
+
+      // NOTE: This is some weird MySQL quirk... if an encoding is set
+      // explicitly, then the *collate* defines what gets displayed, otherwise
+      // the *charset* difference will determine it
+      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
+      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+
+      options = [
+        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+      ]
+        .filter(Boolean)
+        .join(' ');
       break;
+    }
 
     default:
       // Nothing
