@@ -60,13 +60,21 @@ function run() {
     .option('-v, --verbose', 'Be verbose')
     .parse(process.argv);
 
-  // $FlowFixMe[incompatible-use] - options monkey-patched on program are invisible to Flow
   if (program.args.length < 1) {
     program.help();
   } else {
-    // $FlowFixMe[incompatible-use] - options monkey-patched on program are invisible to Flow
     const { verbose, table, asRolSchema, charset, collate } = program.opts();
-    const options = { args: program.args, verbose, tables: table, asROLSchema: !!asRolSchema, charset, collate };
+    const options: Options = {
+      args: program.args,
+      verbose: !!verbose,
+      // $FlowFixMe[incompatible-type]: mixed != Array<string>
+      tables: table,
+      asROLSchema: !!asRolSchema,
+      // $FlowFixMe[incompatible-type]: mixed != (string | void)
+      charset,
+      // $FlowFixMe[incompatible-type]: mixed != (string | void)
+      collate,
+    };
     runWithOptions(options);
   }
 }

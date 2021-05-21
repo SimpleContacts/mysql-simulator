@@ -190,7 +190,7 @@ declare module "commander" {
      * @return {Object}
      * @api public
      */
-    opts(): { [key: string]: any };
+    opts(): { [key: string]: mixed };
 
     args: Array<string>;
 
