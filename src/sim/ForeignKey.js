@@ -1,10 +1,20 @@
 // @flow strict
 
+import invariant from 'invariant';
+
 import { escape } from './utils';
+
+export type ReferenceOption =
+  | 'RESTRICT' // The default
+  | 'CASCADE'
+  | 'SET NULL'
+  | 'SET DEFAULT' // Not supported by InnoDB tables
+  | 'NO ACTION';
 
 type Reference = {|
   +table: string,
   +columns: $ReadOnlyArray<string>,
+  +onDelete: ReferenceOption,
 |};
 
 export default class ForeignKey {
@@ -16,6 +26,9 @@ export default class ForeignKey {
     this.name = name;
     this.columns = columns;
     this.reference = reference;
+
+    invariant(reference.onDelete !== 'SET DEFAULT', 'SET DEFAULT is not supported on InnoDB tables');
+    invariant(reference.onDelete !== 'NO ACTION', 'NO ACTION is not a valid reference option for ON DELETE rules');
   }
 
   /**
@@ -31,8 +44,13 @@ export default class ForeignKey {
   }
 
   toString(): string {
-    return `CONSTRAINT ${escape(this.name)} FOREIGN KEY (${this.columns.map(escape).join(', ')}) REFERENCES ${escape(
-      this.reference.table,
-    )} (${this.reference.columns.map(escape).join(', ')})`;
+    return [
+      `CONSTRAINT ${escape(this.name)}`,
+      `FOREIGN KEY (${this.columns.map(escape).join(', ')})`,
+      `REFERENCES ${escape(this.reference.table)} (${this.reference.columns.map(escape).join(', ')})`,
+      this.reference.onDelete !== 'RESTRICT' ? `ON DELETE ${this.reference.onDelete}` : null,
+    ]
+      .filter(Boolean)
+      .join(' ');
   }
 }

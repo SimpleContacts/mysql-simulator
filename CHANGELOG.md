@@ -1,6 +1,7 @@
 # v1.7.0
 
 - Add full support for `CHARACTER SET` and `COLLATE`
+- Add support for `ON DELETE` clause in foreign key definitions
 
 # v1.6.0
 
