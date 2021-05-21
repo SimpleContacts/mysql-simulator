@@ -6,7 +6,6 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
-import type { TextDataType, EnumDataType } from './DataType';
 import type { Encoding } from './encodings';
 import { formatDataType } from './DataType';
 import { getDefaultCollationForCharset, isWider } from './encodings';
