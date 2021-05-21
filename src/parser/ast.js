@@ -121,6 +121,12 @@ export type AlterTableOptions = {|
   options: TableOptions,
 |};
 
+export type AlterConvertTo = {|
+  type: 'CONVERT TO',
+  charset: string,
+  collate?: string,
+|};
+
 export type AlterAddColumn = {|
   type: 'ADD COLUMN',
   colName: Identifier,
@@ -222,6 +228,7 @@ export type AlterDatabaseStatement = {|
 
 export type AlterSpec =
   | AlterTableOptions
+  | AlterConvertTo
   | AlterAddColumn
   | AlterAddIndex
   | AlterAddPrimaryKey

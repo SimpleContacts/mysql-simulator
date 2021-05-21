@@ -10,7 +10,9 @@ CREATE TABLE t1 (
   c3 VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   c4 ENUM('foo','bar','qux'),
   d TEXT,
-  e TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci
+  e TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci,
+  f MEDIUMTEXT,
+  g LONGTEXT
 ) CHARACTER SET utf8;
 
 CREATE TABLE t2 LIKE t1;
@@ -40,5 +42,5 @@ ALTER TABLE t6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 -- Convert the entire table at once
 ALTER TABLE t7 CONVERT TO CHARACTER SET utf8;
-ALTER TABLE t8 CONVERT TO COLLATE utf8_general_ci;
+ALTER TABLE t8 CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER TABLE t9 CONVERT TO CHARACTER SET latin1;

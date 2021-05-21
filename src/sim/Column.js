@@ -24,6 +24,9 @@ export default class Column {
   +autoIncrement: boolean;
   +comment: null | string;
   +generated: null | Generated;
+
+  // TODO: This should honestly be a property on the "typeInfo" and only apply
+  // to text-based fields
   +tableDefaultEncoding: Encoding;
 
   constructor(
@@ -52,17 +55,19 @@ export default class Column {
    * Helper method that returns a new Column instance with the given fields
    * replaced.
    */
-  patch(record: {|
-    +name?: string,
-    +type?: string,
-    +nullable?: boolean,
-    +defaultValue?: null | string,
-    +onUpdate?: null | string,
-    +autoIncrement?: boolean,
-    +comment?: null | string,
-    +generated?: null | Generated,
-    +tableDefaultEncoding?: Encoding,
-  |}): Column {
+  patch(
+    record: {|
+      +name?: string,
+      +type?: string,
+      +nullable?: boolean,
+      +defaultValue?: null | string,
+      +onUpdate?: null | string,
+      +autoIncrement?: boolean,
+      +comment?: null | string,
+      +generated?: null | Generated,
+    |},
+    tableDefaultEncoding: Encoding,
+  ): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
       record.type !== undefined ? record.type : this.type,
@@ -72,7 +77,7 @@ export default class Column {
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
       record.generated !== undefined ? record.generated : this.generated,
-      record.tableDefaultEncoding !== undefined ? record.tableDefaultEncoding : this.tableDefaultEncoding,
+      tableDefaultEncoding,
     );
   }
 
@@ -126,7 +131,12 @@ export default class Column {
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
-    if (typeInfo.baseType === 'text' || typeInfo.baseType === 'blob') {
+    if (
+      typeInfo.baseType === 'text' ||
+      typeInfo.baseType === 'mediumtext' ||
+      typeInfo.baseType === 'longtext' ||
+      typeInfo.baseType === 'blob'
+    ) {
       if (defaultValue === 'DEFAULT NULL') {
         defaultValue = '';
       }
@@ -168,6 +178,8 @@ export default class Column {
       case 'char':
       case 'varchar':
       case 'text':
+      case 'mediumtext':
+      case 'longtext':
       case 'enum':
         return t.String();
 

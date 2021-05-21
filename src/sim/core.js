@@ -238,6 +238,10 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           if (charset || collate) {
             db = db.setDefaultTableEncoding(stm.tblName, charset, collate);
           }
+        } else if (change.type === 'CONVERT TO') {
+          const charset = change.charset;
+          const collate = change.collate;
+          db = db.convertToEncoding(stm.tblName, charset, collate);
         } else {
           // Log details to the console (useful for debugging)
           error(`Unknown change type: ${change.type}`);

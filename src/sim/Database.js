@@ -285,6 +285,11 @@ export default class Database {
     return this.swapTable(tblName, (table) => table.setDefaultEncoding(encoding));
   }
 
+  convertToEncoding(tblName: string, charset?: string, collate?: string): Database {
+    const encoding = makeEncoding(charset, collate);
+    return this.swapTable(tblName, (table) => table.convertToEncoding(encoding));
+  }
+
   toSchema(): ROLSchema {
     const schema = {};
     for (const table of this.getTables()) {

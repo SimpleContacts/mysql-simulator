@@ -663,6 +663,15 @@ AlterSpec
       }
     }
   / LOCK EQ? ( DEFAULT / NONE / SHARED / EXCLUSIVE ) { return null; }
+  / CONVERT TO CHARACTER SET
+    charset:CharsetName
+    collate:( COLLATE collate:CollationName { return collate } )? {
+      return {
+        type: 'CONVERT TO',
+        charset,
+        collate,
+      }
+    }
 
 NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol }
 
@@ -862,7 +871,7 @@ TextDataType
   = // Length required
     type:( VARCHAR / VARBINARY ) len:Len { return `${type}(${len})` }
   / // Length required
-    type:( CHAR / BINARY / TEXT ) len:Len? { return len ? `${type}(${len})` : type }
+    type:( CHAR / BINARY / TEXT / MEDIUMTEXT / LONGTEXT ) len:Len? { return len ? `${type}(${len})` : type }
 
 DataType
   = IntDataType
@@ -1020,6 +1029,7 @@ COLLATE           = _ 'COLLATE'i           !IdentifierChar _ { return 'COLLATE' 
 COLUMN            = _ 'COLUMN'i            !IdentifierChar _ { return 'COLUMN' }
 COMMENT           = _ 'COMMENT'i           !IdentifierChar _ { return 'COMMENT' }
 CONSTRAINT        = _ 'CONSTRAINT'i        !IdentifierChar _ { return 'CONSTRAINT' }
+CONVERT           = _ 'CONVERT'i           !IdentifierChar _ { return 'CONVERT' }
 CREATE            = _ 'CREATE'i            !IdentifierChar _ { return 'CREATE' }
 CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
 DATABASE          = _ 'DATABASE'i          !IdentifierChar _ { return 'DATABASE' }
@@ -1064,8 +1074,10 @@ JSON              = _ 'JSON'i              !IdentifierChar _ { return 'JSON' }
 KEY               = _ 'KEY'i               !IdentifierChar _ { return 'KEY' }
 LIKE              = _ 'LIKE'i              !IdentifierChar _ { return 'LIKE' }
 LOCK              = _ 'LOCK'i              !IdentifierChar _ { return 'LOCK' }
+LONGTEXT          = _ 'LONGTEXT'i          !IdentifierChar _ { return 'LONGTEXT' }
 MATCH             = _ 'MATCH'i             !IdentifierChar _ { return 'MATCH' }
 MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierChar _ { return 'MEDIUMINT' }
+MEDIUMTEXT        = _ 'MEDIUMTEXT'i        !IdentifierChar _ { return 'MEDIUMTEXT' }
 MOD               = _ 'MOD'i               !IdentifierChar _ { return 'MOD' }
 MODIFY            = _ 'MODIFY'i            !IdentifierChar _ { return 'MODIFY' }
 NEW               = _ 'NEW'i               !IdentifierChar _ { return 'NEW' }

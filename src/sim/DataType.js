@@ -29,7 +29,7 @@ export type DateTimeDataType = {
 };
 
 export type TextDataType = {
-  baseType: 'char' | 'varchar' | 'text',
+  baseType: 'char' | 'varchar' | 'text' | 'mediumtext' | 'longtext',
   length: number | null,
   encoding?: Encoding,
 };
@@ -216,6 +216,8 @@ export function parseDataType(type: string): TypeInfo {
     case 'char':
     case 'varchar':
     case 'text':
+    case 'mediumtext':
+    case 'longtext':
       return asText(baseType, params, options);
 
     case 'binary':
@@ -276,7 +278,9 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding): string 
 
     case 'char':
     case 'varchar':
-    case 'text': {
+    case 'text':
+    case 'mediumtext':
+    case 'longtext': {
       params = info.length || '';
 
       const encoding = info.encoding ?? tableEncoding;

@@ -6,9 +6,10 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
+import type { TextDataType, EnumDataType } from './DataType';
 import type { Encoding } from './encodings';
 import { formatDataType } from './DataType';
-import { getDefaultCollationForCharset } from './encodings';
+import { getDefaultCollationForCharset, isWider } from './encodings';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
@@ -52,10 +53,12 @@ export default class Table {
           typeInfo.baseType === 'char' ||
           typeInfo.baseType === 'varchar' ||
           typeInfo.baseType === 'text' ||
+          typeInfo.baseType === 'mediumtext' ||
+          typeInfo.baseType === 'longtext' ||
           typeInfo.baseType === 'enum'
         )
       ) {
-        return column;
+        return column.patch({}, newEncoding);
       }
 
       // NOTE: This implementation is correct, and 100% matches MySQL's
@@ -67,15 +70,19 @@ export default class Table {
           typeInfo.encoding.collate === column.tableDefaultEncoding.collate)
       ) {
         if (typeInfo.baseType !== 'enum') {
-          return column.patch({
-            type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
-            tableDefaultEncoding: newEncoding,
-          });
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
+            },
+            newEncoding,
+          );
         } else {
-          return column.patch({
-            type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
-            tableDefaultEncoding: newEncoding,
-          });
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
+            },
+            newEncoding,
+          );
         }
       } else if (
         typeInfo.encoding !== undefined &&
@@ -83,18 +90,64 @@ export default class Table {
         typeInfo.encoding.collate === newEncoding.collate
       ) {
         if (typeInfo.baseType !== 'enum') {
-          return column.patch({
-            type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
-            tableDefaultEncoding: newEncoding,
-          });
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
+            },
+            newEncoding,
+          );
         } else {
-          return column.patch({
-            type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
-            tableDefaultEncoding: newEncoding,
-          });
+          return column.patch(
+            {
+              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
+            },
+            newEncoding,
+          );
         }
       } else {
         return column;
+      }
+    });
+    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+  }
+
+  convertToEncoding(newEncoding: Encoding): Table {
+    const columns = this.columns.map((column) => {
+      const typeInfo = column.getTypeInfo();
+      if (
+        !(
+          typeInfo.baseType === 'char' ||
+          typeInfo.baseType === 'varchar' ||
+          typeInfo.baseType === 'text' ||
+          typeInfo.baseType === 'mediumtext' ||
+          typeInfo.baseType === 'longtext' ||
+          typeInfo.baseType === 'enum'
+        )
+      ) {
+        return column.patch({}, newEncoding);
+      }
+
+      // If no explicit encoding is set for this column, just keep it that way
+      if (typeInfo.encoding === undefined) {
+        return column.patch({}, newEncoding);
+      } else {
+        if (typeInfo.baseType === 'enum') {
+          const newType = { ...typeInfo, encoding: newEncoding };
+          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+        } else {
+          const newType = {
+            ...typeInfo,
+            baseType:
+              typeInfo.baseType === 'text' && isWider(newEncoding.charset, typeInfo.encoding.charset)
+                ? // This is by design in MySQL, since converting to another encoding
+                  // can grow the text size, and this explicit conversion helps to
+                  // avoid truncation. See https://bugs.mysql.com/bug.php?id=31291
+                  'mediumtext'
+                : typeInfo.baseType,
+            encoding: newEncoding,
+          };
+          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+        }
       }
     });
     return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
@@ -252,7 +305,7 @@ export default class Table {
         return column;
       }
 
-      return column.patch({ name: newName });
+      return column.patch({ name: newName }, column.tableDefaultEncoding);
     });
 
     // Replace all references to this column if they're used in any of the
@@ -353,7 +406,7 @@ export default class Table {
    */
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
-    const newColumn = column.patch({ defaultValue: null });
+    const newColumn = column.patch({ defaultValue: null }, column.tableDefaultEncoding);
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
     return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
@@ -411,7 +464,7 @@ export default class Table {
       if (!columnNames.includes(c.name)) {
         return c;
       }
-      return c.patch({ nullable: false });
+      return c.patch({ nullable: false }, c.tableDefaultEncoding);
     });
 
     return new Table(
