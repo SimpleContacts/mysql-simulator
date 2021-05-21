@@ -1,6 +1,6 @@
-# vNEXT
+# v1.7.0
 
-- Add support for character sets and collations
+- Add full support for `CHARACTER SET` and `COLLATE`
 
 # v1.6.0
 
