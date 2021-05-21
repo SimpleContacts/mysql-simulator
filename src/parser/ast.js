@@ -21,7 +21,7 @@ export type ReferenceDefinition = {|
   tblName: Identifier,
   indexColNames: Array<IndexColName>,
   matchMode: MatchMode | null,
-  onDelete: ReferenceOption | null,
+  onDelete: ReferenceOption,
   onUpdate: ReferenceOption | null,
 |};
 

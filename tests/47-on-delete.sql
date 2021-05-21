@@ -9,21 +9,14 @@ CREATE TABLE bbb (
 
 CREATE TABLE ccc (
   id INT PRIMARY KEY,
-  a INT NOT NULL,
+  a INT,
   CONSTRAINT ccc_a_fk FOREIGN KEY (a) REFERENCES aaa (id) ON DELETE SET NULL
   --                                                      ^^^^^^^^^^^^^^^^^^
 );
 
 CREATE TABLE ddd (
   id INT PRIMARY KEY,
-  a INT NOT NULL,
-  CONSTRAINT ddd_a_fk FOREIGN KEY (a) REFERENCES aaa (id) ON DELETE SET DEFAULT
-  --                                                      ^^^^^^^^^^^^^^^^^^^^^
-);
-
-CREATE TABLE eee (
-  id INT PRIMARY KEY,
-  a INT NOT NULL,
-  CONSTRAINT eee_a_fk FOREIGN KEY (a) REFERENCES aaa (id) ON DELETE RESTRICT
+  a INT NULL,
+  CONSTRAINT ddd_a_fk FOREIGN KEY (a) REFERENCES aaa (id) ON DELETE RESTRICT
   --                                                      ^^^^^^^^^^^^^^^^^^
 );

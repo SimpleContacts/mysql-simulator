@@ -8,6 +8,7 @@ import { makeEncoding } from './encodings';
 import type { Encoding } from './encodings';
 import type { IndexType } from './Index';
 import Table from './Table';
+import type { ReferenceOption } from './ForeignKey';
 
 type LUT<+T> = { +[string]: T };
 
@@ -188,6 +189,7 @@ export default class Database {
           }
 
           const reference = {
+            ...fk.reference,
             table: fk.reference.table,
             columns: fk.reference.columns.map((ref) => (ref === colName ? column.name : ref)),
           };
@@ -225,6 +227,7 @@ export default class Database {
     localColumns: Array<string>,
     targetTblName: string,
     targetColumns: Array<string>,
+    onDelete: ReferenceOption,
   ): Database {
     // Makes sure the tables exist
     const localTable = this.getTable(tblName);
@@ -252,7 +255,7 @@ export default class Database {
     }
 
     return this.swapTable(tblName, (table) =>
-      table.addForeignKey(constraintName, indexName, localColumns, targetTblName, targetColumns),
+      table.addForeignKey(constraintName, indexName, localColumns, targetTblName, targetColumns, onDelete),
     );
   }
 

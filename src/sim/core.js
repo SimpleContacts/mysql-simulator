@@ -114,6 +114,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
         index.indexColNames.map((def) => def.colName), // Local columns
         index.reference.tblName, // Foreign/target table
         index.reference.indexColNames.map((def) => def.colName), // Foreign/target columns
+        index.reference.onDelete,
       );
     } else {
       const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
@@ -197,6 +198,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             change.indexColNames.map((def) => def.colName),
             change.reference.tblName,
             change.reference.indexColNames.map((def) => def.colName),
+            change.reference.onDelete,
           );
         } else if (change.type === 'ADD UNIQUE INDEX') {
           db = db.addIndex(

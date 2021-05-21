@@ -904,23 +904,26 @@ IndexColName
 ReferenceDefinition
   = REFERENCES tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN
     matchMode:( MATCH ( FULL / PARTIAL / SIMPLE ) )?
-    onDelete:( ON DELETE ReferenceOption )?
-    onUpdate:( ON UPDATE ReferenceOption )? {
+    onDelete:( ON DELETE x:ReferenceOption { return x } )?
+    onUpdate:( ON UPDATE x:ReferenceOption { return x } )? {
       return {
         tblName,
         indexColNames,
         matchMode,
-        onDelete,
+        onDelete: onDelete ?? 'RESTRICT',
         onUpdate,
       }
     }
 
 ReferenceOption
-  = RESTRICT
-  / CASCADE
-  / SET NULL
-  / NO ACTION
-  / SET DEFAULT
+  = RESTRICT    { return 'RESTRICT' }
+  / CASCADE     { return 'CASCADE' }
+  / SET NULL    { return 'SET NULL' }
+  / NO ACTION   { return 'NO ACTION' }
+
+  // NOTE: While the MySQL accepts "SET DEFAULT" as a valid option, it's
+  // rejected by InnoDB tables.
+  // / SET DEFAULT { return 'SET DEFAULT' }
 
 TableOptions
   = first:TableOption COMMA? rest:TableOptions { return [first, ...rest] }

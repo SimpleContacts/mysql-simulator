@@ -1,6 +1,7 @@
 // @flow strict
 
 import { maxBy, sortBy } from 'lodash';
+import invariant from 'invariant';
 import t from 'rule-of-law/types';
 import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
@@ -13,6 +14,7 @@ import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
+import type { ReferenceOption } from './ForeignKey';
 
 export default class Table {
   +name: string;
@@ -270,6 +272,7 @@ export default class Table {
       }
 
       const reference = {
+        ...fk.reference,
         columns: fk.reference.columns,
         table: newRefName,
       };
@@ -533,6 +536,7 @@ export default class Table {
     localColumns: Array<string>,
     targetTblName: string,
     targetColumns: Array<string>,
+    onDelete: ReferenceOption,
   ): Table {
     // TODO: Assert local columns exist
     // TODO: Assert target columns exist
@@ -570,10 +574,19 @@ export default class Table {
       }
     }
 
+    // Quick check to see if this is a legal definition
+    if (onDelete === 'SET NULL') {
+      invariant(
+        localColumns.every((colName) => this.getColumn(colName).nullable),
+        'Cannot create foreign key: SET NULL only supported for nullable columns',
+      );
+    }
+
     const constraintName = constraintName_ || this.generateForeignKeyName();
     const fk = new ForeignKey(constraintName, localColumns, {
       table: targetTblName,
       columns: targetColumns,
+      onDelete,
     });
     const foreignKeys = [...table.foreignKeys, fk];
 
