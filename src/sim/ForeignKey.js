@@ -1,7 +1,8 @@
 // @flow strict
 
-import { escape } from './utils';
 import invariant from 'invariant';
+
+import { escape } from './utils';
 
 export type ReferenceOption =
   | 'RESTRICT' // The default

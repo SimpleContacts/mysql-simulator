@@ -1,7 +1,7 @@
 // @flow strict
 
-import { maxBy, sortBy } from 'lodash';
 import invariant from 'invariant';
+import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
 import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
@@ -11,10 +11,10 @@ import { formatDataType } from './DataType';
 import type { Encoding } from './encodings';
 import { getDefaultCollationForCharset, isWider } from './encodings';
 import ForeignKey from './ForeignKey';
+import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
-import type { ReferenceOption } from './ForeignKey';
 
 export default class Table {
   +name: string;
