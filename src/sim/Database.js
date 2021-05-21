@@ -2,8 +2,9 @@
 
 import { sortBy, zip } from 'lodash';
 import type { Schema as ROLSchema } from 'rule-of-law/types';
-import { makeEncoding } from './encodings';
+
 import Column from './Column';
+import { makeEncoding } from './encodings';
 import type { Encoding } from './encodings';
 import type { IndexType } from './Index';
 import Table from './Table';

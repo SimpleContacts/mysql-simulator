@@ -6,8 +6,8 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
-import type { Encoding } from './encodings';
 import { formatDataType } from './DataType';
+import type { Encoding } from './encodings';
 import { getDefaultCollationForCharset, isWider } from './encodings';
 import ForeignKey from './ForeignKey';
 import type { IndexType } from './Index';
