@@ -14,12 +14,6 @@ CREATE TABLE aaa (
   -- c11 BLOB,
   c12 JSON,
 
-  -- Timestamps in MySQL are weeeeird
-  c13 TIMESTAMP,
-  c14 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  c15 TIMESTAMP NULL,
-  c16 TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-
   -- ENUMs
   c17 ENUM('A''B', "B", "C"),
   c18 ENUM('Strings \'with quotes\', or comma\'s,,, are fine!', '''', """"),

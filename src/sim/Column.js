@@ -116,14 +116,16 @@ export default class Column {
       else if (defaultValue === 'TRUE') defaultValue = "'1'";
     }
 
-    const nullable = !this.nullable
-      ? 'NOT NULL'
-      : // MySQL's TIMESTAMP columns require an explicit "NULL" spec.  Other
-      // data types are "NULL" by default, so we omit the explicit NULL, like
-      // MySQL does
-      typeInfo.baseType === 'timestamp' && !typeInfo.fsp
-      ? 'NULL'
-      : '';
+    let nullable;
+    if (typeInfo.baseType === 'timestamp') {
+      nullable = !this.nullable ? 'NOT NULL' : 'NULL';
+    } else {
+      nullable = !this.nullable
+        ? 'NOT NULL'
+        : // Other data types are "NULL" by default, so we omit the explicit
+          // NULL, like MySQL does
+          '';
+    }
 
     defaultValue =
       // Generated columns won't have a default value

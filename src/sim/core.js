@@ -24,10 +24,10 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   // specified.  All other types are NULL unless explicitly specified.
   let nullable = def.nullable;
   if (nullable === null) {
-    nullable = type !== 'timestamp';
+    nullable = !type.startsWith('timestamp'); // Could also be "timestamp(6)"
   }
 
-  if (type === 'timestamp') {
+  if (type.startsWith('timestamp')) {
     if (!nullable && defaultValue === null) {
       // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       defaultValue = 'CURRENT_TIMESTAMP';
