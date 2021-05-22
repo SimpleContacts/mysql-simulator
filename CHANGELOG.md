@@ -1,3 +1,7 @@
+# v1.7.1
+
+- Fix bug where `timestamp` columns may sometimes not get serialized correctly
+
 # v1.7.0
 
 - Add full support for `CHARACTER SET` and `COLLATE`
