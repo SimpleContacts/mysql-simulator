@@ -1,3 +1,8 @@
+# v1.8.0
+
+- Support sequence ranges in migration filename format, e.g. `001-012_range_of_migrations.sql`
+- Expose `getMigrations()` API publicly, which returns the parsed migration info from these filenames
+
 # v1.7.1
 
 - Fix bug where `timestamp` columns may sometimes not get serialized correctly
