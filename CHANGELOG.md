@@ -1,3 +1,8 @@
+# v1.8.1
+
+- Support printing foreign keys last in serialized output
+- Add `--foreign-keys-last` CLI flag
+
 # v1.8.0
 
 - Support sequence ranges in migration filename format, e.g. `001-012_range_of_migrations.sql`

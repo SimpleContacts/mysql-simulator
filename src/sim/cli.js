@@ -17,6 +17,7 @@ type Options = {
   args: Array<string>,
   verbose: boolean,
   tables: Array<string>,
+  foreignKeysLast: boolean,
   asROLSchema: boolean,
   charset?: string,
   collate?: string,
@@ -38,7 +39,12 @@ function runWithOptions(options: Options) {
   if (options.asROLSchema) {
     log(dumpSchema(db.toSchema()));
   } else {
-    log(db.toString(options.tables));
+    log(
+      db.toString({
+        tableNames: options.tables,
+        foreignKeysLast: options.foreignKeysLast,
+      }),
+    );
   }
 }
 
@@ -55,6 +61,7 @@ function run() {
     .description('Parses SQL migration files and outputs the resulting DB state.')
     .option('-s, --charset <charset>', 'Set the (initial) default charset for the DB')
     .option('-c, --collate <collation>', 'Set the (initial) default collation for the DB')
+    .option('-f, --foreign-keys-last', 'Create foreign keys last')
     .option('--table <table>', 'Dump only these tables', collect, [])
     .option('--as-rol-schema', 'Dump database as a rule-of-law schema')
     .option('-v, --verbose', 'Be verbose')
@@ -63,17 +70,18 @@ function run() {
   if (program.args.length < 1) {
     program.help();
   } else {
-    const { verbose, table, asRolSchema, charset, collate } = program.opts();
+    const opts = program.opts();
     const options: Options = {
       args: program.args,
-      verbose: !!verbose,
+      verbose: !!opts.verbose,
       // $FlowFixMe[incompatible-type]: mixed != Array<string>
-      tables: table,
-      asROLSchema: !!asRolSchema,
+      tables: opts.table,
+      asROLSchema: !!opts.asRolSchema,
       // $FlowFixMe[incompatible-type]: mixed != (string | void)
-      charset,
+      charset: opts.charset,
       // $FlowFixMe[incompatible-type]: mixed != (string | void)
-      collate,
+      collate: opts.collate,
+      foreignKeysLast: !!opts.foreignKeysLast,
     };
     runWithOptions(options);
   }

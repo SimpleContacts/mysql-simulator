@@ -16,6 +16,10 @@ import type { IndexType } from './Index';
 import Index from './Index';
 import { escape, insert } from './utils';
 
+function indent(line: string) {
+  return `  ${line}`;
+}
+
 export default class Table {
   +name: string;
   +defaultEncoding: Encoding;
@@ -742,7 +746,7 @@ export default class Table {
     return sortBy(this.foreignKeys, (fk) => fk.name);
   }
 
-  serializeDefinitions(): Array<string> {
+  serializeDefinitions(printOptions?: {| includeForeignKeys?: boolean |}): Array<string> {
     return [
       ...this.columns.map((col) => col.toString()),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
@@ -750,7 +754,7 @@ export default class Table {
       ...this.getUniqueIndexes().map((index) => index.toString()),
       ...this.getNormalIndexes().map((index) => index.toString()),
       ...this.getFullTextIndexes().map((index) => index.toString()),
-      ...this.getForeignKeys().map((fk) => fk.toString()),
+      ...(printOptions?.includeForeignKeys ? this.getForeignKeys().map((fk) => fk.toString()) : []),
     ];
   }
 
@@ -770,8 +774,24 @@ export default class Table {
     return t.Record(record, this.name);
   }
 
-  toString(): string {
-    const indent = (line: string) => `  ${line}`;
+  printFKs(): string | null {
+    const fks = this.getForeignKeys();
+    if (fks.length === 0) {
+      return null;
+    }
+
+    return (
+      [
+        `ALTER TABLE \`${this.name}\``,
+        fks
+          .map((fk) => 'ADD ' + fk.toString())
+          .map(indent)
+          .join(',\n'),
+      ].join('\n') + ';'
+    );
+  }
+
+  toString(printOptions?: {| includeForeignKeys?: boolean |}): string {
     const options = [
       'ENGINE=InnoDB',
       `DEFAULT CHARSET=${this.defaultEncoding.charset}`,
@@ -784,7 +804,7 @@ export default class Table {
     ];
     return [
       `CREATE TABLE \`${this.name}\` (`,
-      this.serializeDefinitions().map(indent).join(',\n'),
+      this.serializeDefinitions(printOptions).map(indent).join(',\n'),
       `) ${options.filter(Boolean).join(' ')};`,
     ].join('\n');
   }

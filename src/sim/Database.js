@@ -12,6 +12,11 @@ import Table from './Table';
 
 type LUT<+T> = { +[string]: T };
 
+type PrintOptions = {|
+  tableNames?: Array<string>,
+  foreignKeysLast?: boolean,
+|};
+
 const indexBy = <T>(items: Iterable<T>, keyFn: (T) => string): LUT<T> => {
   const lut = {};
   for (const item of items) {
@@ -303,19 +308,39 @@ export default class Database {
   }
 
   // The optional subset of tables to print
-  toString(tableNames_: Array<string> = []): string {
-    const tableNames = tableNames_.length > 0 ? tableNames_ : this.getTables().map((t) => t.name);
+  toString(options_: Array<string> | PrintOptions = { ...null }): string {
+    let options: PrintOptions;
+    if (Array.isArray(options_)) {
+      options = { tableNames: options_ };
+    } else {
+      options = options_;
+    }
+
+    const tableNames =
+      options.tableNames && options.tableNames.length > 0 ? options.tableNames : this.getTables().map((t) => t.name);
+
     const dumps = [];
+    const footer = [];
 
     // To keep the output byte-by-byte the same as MySQL's dump output, we'll
     // emit an empty line at the start.
     dumps.push('');
 
     for (const tableName of tableNames) {
-      dumps.push(this.getTable(tableName).toString());
+      const table = this.getTable(tableName);
+      if (options.foreignKeysLast) {
+        dumps.push(table.toString({ includeForeignKeys: false }));
+        const fks = table.printFKs();
+        if (fks) {
+          footer.push(fks);
+          footer.push('');
+        }
+      } else {
+        dumps.push(table.toString());
+      }
       dumps.push('');
     }
 
-    return dumps.join('\n');
+    return [...dumps, ...footer].join('\n');
   }
 }
