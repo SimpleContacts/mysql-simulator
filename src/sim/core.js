@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
+import invariant from 'invariant';
 import { maxBy, minBy, sortBy } from 'lodash';
 
 import parseSql from '../parser';
@@ -11,6 +12,60 @@ import Column from './Column';
 import Database from './Database';
 import type { Encoding } from './encodings';
 import { makeEncoding } from './encodings';
+
+// Example: 0001-0005_initial.sql
+export type MigrationInfo = {|
+  seqFrom: number, // 1
+  seqTo: number | null, // 5
+  versions: Array<number>, // [1, 2, 3, 4, 5]
+  title: string, // 'initial'
+  filename: string, // '0001-0005_initial.sql'
+  fullpath: string, // '/path/to/migrations/0001-0005_initial.sql'
+|};
+
+/**
+ * Get all migration files from a given directory.
+ */
+export function getMigrations(dirpath: string): Array<MigrationInfo> {
+  const absdir = path.resolve(dirpath);
+  const fullpaths = fs.readdirSync(absdir).map((f) => path.join(absdir, f));
+  const migrations = sortBy(
+    fullpaths
+      .map((fullpath) => {
+        const filename = path.basename(fullpath);
+        const match = filename.match(/^(\d+)(?:-(\d+))?_(.*)[.]sql$/);
+        //                             ^^^^^    ^^^^^   ^^^^
+        //                               1        2      3
+        if (!match) {
+          return null;
+        }
+
+        const seqFrom = Number(match[1]);
+        const seqTo = match[2] ? Number(match[2]) : null;
+        const title = match[3];
+
+        const versions = [seqFrom];
+        if (seqTo) {
+          invariant(seqTo > seqFrom, `Invalid range: ${seqFrom}-${seqTo}`);
+          for (let version = seqTo + 1; version <= seqTo; ++version) {
+            versions.push(version);
+          }
+        }
+        return {
+          seqFrom: Number(seqFrom),
+          seqTo: seqTo ? Number(seqTo) : null,
+          versions,
+          title,
+          filename,
+          fullpath,
+        };
+      })
+      .filter(Boolean),
+    (mig) => mig.seqFrom,
+  );
+  ensureConsecutive(migrations.flatMap((mig) => mig.versions));
+  return migrations;
+}
 
 const error = console.error;
 
@@ -350,11 +405,8 @@ function ensureConsecutive(numbers: Array<number>): void {
 export function* expandInputFiles(paths: Array<string>): Iterable<string> {
   for (const inputPath of paths) {
     if (fs.statSync(inputPath).isDirectory()) {
-      // Naturally sort files before processing -- order is crucial!
-      let files = fs.readdirSync(inputPath).filter((f) => f.endsWith('.sql'));
-      ensureConsecutive(files.map((f) => parseInt(f, 10)));
-      files = sortBy(files, (f) => parseInt(f, 10)).map((f) => path.join(inputPath, f));
-      yield* files;
+      let migrations = getMigrations(inputPath);
+      yield* migrations.map((mig) => mig.fullpath);
     } else {
       yield inputPath;
     }
