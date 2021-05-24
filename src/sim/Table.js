@@ -747,6 +747,7 @@ export default class Table {
   }
 
   serializeDefinitions(printOptions?: {| includeForeignKeys?: boolean |}): Array<string> {
+    const includeFKs = printOptions?.includeForeignKeys ?? true;
     return [
       ...this.columns.map((col) => col.toString()),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
@@ -754,7 +755,7 @@ export default class Table {
       ...this.getUniqueIndexes().map((index) => index.toString()),
       ...this.getNormalIndexes().map((index) => index.toString()),
       ...this.getFullTextIndexes().map((index) => index.toString()),
-      ...(printOptions?.includeForeignKeys ? this.getForeignKeys().map((fk) => fk.toString()) : []),
+      ...(includeFKs ? this.getForeignKeys().map((fk) => fk.toString()) : []),
     ];
   }
 
