@@ -45,20 +45,13 @@ export function getMigrations(dirpath: string): Array<MigrationInfo> {
         const title = match[3];
 
         const versions = [seqFrom];
-        if (seqTo) {
+        if (seqTo !== null) {
           invariant(seqTo > seqFrom, `Invalid range: ${seqFrom}-${seqTo}`);
-          for (let version = seqTo + 1; version <= seqTo; ++version) {
-            versions.push(version);
+          for (let n = seqFrom + 1; n <= seqTo; ++n) {
+            versions.push(n);
           }
         }
-        return {
-          seqFrom: Number(seqFrom),
-          seqTo: seqTo ? Number(seqTo) : null,
-          versions,
-          title,
-          filename,
-          fullpath,
-        };
+        return { seqFrom, seqTo, versions, title, filename, fullpath };
       })
       .filter(Boolean),
     (mig) => mig.seqFrom,
