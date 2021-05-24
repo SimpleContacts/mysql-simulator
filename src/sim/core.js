@@ -46,7 +46,7 @@ export function getMigrations(dirpath: string): Array<MigrationInfo> {
 
         const versions = [seqFrom];
         if (seqTo !== null) {
-          invariant(seqTo > seqFrom, `Invalid range: ${seqFrom}-${seqTo}`);
+          invariant(seqTo >= seqFrom, `Invalid range: ${seqFrom}-${seqTo}`);
           for (let n = seqFrom + 1; n <= seqTo; ++n) {
             versions.push(n);
           }
