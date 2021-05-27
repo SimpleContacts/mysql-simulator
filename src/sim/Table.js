@@ -118,13 +118,17 @@ export default class Table {
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
-    function computeNewType(typeInfo: TextDataType, newEncoding: Encoding): TextDataType {
-      const currentEncoding = typeInfo.encoding;
+    function computeNewType(
+      typeInfo: TextDataType,
+      tableDefaultEncoding: Encoding,
+      newEncoding: Encoding,
+    ): TextDataType {
+      const currentEncoding = typeInfo.encoding ?? tableDefaultEncoding;
 
       // Converting to another encoding can cause MySQL to grow the datatype's
       // size to the next tier, and this explicit conversion helps to avoid
       // truncation. See https://bugs.mysql.com/bug.php?id=31291
-      if (currentEncoding === undefined || !isWider(newEncoding.charset, currentEncoding.charset)) {
+      if (!isWider(newEncoding.charset, currentEncoding.charset)) {
         // If the charset didn't grow wider, just updating the encoding is
         // fine. The base type of the column won't change.
         return { ...typeInfo, encoding: newEncoding };
@@ -179,18 +183,18 @@ export default class Table {
       }
 
       // If no explicit encoding is set for this column, just keep it that way
-      if (typeInfo.encoding === undefined) {
-        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
-      } else {
-        if (typeInfo.baseType === 'enum') {
+      if (typeInfo.baseType === 'enum') {
+        if (typeInfo.encoding === undefined) {
+          return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+        } else {
           const newType = { ...typeInfo, encoding: newEncoding };
           return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
-        } else {
-          return column.patch(
-            { type: formatDataType(computeNewType(typeInfo, newEncoding), column.tableDefaultEncoding) },
-            newEncoding,
-          );
         }
+      } else {
+        return column.patch(
+          { type: formatDataType(computeNewType(typeInfo, column.tableDefaultEncoding, newEncoding), newEncoding) },
+          newEncoding,
+        );
       }
     });
     return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
