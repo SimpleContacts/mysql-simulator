@@ -1,3 +1,7 @@
+# v1.8.2
+
+- Fix a bug where the datatype of a column may change after `CONVERT TO`
+
 # v1.8.1
 
 - Support printing foreign keys last in serialized output
