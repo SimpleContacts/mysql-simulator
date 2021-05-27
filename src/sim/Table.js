@@ -8,6 +8,7 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 import Column from './Column';
 import Database from './Database';
 import { formatDataType } from './DataType';
+import type { TextDataType } from './DataType';
 import type { Encoding } from './encodings';
 import { getDefaultCollationForCharset, isWider } from './encodings';
 import ForeignKey from './ForeignKey';
@@ -117,6 +118,36 @@ export default class Table {
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
+    function computeNewType(
+      typeInfo: TextDataType,
+      tableDefaultEncoding: Encoding,
+      newEncoding: Encoding,
+    ): TextDataType {
+      const currentEncoding = typeInfo.encoding ?? tableDefaultEncoding;
+
+      // Converting to another encoding can cause MySQL to grow the datatype's
+      // size to the next tier, and this explicit conversion helps to avoid
+      // truncation. See https://bugs.mysql.com/bug.php?id=31291
+      if (!isWider(newEncoding.charset, currentEncoding.charset)) {
+        // If the charset didn't grow wider, just updating the encoding is
+        // fine. The base type of the column won't change.
+        return { ...typeInfo, encoding: newEncoding };
+      }
+
+      // Pick the next tier
+      const baseType =
+        typeInfo.baseType === 'text'
+          ? 'mediumtext'
+          : typeInfo.baseType === 'mediumtext'
+          ? 'longtext'
+          : typeInfo.baseType;
+      return {
+        ...typeInfo,
+        baseType,
+        encoding: newEncoding,
+      };
+    }
+
     const columns = this.columns.map((column) => {
       const typeInfo = column.getTypeInfo();
       if (
@@ -152,26 +183,18 @@ export default class Table {
       }
 
       // If no explicit encoding is set for this column, just keep it that way
-      if (typeInfo.encoding === undefined) {
-        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
-      } else {
-        if (typeInfo.baseType === 'enum') {
+      if (typeInfo.baseType === 'enum') {
+        if (typeInfo.encoding === undefined) {
+          return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+        } else {
           const newType = { ...typeInfo, encoding: newEncoding };
           return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
-        } else {
-          const newType = {
-            ...typeInfo,
-            baseType:
-              typeInfo.baseType === 'text' && isWider(newEncoding.charset, typeInfo.encoding.charset)
-                ? // This is by design in MySQL, since converting to another encoding
-                  // can grow the text size, and this explicit conversion helps to
-                  // avoid truncation. See https://bugs.mysql.com/bug.php?id=31291
-                  'mediumtext'
-                : typeInfo.baseType,
-            encoding: newEncoding,
-          };
-          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
         }
+      } else {
+        return column.patch(
+          { type: formatDataType(computeNewType(typeInfo, column.tableDefaultEncoding, newEncoding), newEncoding) },
+          newEncoding,
+        );
       }
     });
     return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
