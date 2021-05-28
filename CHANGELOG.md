@@ -1,3 +1,8 @@
+# vNEXT
+
+- Drop support for Node 10.x (= soon unsupported)
+- Drop support for Node 13.x (= unstable)
+
 # v1.8.2
 
 - Fix a bug where the datatype of a column may change after `CONVERT TO`
