@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         mysql: ['mysql:5.7'] # "mysql:8.0"
-        node: [12.x, 14.x]
+        node: [12.x, 14.x, 16.x]
 
     services:
       mysql:

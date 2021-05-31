@@ -1,7 +1,10 @@
 # vNEXT
 
-- Drop support for Node 10.x (= soon unsupported)
-- Drop support for Node 13.x (= unstable)
+- **Changes in supported Node versions:**
+
+  - Drop support for Node 10.x (= soon unsupported)
+  - Drop support for Node 10.x (= soon unsupported)
+  - Add support for Node 16.x
 
 # v1.8.2
 
