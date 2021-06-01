@@ -51,40 +51,7 @@ export default class Table {
     // happening by changing the encoding. However, any columns that don't have
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
-    const columns = this.columns.map((column) => {
-      const dataType = column.dataType;
-      if (
-        !(
-          dataType.baseType === 'char' ||
-          dataType.baseType === 'varchar' ||
-          dataType.baseType === 'text' ||
-          dataType.baseType === 'mediumtext' ||
-          dataType.baseType === 'longtext' ||
-          dataType.baseType === 'enum'
-        )
-      ) {
-        return column.patch({}, newEncoding);
-      }
-
-      // NOTE: This implementation is correct, and 100% matches MySQL's
-      // behavior. Still...
-      // TODO: SIMPLIFY THIS!
-      if (
-        dataType.encoding === null ||
-        (dataType.encoding.charset === column.tableDefaultEncoding.charset &&
-          dataType.encoding.collate === column.tableDefaultEncoding.collate)
-      ) {
-        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
-      } else if (
-        dataType.encoding !== null &&
-        dataType.encoding.charset === newEncoding.charset &&
-        dataType.encoding.collate === newEncoding.collate
-      ) {
-        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
-      } else {
-        return column;
-      }
-    });
+    const columns = this.columns.map((column) => column.patch({}, newEncoding));
     return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
