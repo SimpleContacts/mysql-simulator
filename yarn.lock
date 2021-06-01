@@ -1645,9 +1645,12 @@ assign-symbols@^1.0.0:
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c=
 
-ast-generator@../../ast-generator:
-  version "0.0.1"
+ast-generator@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/ast-generator/-/ast-generator-0.0.3.tgz#13f3a69cc878497baebfb2f84215324ffc93fee8"
+  integrity sha512-QnzcL71O+0CFSV3N6JpSgkWbocgMjvm+su07yqyETVg3UHli0quHgCOodU+T0DSpaF+dwQrs6SJUVxJsBI/tPg==
   dependencies:
+    chalk "^4.1.1"
     commander "^7.2.0"
     invariant "^2.2.4"
     prettier "^2.3.0"
@@ -2020,7 +2023,7 @@ chalk@^2.0.0, chalk@^2.1.0, chalk@^2.4.2:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chalk@^4.0.0:
+chalk@^4.0.0, chalk@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.1.tgz#c80b3fab28bf6371e6863325eee67e618b77e6ad"
   integrity sha512-diHzdDKxcU+bAsUboHLPEDQiw0qEe0qd7SYUn3HgcFlWgbDcfLGswOHYeGrHKzG9z6UYf01d9VFMfZxPM1xZSg==
