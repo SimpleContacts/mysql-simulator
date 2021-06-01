@@ -1,5 +1,10 @@
 # vNEXT
 
+- **Breaking API changes:**
+
+  - Exported type `TypeInfo` is now renamed to `DataType`.
+  - The `column.type` (raw type string) is no longer directly available. Use `column.dataType` instead.
+
 - **Changes in supported Node versions:**
 
   - Drop support for Node 10.x (= soon unsupported)
