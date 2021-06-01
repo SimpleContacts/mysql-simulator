@@ -15,6 +15,13 @@ export function insert<T>(arr: $ReadOnlyArray<T>, pos: number, item: T): Array<T
 }
 
 /**
+ * Unquotes a string literal (from SQL parsing output).
+ */
+export function unquote(quoted: string): string {
+  return quoted.substring(1, quoted.length - 1).replace("''", "'");
+}
+
+/**
  * Quotes a string literal.
  */
 export function quote(s: string): string {

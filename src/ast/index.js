@@ -7,695 +7,630 @@
  * Instead, update the `*.grammar` file, and re-run `generate-ast`
  */
 
-import type { Encoding } from './encodings'
-import type { Precision } from './types'
+import type { Encoding } from './encodings';
+import type { Precision } from './types';
 
-import invariant from 'invariant'
+import invariant from 'invariant';
 
 function isBytes(node: Node): boolean %checks {
-    return (
-        node.baseType === 'blob' ||
-        node.baseType === 'binary' ||
-        node.baseType === 'varbinary' ||
-        node.baseType === 'tinyblob' ||
-        node.baseType === 'mediumblob' ||
-        node.baseType === 'longblob'
-    )
+  return (
+    node.baseType === 'blob' ||
+    node.baseType === 'binary' ||
+    node.baseType === 'varbinary' ||
+    node.baseType === 'tinyblob' ||
+    node.baseType === 'mediumblob' ||
+    node.baseType === 'longblob'
+  );
 }
 
 function isDataType(node: Node): boolean %checks {
-    return (
-        node.baseType === 'enum' ||
-        node.baseType === 'json' ||
-        isNumeric(node) ||
-        isTemporal(node) ||
-        isTextual(node) ||
-        isBytes(node)
-    )
+  return (
+    node.baseType === 'enum' ||
+    node.baseType === 'json' ||
+    isNumeric(node) ||
+    isTemporal(node) ||
+    isTextual(node) ||
+    isBytes(node)
+  );
 }
 
 function isInteger(node: Node): boolean %checks {
-    return (
-        node.baseType === 'tinyint' ||
-        node.baseType === 'mediumint' ||
-        node.baseType === 'smallint' ||
-        node.baseType === 'int' ||
-        node.baseType === 'bigint'
-    )
+  return (
+    node.baseType === 'tinyint' ||
+    node.baseType === 'mediumint' ||
+    node.baseType === 'smallint' ||
+    node.baseType === 'int' ||
+    node.baseType === 'bigint'
+  );
 }
 
 function isNumeric(node: Node): boolean %checks {
-    return isInteger(node) || isReal(node)
+  return isInteger(node) || isReal(node);
 }
 
 function isReal(node: Node): boolean %checks {
-    return (
-        node.baseType === 'decimal' ||
-        node.baseType === 'float' ||
-        node.baseType === 'double'
-    )
+  return (
+    node.baseType === 'decimal' || node.baseType === 'float' || node.baseType === 'double'
+  );
 }
 
 function isTemporal(node: Node): boolean %checks {
-    return (
-        node.baseType === 'datetime' ||
-        node.baseType === 'timestamp' ||
-        node.baseType === 'date' ||
-        node.baseType === 'year' ||
-        node.baseType === 'time'
-    )
+  return (
+    node.baseType === 'datetime' ||
+    node.baseType === 'timestamp' ||
+    node.baseType === 'date' ||
+    node.baseType === 'year' ||
+    node.baseType === 'time'
+  );
 }
 
 function isTextual(node: Node): boolean %checks {
-    return (
-        node.baseType === 'char' ||
-        node.baseType === 'varchar' ||
-        node.baseType === 'text' ||
-        node.baseType === 'mediumtext' ||
-        node.baseType === 'longtext'
-    )
+  return (
+    node.baseType === 'char' ||
+    node.baseType === 'varchar' ||
+    node.baseType === 'text' ||
+    node.baseType === 'mediumtext' ||
+    node.baseType === 'longtext'
+  );
 }
 
 function isTextualOrEnum(node: Node): boolean %checks {
-    return node.baseType === 'enum' || isTextual(node)
+  return node.baseType === 'enum' || isTextual(node);
 }
 
-export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob
+export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
 
-export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json
+export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
 
-export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt
+export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt;
 
-export type Numeric = Integer | Real
+export type Numeric = Integer | Real;
 
-export type Real = Decimal | Float | Double
+export type Real = Decimal | Float | Double;
 
-export type Temporal = DateTime | Timestamp | Date | Year | Time
+export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
-export type Textual = Char | VarChar | Text | MediumText | LongText
+export type Textual = Char | VarChar | Text | MediumText | LongText;
 
-export type TextualOrEnum = Textual | Enum
+export type TextualOrEnum = Textual | Enum;
 
 export type Node =
-    | BigInt
-    | Binary
-    | Blob
-    | Char
-    | Date
-    | DateTime
-    | Decimal
-    | Double
-    | Enum
-    | Float
-    | Int
-    | Json
-    | LongBlob
-    | LongText
-    | MediumBlob
-    | MediumInt
-    | MediumText
-    | SmallInt
-    | Text
-    | Time
-    | Timestamp
-    | TinyBlob
-    | TinyInt
-    | VarBinary
-    | VarChar
-    | Year
+  | BigInt
+  | Binary
+  | Blob
+  | Char
+  | Date
+  | DateTime
+  | Decimal
+  | Double
+  | Enum
+  | Float
+  | Int
+  | Json
+  | LongBlob
+  | LongText
+  | MediumBlob
+  | MediumInt
+  | MediumText
+  | SmallInt
+  | Text
+  | Time
+  | Timestamp
+  | TinyBlob
+  | TinyInt
+  | VarBinary
+  | VarChar
+  | Year;
 
 function isNode(node: Node): boolean %checks {
-    return (
-        node.baseType === 'bigint' ||
-        node.baseType === 'binary' ||
-        node.baseType === 'blob' ||
-        node.baseType === 'char' ||
-        node.baseType === 'date' ||
-        node.baseType === 'datetime' ||
-        node.baseType === 'decimal' ||
-        node.baseType === 'double' ||
-        node.baseType === 'enum' ||
-        node.baseType === 'float' ||
-        node.baseType === 'int' ||
-        node.baseType === 'json' ||
-        node.baseType === 'longblob' ||
-        node.baseType === 'longtext' ||
-        node.baseType === 'mediumblob' ||
-        node.baseType === 'mediumint' ||
-        node.baseType === 'mediumtext' ||
-        node.baseType === 'smallint' ||
-        node.baseType === 'text' ||
-        node.baseType === 'time' ||
-        node.baseType === 'timestamp' ||
-        node.baseType === 'tinyblob' ||
-        node.baseType === 'tinyint' ||
-        node.baseType === 'varbinary' ||
-        node.baseType === 'varchar' ||
-        node.baseType === 'year'
-    )
+  return (
+    node.baseType === 'bigint' ||
+    node.baseType === 'binary' ||
+    node.baseType === 'blob' ||
+    node.baseType === 'char' ||
+    node.baseType === 'date' ||
+    node.baseType === 'datetime' ||
+    node.baseType === 'decimal' ||
+    node.baseType === 'double' ||
+    node.baseType === 'enum' ||
+    node.baseType === 'float' ||
+    node.baseType === 'int' ||
+    node.baseType === 'json' ||
+    node.baseType === 'longblob' ||
+    node.baseType === 'longtext' ||
+    node.baseType === 'mediumblob' ||
+    node.baseType === 'mediumint' ||
+    node.baseType === 'mediumtext' ||
+    node.baseType === 'smallint' ||
+    node.baseType === 'text' ||
+    node.baseType === 'time' ||
+    node.baseType === 'timestamp' ||
+    node.baseType === 'tinyblob' ||
+    node.baseType === 'tinyint' ||
+    node.baseType === 'varbinary' ||
+    node.baseType === 'varchar' ||
+    node.baseType === 'year'
+  );
 }
 
 export type BigInt = {|
-    baseType: 'bigint',
-    length: number,
-    unsigned: boolean,
-|}
+  baseType: 'bigint',
+  length: number,
+  unsigned: boolean,
+|};
 
 export type Binary = {|
-    baseType: 'binary',
-    length: number,
-|}
+  baseType: 'binary',
+  length: number,
+|};
 
 export type Blob = {|
-    baseType: 'blob',
-    length: number,
-|}
+  baseType: 'blob',
+  length: number,
+|};
 
 export type Char = {|
-    baseType: 'char',
-    length: number,
-    encoding: Encoding | null,
-|}
+  baseType: 'char',
+  length: number,
+  encoding: Encoding | null,
+|};
 
 export type Date = {|
-    baseType: 'date',
-|}
+  baseType: 'date',
+|};
 
 export type DateTime = {|
-    baseType: 'datetime',
-    fsp: number | null,
-|}
+  baseType: 'datetime',
+  fsp: number | null,
+|};
 
 export type Decimal = {|
-    baseType: 'decimal',
-    precision: Precision | null,
-    unsigned: boolean,
-|}
+  baseType: 'decimal',
+  precision: Precision | null,
+  unsigned: boolean,
+|};
 
 export type Double = {|
-    baseType: 'double',
-    precision: Precision | null,
-    unsigned: boolean,
-|}
+  baseType: 'double',
+  precision: Precision | null,
+  unsigned: boolean,
+|};
 
 export type Enum = {|
-    baseType: 'enum',
-    values: Array<string>,
-    encoding: Encoding | null,
-|}
+  baseType: 'enum',
+  values: Array<string>,
+  encoding: Encoding | null,
+|};
 
 export type Float = {|
-    baseType: 'float',
-    precision: Precision | null,
-    unsigned: boolean,
-|}
+  baseType: 'float',
+  precision: Precision | null,
+  unsigned: boolean,
+|};
 
 export type Int = {|
-    baseType: 'int',
-    length: number,
-    unsigned: boolean,
-|}
+  baseType: 'int',
+  length: number,
+  unsigned: boolean,
+|};
 
 export type Json = {|
-    baseType: 'json',
-|}
+  baseType: 'json',
+|};
 
 export type LongBlob = {|
-    baseType: 'longblob',
-|}
+  baseType: 'longblob',
+|};
 
 export type LongText = {|
-    baseType: 'longtext',
-    encoding: Encoding | null,
-|}
+  baseType: 'longtext',
+  encoding: Encoding | null,
+|};
 
 export type MediumBlob = {|
-    baseType: 'mediumblob',
-|}
+  baseType: 'mediumblob',
+|};
 
 export type MediumInt = {|
-    baseType: 'mediumint',
-    length: number,
-    unsigned: boolean,
-|}
+  baseType: 'mediumint',
+  length: number,
+  unsigned: boolean,
+|};
 
 export type MediumText = {|
-    baseType: 'mediumtext',
-    encoding: Encoding | null,
-|}
+  baseType: 'mediumtext',
+  encoding: Encoding | null,
+|};
 
 export type SmallInt = {|
-    baseType: 'smallint',
-    length: number,
-    unsigned: boolean,
-|}
+  baseType: 'smallint',
+  length: number,
+  unsigned: boolean,
+|};
 
 export type Text = {|
-    baseType: 'text',
-    encoding: Encoding | null,
-|}
+  baseType: 'text',
+  encoding: Encoding | null,
+|};
 
 export type Time = {|
-    baseType: 'time',
-|}
+  baseType: 'time',
+|};
 
 export type Timestamp = {|
-    baseType: 'timestamp',
-    fsp: number | null,
-|}
+  baseType: 'timestamp',
+  fsp: number | null,
+|};
 
 export type TinyBlob = {|
-    baseType: 'tinyblob',
-|}
+  baseType: 'tinyblob',
+|};
 
 export type TinyInt = {|
-    baseType: 'tinyint',
-    length: number,
-    unsigned: boolean,
-|}
+  baseType: 'tinyint',
+  length: number,
+  unsigned: boolean,
+|};
 
 export type VarBinary = {|
-    baseType: 'varbinary',
-    length: number,
-|}
+  baseType: 'varbinary',
+  length: number,
+|};
 
 export type VarChar = {|
-    baseType: 'varchar',
-    length: number,
-    encoding: Encoding | null,
-|}
+  baseType: 'varchar',
+  length: number,
+  encoding: Encoding | null,
+|};
 
 export type Year = {|
-    baseType: 'year',
-|}
+  baseType: 'year',
+|};
 
 export default {
-    BigInt(length: number, unsigned: boolean): BigInt {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "BigInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+  BigInt(length: number, unsigned: boolean): BigInt {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "BigInt" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "BigInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "BigInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-        return {
-            baseType: 'bigint',
-            length,
-            unsigned,
-        }
-    },
+    return {
+      baseType: 'bigint',
+      length,
+      unsigned,
+    };
+  },
 
-    Binary(length: number): Binary {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Binary" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+  Binary(length: number): Binary {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "Binary" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        return {
-            baseType: 'binary',
-            length,
-        }
-    },
+    return {
+      baseType: 'binary',
+      length,
+    };
+  },
 
-    Blob(length: number): Blob {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Blob" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+  Blob(length: number): Blob {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "Blob" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        return {
-            baseType: 'blob',
-            length,
-        }
-    },
+    return {
+      baseType: 'blob',
+      length,
+    };
+  },
 
-    Char(length: number, encoding: Encoding | null = null): Char {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Char" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+  Char(length: number, encoding: Encoding | null = null): Char {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "Char" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "Char" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
+    return {
+      baseType: 'char',
+      length,
+      encoding,
+    };
+  },
 
-        return {
-            baseType: 'char',
-            length,
-            encoding,
-        }
-    },
+  Date(): Date {
+    return {
+      baseType: 'date',
+    };
+  },
 
-    Date(): Date {
-        return {
-            baseType: 'date',
-        }
-    },
+  DateTime(fsp: number | null = null): DateTime {
+    invariant(
+      fsp === null || typeof fsp === 'number',
+      `Invalid value for "fsp" arg in "DateTime" call.\nExpected: number?\nGot:      ${JSON.stringify(
+        fsp,
+      )}`,
+    );
 
-    DateTime(fsp: number | null = null): DateTime {
-        invariant(
-            fsp === null || typeof fsp === 'number',
-            `Invalid value for "fsp" arg in "DateTime" call.\nExpected: number?\nGot:      ${JSON.stringify(
-                fsp,
-            )}`,
-        )
+    return {
+      baseType: 'datetime',
+      fsp,
+    };
+  },
 
-        return {
-            baseType: 'datetime',
-            fsp,
-        }
-    },
+  Decimal(precision: Precision | null, unsigned: boolean): Decimal {
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "Decimal" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-    Decimal(precision: Precision | null, unsigned: boolean): Decimal {
-        invariant(
-            precision === null,
-            `Invalid value for "precision" arg in "Decimal" call.\nExpected: Precision?\nGot:      ${JSON.stringify(
-                precision,
-            )}`,
-        )
+    return {
+      baseType: 'decimal',
+      precision,
+      unsigned,
+    };
+  },
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "Decimal" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+  Double(precision: Precision | null, unsigned: boolean): Double {
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "Double" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-        return {
-            baseType: 'decimal',
-            precision,
-            unsigned,
-        }
-    },
+    return {
+      baseType: 'double',
+      precision,
+      unsigned,
+    };
+  },
 
-    Double(precision: Precision | null, unsigned: boolean): Double {
-        invariant(
-            precision === null,
-            `Invalid value for "precision" arg in "Double" call.\nExpected: Precision?\nGot:      ${JSON.stringify(
-                precision,
-            )}`,
-        )
+  Enum(values: Array<string>, encoding: Encoding | null = null): Enum {
+    invariant(
+      Array.isArray(values) &&
+        values.length > 0 &&
+        values.every((item) => typeof item === 'string'),
+      `Invalid value for "values" arg in "Enum" call.\nExpected: string+\nGot:      ${JSON.stringify(
+        values,
+      )}`,
+    );
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "Double" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+    return {
+      baseType: 'enum',
+      values,
+      encoding,
+    };
+  },
 
-        return {
-            baseType: 'double',
-            precision,
-            unsigned,
-        }
-    },
+  Float(precision: Precision | null, unsigned: boolean): Float {
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "Float" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-    Enum(values: Array<string>, encoding: Encoding | null = null): Enum {
-        invariant(
-            Array.isArray(values) &&
-                values.length > 0 &&
-                values.every((item) => typeof item === 'string'),
-            `Invalid value for "values" arg in "Enum" call.\nExpected: string+\nGot:      ${JSON.stringify(
-                values,
-            )}`,
-        )
+    return {
+      baseType: 'float',
+      precision,
+      unsigned,
+    };
+  },
 
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "Enum" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
+  Int(length: number, unsigned: boolean): Int {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "Int" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        return {
-            baseType: 'enum',
-            values,
-            encoding,
-        }
-    },
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "Int" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-    Float(precision: Precision | null, unsigned: boolean): Float {
-        invariant(
-            precision === null,
-            `Invalid value for "precision" arg in "Float" call.\nExpected: Precision?\nGot:      ${JSON.stringify(
-                precision,
-            )}`,
-        )
+    return {
+      baseType: 'int',
+      length,
+      unsigned,
+    };
+  },
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "Float" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+  Json(): Json {
+    return {
+      baseType: 'json',
+    };
+  },
 
-        return {
-            baseType: 'float',
-            precision,
-            unsigned,
-        }
-    },
+  LongBlob(): LongBlob {
+    return {
+      baseType: 'longblob',
+    };
+  },
 
-    Int(length: number, unsigned: boolean): Int {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Int" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+  LongText(encoding: Encoding | null = null): LongText {
+    return {
+      baseType: 'longtext',
+      encoding,
+    };
+  },
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "Int" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+  MediumBlob(): MediumBlob {
+    return {
+      baseType: 'mediumblob',
+    };
+  },
 
-        return {
-            baseType: 'int',
-            length,
-            unsigned,
-        }
-    },
+  MediumInt(length: number, unsigned: boolean): MediumInt {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "MediumInt" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-    Json(): Json {
-        return {
-            baseType: 'json',
-        }
-    },
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "MediumInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-    LongBlob(): LongBlob {
-        return {
-            baseType: 'longblob',
-        }
-    },
+    return {
+      baseType: 'mediumint',
+      length,
+      unsigned,
+    };
+  },
 
-    LongText(encoding: Encoding | null = null): LongText {
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "LongText" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
+  MediumText(encoding: Encoding | null = null): MediumText {
+    return {
+      baseType: 'mediumtext',
+      encoding,
+    };
+  },
 
-        return {
-            baseType: 'longtext',
-            encoding,
-        }
-    },
+  SmallInt(length: number, unsigned: boolean): SmallInt {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "SmallInt" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-    MediumBlob(): MediumBlob {
-        return {
-            baseType: 'mediumblob',
-        }
-    },
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "SmallInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-    MediumInt(length: number, unsigned: boolean): MediumInt {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "MediumInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+    return {
+      baseType: 'smallint',
+      length,
+      unsigned,
+    };
+  },
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "MediumInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+  Text(encoding: Encoding | null = null): Text {
+    return {
+      baseType: 'text',
+      encoding,
+    };
+  },
 
-        return {
-            baseType: 'mediumint',
-            length,
-            unsigned,
-        }
-    },
+  Time(): Time {
+    return {
+      baseType: 'time',
+    };
+  },
 
-    MediumText(encoding: Encoding | null = null): MediumText {
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "MediumText" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
+  Timestamp(fsp: number | null = null): Timestamp {
+    invariant(
+      fsp === null || typeof fsp === 'number',
+      `Invalid value for "fsp" arg in "Timestamp" call.\nExpected: number?\nGot:      ${JSON.stringify(
+        fsp,
+      )}`,
+    );
 
-        return {
-            baseType: 'mediumtext',
-            encoding,
-        }
-    },
+    return {
+      baseType: 'timestamp',
+      fsp,
+    };
+  },
 
-    SmallInt(length: number, unsigned: boolean): SmallInt {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "SmallInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
+  TinyBlob(): TinyBlob {
+    return {
+      baseType: 'tinyblob',
+    };
+  },
 
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "SmallInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
+  TinyInt(length: number, unsigned: boolean): TinyInt {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "TinyInt" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        return {
-            baseType: 'smallint',
-            length,
-            unsigned,
-        }
-    },
+    invariant(
+      typeof unsigned === 'boolean',
+      `Invalid value for "unsigned" arg in "TinyInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        unsigned,
+      )}`,
+    );
 
-    Text(encoding: Encoding | null = null): Text {
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "Text" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
+    return {
+      baseType: 'tinyint',
+      length,
+      unsigned,
+    };
+  },
 
-        return {
-            baseType: 'text',
-            encoding,
-        }
-    },
+  VarBinary(length: number): VarBinary {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "VarBinary" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-    Time(): Time {
-        return {
-            baseType: 'time',
-        }
-    },
+    return {
+      baseType: 'varbinary',
+      length,
+    };
+  },
 
-    Timestamp(fsp: number | null = null): Timestamp {
-        invariant(
-            fsp === null || typeof fsp === 'number',
-            `Invalid value for "fsp" arg in "Timestamp" call.\nExpected: number?\nGot:      ${JSON.stringify(
-                fsp,
-            )}`,
-        )
+  VarChar(length: number, encoding: Encoding | null = null): VarChar {
+    invariant(
+      typeof length === 'number',
+      `Invalid value for "length" arg in "VarChar" call.\nExpected: number\nGot:      ${JSON.stringify(
+        length,
+      )}`,
+    );
 
-        return {
-            baseType: 'timestamp',
-            fsp,
-        }
-    },
+    return {
+      baseType: 'varchar',
+      length,
+      encoding,
+    };
+  },
 
-    TinyBlob(): TinyBlob {
-        return {
-            baseType: 'tinyblob',
-        }
-    },
+  Year(): Year {
+    return {
+      baseType: 'year',
+    };
+  },
 
-    TinyInt(length: number, unsigned: boolean): TinyInt {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "TinyInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
-
-        invariant(
-            typeof unsigned === 'boolean',
-            `Invalid value for "unsigned" arg in "TinyInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                unsigned,
-            )}`,
-        )
-
-        return {
-            baseType: 'tinyint',
-            length,
-            unsigned,
-        }
-    },
-
-    VarBinary(length: number): VarBinary {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "VarBinary" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
-
-        return {
-            baseType: 'varbinary',
-            length,
-        }
-    },
-
-    VarChar(length: number, encoding: Encoding | null = null): VarChar {
-        invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "VarChar" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
-
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "VarChar" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
-
-        return {
-            baseType: 'varchar',
-            length,
-            encoding,
-        }
-    },
-
-    Year(): Year {
-        return {
-            baseType: 'year',
-        }
-    },
-
-    // Node groups
-    isNode,
-    isBytes,
-    isDataType,
-    isInteger,
-    isNumeric,
-    isReal,
-    isTemporal,
-    isTextual,
-    isTextualOrEnum,
-}
+  // Node groups
+  isNode,
+  isBytes,
+  isDataType,
+  isInteger,
+  isNumeric,
+  isReal,
+  isTemporal,
+  isTextual,
+  isTextualOrEnum,
+};

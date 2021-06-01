@@ -4,9 +4,8 @@
  * Helper functions to more succinctly produce nodes
  */
 const invariant = require('invariant');
-
-import ast from '../ast'
-import { makeEncoding } from '../ast/encodings'
+const ast = require('../ast').default;
+const { makeEncoding } = require('../ast/encodings.js')
 
 function identifier(name) {
   return {
@@ -101,7 +100,7 @@ function serializeCallExpression(node) {
   return f;
 }
 
-function unquote(quoted: string): string {
+function unquote(quoted) {
   return quoted.substring(1, quoted.length - 1).replace("''", "'");
 }
 

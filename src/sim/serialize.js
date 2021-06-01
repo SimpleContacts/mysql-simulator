@@ -2,6 +2,7 @@ import invariant from 'invariant';
 
 import { escape, quoteInExpressionContext, unquote } from './utils';
 
+// TODO: Type this file, and declare Node as a proper AST node here
 export function serialize(node) {
   invariant(node, 'expected a node');
 
