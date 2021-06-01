@@ -4,19 +4,15 @@ import type { Encoding } from './encodings';
 import { getDefaultCollationForCharset, makeEncoding } from './encodings';
 import { parseEnumValues, quote } from './utils';
 
-export type IntegerDataType = {
-  category: 'NUMERIC',
-  subCategory: 'INTEGER',
+export type IntDataType = {
   baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
   length: number,
   unsigned: boolean,
   zeroFill: boolean,
 };
 
-export type FixedPointDataType = {
-  category: 'NUMERIC',
-  subCategory: 'FIXED_POINT',
-  baseType: 'decimal',
+export type RealDataType = {
+  baseType: 'float' | 'double' | 'decimal',
   precision: {
     length: number,
     decimals: number,
@@ -24,89 +20,44 @@ export type FixedPointDataType = {
   unsigned: boolean,
   zeroFill: boolean,
 };
-
-export type FloatingPointDataType = {
-  category: 'NUMERIC',
-  subCategory: 'FLOATING_POINT',
-  baseType: 'float' | 'double',
-  precision: {
-    length: number,
-    decimals: number,
-  } | null,
-  unsigned: boolean,
-  zeroFill: boolean,
-};
-
-export type NumericDataType = IntegerDataType | FixedPointDataType | FloatingPointDataType;
 
 export type DateTimeDataType = {
-  category: 'TEMPORAL',
-  baseType: 'timestamp' | 'datetime',
+  // NOTE: "DATE" does not belong here! It's an OtherDataType, as it does not
+  // have any parameters!
+  baseType: 'time' | 'timestamp' | 'datetime',
   fsp: number | null,
 };
 
-export type DateOnlyDataType = {
-  category: 'TEMPORAL',
-  baseType: 'date' | 'year',
-};
-
-export type TimeOnlyDataType = {
-  category: 'TEMPORAL',
-  baseType: 'time',
-  fsp: number | null,
-};
-
-export type TemporalDataType = DateTimeDataType | DateOnlyDataType | TimeOnlyDataType;
-
-export type StringWithLengthDataType = {
-  category: 'STRING',
-  baseType: 'char' | 'varchar',
-  length: number,
+export type TextDataType = {
+  baseType: 'char' | 'varchar' | 'text' | 'mediumtext' | 'longtext',
+  length: number | null,
   encoding?: Encoding,
 };
 
-export type StringWithoutLengthDataType = {
-  category: 'STRING',
-  baseType: 'text' | 'mediumtext' | 'longtext',
-  encoding?: Encoding,
+export type BinaryDataType = {
+  baseType: 'blob' | 'binary' | 'varbinary',
+  length: number | null,
 };
 
 export type EnumDataType = {
-  category: 'STRING',
   baseType: 'enum',
   values: Array<string>,
   encoding?: Encoding,
 };
 
-export type StringDataType = StringWithLengthDataType | StringWithoutLengthDataType;
-
-export type StringOrEnumDataType = StringDataType | EnumDataType;
-
-export type BinaryWithLengthDataType = {
-  category: 'BINARY',
-  baseType: 'blob' | 'binary' | 'varbinary',
-  length: number | null,
-};
-
-export type BinaryWithoutLengthDataType = {
-  category: 'BINARY',
-  baseType: 'tinyblob' | 'mediumblob' | 'longblob',
-};
-
-export type BinaryDataType = BinaryWithLengthDataType | BinaryWithoutLengthDataType;
-
-export type JSONDataType = {
-  category: 'JSON',
-  baseType: 'json',
+// These data types have no params
+export type OtherDataType = {
+  baseType: 'date' | 'year' | 'tinyblob' | 'mediumblob' | 'longblob' | 'json',
 };
 
 export type DataType =
-  | NumericDataType
-  | TemporalDataType
-  | StringDataType
-  | EnumDataType
+  | IntDataType
+  | RealDataType
+  | DateTimeDataType
+  | TextDataType
   | BinaryDataType
-  | JSONDataType;
+  | EnumDataType
+  | OtherDataType;
 
 const DEFAULT_INT_LENGTHS = {
   bigint: 20,
@@ -116,7 +67,7 @@ const DEFAULT_INT_LENGTHS = {
   tinyint: 4,
 };
 
-function asInt(baseType: $PropertyType<IntegerDataType, 'baseType'>, params: string, options: string): IntegerDataType {
+function asInt(baseType: $PropertyType<IntDataType, 'baseType'>, params: string, options: string): IntDataType {
   const unsigned = /unsigned/i.test(options);
   const zeroFill = /zerofill/i.test(options);
 
@@ -129,14 +80,10 @@ function asInt(baseType: $PropertyType<IntegerDataType, 'baseType'>, params: str
     if (unsigned) length -= 1;
   }
 
-  return { category: 'NUMERIC', subCategory: 'INTEGER', baseType, length, unsigned, zeroFill };
+  return { baseType, length, unsigned, zeroFill };
 }
 
-function asFixedPoint(
-  baseType: $PropertyType<FixedPointDataType, 'baseType'>,
-  params: string,
-  options: string,
-): FixedPointDataType {
+function asReal(baseType: $PropertyType<RealDataType, 'baseType'>, params: string, options: string): RealDataType {
   const unsigned = /unsigned/i.test(options);
   const zeroFill = /zerofill/i.test(options);
 
@@ -148,26 +95,7 @@ function asFixedPoint(
     precision = { length, decimals };
   }
 
-  return { category: 'NUMERIC', subCategory: 'FIXED_POINT', baseType, precision, unsigned, zeroFill };
-}
-
-function asFloatingPoint(
-  baseType: $PropertyType<FloatingPointDataType, 'baseType'>,
-  params: string,
-  options: string,
-): FloatingPointDataType {
-  const unsigned = /unsigned/i.test(options);
-  const zeroFill = /zerofill/i.test(options);
-
-  let precision = null;
-  if (params) {
-    const [first, second] = params.split(',').map((s) => s.trim());
-    const length = parseInt(first, 10);
-    const decimals = second ? parseInt(second, 10) : 0;
-    precision = { length, decimals };
-  }
-
-  return { category: 'NUMERIC', subCategory: 'FLOATING_POINT', baseType, precision, unsigned, zeroFill };
+  return { baseType, precision, unsigned, zeroFill };
 }
 
 function asDateTime(
@@ -176,24 +104,11 @@ function asDateTime(
   // options: string,
 ): DateTimeDataType {
   const fsp = params ? parseInt(params, 10) : null;
-  return { category: 'TEMPORAL', baseType, fsp };
+  return { baseType, fsp };
 }
 
-function asTimeOnly(baseType: $PropertyType<TimeOnlyDataType, 'baseType'>, params: string): TimeOnlyDataType {
-  const fsp = params ? parseInt(params, 10) : null;
-  return { category: 'TEMPORAL', baseType, fsp };
-}
-
-function asDateOnly(baseType: $PropertyType<DateOnlyDataType, 'baseType'>): DateOnlyDataType {
-  return { category: 'TEMPORAL', baseType };
-}
-
-function asStringWithLength(
-  baseType: $PropertyType<StringWithLengthDataType, 'baseType'>,
-  params: string,
-  options: string,
-): StringWithLengthDataType {
-  let length;
+function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: string, options: string): TextDataType {
+  let length = null;
   if (params) {
     length = parseInt(params, 10);
   }
@@ -204,27 +119,16 @@ function asStringWithLength(
     length = 1;
   }
 
-  if (!length) {
+  if (baseType === 'varchar' && !length) {
     // VARCHAR without a length is invalid MySQL
     throw new Error('VARCHAR must have valid length, please use VARCHAR(n)');
   }
 
   const encoding = parseEncodingOptions(options);
-  return { category: 'STRING', baseType, length, encoding };
+  return { baseType, length, encoding };
 }
 
-function asStringWithoutLength(
-  baseType: $PropertyType<StringWithoutLengthDataType, 'baseType'>,
-  options: string,
-): StringWithoutLengthDataType {
-  const encoding = parseEncodingOptions(options);
-  return { category: 'STRING', baseType, encoding };
-}
-
-function asBinary(
-  baseType: $PropertyType<BinaryWithLengthDataType, 'baseType'>,
-  params: string,
-): BinaryWithLengthDataType {
+function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: string): BinaryDataType {
   let length = null;
   if (params) {
     length = parseInt(params, 10);
@@ -236,13 +140,7 @@ function asBinary(
     throw new Error('VARBINARY must have valid length, please use VARBINARY(n)');
   }
 
-  return { category: 'BINARY', baseType, length };
-}
-
-function asBinaryWithoutLength(
-  baseType: $PropertyType<BinaryWithoutLengthDataType, 'baseType'>,
-): BinaryWithoutLengthDataType {
-  return { category: 'BINARY', baseType };
+  return { baseType, length };
 }
 
 // TODO: Honestly, why are we not just doing this at the parser level?
@@ -274,23 +172,7 @@ function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: strin
 
   const values = parseEnumValues(params);
   const encoding = parseEncodingOptions(options);
-  return { category: 'STRING', baseType, values, encoding };
-}
-
-function asJSON(baseType: $PropertyType<JSONDataType, 'baseType'>): JSONDataType {
-  return { category: 'JSON', baseType: 'json' };
-}
-
-export function setEncoding<T: StringOrEnumDataType>(dataType: T, encoding: Encoding | void): T {
-  if (dataType.baseType === 'char' || dataType.baseType === 'varchar') {
-    return { ...dataType, encoding };
-  } else if (dataType.baseType === 'text' || dataType.baseType === 'mediumtext' || dataType.baseType === 'longtext') {
-    return { ...dataType, encoding };
-  } else if (dataType.baseType === 'enum') {
-    return { ...dataType, encoding };
-  }
-
-  throw new Error('Unknown string column: ' + dataType.baseType);
+  return { baseType, values, encoding };
 }
 
 /**
@@ -325,29 +207,21 @@ export function parseDataType(type: string): DataType {
 
     case 'float':
     case 'double':
-      return asFloatingPoint(baseType, params, options);
-
     case 'decimal':
-      return asFixedPoint(baseType, params, options);
+      return asReal(baseType, params, options);
 
+    // case 'date': // NOTE: "date" does not belong here! It's a "paramless" type.
+    case 'time':
     case 'timestamp':
     case 'datetime':
       return asDateTime(baseType, params /* , options */);
 
-    case 'time':
-      return asTimeOnly(baseType, params /* , options */);
-
-    case 'date':
-      return asDateOnly(baseType /* , params, options */);
-
     case 'char':
     case 'varchar':
-      return asStringWithLength(baseType, params, options);
-
     case 'text':
     case 'mediumtext':
     case 'longtext':
-      return asStringWithoutLength(baseType, /* params, */ options);
+      return asText(baseType, params, options);
 
     case 'binary':
     case 'varbinary':
@@ -357,13 +231,13 @@ export function parseDataType(type: string): DataType {
     case 'enum':
       return asEnum(baseType, params, options);
 
-    case 'json':
-      return asJSON(baseType /* params, options */);
-
+    case 'date':
+    case 'year':
     case 'tinyblob':
     case 'mediumblob':
     case 'longblob':
-      return asBinaryWithoutLength(baseType);
+    case 'json':
+      return { baseType };
 
     default:
       throw new Error(`Unrecognized MySQL data type: ${baseType}`);
@@ -406,30 +280,11 @@ export function formatDataType(dataType: DataType, tableEncoding: Encoding, full
       break;
 
     case 'char':
-    case 'varchar': {
-      params = dataType.length || '';
-
-      const encoding = dataType.encoding ?? tableEncoding;
-
-      // NOTE: This is some weird MySQL quirk... if an encoding is set
-      // explicitly, then the *collate* defines what gets displayed, otherwise
-      // the *charset* difference will determine it
-      let outputCharset = dataType.encoding !== undefined && dataType.encoding.collate !== tableEncoding.collate;
-      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
-
-      options = [
-        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
-      ]
-        .filter(Boolean)
-        .join(' ');
-      break;
-    }
-
+    case 'varchar':
     case 'text':
     case 'mediumtext':
     case 'longtext': {
-      params = '';
+      params = dataType.length || '';
 
       const encoding = dataType.encoding ?? tableEncoding;
 

@@ -5,21 +5,13 @@ import { applySql, applySqlFile, applySqlFiles, getMigrations, simulate } from '
 import Database from './sim/Database';
 import type {
   BinaryDataType,
-  BinaryWithLengthDataType,
-  BinaryWithoutLengthDataType,
   DataType,
-  DateOnlyDataType,
   DateTimeDataType,
   EnumDataType,
-  FixedPointDataType,
-  FloatingPointDataType,
-  JSONDataType,
-  NumericDataType,
-  StringDataType,
-  StringOrEnumDataType,
-  StringWithLengthDataType,
-  StringWithoutLengthDataType,
-  TimeOnlyDataType,
+  IntDataType,
+  OtherDataType,
+  RealDataType,
+  TextDataType,
 } from './sim/DataType';
 import ForeignKey from './sim/ForeignKey';
 import Index from './sim/Index';
@@ -28,21 +20,14 @@ import Table from './sim/Table';
 
 export type {
   BinaryDataType,
-  BinaryWithLengthDataType,
-  BinaryWithoutLengthDataType,
   DataType,
-  DateOnlyDataType,
   DateTimeDataType,
   EnumDataType,
-  FixedPointDataType,
-  FloatingPointDataType,
-  JSONDataType,
-  NumericDataType,
-  StringDataType,
-  StringOrEnumDataType,
-  StringWithLengthDataType,
-  StringWithoutLengthDataType,
-  TimeOnlyDataType,
+  IndexType,
+  IntDataType,
+  OtherDataType,
+  RealDataType,
+  TextDataType,
 };
 export { applySql, applySqlFile, applySqlFiles, getMigrations, simulate, Column, Database, ForeignKey, Index, Table };
 export type { MigrationInfo } from './sim/core';
