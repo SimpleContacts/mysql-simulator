@@ -5,13 +5,14 @@ import path from 'path';
 
 import invariant from 'invariant';
 import { maxBy, minBy, sortBy } from 'lodash';
+
+import type { DataType } from '../ast';
+import type { Encoding } from '../ast/encodings';
+import { makeEncoding } from '../ast/encodings';
 import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
-import type { Encoding } from '../ast/encodings';
-import type { DataType } from '../ast';
-import { makeEncoding } from '../ast/encodings';
 import { setEncoding } from './DataType';
 
 function setEncodingIfNull<T: DataType>(dataType: T, encoding: Encoding): T {

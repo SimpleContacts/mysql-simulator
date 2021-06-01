@@ -1,12 +1,13 @@
 // @flow strict
 
+import invariant from 'invariant';
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
-import invariant from 'invariant';
-import { formatDataType } from './DataType';
+
 import ast from '../ast';
 import type { DataType } from '../ast';
 import type { Encoding } from '../ast/encodings';
+import { formatDataType } from './DataType';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';

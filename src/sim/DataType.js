@@ -1,9 +1,9 @@
 // @flow strict
 
+import type { DataType, TextualOrEnum } from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
 import { quote } from './utils';
-import type { DataType, TextualOrEnum } from '../ast';
 
 export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): T {
   switch (dataType.baseType) {

@@ -4,13 +4,14 @@ import invariant from 'invariant';
 import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
 import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
+
 import ast from '../ast';
-import Column from './Column';
-import Database from './Database';
-import { setEncoding } from './DataType';
 import type { Textual } from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset, isWider } from '../ast/encodings';
+import Column from './Column';
+import Database from './Database';
+import { setEncoding } from './DataType';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';

@@ -7,10 +7,10 @@
  * Instead, update the `*.grammar` file, and re-run `generate-ast`
  */
 
+import invariant from 'invariant';
+
 import type { Encoding } from './encodings';
 import type { Precision } from './types';
-
-import invariant from 'invariant';
 
 function isBytes(node: Node): boolean %checks {
   return (
@@ -49,9 +49,7 @@ function isNumeric(node: Node): boolean %checks {
 }
 
 function isReal(node: Node): boolean %checks {
-  return (
-    node.baseType === 'decimal' || node.baseType === 'float' || node.baseType === 'double'
-  );
+  return node.baseType === 'decimal' || node.baseType === 'float' || node.baseType === 'double';
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -291,16 +289,12 @@ export default {
   BigInt(length: number, unsigned: boolean): BigInt {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "BigInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "BigInt" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "BigInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "BigInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -313,9 +307,7 @@ export default {
   Binary(length: number): Binary {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "Binary" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "Binary" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     return {
@@ -327,9 +319,7 @@ export default {
   Blob(length: number): Blob {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "Blob" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "Blob" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     return {
@@ -341,9 +331,7 @@ export default {
   Char(length: number, encoding: Encoding | null = null): Char {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "Char" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "Char" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     return {
@@ -362,9 +350,7 @@ export default {
   DateTime(fsp: number | null = null): DateTime {
     invariant(
       fsp === null || typeof fsp === 'number',
-      `Invalid value for "fsp" arg in "DateTime" call.\nExpected: number?\nGot:      ${JSON.stringify(
-        fsp,
-      )}`,
+      `Invalid value for "fsp" arg in "DateTime" call.\nExpected: number?\nGot:      ${JSON.stringify(fsp)}`,
     );
 
     return {
@@ -376,9 +362,7 @@ export default {
   Decimal(precision: Precision | null, unsigned: boolean): Decimal {
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "Decimal" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "Decimal" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -391,9 +375,7 @@ export default {
   Double(precision: Precision | null, unsigned: boolean): Double {
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "Double" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "Double" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -405,12 +387,8 @@ export default {
 
   Enum(values: Array<string>, encoding: Encoding | null = null): Enum {
     invariant(
-      Array.isArray(values) &&
-        values.length > 0 &&
-        values.every((item) => typeof item === 'string'),
-      `Invalid value for "values" arg in "Enum" call.\nExpected: string+\nGot:      ${JSON.stringify(
-        values,
-      )}`,
+      Array.isArray(values) && values.length > 0 && values.every((item) => typeof item === 'string'),
+      `Invalid value for "values" arg in "Enum" call.\nExpected: string+\nGot:      ${JSON.stringify(values)}`,
     );
 
     return {
@@ -423,9 +401,7 @@ export default {
   Float(precision: Precision | null, unsigned: boolean): Float {
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "Float" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "Float" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -438,16 +414,12 @@ export default {
   Int(length: number, unsigned: boolean): Int {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "Int" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "Int" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "Int" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "Int" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -485,16 +457,12 @@ export default {
   MediumInt(length: number, unsigned: boolean): MediumInt {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "MediumInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "MediumInt" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "MediumInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "MediumInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -514,16 +482,12 @@ export default {
   SmallInt(length: number, unsigned: boolean): SmallInt {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "SmallInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "SmallInt" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "SmallInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "SmallInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -549,9 +513,7 @@ export default {
   Timestamp(fsp: number | null = null): Timestamp {
     invariant(
       fsp === null || typeof fsp === 'number',
-      `Invalid value for "fsp" arg in "Timestamp" call.\nExpected: number?\nGot:      ${JSON.stringify(
-        fsp,
-      )}`,
+      `Invalid value for "fsp" arg in "Timestamp" call.\nExpected: number?\nGot:      ${JSON.stringify(fsp)}`,
     );
 
     return {
@@ -569,16 +531,12 @@ export default {
   TinyInt(length: number, unsigned: boolean): TinyInt {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "TinyInt" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "TinyInt" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     invariant(
       typeof unsigned === 'boolean',
-      `Invalid value for "unsigned" arg in "TinyInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-        unsigned,
-      )}`,
+      `Invalid value for "unsigned" arg in "TinyInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
     );
 
     return {
@@ -591,9 +549,7 @@ export default {
   VarBinary(length: number): VarBinary {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "VarBinary" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "VarBinary" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     return {
@@ -605,9 +561,7 @@ export default {
   VarChar(length: number, encoding: Encoding | null = null): VarChar {
     invariant(
       typeof length === 'number',
-      `Invalid value for "length" arg in "VarChar" call.\nExpected: number\nGot:      ${JSON.stringify(
-        length,
-      )}`,
+      `Invalid value for "length" arg in "VarChar" call.\nExpected: number\nGot:      ${JSON.stringify(length)}`,
     );
 
     return {
