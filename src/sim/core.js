@@ -5,13 +5,40 @@ import path from 'path';
 
 import invariant from 'invariant';
 import { maxBy, minBy, sortBy } from 'lodash';
-
 import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
 import type { Encoding } from '../ast/encodings';
+import type { DataType } from '../ast';
 import { makeEncoding } from '../ast/encodings';
+import { setEncoding } from './DataType';
+
+function setEncodingIfNull<T: DataType>(dataType: T, encoding: Encoding): T {
+  if (
+    !(
+      // TODO: Ideally, just use `isTextualOrEnum()` here, but Flow's %checks
+      // predicates don't work across module boundaries :(
+      (
+        dataType.baseType === 'char' ||
+        dataType.baseType === 'varchar' ||
+        dataType.baseType === 'text' ||
+        dataType.baseType === 'mediumtext' ||
+        dataType.baseType === 'longtext' ||
+        dataType.baseType === 'enum'
+      )
+    )
+  ) {
+    // Not a textual column - ignore
+    return dataType;
+  }
+
+  if (dataType.encoding === null) {
+    return setEncoding(dataType, encoding);
+  } else {
+    return dataType;
+  }
+}
 
 // Example: 0001-0005_initial.sql
 export type MigrationInfo = {|
@@ -93,7 +120,7 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
 
   return new Column(
     colName,
-    def.dataType,
+    setEncodingIfNull(def.dataType, tableEncoding),
     nullable,
     defaultValue,
     onUpdate,

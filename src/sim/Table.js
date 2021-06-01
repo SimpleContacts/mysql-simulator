@@ -89,8 +89,12 @@ export default class Table {
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
-    function computeNewType(dataType: Textual, tableDefaultEncoding: Encoding, newEncoding: Encoding): Textual {
-      const currentEncoding = dataType.encoding ?? tableDefaultEncoding;
+    function computeNewType(dataType: Textual, newEncoding: Encoding): Textual {
+      const currentEncoding = dataType.encoding;
+      invariant(
+        currentEncoding !== null,
+        'Expected current encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2),
+      );
 
       // Converting to another encoding can cause MySQL to grow the datatype's
       // size to the next tier, and this explicit conversion helps to avoid
@@ -104,9 +108,11 @@ export default class Table {
       // Pick the next tier
       switch (dataType.baseType) {
         case 'text':
+          // TEXT -> MEDIUMTEXT
           return ast.MediumText(newEncoding);
 
         case 'mediumtext':
+          // MEDIUMTEXT -> LONGTEXT
           return ast.LongText(newEncoding);
 
         default:
@@ -117,6 +123,8 @@ export default class Table {
     const columns = this.columns.map((column) => {
       const dataType = column.dataType;
       if (
+        // TODO: Ideally, just use `isTextualOrEnum()` here, but Flow's %checks
+        // predicates don't work across module boundaries :(
         !(
           dataType.baseType === 'char' ||
           dataType.baseType === 'varchar' ||
@@ -129,17 +137,19 @@ export default class Table {
         return column.patch({}, newEncoding);
       }
 
+      invariant(
+        dataType.encoding !== null,
+        'Encoding must be set by now, but found: ' + JSON.stringify({ dataType }, null, 2),
+      );
+
       // NOTE: The implementation below is correct, and 100% matches MySQL's
       // behavior. Still...
       // TODO: SIMPLIFY THIS!
 
       // Also, if the new encoding is the same as the old one, just wipe it (no
       // real change is happening here)
-      if (
-        (dataType.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
-        (dataType.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
-      ) {
-        return column.patch({ dataType: setEncoding(dataType, null) }, newEncoding);
+      if (dataType.encoding.charset === newEncoding.charset && dataType.encoding.collate === newEncoding.collate) {
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
       }
 
       // Otherwise, some conversion is actually imminent. We can only continue
@@ -150,18 +160,12 @@ export default class Table {
 
       // If no explicit encoding is set for this column, just keep it that way
       if (dataType.baseType === 'enum') {
-        if (dataType.encoding === null) {
-          return column.patch({}, newEncoding);
-        } else {
-          return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
-        }
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
       } else {
-        return column.patch(
-          { dataType: computeNewType(dataType, column.tableDefaultEncoding, newEncoding) },
-          newEncoding,
-        );
+        return column.patch({ dataType: computeNewType(dataType, newEncoding) }, newEncoding);
       }
     });
+
     return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 

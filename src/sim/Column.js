@@ -2,8 +2,9 @@
 
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
-
+import invariant from 'invariant';
 import { formatDataType } from './DataType';
+import ast from '../ast';
 import type { DataType } from '../ast';
 import type { Encoding } from '../ast/encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
@@ -42,6 +43,7 @@ export default class Column {
     generated: null | Generated,
     tableDefaultEncoding: Encoding,
   ) {
+    invariant(!ast.isTextual(dataType) || dataType.encoding, 'Encoding must be explicitly set for textual columns');
     this.name = name;
     this.dataType = dataType;
     this.nullable = nullable;
