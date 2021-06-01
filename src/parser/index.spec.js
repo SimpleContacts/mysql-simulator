@@ -21,7 +21,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'id',
             definition: {
-              dataType: 'INT',
+              dataType: { baseType: 'int', length: 11, unsigned: false },
               defaultValue: null,
               nullable: false,
               isPrimary: true,
@@ -37,7 +37,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'date_created',
             definition: {
-              dataType: 'TIMESTAMP',
+              dataType: { baseType: 'timestamp', fsp: null },
               defaultValue: 'CURRENT_TIMESTAMP',
               nullable: false,
               isPrimary: false,
@@ -53,7 +53,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'name',
             definition: {
-              dataType: 'VARCHAR(128)',
+              dataType: { baseType: 'varchar', length: 128, encoding: null },
               defaultValue: null,
               nullable: null,
               isPrimary: false,
@@ -69,7 +69,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'email',
             definition: {
-              dataType: 'VARCHAR(64)',
+              dataType: { baseType: 'varchar', length: 64, encoding: null },
               defaultValue: null,
               nullable: null,
               isPrimary: false,
@@ -111,7 +111,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'id',
             definition: {
-              dataType: 'INT(11)',
+              dataType: { baseType: 'int', length: 11, unsigned: false },
               nullable: false,
               defaultValue: null,
               isPrimary: true,
@@ -127,7 +127,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'user_id',
             definition: {
-              dataType: 'INT',
+              dataType: { baseType: 'int', length: 11, unsigned: false },
               nullable: false,
               defaultValue: null,
               isPrimary: false,
@@ -143,7 +143,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'date_created',
             definition: {
-              dataType: 'TIMESTAMP',
+              dataType: { baseType: 'timestamp', fsp: null },
               nullable: false,
               defaultValue: 'CURRENT_TIMESTAMP',
               isPrimary: false,
@@ -159,7 +159,7 @@ describe('Read documentation', () => {
             type: 'COLUMN',
             colName: 'text',
             definition: {
-              dataType: 'VARCHAR(32)',
+              dataType: { baseType: 'varchar', length: 32, encoding: null },
               nullable: null,
               defaultValue: 'NULL',
               isPrimary: false,
@@ -225,7 +225,7 @@ describe('Read documentation', () => {
             type: 'ADD COLUMN',
             colName: 'foobar',
             definition: {
-              dataType: 'INT',
+              dataType: { baseType: 'int', length: 11, unsigned: false },
               autoIncrement: false,
               defaultValue: null,
               nullable: null,
