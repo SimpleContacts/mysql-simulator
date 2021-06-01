@@ -7,8 +7,8 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import Column from './Column';
 import Database from './Database';
-import { formatDataType } from './DataType';
-import type { TextDataType } from './DataType';
+import { formatDataType, setEncoding } from './DataType';
+import type { StringDataType } from './DataType';
 import type { Encoding } from './encodings';
 import { getDefaultCollationForCharset, isWider } from './encodings';
 import ForeignKey from './ForeignKey';
@@ -74,33 +74,16 @@ export default class Table {
         (dataType.encoding.charset === column.tableDefaultEncoding.charset &&
           dataType.encoding.collate === column.tableDefaultEncoding.collate)
       ) {
-        if (dataType.baseType !== 'enum') {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: this.defaultEncoding }, newEncoding) },
-            newEncoding,
-          );
-        } else {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: this.defaultEncoding }, newEncoding) },
-            newEncoding,
-          );
-        }
+        return column.patch(
+          { dataType: formatDataType(setEncoding(dataType, this.defaultEncoding), newEncoding) },
+          newEncoding,
+        );
       } else if (
         dataType.encoding !== undefined &&
         dataType.encoding.charset === newEncoding.charset &&
         dataType.encoding.collate === newEncoding.collate
       ) {
-        if (dataType.baseType !== 'enum') {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: undefined }, newEncoding) },
-            newEncoding,
-          );
-        } else {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: undefined }, newEncoding) },
-            newEncoding,
-          );
-        }
+        return column.patch({ dataType: formatDataType(setEncoding(dataType, undefined), newEncoding) }, newEncoding);
       } else {
         return column;
       }
@@ -110,19 +93,23 @@ export default class Table {
 
   convertToEncoding(newEncoding: Encoding): Table {
     function computeNewType(
-      dataType: TextDataType,
+      dataType: StringDataType,
       tableDefaultEncoding: Encoding,
       newEncoding: Encoding,
-    ): TextDataType {
+    ): StringDataType {
       const currentEncoding = dataType.encoding ?? tableDefaultEncoding;
 
       // Converting to another encoding can cause MySQL to grow the datatype's
       // size to the next tier, and this explicit conversion helps to avoid
       // truncation. See https://bugs.mysql.com/bug.php?id=31291
-      if (!isWider(newEncoding.charset, currentEncoding.charset)) {
+      if (
+        !isWider(newEncoding.charset, currentEncoding.charset) ||
+        dataType.baseType === 'char' ||
+        dataType.baseType === 'varchar'
+      ) {
         // If the charset didn't grow wider, just updating the encoding is
         // fine. The base type of the column won't change.
-        return { ...dataType, encoding: newEncoding };
+        return setEncoding(dataType, newEncoding);
       }
 
       // Pick the next tier
@@ -132,11 +119,8 @@ export default class Table {
           : dataType.baseType === 'mediumtext'
           ? 'longtext'
           : dataType.baseType;
-      return {
-        ...dataType,
-        baseType,
-        encoding: newEncoding,
-      };
+
+      return setEncoding({ ...dataType, baseType }, newEncoding);
     }
 
     const columns = this.columns.map((column) => {

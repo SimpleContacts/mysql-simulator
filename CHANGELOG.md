@@ -2,8 +2,33 @@
 
 - **Breaking API changes:**
 
-  - Exported type `TypeInfo` is now renamed to `DataType`.
   - The `column.type` (raw type string) is no longer directly available. Use `column.dataType` instead.
+  - All data types now include a `category` field for easier switching
+  - Some exported types are renamed:
+    - `TypeInfo` → `DataType`
+    - `IntDataType` → `IntegerDataType`
+  - Some exported types have been removed:
+    - `OtherDataType`
+    - `RealDataType`
+  - New data types:
+    - `FixedPointDataType`
+    - `FloatingPointDataType`
+    - `DateOnlyDataType`
+    - `TimeOnlyDataType`
+    - `JSONDataType`
+    - `FixedLengthBinaryDataType`
+    - `FixedLengthStringDataType`
+  - New aggregate/category data types:
+    - `NumericDataType`
+    - `TemporalDataType`
+    - `StringDataType`
+    - `StringOrEnumDataType`
+    - `BinaryDataType`
+  - Reorganization:
+    - `time` now lives in `TimeOnlyDataType`
+    - `date` and `year` now live in `DateOnlyDataType`
+    - `tinyblob`, `mediumblob`, and `longblob` now live in `FixedLengthBinaryDataType`
+    - `text`, `mediumtext`, and `longtext` now live in `FixedLengthStringDataType`
 
 - **Changes in supported Node versions:**
 
