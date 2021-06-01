@@ -1,0 +1,155 @@
+"""
+import type { Encoding } from './encodings';
+import type { Precision } from './types';
+"""
+# ^^^ This preamble will be included verbatim into the generated output.
+
+TinyInt:
+  length    number
+  unsigned  boolean
+  zeroFill  boolean
+
+SmallInt:
+  length    number
+  unsigned  boolean
+  zeroFill  boolean
+
+MediumInt:
+  length    number
+  unsigned  boolean
+  zeroFill  boolean
+
+Int:
+  length    number
+  unsigned  boolean
+  zeroFill  boolean
+
+BigInt:
+  length    number
+  unsigned  boolean
+  zeroFill  boolean
+
+Decimal:
+  precision  Precision?
+  unsigned   boolean
+  zeroFill   boolean
+
+Float:
+  precision  Precision?
+  unsigned   boolean
+  zeroFill   boolean
+
+Double:
+  length     number
+  precision  number
+  unsigned   boolean
+  zeroFill   boolean
+
+DateTime:
+  fsp  number?
+
+Timestamp:
+  fsp  number?
+
+Date:
+  # empty
+
+Year:
+  # empty
+
+Time:
+  # TODO: This may officially take an fsp, but we're not parsing it?
+  # fsp  number
+  # empty
+
+@Real:
+  | Decimal
+  | Float
+  | Double
+
+@Integer:
+  | TinyInt
+  | MediumInt
+  | SmallInt
+  | Int
+  | BigInt
+
+@Numeric:
+  | @Integer
+  | @Real
+
+@Temporal:
+  | DateTime
+  | Timestamp
+  | Date
+  | Year
+  | Time
+
+Text:
+  encoding  Encoding?
+
+MediumText:
+  encoding  Encoding?
+
+LongText:
+  encoding  Encoding?
+
+Char:
+  encoding  Encoding?
+  length    number
+
+VarChar:
+  encoding  Encoding?
+  length    number
+
+Enum:
+  encoding  Encoding?
+  values    string+
+
+@Textual:
+  | Char
+  | VarChar
+  | Text
+  | MediumText
+  | LongText
+
+@TextualOrEnum:
+  | @Textual
+  | Enum
+
+TinyBlob:
+  # empty
+
+MediumBlob:
+  # empty
+
+LongBlob:
+  # empty
+
+Blob:
+  length  number
+
+Binary:
+  length  number
+
+VarBinary:
+  length  number
+
+@Bytes:
+  | Blob
+  | Binary
+  | VarBinary
+  | TinyBlob
+  | MediumBlob
+  | LongBlob
+
+Json:
+  # empty
+
+
+@DataType:
+  | @Numeric
+  | @Temporal
+  | @Textual
+  | @Bytes
+  | Json

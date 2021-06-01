@@ -12,7 +12,7 @@
   "scripts": {
     "build": "yarn run build:clean && yarn run build:ast && yarn run build:parser && yarn run build:dist && yarn run build:flow",
     "build:clean": "rimraf dist",
-    "build:ast": "generate-ast --discriminator baseType --discriminator-transform lower --builtin Encoding src/sim/datatypes.grammar",
+    "build:ast": "generate-ast --discriminator baseType --discriminator-transform lower --builtin Encoding --builtin Precision src/ast/ast.grammar src/ast/index.js",
     "build:parser": "pegjs --allowed-start-rules start,StringLiteralList --cache src/parser/mysql.pegjs",
     "build:flow": "flow-copy-source -v -i '**/__tests__/**' -i '**/*.spec.*' src dist",
     "build:dist": "babel -d dist src --ignore '**/__tests__/**' --ignore '**/*.spec.*'",
