@@ -24,6 +24,7 @@ function isBytes(node: Node): boolean %checks {
 
 function isDataType(node: Node): boolean %checks {
     return (
+        node.baseType === 'enum' ||
         node.baseType === 'json' ||
         isNumeric(node) ||
         isTemporal(node) ||
@@ -80,7 +81,7 @@ function isTextualOrEnum(node: Node): boolean %checks {
 
 export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob
 
-export type DataType = Numeric | Temporal | Textual | Bytes | Json
+export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json
 
 export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt
 
@@ -172,8 +173,8 @@ export type Blob = {|
 
 export type Char = {|
     baseType: 'char',
-    encoding: Encoding | null,
     length: number,
+    encoding: Encoding | null,
 |}
 
 export type Date = {|
@@ -203,8 +204,8 @@ export type Double = {|
 
 export type Enum = {|
     baseType: 'enum',
-    encoding: Encoding | null,
     values: Array<string>,
+    encoding: Encoding | null,
 |}
 
 export type Float = {|
@@ -291,8 +292,8 @@ export type VarBinary = {|
 
 export type VarChar = {|
     baseType: 'varchar',
-    encoding: Encoding | null,
     length: number,
+    encoding: Encoding | null,
 |}
 
 export type Year = {|
@@ -358,14 +359,7 @@ export default {
         }
     },
 
-    Char(encoding: Encoding | null, length: number): Char {
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "Char" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
-
+    Char(length: number, encoding: Encoding | null = null): Char {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "Char" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -373,10 +367,17 @@ export default {
             )}`,
         )
 
+        invariant(
+            encoding === null,
+            `Invalid value for "encoding" arg in "Char" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
+                encoding,
+            )}`,
+        )
+
         return {
             baseType: 'char',
-            encoding,
             length,
+            encoding,
         }
     },
 
@@ -486,14 +487,7 @@ export default {
         }
     },
 
-    Enum(encoding: Encoding | null, values: Array<string>): Enum {
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "Enum" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
-
+    Enum(values: Array<string>, encoding: Encoding | null = null): Enum {
         invariant(
             Array.isArray(values) &&
                 values.length > 0 &&
@@ -503,10 +497,17 @@ export default {
             )}`,
         )
 
+        invariant(
+            encoding === null,
+            `Invalid value for "encoding" arg in "Enum" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
+                encoding,
+            )}`,
+        )
+
         return {
             baseType: 'enum',
-            encoding,
             values,
+            encoding,
         }
     },
 
@@ -781,14 +782,7 @@ export default {
         }
     },
 
-    VarChar(encoding: Encoding | null, length: number): VarChar {
-        invariant(
-            encoding === null,
-            `Invalid value for "encoding" arg in "VarChar" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
-                encoding,
-            )}`,
-        )
-
+    VarChar(length: number, encoding: Encoding | null = null): VarChar {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "VarChar" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -796,10 +790,17 @@ export default {
             )}`,
         )
 
+        invariant(
+            encoding === null,
+            `Invalid value for "encoding" arg in "VarChar" call.\nExpected: Encoding?\nGot:      ${JSON.stringify(
+                encoding,
+            )}`,
+        )
+
         return {
             baseType: 'varchar',
-            encoding,
             length,
+            encoding,
         }
     },
 
