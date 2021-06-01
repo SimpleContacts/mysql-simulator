@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.14.5",
+    "ast-generator": "../../ast-generator",
     "commander": "^7.2.0",
     "invariant": "^2.2.4",
     "lodash": "^4.17.21",
