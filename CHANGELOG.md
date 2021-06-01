@@ -2,8 +2,8 @@
 
 - **Breaking API changes:**
 
-  - Exported type `TypeInfo` is now renamed to `DataType`.
   - The `column.type` (raw type string) is no longer directly available. Use `column.dataType` instead.
+  - The internal AST tree for MySQL DataTypes has been cleaned up
 
 - **Changes in supported Node versions:**
 
