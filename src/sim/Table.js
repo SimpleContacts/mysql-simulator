@@ -52,15 +52,15 @@ export default class Table {
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
     const columns = this.columns.map((column) => {
-      const typeInfo = column.typeInfo;
+      const dataType = column.dataType;
       if (
         !(
-          typeInfo.baseType === 'char' ||
-          typeInfo.baseType === 'varchar' ||
-          typeInfo.baseType === 'text' ||
-          typeInfo.baseType === 'mediumtext' ||
-          typeInfo.baseType === 'longtext' ||
-          typeInfo.baseType === 'enum'
+          dataType.baseType === 'char' ||
+          dataType.baseType === 'varchar' ||
+          dataType.baseType === 'text' ||
+          dataType.baseType === 'mediumtext' ||
+          dataType.baseType === 'longtext' ||
+          dataType.baseType === 'enum'
         )
       ) {
         return column.patch({}, newEncoding);
@@ -70,34 +70,34 @@ export default class Table {
       // behavior. Still...
       // TODO: SIMPLIFY THIS!
       if (
-        typeInfo.encoding === undefined ||
-        (typeInfo.encoding.charset === column.tableDefaultEncoding.charset &&
-          typeInfo.encoding.collate === column.tableDefaultEncoding.collate)
+        dataType.encoding === undefined ||
+        (dataType.encoding.charset === column.tableDefaultEncoding.charset &&
+          dataType.encoding.collate === column.tableDefaultEncoding.collate)
       ) {
-        if (typeInfo.baseType !== 'enum') {
+        if (dataType.baseType !== 'enum') {
           return column.patch(
-            { typeInfo: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding) },
+            { dataType: formatDataType({ ...dataType, encoding: this.defaultEncoding }, newEncoding) },
             newEncoding,
           );
         } else {
           return column.patch(
-            { typeInfo: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding) },
+            { dataType: formatDataType({ ...dataType, encoding: this.defaultEncoding }, newEncoding) },
             newEncoding,
           );
         }
       } else if (
-        typeInfo.encoding !== undefined &&
-        typeInfo.encoding.charset === newEncoding.charset &&
-        typeInfo.encoding.collate === newEncoding.collate
+        dataType.encoding !== undefined &&
+        dataType.encoding.charset === newEncoding.charset &&
+        dataType.encoding.collate === newEncoding.collate
       ) {
-        if (typeInfo.baseType !== 'enum') {
+        if (dataType.baseType !== 'enum') {
           return column.patch(
-            { typeInfo: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding) },
+            { dataType: formatDataType({ ...dataType, encoding: undefined }, newEncoding) },
             newEncoding,
           );
         } else {
           return column.patch(
-            { typeInfo: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding) },
+            { dataType: formatDataType({ ...dataType, encoding: undefined }, newEncoding) },
             newEncoding,
           );
         }
@@ -110,11 +110,11 @@ export default class Table {
 
   convertToEncoding(newEncoding: Encoding): Table {
     function computeNewType(
-      typeInfo: TextDataType,
+      dataType: TextDataType,
       tableDefaultEncoding: Encoding,
       newEncoding: Encoding,
     ): TextDataType {
-      const currentEncoding = typeInfo.encoding ?? tableDefaultEncoding;
+      const currentEncoding = dataType.encoding ?? tableDefaultEncoding;
 
       // Converting to another encoding can cause MySQL to grow the datatype's
       // size to the next tier, and this explicit conversion helps to avoid
@@ -122,33 +122,33 @@ export default class Table {
       if (!isWider(newEncoding.charset, currentEncoding.charset)) {
         // If the charset didn't grow wider, just updating the encoding is
         // fine. The base type of the column won't change.
-        return { ...typeInfo, encoding: newEncoding };
+        return { ...dataType, encoding: newEncoding };
       }
 
       // Pick the next tier
       const baseType =
-        typeInfo.baseType === 'text'
+        dataType.baseType === 'text'
           ? 'mediumtext'
-          : typeInfo.baseType === 'mediumtext'
+          : dataType.baseType === 'mediumtext'
           ? 'longtext'
-          : typeInfo.baseType;
+          : dataType.baseType;
       return {
-        ...typeInfo,
+        ...dataType,
         baseType,
         encoding: newEncoding,
       };
     }
 
     const columns = this.columns.map((column) => {
-      const typeInfo = column.typeInfo;
+      const dataType = column.dataType;
       if (
         !(
-          typeInfo.baseType === 'char' ||
-          typeInfo.baseType === 'varchar' ||
-          typeInfo.baseType === 'text' ||
-          typeInfo.baseType === 'mediumtext' ||
-          typeInfo.baseType === 'longtext' ||
-          typeInfo.baseType === 'enum'
+          dataType.baseType === 'char' ||
+          dataType.baseType === 'varchar' ||
+          dataType.baseType === 'text' ||
+          dataType.baseType === 'mediumtext' ||
+          dataType.baseType === 'longtext' ||
+          dataType.baseType === 'enum'
         )
       ) {
         return column.patch({}, newEncoding);
@@ -161,10 +161,10 @@ export default class Table {
       // Also, if the new encoding is the same as the old one, just wipe it (no
       // real change is happening here)
       if (
-        (typeInfo.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
-        (typeInfo.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
+        (dataType.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
+        (dataType.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
       ) {
-        return column.patch({ typeInfo: formatDataType(typeInfo, newEncoding) }, newEncoding);
+        return column.patch({ dataType: formatDataType(dataType, newEncoding) }, newEncoding);
       }
 
       // Otherwise, some conversion is actually imminent. We can only continue
@@ -174,16 +174,16 @@ export default class Table {
       }
 
       // If no explicit encoding is set for this column, just keep it that way
-      if (typeInfo.baseType === 'enum') {
-        if (typeInfo.encoding === undefined) {
-          return column.patch({ typeInfo: formatDataType(typeInfo, newEncoding) }, newEncoding);
+      if (dataType.baseType === 'enum') {
+        if (dataType.encoding === undefined) {
+          return column.patch({ dataType: formatDataType(dataType, newEncoding) }, newEncoding);
         } else {
-          const newType = { ...typeInfo, encoding: newEncoding };
-          return column.patch({ typeInfo: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+          const newType = { ...dataType, encoding: newEncoding };
+          return column.patch({ dataType: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
         }
       } else {
         return column.patch(
-          { typeInfo: formatDataType(computeNewType(typeInfo, column.tableDefaultEncoding, newEncoding), newEncoding) },
+          { dataType: formatDataType(computeNewType(dataType, column.tableDefaultEncoding, newEncoding), newEncoding) },
           newEncoding,
         );
       }

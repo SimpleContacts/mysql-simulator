@@ -50,7 +50,7 @@ export type OtherDataType = {
   baseType: 'date' | 'year' | 'tinyblob' | 'mediumblob' | 'longblob' | 'json',
 };
 
-export type TypeInfo =
+export type DataType =
   | IntDataType
   | RealDataType
   | DateTimeDataType
@@ -181,7 +181,7 @@ function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: strin
  *
  * TODO: Let the PEG parser do... well... the parsing instead?
  */
-export function parseDataType(type: string): TypeInfo {
+export function parseDataType(type: string): DataType {
   const matches = type.match(/^([^ (]+)(?:\s*[(]([^)]+)[)])?(.*)?$/);
   if (!matches) {
     throw new Error(`Error parsing data type: ${type}`);
@@ -247,36 +247,36 @@ export function parseDataType(type: string): TypeInfo {
 /**
  * Format type information back to a printable string.
  */
-export function formatDataType(info: TypeInfo, tableEncoding: Encoding, fullyResolved: boolean = false): string {
-  const baseType = info.baseType;
+export function formatDataType(dataType: DataType, tableEncoding: Encoding, fullyResolved: boolean = false): string {
+  const baseType = dataType.baseType;
   let params = '';
   let options = '';
 
   // Dispatch based on the type
-  switch (info.baseType) {
+  switch (dataType.baseType) {
     case 'tinyint':
     case 'smallint':
     case 'mediumint':
     case 'int':
     case 'bigint':
-      params = info.length;
-      options = [info.unsigned ? 'unsigned' : '', info.zeroFill ? 'zerofill' : ''].filter(Boolean).join(' ');
+      params = dataType.length;
+      options = [dataType.unsigned ? 'unsigned' : '', dataType.zeroFill ? 'zerofill' : ''].filter(Boolean).join(' ');
       break;
 
     case 'float':
     case 'double':
     case 'decimal':
-      if (info.precision) {
-        params = [info.precision.length, info.precision.decimals].join(',');
+      if (dataType.precision) {
+        params = [dataType.precision.length, dataType.precision.decimals].join(',');
       }
-      options = [info.unsigned ? 'unsigned' : '', info.zeroFill ? 'zerofill' : ''].filter(Boolean).join(' ');
+      options = [dataType.unsigned ? 'unsigned' : '', dataType.zeroFill ? 'zerofill' : ''].filter(Boolean).join(' ');
       break;
 
     // case 'date': // NOTE: "date" does not belong here! It's a "paramless" type.
     case 'time':
     case 'timestamp':
     case 'datetime':
-      params = info.fsp || '';
+      params = dataType.fsp || '';
       break;
 
     case 'char':
@@ -284,14 +284,14 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding, fullyRes
     case 'text':
     case 'mediumtext':
     case 'longtext': {
-      params = info.length || '';
+      params = dataType.length || '';
 
-      const encoding = info.encoding ?? tableEncoding;
+      const encoding = dataType.encoding ?? tableEncoding;
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
+      let outputCharset = dataType.encoding !== undefined && dataType.encoding.collate !== tableEncoding.collate;
       let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
@@ -306,18 +306,18 @@ export function formatDataType(info: TypeInfo, tableEncoding: Encoding, fullyRes
     case 'binary':
     case 'varbinary':
     case 'blob':
-      params = info.length || '';
+      params = dataType.length || '';
       break;
 
     case 'enum': {
-      params = info.values.map(quote).join(',');
+      params = dataType.values.map(quote).join(',');
 
-      const encoding = info.encoding ?? tableEncoding;
+      const encoding = dataType.encoding ?? tableEncoding;
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
+      let outputCharset = dataType.encoding !== undefined && dataType.encoding.collate !== tableEncoding.collate;
       let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [

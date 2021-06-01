@@ -4,7 +4,7 @@ import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import { formatDataType, parseDataType } from './DataType';
-import type { TypeInfo } from './DataType';
+import type { DataType } from './DataType';
 import type { Encoding } from './encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
@@ -17,7 +17,7 @@ type Generated = {|
 
 export default class Column {
   +name: string;
-  +typeInfo: TypeInfo;
+  +dataType: DataType;
   +nullable: boolean;
   +defaultValue: null | string;
   +onUpdate: null | string;
@@ -33,7 +33,7 @@ export default class Column {
 
   constructor(
     name: string,
-    typeInfo: string | TypeInfo,
+    dataType: string | DataType, // TODO: Stop passing in raw strings here - parse at the parser level!
     nullable: boolean,
     defaultValue: null | string,
     onUpdate: null | string,
@@ -43,7 +43,7 @@ export default class Column {
     tableDefaultEncoding: Encoding,
   ) {
     this.name = name;
-    this.typeInfo = typeof typeInfo === 'string' ? parseDataType(typeInfo) : typeInfo;
+    this.dataType = typeof dataType === 'string' ? parseDataType(dataType) : dataType; // TODO: Stop parsing at this level!
     this.nullable = nullable;
     this.defaultValue = defaultValue;
     this.onUpdate = onUpdate;
@@ -60,7 +60,7 @@ export default class Column {
   patch(
     record: {|
       +name?: string,
-      +typeInfo?: string | TypeInfo,
+      +dataType?: string | DataType,
       +nullable?: boolean,
       +defaultValue?: null | string,
       +onUpdate?: null | string,
@@ -72,7 +72,7 @@ export default class Column {
   ): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
-      record.typeInfo !== undefined ? record.typeInfo : this.typeInfo,
+      record.dataType !== undefined ? record.dataType : this.dataType,
       record.nullable !== undefined ? record.nullable : this.nullable,
       record.defaultValue !== undefined ? record.defaultValue : this.defaultValue,
       record.onUpdate !== undefined ? record.onUpdate : this.onUpdate,
@@ -91,32 +91,32 @@ export default class Column {
     // TODO: Note that it might be better to "unify" this type in the
     // constructor.  That way, there simply won't be a way of distinguishing
     // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(this.typeInfo, this.tableDefaultEncoding, fullyResolved);
+    return formatDataType(this.dataType, this.tableDefaultEncoding, fullyResolved);
   }
 
   /**
    * Get the full-blown column definition, without the name.
    */
   getDefinition(): string {
-    const typeInfo = this.typeInfo;
+    const dataType = this.dataType;
     const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
     // MySQL outputs number constants as strings. No idea why that would make
     // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
     if (typeof defaultValue === 'number') {
-      if (typeInfo.baseType === 'decimal') {
+      if (dataType.baseType === 'decimal') {
         defaultValue = `'${defaultValue.toFixed(2)}'`;
       } else {
         defaultValue = `'${defaultValue}'`;
       }
-    } else if (typeInfo.baseType === 'tinyint' && typeInfo.length === 1) {
+    } else if (dataType.baseType === 'tinyint' && dataType.length === 1) {
       if (defaultValue === 'FALSE') defaultValue = "'0'";
       else if (defaultValue === 'TRUE') defaultValue = "'1'";
     }
 
     let nullable;
-    if (typeInfo.baseType === 'timestamp') {
+    if (dataType.baseType === 'timestamp') {
       nullable = !this.nullable ? 'NOT NULL' : 'NULL';
     } else {
       nullable = !this.nullable
@@ -133,10 +133,10 @@ export default class Column {
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
     if (
-      typeInfo.baseType === 'text' ||
-      typeInfo.baseType === 'mediumtext' ||
-      typeInfo.baseType === 'longtext' ||
-      typeInfo.baseType === 'blob'
+      dataType.baseType === 'text' ||
+      dataType.baseType === 'mediumtext' ||
+      dataType.baseType === 'longtext' ||
+      dataType.baseType === 'blob'
     ) {
       if (defaultValue === 'DEFAULT NULL') {
         defaultValue = '';
@@ -144,7 +144,7 @@ export default class Column {
     }
 
     return [
-      formatDataType(typeInfo, this.tableDefaultEncoding, false),
+      formatDataType(dataType, this.tableDefaultEncoding, false),
       generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
@@ -158,7 +158,7 @@ export default class Column {
   }
 
   toSchemaBaseType(): ROLTypeInfo {
-    const info = this.typeInfo;
+    const info = this.dataType;
 
     // NOTE: MySQL represents boolean columns with TINYINT(1) specifically
     if (info.baseType === 'tinyint' && info.length === 1) {
