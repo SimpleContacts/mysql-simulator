@@ -17,7 +17,7 @@ type Generated = {|
 
 export default class Column {
   +name: string;
-  +type: string;
+  +typeInfo: TypeInfo;
   +nullable: boolean;
   +defaultValue: null | string;
   +onUpdate: null | string;
@@ -25,13 +25,15 @@ export default class Column {
   +comment: null | string;
   +generated: null | Generated;
 
-  // TODO: This should honestly be a property on the "typeInfo" and only apply
-  // to text-based fields
+  // This contains the parent table's default encoding, which influences how
+  // this column will get serialized.
+  // TODO: See if we can factor this out. Storing this on the column itself
+  // feels wrong.
   +tableDefaultEncoding: Encoding;
 
   constructor(
     name: string,
-    type: string,
+    typeInfo: string | TypeInfo,
     nullable: boolean,
     defaultValue: null | string,
     onUpdate: null | string,
@@ -41,7 +43,7 @@ export default class Column {
     tableDefaultEncoding: Encoding,
   ) {
     this.name = name;
-    this.type = type;
+    this.typeInfo = typeof typeInfo === 'string' ? parseDataType(typeInfo) : typeInfo;
     this.nullable = nullable;
     this.defaultValue = defaultValue;
     this.onUpdate = onUpdate;
@@ -58,7 +60,7 @@ export default class Column {
   patch(
     record: {|
       +name?: string,
-      +type?: string,
+      +typeInfo?: string | TypeInfo,
       +nullable?: boolean,
       +defaultValue?: null | string,
       +onUpdate?: null | string,
@@ -70,7 +72,7 @@ export default class Column {
   ): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
-      record.type !== undefined ? record.type : this.type,
+      record.typeInfo !== undefined ? record.typeInfo : this.typeInfo,
       record.nullable !== undefined ? record.nullable : this.nullable,
       record.defaultValue !== undefined ? record.defaultValue : this.defaultValue,
       record.onUpdate !== undefined ? record.onUpdate : this.onUpdate,
@@ -83,23 +85,20 @@ export default class Column {
 
   /**
    * Get the normalized type, not the raw type for this column.
+   * e.g. returns "int(11)" or "varchar(16) CHARACTER SET utf8"
    */
   getType(fullyResolved: boolean = false): string {
     // TODO: Note that it might be better to "unify" this type in the
     // constructor.  That way, there simply won't be a way of distinguishing
     // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(parseDataType(this.type), this.tableDefaultEncoding, fullyResolved);
-  }
-
-  getTypeInfo(): TypeInfo {
-    return parseDataType(this.type);
+    return formatDataType(this.typeInfo, this.tableDefaultEncoding, fullyResolved);
   }
 
   /**
    * Get the full-blown column definition, without the name.
    */
   getDefinition(): string {
-    const typeInfo = this.getTypeInfo();
+    const typeInfo = this.typeInfo;
     const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
@@ -159,7 +158,7 @@ export default class Column {
   }
 
   toSchemaBaseType(): ROLTypeInfo {
-    const info = this.getTypeInfo();
+    const info = this.typeInfo;
 
     // NOTE: MySQL represents boolean columns with TINYINT(1) specifically
     if (info.baseType === 'tinyint' && info.length === 1) {

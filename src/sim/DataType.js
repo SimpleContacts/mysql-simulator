@@ -177,6 +177,9 @@ function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: strin
 
 /**
  * Parse and return type information for the given type string.
+ * e.g. "TEXT" or "int", or "VARCHAR(11) CHARACTER SET latin1"
+ *
+ * TODO: Let the PEG parser do... well... the parsing instead?
  */
 export function parseDataType(type: string): TypeInfo {
   const matches = type.match(/^([^ (]+)(?:\s*[(]([^)]+)[)])?(.*)?$/);

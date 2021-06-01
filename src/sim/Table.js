@@ -52,8 +52,7 @@ export default class Table {
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
     const columns = this.columns.map((column) => {
-      // TODO: Make explicit
-      const typeInfo = column.getTypeInfo();
+      const typeInfo = column.typeInfo;
       if (
         !(
           typeInfo.baseType === 'char' ||
@@ -77,16 +76,12 @@ export default class Table {
       ) {
         if (typeInfo.baseType !== 'enum') {
           return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
-            },
+            { typeInfo: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding) },
             newEncoding,
           );
         } else {
           return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
-            },
+            { typeInfo: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding) },
             newEncoding,
           );
         }
@@ -97,16 +92,12 @@ export default class Table {
       ) {
         if (typeInfo.baseType !== 'enum') {
           return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
-            },
+            { typeInfo: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding) },
             newEncoding,
           );
         } else {
           return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
-            },
+            { typeInfo: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding) },
             newEncoding,
           );
         }
@@ -149,7 +140,7 @@ export default class Table {
     }
 
     const columns = this.columns.map((column) => {
-      const typeInfo = column.getTypeInfo();
+      const typeInfo = column.typeInfo;
       if (
         !(
           typeInfo.baseType === 'char' ||
@@ -173,7 +164,7 @@ export default class Table {
         (typeInfo.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
         (typeInfo.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
       ) {
-        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+        return column.patch({ typeInfo: formatDataType(typeInfo, newEncoding) }, newEncoding);
       }
 
       // Otherwise, some conversion is actually imminent. We can only continue
@@ -185,14 +176,14 @@ export default class Table {
       // If no explicit encoding is set for this column, just keep it that way
       if (typeInfo.baseType === 'enum') {
         if (typeInfo.encoding === undefined) {
-          return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+          return column.patch({ typeInfo: formatDataType(typeInfo, newEncoding) }, newEncoding);
         } else {
           const newType = { ...typeInfo, encoding: newEncoding };
-          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+          return column.patch({ typeInfo: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
         }
       } else {
         return column.patch(
-          { type: formatDataType(computeNewType(typeInfo, column.tableDefaultEncoding, newEncoding), newEncoding) },
+          { typeInfo: formatDataType(computeNewType(typeInfo, column.tableDefaultEncoding, newEncoding), newEncoding) },
           newEncoding,
         );
       }
