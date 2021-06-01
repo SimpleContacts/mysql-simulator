@@ -4,8 +4,8 @@ import { sortBy, zip } from 'lodash';
 import type { Schema as ROLSchema } from 'rule-of-law/types';
 
 import Column from './Column';
-import { makeEncoding } from './encodings';
-import type { Encoding } from './encodings';
+import { makeEncoding } from '../ast/encodings';
+import type { Encoding } from '../ast/encodings';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
 import Table from './Table';

@@ -7,43 +7,34 @@ import type { Precision } from './types';
 TinyInt:
   length    number
   unsigned  boolean
-  zeroFill  boolean
 
 SmallInt:
   length    number
   unsigned  boolean
-  zeroFill  boolean
 
 MediumInt:
   length    number
   unsigned  boolean
-  zeroFill  boolean
 
 Int:
   length    number
   unsigned  boolean
-  zeroFill  boolean
 
 BigInt:
   length    number
   unsigned  boolean
-  zeroFill  boolean
 
 Decimal:
   precision  Precision?
   unsigned   boolean
-  zeroFill   boolean
 
 Float:
   precision  Precision?
   unsigned   boolean
-  zeroFill   boolean
 
 Double:
-  length     number
-  precision  number
+  precision  Precision?
   unsigned   boolean
-  zeroFill   boolean
 
 DateTime:
   fsp  number?
@@ -95,16 +86,16 @@ LongText:
   encoding  Encoding?
 
 Char:
-  encoding  Encoding?
   length    number
+  encoding  Encoding?
 
 VarChar:
-  encoding  Encoding?
   length    number
+  encoding  Encoding?
 
 Enum:
-  encoding  Encoding?
   values    string+
+  encoding  Encoding?
 
 @Textual:
   | Char

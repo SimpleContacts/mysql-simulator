@@ -8,7 +8,7 @@ import { dumpSchema } from 'rule-of-law';
 
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
-import { makeEncoding } from './encodings';
+import { makeEncoding } from '../ast/encodings';
 
 const log = console.log;
 const error = console.error;

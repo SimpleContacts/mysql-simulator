@@ -1,6 +1,6 @@
 // @flow strict
 
-// export type __TODO__ = mixed;
+import type { DataType } from '../ast';
 
 export type Identifier = string;
 export type ConstantExpr = string;
@@ -31,7 +31,7 @@ export type GeneratedDefinition = {|
 |};
 
 export type ColumnDefinition = {|
-  dataType: string,
+  dataType: DataType,
   nullable: boolean | null,
   defaultValue: ConstantExpr | null,
   onUpdate: ConstantExpr | null,

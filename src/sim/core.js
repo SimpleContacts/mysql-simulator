@@ -10,8 +10,8 @@ import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
-import type { Encoding } from './encodings';
-import { makeEncoding } from './encodings';
+import type { Encoding } from '../ast/encodings';
+import { makeEncoding } from '../ast/encodings';
 
 // Example: 0001-0005_initial.sql
 export type MigrationInfo = {|
@@ -63,7 +63,7 @@ export function getMigrations(dirpath: string): Array<MigrationInfo> {
 const error = console.error;
 
 function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Column {
-  const type = def.dataType.toLowerCase();
+  const dataType = def.dataType;
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
 
@@ -72,10 +72,10 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   // specified.  All other types are NULL unless explicitly specified.
   let nullable = def.nullable;
   if (nullable === null) {
-    nullable = !type.startsWith('timestamp'); // Could also be "timestamp(6)"
+    nullable = dataType.baseType !== 'timestamp'; // Could also be "timestamp(6)"
   }
 
-  if (type.startsWith('timestamp')) {
+  if (dataType.baseType === 'timestamp') {
     if (!nullable && defaultValue === null) {
       // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       defaultValue = 'CURRENT_TIMESTAMP';

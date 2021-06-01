@@ -4,13 +4,13 @@ import invariant from 'invariant';
 import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
 import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
-
+import ast from '../ast';
 import Column from './Column';
 import Database from './Database';
-import { formatDataType } from './DataType';
-import type { TextDataType } from './DataType';
-import type { Encoding } from './encodings';
-import { getDefaultCollationForCharset, isWider } from './encodings';
+import { setEncoding } from './DataType';
+import type { Textual } from '../ast';
+import type { Encoding } from '../ast/encodings';
+import { getDefaultCollationForCharset, isWider } from '../ast/encodings';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
@@ -70,37 +70,17 @@ export default class Table {
       // behavior. Still...
       // TODO: SIMPLIFY THIS!
       if (
-        dataType.encoding === undefined ||
+        dataType.encoding === null ||
         (dataType.encoding.charset === column.tableDefaultEncoding.charset &&
           dataType.encoding.collate === column.tableDefaultEncoding.collate)
       ) {
-        if (dataType.baseType !== 'enum') {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: this.defaultEncoding }, newEncoding) },
-            newEncoding,
-          );
-        } else {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: this.defaultEncoding }, newEncoding) },
-            newEncoding,
-          );
-        }
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
       } else if (
-        dataType.encoding !== undefined &&
+        dataType.encoding !== null &&
         dataType.encoding.charset === newEncoding.charset &&
         dataType.encoding.collate === newEncoding.collate
       ) {
-        if (dataType.baseType !== 'enum') {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: undefined }, newEncoding) },
-            newEncoding,
-          );
-        } else {
-          return column.patch(
-            { dataType: formatDataType({ ...dataType, encoding: undefined }, newEncoding) },
-            newEncoding,
-          );
-        }
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
       } else {
         return column;
       }
@@ -109,11 +89,7 @@ export default class Table {
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
-    function computeNewType(
-      dataType: TextDataType,
-      tableDefaultEncoding: Encoding,
-      newEncoding: Encoding,
-    ): TextDataType {
+    function computeNewType(dataType: Textual, tableDefaultEncoding: Encoding, newEncoding: Encoding): Textual {
       const currentEncoding = dataType.encoding ?? tableDefaultEncoding;
 
       // Converting to another encoding can cause MySQL to grow the datatype's
@@ -122,21 +98,20 @@ export default class Table {
       if (!isWider(newEncoding.charset, currentEncoding.charset)) {
         // If the charset didn't grow wider, just updating the encoding is
         // fine. The base type of the column won't change.
-        return { ...dataType, encoding: newEncoding };
+        return setEncoding(dataType, newEncoding);
       }
 
       // Pick the next tier
-      const baseType =
-        dataType.baseType === 'text'
-          ? 'mediumtext'
-          : dataType.baseType === 'mediumtext'
-          ? 'longtext'
-          : dataType.baseType;
-      return {
-        ...dataType,
-        baseType,
-        encoding: newEncoding,
-      };
+      switch (dataType.baseType) {
+        case 'text':
+          return ast.MediumText(newEncoding);
+
+        case 'mediumtext':
+          return ast.LongText(newEncoding);
+
+        default:
+          return setEncoding(dataType, newEncoding);
+      }
     }
 
     const columns = this.columns.map((column) => {
@@ -164,7 +139,7 @@ export default class Table {
         (dataType.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
         (dataType.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
       ) {
-        return column.patch({ dataType: formatDataType(dataType, newEncoding) }, newEncoding);
+        return column.patch({ dataType: setEncoding(dataType, null) }, newEncoding);
       }
 
       // Otherwise, some conversion is actually imminent. We can only continue
@@ -175,15 +150,14 @@ export default class Table {
 
       // If no explicit encoding is set for this column, just keep it that way
       if (dataType.baseType === 'enum') {
-        if (dataType.encoding === undefined) {
-          return column.patch({ dataType: formatDataType(dataType, newEncoding) }, newEncoding);
+        if (dataType.encoding === null) {
+          return column.patch({}, newEncoding);
         } else {
-          const newType = { ...dataType, encoding: newEncoding };
-          return column.patch({ dataType: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
+          return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
         }
       } else {
         return column.patch(
-          { dataType: formatDataType(computeNewType(dataType, column.tableDefaultEncoding, newEncoding), newEncoding) },
+          { dataType: computeNewType(dataType, column.tableDefaultEncoding, newEncoding) },
           newEncoding,
         );
       }

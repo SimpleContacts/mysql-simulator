@@ -5,6 +5,9 @@
  */
 const invariant = require('invariant');
 
+import ast from '../ast'
+import { makeEncoding } from '../ast/encodings'
+
 function identifier(name) {
   return {
     type: 'identifier',
@@ -96,6 +99,10 @@ function serializeCallExpression(node) {
     f += `(${node.args.map(serialize).join(', ')})`;
   }
   return f;
+}
+
+function unquote(quoted: string): string {
+  return quoted.substring(1, quoted.length - 1).replace("''", "'");
 }
 
 }
@@ -816,83 +823,59 @@ ColumnDefinition
       }
     }
 
-
 Len
   = LPAREN number:NumberLiteral RPAREN { return number.value }
 
-PrecisionSpec
-  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length.value, decimals.value] }
+Precision
+  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN
+    { return { length: length.value, decimals } }
 
-BoolTypeName
-  = BOOLEAN
+Charset
+  = CHARACTER SET name:CharsetName
+    { return name }
 
-IntTypeName
-  = BIGINT
-  / INTEGER
-  / INT
-  / MEDIUMINT
-  / SMALLINT
-  / TINYINT
+Collate
+  = COLLATE name:CollationName
+    { return name }
 
-PrecisionTypeName
-  = REAL
-  / DOUBLE
-  / FLOAT
-  / DECIMAL
-  / NUMERIC
-
-DateTypeName
-  = type:TIMESTAMP precision:Len? { return precision ? `${type}(${precision})`:type }
-  / TIME
-  / type:DATETIME precision:Len? { return precision ? `${type}(${precision})`:type }
-  / DATE
-
-BoolDataType
-  = type:BoolTypeName len:Len? { return 'TINYINT(1)' }
-
-IntDataType
-  = type:IntTypeName len:Len? unsigned:UNSIGNED? {
-    len = len ? `(${len})` : '';
-    unsigned = unsigned || '';
-    return (type + len + ' ' + unsigned).trim()
-  }
-
-PrecisionDataType
-  = type:PrecisionTypeName _ prec:PrecisionSpec? _ unsigned:UNSIGNED? {
-    prec = prec ? `(${prec.join(',')})` : '';
-    unsigned = unsigned || '';
-    return (type + prec + ' ' + unsigned).trim()
-  }
-
-DateDataType
-  = type:DateTypeName { return type }
-
-TextDataType
-  = // Length required
-    type:( VARCHAR / VARBINARY ) len:Len { return `${type}(${len})` }
-  / // Length required
-    type:( CHAR / BINARY / TEXT / MEDIUMTEXT / LONGTEXT ) len:Len? { return len ? `${type}(${len})` : type }
+Encoding
+  = charset:Charset collate:Collate?
+    { return makeEncoding(charset, collate ?? undefined) }
+  / collate:Collate
+    { return makeEncoding(undefined, collate) }
 
 DataType
-  = IntDataType
-  / BoolDataType
-  / DateDataType
-  / PrecisionDataType
-  / type:TextDataType charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
-      return [
-        type,
-        charset ? 'CHARACTER SET ' + charset : null,
-        collate ? 'COLLATE ' + collate : null,
-      ].filter(Boolean).join(' ');
-    }
-  / JSON
-  / ENUM LPAREN literals:StringLiteralList RPAREN charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
-      return [
-        `ENUM(${literals.map(str => str.value).join(',')})`,
-        charset ? 'CHARACTER SET ' + charset : null,
-        collate ? 'COLLATE ' + collate : null,
-      ].filter(Boolean).join(' ');
-    }
+  = ( INTEGER / INT ) len:Len? unsigned:UNSIGNED? { return ast.Int((len ?? 11) - (unsigned ? 1 : 0), !!unsigned) }
+  / BIGINT len:Len? unsigned:UNSIGNED? { return ast.BigInt((len ?? 20) - (unsigned ? 1 : 0), !!unsigned) }
+  / MEDIUMINT len:Len? unsigned:UNSIGNED? { return ast.MediumInt((len ?? 9) - (unsigned ? 1 : 0), !!unsigned) }
+  / SMALLINT len:Len? unsigned:UNSIGNED? { return ast.SmallInt((len ?? 6) - (unsigned ? 1 : 0), !!unsigned) }
+  / TINYINT len:Len? unsigned:UNSIGNED? { return ast.TinyInt((len ?? 4) - (unsigned ? 1 : 0), !!unsigned) }
+  / BOOLEAN len:Len? { return ast.TinyInt(len ?? 1, false) }
+  / TIMESTAMP fsp:Len? { return ast.Timestamp(fsp) }
+  / TIME { return ast.Time() }
+  / DATETIME fsp:Len? { return ast.DateTime(fsp) }
+  / DATE { return ast.Date() }
+  / ( REAL / DOUBLE ) _ precision:Precision? _ unsigned:UNSIGNED? { return ast.Double(precision, !!unsigned) }
+  / FLOAT _ precision:Precision? _ unsigned:UNSIGNED? { return ast.Double(precision, !!unsigned) }
+  / ( DECIMAL / NUMERIC ) _ precision:Precision? _ unsigned:UNSIGNED? { return ast.Decimal(precision, !!unsigned) }
+
+  // Length required
+  / VARCHAR len:Len encoding:Encoding? { return ast.VarChar(len, encoding) }
+  / VARBINARY len:Len { return ast.VarBinary(len) }
+
+  // Length optional
+  / CHAR len:Len? encoding:Encoding? { return ast.Char(len ?? 1, encoding) }
+  / BINARY len:Len? { return ast.Binary(len) }
+
+  // Length forbidden
+  / TEXT encoding:Encoding? { return ast.Text(encoding) }
+  / MEDIUMTEXT encoding:Encoding? { return ast.MediumText(encoding) }
+  / LONGTEXT encoding:Encoding? { return ast.LongText(encoding) }
+
+  / JSON { return ast.Json() }
+
+  / ENUM LPAREN literals:StringLiteralList RPAREN encoding:Encoding?
+    { return ast.Enum(literals.map(lit => unquote(lit.value)), encoding) }
 
 IndexColNames
   = first:IndexColName COMMA rest:IndexColNames { return [first, ...rest] }

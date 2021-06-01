@@ -8,6 +8,7 @@
  */
 
 import type { Encoding } from './encodings'
+import type { Precision } from './types'
 
 import invariant from 'invariant'
 
@@ -158,7 +159,6 @@ export type BigInt = {|
     baseType: 'bigint',
     length: number,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type Binary = {|
@@ -183,23 +183,19 @@ export type Date = {|
 
 export type DateTime = {|
     baseType: 'datetime',
-    fsp: number,
+    fsp: number | null,
 |}
 
 export type Decimal = {|
     baseType: 'decimal',
-    length: number,
-    precision: number,
+    precision: Precision | null,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type Double = {|
     baseType: 'double',
-    length: number,
-    precision: number,
+    precision: Precision | null,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type Enum = {|
@@ -210,17 +206,14 @@ export type Enum = {|
 
 export type Float = {|
     baseType: 'float',
-    length: number,
-    precision: number,
+    precision: Precision | null,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type Int = {|
     baseType: 'int',
     length: number,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type Json = {|
@@ -244,7 +237,6 @@ export type MediumInt = {|
     baseType: 'mediumint',
     length: number,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type MediumText = {|
@@ -256,7 +248,6 @@ export type SmallInt = {|
     baseType: 'smallint',
     length: number,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type Text = {|
@@ -266,12 +257,11 @@ export type Text = {|
 
 export type Time = {|
     baseType: 'time',
-    fsp: number,
 |}
 
 export type Timestamp = {|
     baseType: 'timestamp',
-    fsp: number,
+    fsp: number | null,
 |}
 
 export type TinyBlob = {|
@@ -282,7 +272,6 @@ export type TinyInt = {|
     baseType: 'tinyint',
     length: number,
     unsigned: boolean,
-    zeroFill: boolean,
 |}
 
 export type VarBinary = {|
@@ -301,7 +290,7 @@ export type Year = {|
 |}
 
 export default {
-    BigInt(length: number, unsigned: boolean, zeroFill: boolean): BigInt {
+    BigInt(length: number, unsigned: boolean): BigInt {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "BigInt" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -316,18 +305,10 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "BigInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'bigint',
             length,
             unsigned,
-            zeroFill,
         }
     },
 
@@ -387,10 +368,10 @@ export default {
         }
     },
 
-    DateTime(fsp: number): DateTime {
+    DateTime(fsp: number | null = null): DateTime {
         invariant(
-            typeof fsp === 'number',
-            `Invalid value for "fsp" arg in "DateTime" call.\nExpected: number\nGot:      ${JSON.stringify(
+            fsp === null || typeof fsp === 'number',
+            `Invalid value for "fsp" arg in "DateTime" call.\nExpected: number?\nGot:      ${JSON.stringify(
                 fsp,
             )}`,
         )
@@ -401,22 +382,10 @@ export default {
         }
     },
 
-    Decimal(
-        length: number,
-        precision: number,
-        unsigned: boolean,
-        zeroFill: boolean,
-    ): Decimal {
+    Decimal(precision: Precision | null, unsigned: boolean): Decimal {
         invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Decimal" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
-
-        invariant(
-            typeof precision === 'number',
-            `Invalid value for "precision" arg in "Decimal" call.\nExpected: number\nGot:      ${JSON.stringify(
+            precision === null,
+            `Invalid value for "precision" arg in "Decimal" call.\nExpected: Precision?\nGot:      ${JSON.stringify(
                 precision,
             )}`,
         )
@@ -428,38 +397,17 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "Decimal" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'decimal',
-            length,
             precision,
             unsigned,
-            zeroFill,
         }
     },
 
-    Double(
-        length: number,
-        precision: number,
-        unsigned: boolean,
-        zeroFill: boolean,
-    ): Double {
+    Double(precision: Precision | null, unsigned: boolean): Double {
         invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Double" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
-
-        invariant(
-            typeof precision === 'number',
-            `Invalid value for "precision" arg in "Double" call.\nExpected: number\nGot:      ${JSON.stringify(
+            precision === null,
+            `Invalid value for "precision" arg in "Double" call.\nExpected: Precision?\nGot:      ${JSON.stringify(
                 precision,
             )}`,
         )
@@ -471,19 +419,10 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "Double" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'double',
-            length,
             precision,
             unsigned,
-            zeroFill,
         }
     },
 
@@ -511,22 +450,10 @@ export default {
         }
     },
 
-    Float(
-        length: number,
-        precision: number,
-        unsigned: boolean,
-        zeroFill: boolean,
-    ): Float {
+    Float(precision: Precision | null, unsigned: boolean): Float {
         invariant(
-            typeof length === 'number',
-            `Invalid value for "length" arg in "Float" call.\nExpected: number\nGot:      ${JSON.stringify(
-                length,
-            )}`,
-        )
-
-        invariant(
-            typeof precision === 'number',
-            `Invalid value for "precision" arg in "Float" call.\nExpected: number\nGot:      ${JSON.stringify(
+            precision === null,
+            `Invalid value for "precision" arg in "Float" call.\nExpected: Precision?\nGot:      ${JSON.stringify(
                 precision,
             )}`,
         )
@@ -538,23 +465,14 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "Float" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'float',
-            length,
             precision,
             unsigned,
-            zeroFill,
         }
     },
 
-    Int(length: number, unsigned: boolean, zeroFill: boolean): Int {
+    Int(length: number, unsigned: boolean): Int {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "Int" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -569,18 +487,10 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "Int" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'int',
             length,
             unsigned,
-            zeroFill,
         }
     },
 
@@ -616,7 +526,7 @@ export default {
         }
     },
 
-    MediumInt(length: number, unsigned: boolean, zeroFill: boolean): MediumInt {
+    MediumInt(length: number, unsigned: boolean): MediumInt {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "MediumInt" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -631,18 +541,10 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "MediumInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'mediumint',
             length,
             unsigned,
-            zeroFill,
         }
     },
 
@@ -660,7 +562,7 @@ export default {
         }
     },
 
-    SmallInt(length: number, unsigned: boolean, zeroFill: boolean): SmallInt {
+    SmallInt(length: number, unsigned: boolean): SmallInt {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "SmallInt" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -675,18 +577,10 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "SmallInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'smallint',
             length,
             unsigned,
-            zeroFill,
         }
     },
 
@@ -704,24 +598,16 @@ export default {
         }
     },
 
-    Time(fsp: number): Time {
-        invariant(
-            typeof fsp === 'number',
-            `Invalid value for "fsp" arg in "Time" call.\nExpected: number\nGot:      ${JSON.stringify(
-                fsp,
-            )}`,
-        )
-
+    Time(): Time {
         return {
             baseType: 'time',
-            fsp,
         }
     },
 
-    Timestamp(fsp: number): Timestamp {
+    Timestamp(fsp: number | null = null): Timestamp {
         invariant(
-            typeof fsp === 'number',
-            `Invalid value for "fsp" arg in "Timestamp" call.\nExpected: number\nGot:      ${JSON.stringify(
+            fsp === null || typeof fsp === 'number',
+            `Invalid value for "fsp" arg in "Timestamp" call.\nExpected: number?\nGot:      ${JSON.stringify(
                 fsp,
             )}`,
         )
@@ -738,7 +624,7 @@ export default {
         }
     },
 
-    TinyInt(length: number, unsigned: boolean, zeroFill: boolean): TinyInt {
+    TinyInt(length: number, unsigned: boolean): TinyInt {
         invariant(
             typeof length === 'number',
             `Invalid value for "length" arg in "TinyInt" call.\nExpected: number\nGot:      ${JSON.stringify(
@@ -753,18 +639,10 @@ export default {
             )}`,
         )
 
-        invariant(
-            typeof zeroFill === 'boolean',
-            `Invalid value for "zeroFill" arg in "TinyInt" call.\nExpected: boolean\nGot:      ${JSON.stringify(
-                zeroFill,
-            )}`,
-        )
-
         return {
             baseType: 'tinyint',
             length,
             unsigned,
-            zeroFill,
         }
     },
 

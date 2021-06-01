@@ -3,9 +3,9 @@
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
-import { formatDataType, parseDataType } from './DataType';
-import type { DataType } from './DataType';
-import type { Encoding } from './encodings';
+import { formatDataType } from './DataType';
+import type { DataType } from '../ast';
+import type { Encoding } from '../ast/encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
@@ -33,7 +33,7 @@ export default class Column {
 
   constructor(
     name: string,
-    dataType: string | DataType, // TODO: Stop passing in raw strings here - parse at the parser level!
+    dataType: DataType,
     nullable: boolean,
     defaultValue: null | string,
     onUpdate: null | string,
@@ -43,7 +43,7 @@ export default class Column {
     tableDefaultEncoding: Encoding,
   ) {
     this.name = name;
-    this.dataType = typeof dataType === 'string' ? parseDataType(dataType) : dataType; // TODO: Stop parsing at this level!
+    this.dataType = dataType;
     this.nullable = nullable;
     this.defaultValue = defaultValue;
     this.onUpdate = onUpdate;
@@ -60,7 +60,7 @@ export default class Column {
   patch(
     record: {|
       +name?: string,
-      +dataType?: string | DataType,
+      +dataType?: DataType,
       +nullable?: boolean,
       +defaultValue?: null | string,
       +onUpdate?: null | string,
