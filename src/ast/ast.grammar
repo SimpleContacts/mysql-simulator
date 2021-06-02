@@ -26,17 +26,14 @@ UnaryExpression:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type  "unary"
   op    UnaryOp
-  # TODO: Replace with `@Expression`
-  expr  mixed
+  expr  @Expression
 
 BinaryExpression:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "binary"
-  op    BinaryOp
-  # TODO: Replace with `@Expression`
-  expr1  mixed
-  # TODO: Replace with `@Expression`
-  expr2  mixed
+  type   "binary"
+  op     BinaryOp
+  expr1  @Expression
+  expr2  @Expression
 
 CallExpression:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
@@ -45,8 +42,7 @@ CallExpression:
   # The args are optional. For example, when null, this means a "call" like
   # `CURRENT_TIMESTAMP`. But when "empty" (e.g. []) this denotes a call like
   # `NOW()`.
-  # TODO: Replace `mixed` with `@Expression`
-  args  mixed*?
+  args  @Expression*?
 
 BuiltInFunction:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
@@ -62,8 +58,7 @@ BuiltInFunction:
 
 GeneratedClause:
   type  "generated"
-  # TODO: Replace with @Expression
-  expr  mixed
+  expr  @Expression
   mode  GeneratedColumnMode
 
 TinyInt:

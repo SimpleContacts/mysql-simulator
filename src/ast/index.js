@@ -209,8 +209,8 @@ export type BinaryExpression = {|
   _kind: 'BinaryExpression',
   type: 'binary',
   op: BinaryOp,
-  expr1: mixed,
-  expr2: mixed,
+  expr1: Expression,
+  expr2: Expression,
 |};
 
 export type Blob = {|
@@ -229,7 +229,7 @@ export type CallExpression = {|
   _kind: 'CallExpression',
   type: 'callExpression',
   name: BuiltInFunction,
-  args: Array<mixed> | null,
+  args: Array<Expression> | null,
 |};
 
 export type Char = {|
@@ -281,7 +281,7 @@ export type Float = {|
 export type GeneratedClause = {|
   _kind: 'GeneratedClause',
   type: 'generated',
-  expr: mixed,
+  expr: Expression,
   mode: GeneratedColumnMode,
 |};
 
@@ -378,7 +378,7 @@ export type UnaryExpression = {|
   _kind: 'UnaryExpression',
   type: 'unary',
   op: UnaryOp,
-  expr: mixed,
+  expr: Expression,
 |};
 
 export type VarBinary = {|
@@ -432,7 +432,21 @@ export default {
     };
   },
 
-  BinaryExpression(op: BinaryOp, expr1: mixed, expr2: mixed): BinaryExpression {
+  BinaryExpression(op: BinaryOp, expr1: Expression, expr2: Expression): BinaryExpression {
+    invariant(
+      isExpression(expr1),
+      `Invalid value for "expr1" arg in "BinaryExpression" call.\nExpected: @Expression\nGot:      ${JSON.stringify(
+        expr1,
+      )}`,
+    );
+
+    invariant(
+      isExpression(expr2),
+      `Invalid value for "expr2" arg in "BinaryExpression" call.\nExpected: @Expression\nGot:      ${JSON.stringify(
+        expr2,
+      )}`,
+    );
+
     return {
       _kind: 'BinaryExpression',
       type: 'binary',
@@ -470,7 +484,7 @@ export default {
     };
   },
 
-  CallExpression(name: BuiltInFunction, args: Array<mixed> | null = null): CallExpression {
+  CallExpression(name: BuiltInFunction, args: Array<Expression> | null = null): CallExpression {
     invariant(
       name._kind === 'BuiltInFunction',
       `Invalid value for "name" arg in "CallExpression" call.\nExpected: BuiltInFunction\nGot:      ${JSON.stringify(
@@ -479,8 +493,10 @@ export default {
     );
 
     invariant(
-      args === null || Array.isArray(args),
-      `Invalid value for "args" arg in "CallExpression" call.\nExpected: mixed*?\nGot:      ${JSON.stringify(args)}`,
+      args === null || (Array.isArray(args) && args.every((item) => isExpression(item))),
+      `Invalid value for "args" arg in "CallExpression" call.\nExpected: @Expression*?\nGot:      ${JSON.stringify(
+        args,
+      )}`,
     );
 
     return {
@@ -581,7 +597,14 @@ export default {
     };
   },
 
-  GeneratedClause(expr: mixed, mode: GeneratedColumnMode): GeneratedClause {
+  GeneratedClause(expr: Expression, mode: GeneratedColumnMode): GeneratedClause {
+    invariant(
+      isExpression(expr),
+      `Invalid value for "expr" arg in "GeneratedClause" call.\nExpected: @Expression\nGot:      ${JSON.stringify(
+        expr,
+      )}`,
+    );
+
     return {
       _kind: 'GeneratedClause',
       type: 'generated',
@@ -759,7 +782,14 @@ export default {
     };
   },
 
-  UnaryExpression(op: UnaryOp, expr: mixed): UnaryExpression {
+  UnaryExpression(op: UnaryOp, expr: Expression): UnaryExpression {
+    invariant(
+      isExpression(expr),
+      `Invalid value for "expr" arg in "UnaryExpression" call.\nExpected: @Expression\nGot:      ${JSON.stringify(
+        expr,
+      )}`,
+    );
+
     return {
       _kind: 'UnaryExpression',
       type: 'unary',
