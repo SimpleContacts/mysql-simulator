@@ -64,9 +64,11 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
 }
 
 /**
- * Format type information back to a printable string.
+ * Format type information back to a printable string. When tableEncoding is
+ * provided, it will conditionally output the encoding information, like MySQL
+ * does, depending on whether it's equal to the table default encoding or not.
  */
-export function formatDataType(dataType: DataType, tableEncoding: Encoding, fullyResolved: boolean = false): string {
+export function formatDataType(dataType: DataType, tableEncoding?: Encoding): string {
   const baseType = dataType.baseType;
   let params = '';
   let options = '';
@@ -102,17 +104,19 @@ export function formatDataType(dataType: DataType, tableEncoding: Encoding, full
     case 'varchar': {
       params = dataType.length || '';
 
-      const encoding = dataType.encoding ?? tableEncoding;
+      const encoding = dataType.encoding;
+      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate;
-      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+      let outputCharset =
+        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');
@@ -124,17 +128,19 @@ export function formatDataType(dataType: DataType, tableEncoding: Encoding, full
     case 'longtext': {
       params = '';
 
-      const encoding = dataType.encoding ?? tableEncoding;
+      const encoding = dataType.encoding;
+      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate;
-      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+      let outputCharset =
+        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');
@@ -150,17 +156,19 @@ export function formatDataType(dataType: DataType, tableEncoding: Encoding, full
     case 'enum': {
       params = dataType.values.map(quote).join(',');
 
-      const encoding = dataType.encoding ?? tableEncoding;
+      const encoding = dataType.encoding;
+      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate;
-      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+      let outputCharset =
+        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');

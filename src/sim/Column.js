@@ -78,17 +78,17 @@ export default class Column {
    * Get the normalized type, not the raw type for this column.
    * e.g. returns "int(11)" or "varchar(16) CHARACTER SET utf8"
    */
-  getType(tableDefaultEncoding: Encoding, fullyResolved: boolean = false): string {
-    // TODO: Note that it might be better to "unify" this type in the
-    // constructor.  That way, there simply won't be a way of distinguishing
-    // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(this.dataType, tableDefaultEncoding, fullyResolved);
+  getType(): string {
+    return formatDataType(this.dataType);
   }
 
   /**
-   * Get the full-blown column definition, without the name.
+   * Get the full-blown column definition, without the name. When the table's
+   * default encoding value is passed, it will conditionally format the
+   * encodings of text columns, based on whether they differ from the table or
+   * not.
    */
-  getDefinition(tableDefaultEncoding: Encoding): string {
+  getDefinition(tableEncoding?: Encoding): string {
     const dataType = this.dataType;
     const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
@@ -135,7 +135,7 @@ export default class Column {
     }
 
     return [
-      formatDataType(dataType, tableDefaultEncoding, false),
+      formatDataType(dataType, tableEncoding),
       generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
@@ -203,7 +203,7 @@ export default class Column {
     return this.nullable ? t.Nullable(baseType) : baseType;
   }
 
-  toString(tableDefaultEncoding: Encoding): string {
-    return `${escape(this.name)} ${this.getDefinition(tableDefaultEncoding)}`;
+  toString(tableEncoding: Encoding): string {
+    return `${escape(this.name)} ${this.getDefinition(tableEncoding)}`;
   }
 }
