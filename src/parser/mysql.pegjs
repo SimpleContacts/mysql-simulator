@@ -7,14 +7,6 @@ const invariant = require('invariant');
 const ast = require('../ast').default;
 const { makeEncoding } = require('../ast/encodings.js')
 
-function identifier(name) {
-  return {
-    type: 'identifier',
-    name,
-    id: name,   // Deprecate in favor of `name`
-  }
-}
-
 function literal(value) {
   return { type: 'literal', value }
 }
@@ -30,10 +22,6 @@ function binary(op, expr1, expr2) {
 function callExpression(name, args) {
   invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
   return { type: 'callExpression', name, args }
-}
-
-function builtinFunction(name) {
-  return { type: 'builtinFunction', name }
 }
 
 function generated(expr, mode) {
@@ -56,7 +44,7 @@ function serialize(node) {
     case 'identifier':
       return node.name
     case 'builtinFunction':
-      return node.name
+      return node.name.name
     default:
       throw new Error(`Don't know how to serialize ${node} nodes yet.  Please tell me.`);
   }
@@ -262,7 +250,7 @@ SimpleExpr
   = Literal
   / FunctionCall
   / MemberAccess  // Not sure where this one fits
-  / name:Identifier { return identifier(name) }
+  / Identifier
   // / simple_expr COLLATE collation_name
   // / param_marker
   // / variable
@@ -283,18 +271,18 @@ SimpleExpr
 
 FunctionCall
   = name:FunctionName LPAREN exprs:ExpressionList RPAREN {
-      return callExpression(builtinFunction(name), exprs)
+      return callExpression(ast.BuiltInFunction(name), exprs)
     }
 
   / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
-      return callExpression(builtinFunction(ident), exprs)
+      return callExpression(ast.BuiltInFunction(ident), exprs)
     }
 
   // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
   / ident:Identifier arrow:( ARROWW / ARROW ) lit:StringLiteral {
-      let rv = callExpression(builtinFunction('JSON_EXTRACT'), [identifier(ident), lit])
+      let rv = callExpression(ast.BuiltInFunction(ast.Identifier('JSON_EXTRACT')), [ident, lit])
       if (arrow === '->>') {
-        rv = callExpression(builtinFunction('JSON_UNQUOTE'), [rv])
+        rv = callExpression(ast.BuiltInFunction(ast.Identifier('JSON_UNQUOTE')), [rv])
       }
       return rv
     }
@@ -367,8 +355,8 @@ RenameTable
     {
       return {
         type: 'RENAME TABLE',
-        tblName,
-        newName,
+        tblName: tblName.name,
+        newName: newName.name,
       }
     }
 
@@ -379,8 +367,8 @@ RenameTable
 DropIndex = DROP INDEX indexName:Identifier ON tblName:Identifier {
   return {
     type: 'DROP INDEX',
-    indexName,
-    tblName
+    indexName: indexName.name,
+    tblName: tblName.name,
   }
 }
 
@@ -392,7 +380,7 @@ DropTable
   = DROP TABLE ifExists:(IF EXISTS)? tblName:Identifier {
     return {
       type: 'DROP TABLE',
-      tblName,
+      tblName: tblName.name,
       ifExists: !!ifExists,
     }
   }
@@ -406,9 +394,9 @@ CreateIndex
     indexKind = indexKind || 'NORMAL'
     return {
       type: 'CREATE INDEX',
-      indexName,
+      indexName: indexName.name,
       indexKind,
-      tblName,
+      tblName: tblName.name,
       indexColNames,
     }
   }
@@ -421,12 +409,12 @@ CreateTrigger
   = CREATE TRIGGER triggerName:Identifier
     ( BEFORE / AFTER )
     ( INSERT / UPDATE / DELETE )
-    ON tblName:Identifier FOR EACH ROW ( ( FOLLOWS / PRECEDES ) otherTrigger:Identifier )?
+    ON tblName:Identifier FOR EACH ROW ( ( FOLLOWS / PRECEDES ) Identifier )?
     triggerBody:Statement {
     return {
       type: 'CREATE TRIGGER',
-      triggerName,
-      tblName,
+      triggerName: triggerName.name,
+      tblName: tblName.name,
     }
   }
 
@@ -439,7 +427,12 @@ FunctionParamList
   / only:FunctionParam { return [only] }
 
 FunctionParam
-  = paramName:Identifier type:DataType { return { paramName, type } }
+  = paramName:Identifier type:DataType
+    { return {
+        paramName: paramName.name,
+        type,
+      }
+    }
 
 CreateFunction
   = CREATE FUNCTION spName:Identifier
@@ -449,7 +442,7 @@ CreateFunction
     body:FunctionBody {
     return {
       type: 'CREATE FUNCTION',
-      spName,
+      spName: spName.name,
       params,
       characteristic,
       // body,
@@ -479,7 +472,8 @@ AssignmentList
   / only:Assignment { return [only] }
 
 Assignment
-  = Identifier EQ Expression
+  = ident:Identifier second:EQ third:Expression
+    { return [ ident.name, second, third ] }
 
 IfStatement
   = IF Condition THEN
@@ -501,7 +495,7 @@ AlterDatabase
   = ALTER DATABASE dbName:Identifier? options:AlterDbOption+ {
       return {
         type: 'ALTER DATABASE',
-        dbName,
+        dbName: dbName.name,
         options
       }
     }
@@ -523,7 +517,7 @@ AlterTable
   = ALTER TABLE tblName:Identifier changes:AlterSpecs {
     return {
       type: 'ALTER TABLE',
-      tblName,
+      tblName: tblName.name,
       changes
     }
   }
@@ -544,12 +538,12 @@ AlterSpec
     }
   / ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition
     position:(
-      AFTER ident:Identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
     )? {
       return {
         type: 'ADD COLUMN',
-        colName,
+        colName: colName.name,
         definition: columnDefinition,
         position,
       }
@@ -557,7 +551,7 @@ AlterSpec
   / ADD ( INDEX / KEY ) indexName:Identifier? indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'ADD INDEX',
-        indexName,
+        indexName: indexName?.name ?? null,
         indexType,
         indexColNames,
       }
@@ -576,7 +570,7 @@ AlterSpec
       return {
         type: 'ADD UNIQUE INDEX',
         constraint,
-        indexName,
+        indexName: indexName?.name ?? null,
         indexType,
         indexColNames,
       }
@@ -584,7 +578,7 @@ AlterSpec
   / ADD FULLTEXT ( INDEX / KEY )? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'ADD FULLTEXT INDEX',
-        indexName,
+        indexName: indexName?.name ?? null,
         indexColNames,
       }
     }
@@ -594,7 +588,7 @@ AlterSpec
       return {
         type: 'ADD FOREIGN KEY',
         constraint,
-        indexName,
+        indexName: indexName?.name ?? null,
         indexColNames,
         reference,
       }
@@ -603,18 +597,18 @@ AlterSpec
   / ALTER COLUMN? colName:Identifier DROP DEFAULT {
       return {
         type: 'DROP DEFAULT',
-        colName,
+        colName: colName.name,
       }
     }
   / CHANGE COLUMN? oldColName:Identifier newColName:Identifier definition:ColumnDefinition
     position:(
-      AFTER ident:Identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
     )? {
       return {
         type: 'CHANGE COLUMN',
-        oldColName,
-        newColName,
+        oldColName: oldColName.name,
+        newColName: newColName.name,
         definition,
         position,
       }
@@ -622,25 +616,25 @@ AlterSpec
   / DROP (INDEX / KEY) indexName:Identifier {
       return {
         type: 'DROP INDEX',
-        indexName,
+        indexName: indexName.name,
       }
     }
   / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
   / DROP FOREIGN KEY symbol:Identifier {
       return {
         type: 'DROP FOREIGN KEY',
-        symbol,
+        symbol: symbol.name,
       }
     }
   / DROP COLUMN? colName:Identifier {
       return {
         type: 'DROP COLUMN',
-        colName,
+        colName: colName.name,
       }
     }
   / MODIFY COLUMN? colName:Identifier definition:ColumnDefinition
     position:(
-      AFTER ident:Identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
     )? {
       // MODIFY COLUMN is like CHANGE COLUMN in every way, except that it
@@ -649,8 +643,8 @@ AlterSpec
       // are identical (i.e. no rename).
       return {
         type: 'CHANGE COLUMN',
-        oldColName: colName,
-        newColName: colName,
+        oldColName: colName.name,
+        newColName: colName.name,
         definition,
         position,
       }
@@ -658,14 +652,14 @@ AlterSpec
   / RENAME ( INDEX / KEY ) oldIndexName:Identifier TO newIndexName:Identifier {
       return {
         type: 'RENAME INDEX',
-        oldIndexName,
-        newIndexName,
+        oldIndexName: oldIndexName.name,
+        newIndexName: newIndexName.name,
       }
     }
   / RENAME ( TO / AS )? newTblName:Identifier {
       return {
         type: 'RENAME TABLE',
-        newTblName,
+        newTblName: newTblName.name,
       }
     }
   / LOCK EQ? ( DEFAULT / NONE / SHARED / EXCLUSIVE ) { return null; }
@@ -679,7 +673,7 @@ AlterSpec
       }
     }
 
-NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol }
+NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol?.name ?? null }
 
 IndexType = USING ( BTREE / HASH )
 
@@ -702,7 +696,7 @@ CreateTable1
       const options = Object.assign({}, ...(tableOptions || []));
       return {
         type: 'CREATE TABLE',
-        tblName,
+        tblName: tblName.name,
         definitions,
         options,
         ifNotExists: !!ifNotExists,
@@ -715,8 +709,8 @@ CreateTable3
     tblName:Identifier LIKE oldTblName:Identifier {
     return {
       type: 'CREATE TABLE LIKE', // Copy table
-      tblName,
-      oldTblName,
+      tblName: tblName.name,
+      oldTblName: oldTblName.name,
       ifNotExists,
     }
   }
@@ -729,7 +723,7 @@ CreateDefinition
   = colName:Identifier _ columnDefinition:ColumnDefinition {
       return {
         type: 'COLUMN',
-        colName,
+        colName: colName.name,
         definition: columnDefinition,
       }
     }
@@ -744,7 +738,7 @@ CreateDefinition
   / ( INDEX / KEY ) indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
     return {
       type: 'INDEX',
-      indexName,
+      indexName: indexName?.name ?? null,
       indexColNames,
     }
   }
@@ -754,14 +748,14 @@ CreateDefinition
       return {
         type: 'UNIQUE INDEX',
         constraint,
-        indexName,
+        indexName: indexName?.name ?? null,
         indexColNames,
       }
     }
   / FULLTEXT (INDEX / KEY)? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
       return {
         type: 'FULLTEXT INDEX',
-        indexName,
+        indexName: indexName?.name ?? null,
         indexColNames,
       }
     }
@@ -770,7 +764,7 @@ CreateDefinition
       return {
         type: 'FOREIGN KEY',
         constraint,
-        indexName,
+        indexName: indexName?.name ?? null,
         indexColNames,
         reference,
       }
@@ -881,7 +875,7 @@ IndexColNames
   / only:IndexColName { return [only] }
 
 IndexColName
-  = colName:Identifier len:Len? direction:( ASC / DESC )? { return { colName, len, direction } }
+  = colName:Identifier len:Len? direction:( ASC / DESC )? { return { colName: colName.name, len, direction } }
 
 ReferenceDefinition
   = REFERENCES tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN
@@ -889,7 +883,7 @@ ReferenceDefinition
     onDelete:( ON DELETE x:ReferenceOption { return x } )?
     onUpdate:( ON UPDATE x:ReferenceOption { return x } )? {
       return {
-        tblName,
+        tblName: tblName.name,
         indexColNames,
         matchMode,
         onDelete: onDelete ?? 'RESTRICT',
@@ -954,11 +948,11 @@ DefaultValueExpr
 
 CurrentTimestamp
   = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? {
-    return callExpression(builtinFunction(value), precision ? [precision] : undefined)
+    return callExpression(ast.BuiltInFunction(value), precision ? [precision] : undefined)
   }
 
 NowCall
-  = NOW LPAREN RPAREN { return callExpression(builtinFunction('NOW'), []) }
+  = NOW LPAREN RPAREN { return callExpression(ast.BuiltInFunction(ast.Identifier('NOW')), []) }
 
 // ====================================================
 // Util
@@ -975,10 +969,10 @@ Identifier
   / NonQuotedIdentifier
 
 QuotedIdentifier
-  = _ '`' chars:[^`]+ '`' _ { return chars.join('') }
+  = _ '`' chars:[^`]+ '`' _ { return ast.Identifier(chars.join('')) }
 
 NonQuotedIdentifier
-  = _ !Keyword first:IdentifierStart rest:IdentifierChar* _ { return [first, ...rest].join('') }
+  = _ !Keyword first:IdentifierStart rest:IdentifierChar* _ { return ast.Identifier([first, ...rest].join('')) }
 
 // ====================================================
 // Keywords
@@ -1016,7 +1010,7 @@ COMMENT           = _ 'COMMENT'i           !IdentifierChar _ { return 'COMMENT' 
 CONSTRAINT        = _ 'CONSTRAINT'i        !IdentifierChar _ { return 'CONSTRAINT' }
 CONVERT           = _ 'CONVERT'i           !IdentifierChar _ { return 'CONVERT' }
 CREATE            = _ 'CREATE'i            !IdentifierChar _ { return 'CREATE' }
-CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
+CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierChar _ { return ast.Identifier('CURRENT_TIMESTAMP') }
 DATABASE          = _ 'DATABASE'i          !IdentifierChar _ { return 'DATABASE' }
 DATE              = _ 'DATE'i              !IdentifierChar _ { return 'DATE' }
 DATETIME          = _ 'DATETIME'i          !IdentifierChar _ { return 'DATETIME' }
@@ -1115,12 +1109,12 @@ XOR               = _ 'XOR'i               !IdentifierChar _ { return 'XOR' }
 
 // Reserved built-in functions
 // TODO: Complete this list
-CHAR_LENGTH       = _ 'CHAR_LENGTH'i       !IdentifierChar _ { return 'CHAR_LENGTH' }
-CONCAT            = _ 'CONCAT'i            !IdentifierChar _ { return 'CONCAT' }
-CONV              = _ 'CONV'i              !IdentifierChar _ { return 'CONV' }
-HEX               = _ 'HEX'i               !IdentifierChar _ { return 'HEX' }
-SUBSTRING         = _ 'SUBSTRING'i         !IdentifierChar _ { return 'SUBSTRING' }
-UNHEX             = _ 'UNHEX'i             !IdentifierChar _ { return 'UNHEX' }
+CHAR_LENGTH       = _ 'CHAR_LENGTH'i       !IdentifierChar _ { return ast.Identifier('CHAR_LENGTH') }
+CONCAT            = _ 'CONCAT'i            !IdentifierChar _ { return ast.Identifier('CONCAT') }
+CONV              = _ 'CONV'i              !IdentifierChar _ { return ast.Identifier('CONV') }
+HEX               = _ 'HEX'i               !IdentifierChar _ { return ast.Identifier('HEX') }
+SUBSTRING         = _ 'SUBSTRING'i         !IdentifierChar _ { return ast.Identifier('SUBSTRING') }
+UNHEX             = _ 'UNHEX'i             !IdentifierChar _ { return ast.Identifier('UNHEX') }
 
 // Composite types
 NOT_NULL = NOT NULL { return 'NOT NULL' }

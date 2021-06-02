@@ -4,6 +4,16 @@ import type { Precision } from './types';
 """
 # ^^^ This preamble will be included verbatim into the generated output.
 
+Identifier:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "identifier"
+  name  string
+
+BuiltInFunction:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "builtinFunction"
+  name  Identifier
+
 TinyInt:
   baseType  "tinyint"
   length    number
@@ -163,3 +173,10 @@ Json:
   | Enum
   | @Bytes
   | Json
+
+# Artificially include a "@Start" group here now, to avoid ast-generator error
+# of "unused nodes". It will automatically combine everything into a "Node"
+# type already. I will need to figure out if that default behaviour is useful,
+# or if we should explicitly define it.
+@Start:
+  | BuiltInFunction

@@ -52,6 +52,10 @@ function isReal(node: Node): boolean %checks {
   return node._kind === 'Decimal' || node._kind === 'Float' || node._kind === 'Double';
 }
 
+function isStart(node: Node): boolean %checks {
+  return node._kind === 'BuiltInFunction';
+}
+
 function isTemporal(node: Node): boolean %checks {
   return (
     node._kind === 'DateTime' ||
@@ -86,6 +90,8 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
+export type Start = BuiltInFunction;
+
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
 export type Textual = Char | VarChar | Text | MediumText | LongText;
@@ -96,6 +102,7 @@ export type Node =
   | BigInt
   | Binary
   | Blob
+  | BuiltInFunction
   | Char
   | Date
   | DateTime
@@ -103,6 +110,7 @@ export type Node =
   | Double
   | Enum
   | Float
+  | Identifier
   | Int
   | Json
   | LongBlob
@@ -125,6 +133,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'BigInt' ||
     node._kind === 'Binary' ||
     node._kind === 'Blob' ||
+    node._kind === 'BuiltInFunction' ||
     node._kind === 'Char' ||
     node._kind === 'Date' ||
     node._kind === 'DateTime' ||
@@ -132,6 +141,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Double' ||
     node._kind === 'Enum' ||
     node._kind === 'Float' ||
+    node._kind === 'Identifier' ||
     node._kind === 'Int' ||
     node._kind === 'Json' ||
     node._kind === 'LongBlob' ||
@@ -168,6 +178,12 @@ export type Blob = {|
   _kind: 'Blob',
   baseType: 'blob',
   length: number,
+|};
+
+export type BuiltInFunction = {|
+  _kind: 'BuiltInFunction',
+  type: 'builtinFunction',
+  name: Identifier,
 |};
 
 export type Char = {|
@@ -214,6 +230,12 @@ export type Float = {|
   baseType: 'float',
   precision: Precision | null,
   unsigned: boolean,
+|};
+
+export type Identifier = {|
+  _kind: 'Identifier',
+  type: 'identifier',
+  name: string,
 |};
 
 export type Int = {|
@@ -357,6 +379,21 @@ export default {
     };
   },
 
+  BuiltInFunction(name: Identifier): BuiltInFunction {
+    invariant(
+      name._kind === 'Identifier',
+      `Invalid value for "name" arg in "BuiltInFunction" call.\nExpected: Identifier\nGot:      ${JSON.stringify(
+        name,
+      )}`,
+    );
+
+    return {
+      _kind: 'BuiltInFunction',
+      type: 'builtinFunction',
+      name,
+    };
+  },
+
   Char(length: number, encoding: Encoding | null = null): Char {
     invariant(
       typeof length === 'number',
@@ -444,6 +481,19 @@ export default {
       baseType: 'float',
       precision,
       unsigned,
+    };
+  },
+
+  Identifier(name: string): Identifier {
+    invariant(
+      typeof name === 'string',
+      `Invalid value for "name" arg in "Identifier" call.\nExpected: string\nGot:      ${JSON.stringify(name)}`,
+    );
+
+    return {
+      _kind: 'Identifier',
+      type: 'identifier',
+      name,
     };
   },
 
@@ -636,6 +686,7 @@ export default {
   isInteger,
   isNumeric,
   isReal,
+  isStart,
   isTemporal,
   isTextual,
   isTextualOrEnum,

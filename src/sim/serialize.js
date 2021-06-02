@@ -58,10 +58,12 @@ export function serialize(node) {
       return escape(node.name);
 
     case 'builtinFunction':
-      return node.name.toLowerCase();
+      return node.name.name.toLowerCase();
 
     default:
-      throw new Error(`Don't know how to serialize ${node.type} nodes yet.  Please tell me.`);
+      throw new Error(
+        `Don't know how to serialize ${node.type} nodes yet. Please tell me. ${JSON.stringify({ node }, null, 2)}`,
+      );
   }
 }
 
