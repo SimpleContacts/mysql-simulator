@@ -240,7 +240,7 @@ SimpleExpr
   // / ~ simple_expr
   / BANG expr:SimpleExpr { return ast.UnaryExpression('!', expr) }
   // / BINARY simple_expr
-  / LPAREN exprs:ExpressionList RPAREN { return exprs }
+  / LPAREN expr:Expression RPAREN { return expr }
   // / ROW (expr, expr [, expr] ...)
   // / (subquery)
   // / EXISTS (subquery)
