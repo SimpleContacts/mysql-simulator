@@ -128,7 +128,6 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
     def.autoIncrement,
     def.comment,
     def.generated,
-    tableEncoding,
   );
 }
 

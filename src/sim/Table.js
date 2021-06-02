@@ -50,8 +50,7 @@ export default class Table {
     // happening by changing the encoding. However, any columns that don't have
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
-    const columns = this.columns.map((column) => column.patch({}, newEncoding));
-    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, newEncoding, this.columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
@@ -69,7 +68,7 @@ export default class Table {
           dataType.baseType === 'enum'
         )
       ) {
-        return column.patch({}, newEncoding);
+        return column;
       }
 
       invariant(
@@ -84,7 +83,7 @@ export default class Table {
       // Also, if the new encoding is the same as the old one, just wipe it (no
       // real change is happening here)
       if (dataType.encoding.charset === newEncoding.charset && dataType.encoding.collate === newEncoding.collate) {
-        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) });
       }
 
       // Otherwise, some conversion is actually imminent. We can only continue
@@ -95,9 +94,9 @@ export default class Table {
 
       // If no explicit encoding is set for this column, just keep it that way
       if (dataType.baseType === 'enum') {
-        return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) });
       } else {
-        return column.patch({ dataType: convertToEncoding(dataType, newEncoding) }, newEncoding);
+        return column.patch({ dataType: convertToEncoding(dataType, newEncoding) });
       }
     });
 
@@ -257,7 +256,7 @@ export default class Table {
         return column;
       }
 
-      return column.patch({ name: newName }, column.tableDefaultEncoding);
+      return column.patch({ name: newName });
     });
 
     // Replace all references to this column if they're used in any of the
@@ -305,8 +304,8 @@ export default class Table {
     if (fks.length > 0) {
       // If the type changes, some MySQL servers might throw
       // a ER_FK_COLUMN_CANNOT_CHANGE error.  Therefore, throw a warning.
-      const oldType = oldColumn.getDefinition();
-      const newType = newColumn.getDefinition();
+      const oldType = oldColumn.getDefinition(table.defaultEncoding);
+      const newType = newColumn.getDefinition(table.defaultEncoding);
       if (oldType !== newType) {
         console.warn('');
         console.warn(`WARNING: Column type change detected on column "${table.name}.${oldColName}" used in FK:`);
@@ -358,7 +357,7 @@ export default class Table {
    */
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
-    const newColumn = column.patch({ defaultValue: null }, column.tableDefaultEncoding);
+    const newColumn = column.patch({ defaultValue: null });
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
     return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
@@ -416,7 +415,7 @@ export default class Table {
       if (!columnNames.includes(c.name)) {
         return c;
       }
-      return c.patch({ nullable: false }, c.tableDefaultEncoding);
+      return c.patch({ nullable: false });
     });
 
     return new Table(
@@ -676,7 +675,7 @@ export default class Table {
   serializeDefinitions(printOptions?: {| includeForeignKeys?: boolean |}): Array<string> {
     const includeFKs = printOptions?.includeForeignKeys ?? true;
     return [
-      ...this.columns.map((col) => col.toString()),
+      ...this.columns.map((col) => col.toString(this.defaultEncoding)),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
 
       ...this.getUniqueIndexes().map((index) => index.toString()),

@@ -6,8 +6,8 @@ import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import ast from '../ast';
 import type { DataType } from '../ast';
-import type { Encoding } from '../ast/encodings';
 import { formatDataType } from './DataType';
+import type { Encoding } from '../ast/encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
@@ -27,12 +27,6 @@ export default class Column {
   +comment: null | string;
   +generated: null | Generated;
 
-  // This contains the parent table's default encoding, which influences how
-  // this column will get serialized.
-  // TODO: See if we can factor this out. Storing this on the column itself
-  // feels wrong.
-  +tableDefaultEncoding: Encoding;
-
   constructor(
     name: string,
     dataType: DataType,
@@ -42,7 +36,6 @@ export default class Column {
     autoIncrement: boolean,
     comment: null | string,
     generated: null | Generated,
-    tableDefaultEncoding: Encoding,
   ) {
     invariant(!ast.isTextual(dataType) || dataType.encoding, 'Encoding must be explicitly set for textual columns');
     this.name = name;
@@ -53,26 +46,22 @@ export default class Column {
     this.autoIncrement = autoIncrement;
     this.comment = comment;
     this.generated = generated;
-    this.tableDefaultEncoding = tableDefaultEncoding;
   }
 
   /**
    * Helper method that returns a new Column instance with the given fields
    * replaced.
    */
-  patch(
-    record: {|
-      +name?: string,
-      +dataType?: DataType,
-      +nullable?: boolean,
-      +defaultValue?: null | string,
-      +onUpdate?: null | string,
-      +autoIncrement?: boolean,
-      +comment?: null | string,
-      +generated?: null | Generated,
-    |},
-    tableDefaultEncoding: Encoding,
-  ): Column {
+  patch(record: {|
+    +name?: string,
+    +dataType?: DataType,
+    +nullable?: boolean,
+    +defaultValue?: null | string,
+    +onUpdate?: null | string,
+    +autoIncrement?: boolean,
+    +comment?: null | string,
+    +generated?: null | Generated,
+  |}): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
       record.dataType !== undefined ? record.dataType : this.dataType,
@@ -82,7 +71,6 @@ export default class Column {
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
       record.generated !== undefined ? record.generated : this.generated,
-      tableDefaultEncoding,
     );
   }
 
@@ -90,17 +78,17 @@ export default class Column {
    * Get the normalized type, not the raw type for this column.
    * e.g. returns "int(11)" or "varchar(16) CHARACTER SET utf8"
    */
-  getType(fullyResolved: boolean = false): string {
+  getType(tableDefaultEncoding: Encoding, fullyResolved: boolean = false): string {
     // TODO: Note that it might be better to "unify" this type in the
     // constructor.  That way, there simply won't be a way of distinguishing
     // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(this.dataType, this.tableDefaultEncoding, fullyResolved);
+    return formatDataType(this.dataType, tableDefaultEncoding, fullyResolved);
   }
 
   /**
    * Get the full-blown column definition, without the name.
    */
-  getDefinition(): string {
+  getDefinition(tableDefaultEncoding: Encoding): string {
     const dataType = this.dataType;
     const generated = this.generated;
     let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
@@ -147,7 +135,7 @@ export default class Column {
     }
 
     return [
-      formatDataType(dataType, this.tableDefaultEncoding, false),
+      formatDataType(dataType, tableDefaultEncoding, false),
       generated === null ? nullable : '',
       defaultValue,
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
@@ -215,7 +203,7 @@ export default class Column {
     return this.nullable ? t.Nullable(baseType) : baseType;
   }
 
-  toString(): string {
-    return `${escape(this.name)} ${this.getDefinition()}`;
+  toString(tableDefaultEncoding: Encoding): string {
+    return `${escape(this.name)} ${this.getDefinition(tableDefaultEncoding)}`;
   }
 }
