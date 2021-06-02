@@ -14,19 +14,19 @@ import type { Precision } from './types';
 
 function isBytes(node: Node): boolean %checks {
   return (
-    node.baseType === 'blob' ||
-    node.baseType === 'binary' ||
-    node.baseType === 'varbinary' ||
-    node.baseType === 'tinyblob' ||
-    node.baseType === 'mediumblob' ||
-    node.baseType === 'longblob'
+    node._kind === 'Blob' ||
+    node._kind === 'Binary' ||
+    node._kind === 'VarBinary' ||
+    node._kind === 'TinyBlob' ||
+    node._kind === 'MediumBlob' ||
+    node._kind === 'LongBlob'
   );
 }
 
 function isDataType(node: Node): boolean %checks {
   return (
-    node.baseType === 'enum' ||
-    node.baseType === 'json' ||
+    node._kind === 'Enum' ||
+    node._kind === 'Json' ||
     isNumeric(node) ||
     isTemporal(node) ||
     isTextual(node) ||
@@ -36,11 +36,11 @@ function isDataType(node: Node): boolean %checks {
 
 function isInteger(node: Node): boolean %checks {
   return (
-    node.baseType === 'tinyint' ||
-    node.baseType === 'mediumint' ||
-    node.baseType === 'smallint' ||
-    node.baseType === 'int' ||
-    node.baseType === 'bigint'
+    node._kind === 'TinyInt' ||
+    node._kind === 'MediumInt' ||
+    node._kind === 'SmallInt' ||
+    node._kind === 'Int' ||
+    node._kind === 'BigInt'
   );
 }
 
@@ -49,31 +49,31 @@ function isNumeric(node: Node): boolean %checks {
 }
 
 function isReal(node: Node): boolean %checks {
-  return node.baseType === 'decimal' || node.baseType === 'float' || node.baseType === 'double';
+  return node._kind === 'Decimal' || node._kind === 'Float' || node._kind === 'Double';
 }
 
 function isTemporal(node: Node): boolean %checks {
   return (
-    node.baseType === 'datetime' ||
-    node.baseType === 'timestamp' ||
-    node.baseType === 'date' ||
-    node.baseType === 'year' ||
-    node.baseType === 'time'
+    node._kind === 'DateTime' ||
+    node._kind === 'Timestamp' ||
+    node._kind === 'Date' ||
+    node._kind === 'Year' ||
+    node._kind === 'Time'
   );
 }
 
 function isTextual(node: Node): boolean %checks {
   return (
-    node.baseType === 'char' ||
-    node.baseType === 'varchar' ||
-    node.baseType === 'text' ||
-    node.baseType === 'mediumtext' ||
-    node.baseType === 'longtext'
+    node._kind === 'Char' ||
+    node._kind === 'VarChar' ||
+    node._kind === 'Text' ||
+    node._kind === 'MediumText' ||
+    node._kind === 'LongText'
   );
 }
 
 function isTextualOrEnum(node: Node): boolean %checks {
-  return node.baseType === 'enum' || isTextual(node);
+  return node._kind === 'Enum' || isTextual(node);
 }
 
 export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
@@ -122,166 +122,192 @@ export type Node =
 
 function isNode(node: Node): boolean %checks {
   return (
-    node.baseType === 'bigint' ||
-    node.baseType === 'binary' ||
-    node.baseType === 'blob' ||
-    node.baseType === 'char' ||
-    node.baseType === 'date' ||
-    node.baseType === 'datetime' ||
-    node.baseType === 'decimal' ||
-    node.baseType === 'double' ||
-    node.baseType === 'enum' ||
-    node.baseType === 'float' ||
-    node.baseType === 'int' ||
-    node.baseType === 'json' ||
-    node.baseType === 'longblob' ||
-    node.baseType === 'longtext' ||
-    node.baseType === 'mediumblob' ||
-    node.baseType === 'mediumint' ||
-    node.baseType === 'mediumtext' ||
-    node.baseType === 'smallint' ||
-    node.baseType === 'text' ||
-    node.baseType === 'time' ||
-    node.baseType === 'timestamp' ||
-    node.baseType === 'tinyblob' ||
-    node.baseType === 'tinyint' ||
-    node.baseType === 'varbinary' ||
-    node.baseType === 'varchar' ||
-    node.baseType === 'year'
+    node._kind === 'BigInt' ||
+    node._kind === 'Binary' ||
+    node._kind === 'Blob' ||
+    node._kind === 'Char' ||
+    node._kind === 'Date' ||
+    node._kind === 'DateTime' ||
+    node._kind === 'Decimal' ||
+    node._kind === 'Double' ||
+    node._kind === 'Enum' ||
+    node._kind === 'Float' ||
+    node._kind === 'Int' ||
+    node._kind === 'Json' ||
+    node._kind === 'LongBlob' ||
+    node._kind === 'LongText' ||
+    node._kind === 'MediumBlob' ||
+    node._kind === 'MediumInt' ||
+    node._kind === 'MediumText' ||
+    node._kind === 'SmallInt' ||
+    node._kind === 'Text' ||
+    node._kind === 'Time' ||
+    node._kind === 'Timestamp' ||
+    node._kind === 'TinyBlob' ||
+    node._kind === 'TinyInt' ||
+    node._kind === 'VarBinary' ||
+    node._kind === 'VarChar' ||
+    node._kind === 'Year'
   );
 }
 
 export type BigInt = {|
+  _kind: 'BigInt',
   baseType: 'bigint',
   length: number,
   unsigned: boolean,
 |};
 
 export type Binary = {|
+  _kind: 'Binary',
   baseType: 'binary',
   length: number,
 |};
 
 export type Blob = {|
+  _kind: 'Blob',
   baseType: 'blob',
   length: number,
 |};
 
 export type Char = {|
+  _kind: 'Char',
   baseType: 'char',
   length: number,
   encoding: Encoding | null,
 |};
 
 export type Date = {|
+  _kind: 'Date',
   baseType: 'date',
 |};
 
 export type DateTime = {|
+  _kind: 'DateTime',
   baseType: 'datetime',
   fsp: number | null,
 |};
 
 export type Decimal = {|
+  _kind: 'Decimal',
   baseType: 'decimal',
   precision: Precision | null,
   unsigned: boolean,
 |};
 
 export type Double = {|
+  _kind: 'Double',
   baseType: 'double',
   precision: Precision | null,
   unsigned: boolean,
 |};
 
 export type Enum = {|
+  _kind: 'Enum',
   baseType: 'enum',
   values: Array<string>,
   encoding: Encoding | null,
 |};
 
 export type Float = {|
+  _kind: 'Float',
   baseType: 'float',
   precision: Precision | null,
   unsigned: boolean,
 |};
 
 export type Int = {|
+  _kind: 'Int',
   baseType: 'int',
   length: number,
   unsigned: boolean,
 |};
 
 export type Json = {|
+  _kind: 'Json',
   baseType: 'json',
 |};
 
 export type LongBlob = {|
+  _kind: 'LongBlob',
   baseType: 'longblob',
 |};
 
 export type LongText = {|
+  _kind: 'LongText',
   baseType: 'longtext',
   encoding: Encoding | null,
 |};
 
 export type MediumBlob = {|
+  _kind: 'MediumBlob',
   baseType: 'mediumblob',
 |};
 
 export type MediumInt = {|
+  _kind: 'MediumInt',
   baseType: 'mediumint',
   length: number,
   unsigned: boolean,
 |};
 
 export type MediumText = {|
+  _kind: 'MediumText',
   baseType: 'mediumtext',
   encoding: Encoding | null,
 |};
 
 export type SmallInt = {|
+  _kind: 'SmallInt',
   baseType: 'smallint',
   length: number,
   unsigned: boolean,
 |};
 
 export type Text = {|
+  _kind: 'Text',
   baseType: 'text',
   encoding: Encoding | null,
 |};
 
 export type Time = {|
+  _kind: 'Time',
   baseType: 'time',
 |};
 
 export type Timestamp = {|
+  _kind: 'Timestamp',
   baseType: 'timestamp',
   fsp: number | null,
 |};
 
 export type TinyBlob = {|
+  _kind: 'TinyBlob',
   baseType: 'tinyblob',
 |};
 
 export type TinyInt = {|
+  _kind: 'TinyInt',
   baseType: 'tinyint',
   length: number,
   unsigned: boolean,
 |};
 
 export type VarBinary = {|
+  _kind: 'VarBinary',
   baseType: 'varbinary',
   length: number,
 |};
 
 export type VarChar = {|
+  _kind: 'VarChar',
   baseType: 'varchar',
   length: number,
   encoding: Encoding | null,
 |};
 
 export type Year = {|
+  _kind: 'Year',
   baseType: 'year',
 |};
 
@@ -298,6 +324,7 @@ export default {
     );
 
     return {
+      _kind: 'BigInt',
       baseType: 'bigint',
       length,
       unsigned,
@@ -311,6 +338,7 @@ export default {
     );
 
     return {
+      _kind: 'Binary',
       baseType: 'binary',
       length,
     };
@@ -323,6 +351,7 @@ export default {
     );
 
     return {
+      _kind: 'Blob',
       baseType: 'blob',
       length,
     };
@@ -335,6 +364,7 @@ export default {
     );
 
     return {
+      _kind: 'Char',
       baseType: 'char',
       length,
       encoding,
@@ -343,6 +373,7 @@ export default {
 
   Date(): Date {
     return {
+      _kind: 'Date',
       baseType: 'date',
     };
   },
@@ -354,6 +385,7 @@ export default {
     );
 
     return {
+      _kind: 'DateTime',
       baseType: 'datetime',
       fsp,
     };
@@ -366,6 +398,7 @@ export default {
     );
 
     return {
+      _kind: 'Decimal',
       baseType: 'decimal',
       precision,
       unsigned,
@@ -379,6 +412,7 @@ export default {
     );
 
     return {
+      _kind: 'Double',
       baseType: 'double',
       precision,
       unsigned,
@@ -392,6 +426,7 @@ export default {
     );
 
     return {
+      _kind: 'Enum',
       baseType: 'enum',
       values,
       encoding,
@@ -405,6 +440,7 @@ export default {
     );
 
     return {
+      _kind: 'Float',
       baseType: 'float',
       precision,
       unsigned,
@@ -423,6 +459,7 @@ export default {
     );
 
     return {
+      _kind: 'Int',
       baseType: 'int',
       length,
       unsigned,
@@ -431,18 +468,21 @@ export default {
 
   Json(): Json {
     return {
+      _kind: 'Json',
       baseType: 'json',
     };
   },
 
   LongBlob(): LongBlob {
     return {
+      _kind: 'LongBlob',
       baseType: 'longblob',
     };
   },
 
   LongText(encoding: Encoding | null = null): LongText {
     return {
+      _kind: 'LongText',
       baseType: 'longtext',
       encoding,
     };
@@ -450,6 +490,7 @@ export default {
 
   MediumBlob(): MediumBlob {
     return {
+      _kind: 'MediumBlob',
       baseType: 'mediumblob',
     };
   },
@@ -466,6 +507,7 @@ export default {
     );
 
     return {
+      _kind: 'MediumInt',
       baseType: 'mediumint',
       length,
       unsigned,
@@ -474,6 +516,7 @@ export default {
 
   MediumText(encoding: Encoding | null = null): MediumText {
     return {
+      _kind: 'MediumText',
       baseType: 'mediumtext',
       encoding,
     };
@@ -491,6 +534,7 @@ export default {
     );
 
     return {
+      _kind: 'SmallInt',
       baseType: 'smallint',
       length,
       unsigned,
@@ -499,6 +543,7 @@ export default {
 
   Text(encoding: Encoding | null = null): Text {
     return {
+      _kind: 'Text',
       baseType: 'text',
       encoding,
     };
@@ -506,6 +551,7 @@ export default {
 
   Time(): Time {
     return {
+      _kind: 'Time',
       baseType: 'time',
     };
   },
@@ -517,6 +563,7 @@ export default {
     );
 
     return {
+      _kind: 'Timestamp',
       baseType: 'timestamp',
       fsp,
     };
@@ -524,6 +571,7 @@ export default {
 
   TinyBlob(): TinyBlob {
     return {
+      _kind: 'TinyBlob',
       baseType: 'tinyblob',
     };
   },
@@ -540,6 +588,7 @@ export default {
     );
 
     return {
+      _kind: 'TinyInt',
       baseType: 'tinyint',
       length,
       unsigned,
@@ -553,6 +602,7 @@ export default {
     );
 
     return {
+      _kind: 'VarBinary',
       baseType: 'varbinary',
       length,
     };
@@ -565,6 +615,7 @@ export default {
     );
 
     return {
+      _kind: 'VarChar',
       baseType: 'varchar',
       length,
       encoding,
@@ -573,6 +624,7 @@ export default {
 
   Year(): Year {
     return {
+      _kind: 'Year',
       baseType: 'year',
     };
   },

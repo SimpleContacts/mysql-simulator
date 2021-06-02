@@ -1645,10 +1645,10 @@ assign-symbols@^1.0.0:
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c=
 
-ast-generator@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/ast-generator/-/ast-generator-0.0.3.tgz#13f3a69cc878497baebfb2f84215324ffc93fee8"
-  integrity sha512-QnzcL71O+0CFSV3N6JpSgkWbocgMjvm+su07yqyETVg3UHli0quHgCOodU+T0DSpaF+dwQrs6SJUVxJsBI/tPg==
+ast-generator@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/ast-generator/-/ast-generator-0.0.4.tgz#b3613345af6b016d961c1e222bbb65130b10935b"
+  integrity sha512-CAU9spcOiZln9ANMcX3lSv0g6joWartCC8Pl8pS/yTkTTnWnYWBdwem+qW4NZzjAS7lJQlH6bxaPMxkNw5Q0Bw==
   dependencies:
     chalk "^4.1.1"
     commander "^7.2.0"
