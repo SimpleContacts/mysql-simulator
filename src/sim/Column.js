@@ -5,9 +5,9 @@ import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import ast from '../ast';
-import type { GeneratedDefinition, DataType } from '../ast';
-import { formatDataType } from './DataType';
+import type { DataType, GeneratedDefinition } from '../ast';
 import type { Encoding } from '../ast/encodings';
+import { formatDataType } from './DataType';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';

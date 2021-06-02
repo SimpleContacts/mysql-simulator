@@ -1,6 +1,7 @@
 // @flow strict
 
 import invariant from 'invariant';
+
 import type { Expression } from '../ast';
 import { escape, quoteInExpressionContext, unquote } from './utils';
 
