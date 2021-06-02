@@ -8,7 +8,7 @@ const ast = require('../ast').default;
 const { makeEncoding } = require('../ast/encodings.js')
 
 function literal(value) {
-  return { type: 'literal', value }
+  return ast.Literal(value)
 }
 
 function unary(op, expr) {
@@ -17,11 +17,6 @@ function unary(op, expr) {
 
 function binary(op, expr1, expr2) {
   return { type: 'binary', op, expr1, expr2 }
-}
-
-function callExpression(name, args) {
-  invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
-  return { type: 'callExpression', name, args }
 }
 
 function generated(expr, mode) {
@@ -82,7 +77,7 @@ function serializeDefaultValue_HACK(node) {
 function serializeCallExpression(node) {
   invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
   let f = serialize(node.name)
-  if (node.args !== undefined) {
+  if (node.args !== null) {
     f += `(${node.args.map(serialize).join(', ')})`;
   }
   return f;
@@ -271,18 +266,18 @@ SimpleExpr
 
 FunctionCall
   = name:FunctionName LPAREN exprs:ExpressionList RPAREN {
-      return callExpression(ast.BuiltInFunction(name), exprs)
+      return ast.CallExpression(ast.BuiltInFunction(name), exprs)
     }
 
   / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
-      return callExpression(ast.BuiltInFunction(ident), exprs)
+      return ast.CallExpression(ast.BuiltInFunction(ident), exprs)
     }
 
   // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
   / ident:Identifier arrow:( ARROWW / ARROW ) lit:StringLiteral {
-      let rv = callExpression(ast.BuiltInFunction(ast.Identifier('JSON_EXTRACT')), [ident, lit])
+      let rv = ast.CallExpression(ast.BuiltInFunction(ast.Identifier('JSON_EXTRACT')), [ident, lit])
       if (arrow === '->>') {
-        rv = callExpression(ast.BuiltInFunction(ast.Identifier('JSON_UNQUOTE')), [rv])
+        rv = ast.CallExpression(ast.BuiltInFunction(ast.Identifier('JSON_UNQUOTE')), [rv])
       }
       return rv
     }
@@ -948,7 +943,7 @@ DefaultValueExpr
 
 CurrentTimestamp
   = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? {
-    return callExpression(ast.BuiltInFunction(value), precision ? [precision] : undefined)
+    return ast.CallExpression(ast.BuiltInFunction(value), precision ? [precision] : null)
   }
 
 NowCall

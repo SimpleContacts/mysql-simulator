@@ -4,15 +4,35 @@ import type { Precision } from './types';
 """
 # ^^^ This preamble will be included verbatim into the generated output.
 
+Literal:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type   "literal"
+  value  mixed
+
 Identifier:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type  "identifier"
   name  string
 
+CallExpression:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "callExpression"
+  name  BuiltInFunction
+  # The args are optional. For example, when null, this means a "call" like
+  # `CURRENT_TIMESTAMP`. But when "empty" (e.g. []) this denotes a call like
+  # `NOW()`.
+  # TODO: Replace `mixed` with `@Expression`
+  args  mixed*?
+
 BuiltInFunction:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type  "builtinFunction"
   name  Identifier
+
+@Expression:
+  | Literal
+  | Identifier
+  | CallExpression
 
 TinyInt:
   baseType  "tinyint"
@@ -179,4 +199,4 @@ Json:
 # type already. I will need to figure out if that default behaviour is useful,
 # or if we should explicitly define it.
 @Start:
-  | BuiltInFunction
+  | @Expression

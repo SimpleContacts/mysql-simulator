@@ -34,6 +34,10 @@ function isDataType(node: Node): boolean %checks {
   );
 }
 
+function isExpression(node: Node): boolean %checks {
+  return node._kind === 'Literal' || node._kind === 'Identifier' || node._kind === 'CallExpression';
+}
+
 function isInteger(node: Node): boolean %checks {
   return (
     node._kind === 'TinyInt' ||
@@ -53,7 +57,7 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return node._kind === 'BuiltInFunction';
+  return isExpression(node);
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -84,13 +88,15 @@ export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob
 
 export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
 
+export type Expression = Literal | Identifier | CallExpression;
+
 export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt;
 
 export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = BuiltInFunction;
+export type Start = Expression;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -103,6 +109,7 @@ export type Node =
   | Binary
   | Blob
   | BuiltInFunction
+  | CallExpression
   | Char
   | Date
   | DateTime
@@ -113,6 +120,7 @@ export type Node =
   | Identifier
   | Int
   | Json
+  | Literal
   | LongBlob
   | LongText
   | MediumBlob
@@ -134,6 +142,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Binary' ||
     node._kind === 'Blob' ||
     node._kind === 'BuiltInFunction' ||
+    node._kind === 'CallExpression' ||
     node._kind === 'Char' ||
     node._kind === 'Date' ||
     node._kind === 'DateTime' ||
@@ -144,6 +153,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Identifier' ||
     node._kind === 'Int' ||
     node._kind === 'Json' ||
+    node._kind === 'Literal' ||
     node._kind === 'LongBlob' ||
     node._kind === 'LongText' ||
     node._kind === 'MediumBlob' ||
@@ -184,6 +194,13 @@ export type BuiltInFunction = {|
   _kind: 'BuiltInFunction',
   type: 'builtinFunction',
   name: Identifier,
+|};
+
+export type CallExpression = {|
+  _kind: 'CallExpression',
+  type: 'callExpression',
+  name: BuiltInFunction,
+  args: Array<mixed> | null,
 |};
 
 export type Char = {|
@@ -248,6 +265,12 @@ export type Int = {|
 export type Json = {|
   _kind: 'Json',
   baseType: 'json',
+|};
+
+export type Literal = {|
+  _kind: 'Literal',
+  type: 'literal',
+  value: mixed,
 |};
 
 export type LongBlob = {|
@@ -394,6 +417,27 @@ export default {
     };
   },
 
+  CallExpression(name: BuiltInFunction, args: Array<mixed> | null = null): CallExpression {
+    invariant(
+      name._kind === 'BuiltInFunction',
+      `Invalid value for "name" arg in "CallExpression" call.\nExpected: BuiltInFunction\nGot:      ${JSON.stringify(
+        name,
+      )}`,
+    );
+
+    invariant(
+      args === null || Array.isArray(args),
+      `Invalid value for "args" arg in "CallExpression" call.\nExpected: mixed*?\nGot:      ${JSON.stringify(args)}`,
+    );
+
+    return {
+      _kind: 'CallExpression',
+      type: 'callExpression',
+      name,
+      args,
+    };
+  },
+
   Char(length: number, encoding: Encoding | null = null): Char {
     invariant(
       typeof length === 'number',
@@ -520,6 +564,14 @@ export default {
     return {
       _kind: 'Json',
       baseType: 'json',
+    };
+  },
+
+  Literal(value: mixed): Literal {
+    return {
+      _kind: 'Literal',
+      type: 'literal',
+      value,
     };
   },
 
@@ -683,6 +735,7 @@ export default {
   isNode,
   isBytes,
   isDataType,
+  isExpression,
   isInteger,
   isNumeric,
   isReal,

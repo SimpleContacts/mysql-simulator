@@ -189,15 +189,15 @@ function peg$parse(input, options) {
       peg$c29 = function(expr) { return unary('!', expr) },
       peg$c30 = function(exprs) { return exprs },
       peg$c31 = function(name, exprs) {
-            return callExpression(ast.BuiltInFunction(name), exprs)
+            return ast.CallExpression(ast.BuiltInFunction(name), exprs)
           },
       peg$c32 = function(ident, exprs) {
-            return callExpression(ast.BuiltInFunction(ident), exprs)
+            return ast.CallExpression(ast.BuiltInFunction(ident), exprs)
           },
       peg$c33 = function(ident, arrow, lit) {
-            let rv = callExpression(ast.BuiltInFunction(ast.Identifier('JSON_EXTRACT')), [ident, lit])
+            let rv = ast.CallExpression(ast.BuiltInFunction(ast.Identifier('JSON_EXTRACT')), [ident, lit])
             if (arrow === '->>') {
-              rv = callExpression(ast.BuiltInFunction(ast.Identifier('JSON_UNQUOTE')), [rv])
+              rv = ast.CallExpression(ast.BuiltInFunction(ast.Identifier('JSON_UNQUOTE')), [rv])
             }
             return rv
           },
@@ -615,7 +615,7 @@ function peg$parse(input, options) {
       peg$c187 = function(lit) { return lit.value },
       peg$c188 = function(value, n) { return n },
       peg$c189 = function(value, precision) {
-          return callExpression(ast.BuiltInFunction(value), precision ? [precision] : undefined)
+          return ast.CallExpression(ast.BuiltInFunction(value), precision ? [precision] : null)
         },
       peg$c190 = function() { return callExpression(ast.BuiltInFunction(ast.Identifier('NOW')), []) },
       peg$c191 = peg$otherExpectation("whitespace"),
@@ -17337,11 +17337,6 @@ function peg$parse(input, options) {
     return { type: 'binary', op, expr1, expr2 }
   }
 
-  function callExpression(name, args) {
-    invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
-    return { type: 'callExpression', name, args }
-  }
-
   function generated(expr, mode) {
     return { type: 'generated', expr, mode }
   }
@@ -17400,7 +17395,7 @@ function peg$parse(input, options) {
   function serializeCallExpression(node) {
     invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
     let f = serialize(node.name)
-    if (node.args !== undefined) {
+    if (node.args !== null) {
       f += `(${node.args.map(serialize).join(', ')})`;
     }
     return f;
