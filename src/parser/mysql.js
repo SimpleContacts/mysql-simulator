@@ -510,7 +510,7 @@ function peg$parse(input, options) {
       peg$c117 = function(dataType, nullableClause, value) { return value },
       peg$c118 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, value) { return value.value },
       peg$c119 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, expr) { return expr },
-      peg$c120 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, onUpdate, expr, mode) { return generated(expr, mode || 'VIRTUAL') },
+      peg$c120 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, onUpdate, expr, mode) { return ast.GeneratedClause(expr, mode || 'VIRTUAL') },
       peg$c121 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, onUpdate, generated, nullableClause2) {
             let nullable = null;
             if (nullableClause === 'NULL' || nullableClause2 === 'NULL') {
@@ -17327,10 +17327,6 @@ function peg$parse(input, options) {
   const invariant = require('invariant');
   const ast = require('../ast').default;
   const { makeEncoding } = require('../ast/encodings.js')
-
-  function generated(expr, mode) {
-    return { type: 'generated', expr, mode }
-  }
 
   //
   // HACK: Using this for now, because the Simulator internals aren't aware of

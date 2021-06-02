@@ -8,6 +8,8 @@ type BooleanOp = "AND" | "OR" | "XOR";
 type CmpOp = "=" | "<=>" | "!=" | "<>" | ">=" | "<=" | "<" | ">" | "LIKE" | "REGEXP" | "RLIKE";
 type ArithmOp = "+" | "-" | "*" | "/" | "%" | "DIV";
 export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
+
+export type GeneratedColumnMode = "STORED" | "VIRTUAL";
 """
 
 Literal:
@@ -57,6 +59,12 @@ BuiltInFunction:
   | UnaryExpression
   | BinaryExpression
   | CallExpression
+
+GeneratedClause:
+  type  "generated"
+  # TODO: Replace with @Expression
+  expr  mixed
+  mode  GeneratedColumnMode
 
 TinyInt:
   baseType  "tinyint"
@@ -224,3 +232,4 @@ Json:
 # or if we should explicitly define it.
 @Start:
   | @Expression
+  | GeneratedClause

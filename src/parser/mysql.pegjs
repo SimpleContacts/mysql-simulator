@@ -7,10 +7,6 @@ const invariant = require('invariant');
 const ast = require('../ast').default;
 const { makeEncoding } = require('../ast/encodings.js')
 
-function generated(expr, mode) {
-  return { type: 'generated', expr, mode }
-}
-
 //
 // HACK: Using this for now, because the Simulator internals aren't aware of
 // Nodes, so we'll have to convert this to strings before we pass it on.
@@ -769,7 +765,8 @@ ColumnDefinition
     comment:( COMMENT value:StringLiteral { return value.value } )?
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:DefaultValueExpr { return expr } )?
-    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )? { return generated(expr, mode || 'VIRTUAL') } )?
+    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )?
+                { return ast.GeneratedClause(expr, mode || 'VIRTUAL') } )?
     nullableClause2:( NULL / NOT_NULL )?
     {
       let nullable = null;

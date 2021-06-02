@@ -19,6 +19,8 @@ type CmpOp = '=' | '<=>' | '!=' | '<>' | '>=' | '<=' | '<' | '>' | 'LIKE' | 'REG
 type ArithmOp = '+' | '-' | '*' | '/' | '%' | 'DIV';
 export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
 
+export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
+
 function isBytes(node: Node): boolean %checks {
   return (
     node._kind === 'Blob' ||
@@ -70,7 +72,7 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return isExpression(node);
+  return node._kind === 'GeneratedClause' || isExpression(node);
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -109,7 +111,7 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression;
+export type Start = Expression | GeneratedClause;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -131,6 +133,7 @@ export type Node =
   | Double
   | Enum
   | Float
+  | GeneratedClause
   | Identifier
   | Int
   | Json
@@ -166,6 +169,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Double' ||
     node._kind === 'Enum' ||
     node._kind === 'Float' ||
+    node._kind === 'GeneratedClause' ||
     node._kind === 'Identifier' ||
     node._kind === 'Int' ||
     node._kind === 'Json' ||
@@ -272,6 +276,13 @@ export type Float = {|
   baseType: 'float',
   precision: Precision | null,
   unsigned: boolean,
+|};
+
+export type GeneratedClause = {|
+  _kind: 'GeneratedClause',
+  type: 'generated',
+  expr: mixed,
+  mode: GeneratedColumnMode,
 |};
 
 export type Identifier = {|
@@ -567,6 +578,15 @@ export default {
       baseType: 'float',
       precision,
       unsigned,
+    };
+  },
+
+  GeneratedClause(expr: mixed, mode: GeneratedColumnMode): GeneratedClause {
+    return {
+      _kind: 'GeneratedClause',
+      type: 'generated',
+      expr,
+      mode,
     };
   },
 
