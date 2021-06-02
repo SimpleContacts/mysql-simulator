@@ -1,8 +1,12 @@
 // @flow strict
 
-import type { DataType, TextualOrEnum } from '../ast';
+import invariant from 'invariant';
+
+import type { DataType, Textual, TextualOrEnum } from '../ast';
+import ast from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
+import { isWider } from '../ast/encodings';
 import { quote } from './utils';
 
 export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): T {
@@ -22,6 +26,41 @@ export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): 
   }
 
   throw new Error('Unknown string column: ' + dataType.baseType);
+}
+
+/**
+ * Like setEncoding(), but potentially changes the datatype along the way, if
+ * this is necessary to switch to a wider charset.
+ */
+export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Textual {
+  const currentEncoding = dataType.encoding;
+  invariant(
+    currentEncoding !== null,
+    'Expected current encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2),
+  );
+
+  // Converting to another encoding can cause MySQL to grow the datatype's
+  // size to the next tier, and this explicit conversion helps to avoid
+  // truncation. See https://bugs.mysql.com/bug.php?id=31291
+  if (!isWider(newEncoding.charset, currentEncoding.charset)) {
+    // If the charset didn't grow wider, just updating the encoding is
+    // fine. The base type of the column won't change.
+    return setEncoding(dataType, newEncoding);
+  }
+
+  // Pick the next tier
+  switch (dataType.baseType) {
+    case 'text':
+      // TEXT -> MEDIUMTEXT
+      return ast.MediumText(newEncoding);
+
+    case 'mediumtext':
+      // MEDIUMTEXT -> LONGTEXT
+      return ast.LongText(newEncoding);
+
+    default:
+      return setEncoding(dataType, newEncoding);
+  }
 }
 
 /**

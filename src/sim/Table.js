@@ -5,13 +5,11 @@ import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
 import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
-import ast from '../ast';
-import type { Textual } from '../ast';
 import type { Encoding } from '../ast/encodings';
-import { getDefaultCollationForCharset, isWider } from '../ast/encodings';
+import { getDefaultCollationForCharset } from '../ast/encodings';
 import Column from './Column';
 import Database from './Database';
-import { setEncoding } from './DataType';
+import { convertToEncoding, setEncoding } from './DataType';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
@@ -57,37 +55,6 @@ export default class Table {
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
-    function computeNewType(dataType: Textual, newEncoding: Encoding): Textual {
-      const currentEncoding = dataType.encoding;
-      invariant(
-        currentEncoding !== null,
-        'Expected current encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2),
-      );
-
-      // Converting to another encoding can cause MySQL to grow the datatype's
-      // size to the next tier, and this explicit conversion helps to avoid
-      // truncation. See https://bugs.mysql.com/bug.php?id=31291
-      if (!isWider(newEncoding.charset, currentEncoding.charset)) {
-        // If the charset didn't grow wider, just updating the encoding is
-        // fine. The base type of the column won't change.
-        return setEncoding(dataType, newEncoding);
-      }
-
-      // Pick the next tier
-      switch (dataType.baseType) {
-        case 'text':
-          // TEXT -> MEDIUMTEXT
-          return ast.MediumText(newEncoding);
-
-        case 'mediumtext':
-          // MEDIUMTEXT -> LONGTEXT
-          return ast.LongText(newEncoding);
-
-        default:
-          return setEncoding(dataType, newEncoding);
-      }
-    }
-
     const columns = this.columns.map((column) => {
       const dataType = column.dataType;
       if (
@@ -130,7 +97,7 @@ export default class Table {
       if (dataType.baseType === 'enum') {
         return column.patch({ dataType: setEncoding(dataType, newEncoding) }, newEncoding);
       } else {
-        return column.patch({ dataType: computeNewType(dataType, newEncoding) }, newEncoding);
+        return column.patch({ dataType: convertToEncoding(dataType, newEncoding) }, newEncoding);
       }
     });
 
