@@ -166,27 +166,27 @@ function peg$parse(input, options) {
       peg$c17 = /^[^;]/,
       peg$c18 = peg$classExpectation([";"], true, false),
       peg$c19 = function() { return null; },
-      peg$c20 = function(expr1, op, expr2) { return binary(op, expr1, expr2) },
+      peg$c20 = function(expr1, op, expr2) { return ast.BinaryExpression(op, expr1, expr2) },
       peg$c21 = function(pred, check) {
             if (check === 'NULL') {
-              return unary('is null', pred)
+              return ast.UnaryExpression('is null', pred)
             } else {
-              return unary('is not null', pred)
+              return ast.UnaryExpression('is not null', pred)
             }
           },
-      peg$c22 = function(pred1, op, pred2) { return binary(op, pred1, pred2) },
+      peg$c22 = function(pred1, op, pred2) { return ast.BinaryExpression(op, pred1, pred2) },
       peg$c23 = function() { return 'REGEXP' },
       peg$c24 = function(expr1, op, expr2) { return { op, expr2 } },
       peg$c25 = function(expr1, rest) {
             return rest.reduce(
-              (acc, cur) => binary(cur.op, acc, cur.expr2),
+              (acc, cur) => ast.BinaryExpression(cur.op, acc, cur.expr2),
               expr1
             )
           },
       peg$c26 = function() { return '%' },
-      peg$c27 = function(expr) { return unary('+', expr) },
-      peg$c28 = function(expr) { return unary('-', expr) },
-      peg$c29 = function(expr) { return unary('!', expr) },
+      peg$c27 = function(expr) { return ast.UnaryExpression('+', expr) },
+      peg$c28 = function(expr) { return ast.UnaryExpression('-', expr) },
+      peg$c29 = function(expr) { return ast.UnaryExpression('!', expr) },
       peg$c30 = function(exprs) { return exprs },
       peg$c31 = function(name, exprs) {
             return ast.CallExpression(ast.BuiltInFunction(name), exprs)
@@ -204,17 +204,17 @@ function peg$parse(input, options) {
       peg$c34 = ".",
       peg$c35 = peg$literalExpectation(".", false),
       peg$c36 = function(object, property) { return null },
-      peg$c37 = function() { return literal(null) },
-      peg$c38 = function() { return literal(true) },
-      peg$c39 = function() { return literal(false) },
+      peg$c37 = function() { return ast.Literal(null) },
+      peg$c38 = function() { return ast.Literal(true) },
+      peg$c39 = function() { return ast.Literal(false) },
       peg$c40 = /^[0-9]/,
       peg$c41 = peg$classExpectation([["0", "9"]], false, false),
-      peg$c42 = function(digits) { return literal(parseInt(digits.join(''), 10)) },
+      peg$c42 = function(digits) { return ast.Literal(parseInt(digits.join(''), 10)) },
       peg$c43 = "0x",
       peg$c44 = peg$literalExpectation("0x", false),
       peg$c45 = /^[0-9a-fA-F]/,
       peg$c46 = peg$classExpectation([["0", "9"], ["a", "f"], ["A", "F"]], false, false),
-      peg$c47 = function(digits) { return literal(parseInt(digits.join(''), 16)) },
+      peg$c47 = function(digits) { return ast.Literal(parseInt(digits.join(''), 16)) },
       peg$c48 = "'",
       peg$c49 = peg$literalExpectation("'", false),
       peg$c50 = "''",
@@ -225,7 +225,7 @@ function peg$parse(input, options) {
       peg$c55 = /^[^']/,
       peg$c56 = peg$classExpectation(["'"], true, false),
       peg$c57 = function(seq) {
-          return literal(`'${seq.join('')}'`)
+          return ast.Literal(`'${seq.join('')}'`)
         },
       peg$c58 = "\"",
       peg$c59 = peg$literalExpectation("\"", false),
@@ -2034,7 +2034,7 @@ function peg$parse(input, options) {
           if (s1 !== peg$FAILED) {
             s2 = peg$parseEQ();
             if (s2 === peg$FAILED) {
-              s2 = peg$parseNE();
+              s2 = peg$parseSTRICT_EQ();
               if (s2 === peg$FAILED) {
                 s2 = peg$parseLTE();
                 if (s2 === peg$FAILED) {
@@ -2275,29 +2275,32 @@ function peg$parse(input, options) {
 
     s0 = peg$parseEQ();
     if (s0 === peg$FAILED) {
-      s0 = peg$parseNE1();
+      s0 = peg$parseSTRICT_EQ();
       if (s0 === peg$FAILED) {
-        s0 = peg$parseNE2();
+        s0 = peg$parseNE1();
         if (s0 === peg$FAILED) {
-          s0 = peg$parseGTE();
+          s0 = peg$parseNE2();
           if (s0 === peg$FAILED) {
-            s0 = peg$parseGT();
+            s0 = peg$parseGTE();
             if (s0 === peg$FAILED) {
-              s0 = peg$parseLTE();
+              s0 = peg$parseGT();
               if (s0 === peg$FAILED) {
-                s0 = peg$parseLT();
+                s0 = peg$parseLTE();
                 if (s0 === peg$FAILED) {
-                  s0 = peg$parseLIKE();
+                  s0 = peg$parseLT();
                   if (s0 === peg$FAILED) {
-                    s0 = peg$parseREGEXP();
+                    s0 = peg$parseLIKE();
                     if (s0 === peg$FAILED) {
-                      s0 = peg$currPos;
-                      s1 = peg$parseRLIKE();
-                      if (s1 !== peg$FAILED) {
-                        peg$savedPos = s0;
-                        s1 = peg$c23();
+                      s0 = peg$parseREGEXP();
+                      if (s0 === peg$FAILED) {
+                        s0 = peg$currPos;
+                        s1 = peg$parseRLIKE();
+                        if (s1 !== peg$FAILED) {
+                          peg$savedPos = s0;
+                          s1 = peg$c23();
+                        }
+                        s0 = s1;
                       }
-                      s0 = s1;
                     }
                   }
                 }
@@ -16994,7 +16997,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseNE() {
+  function peg$parseSTRICT_EQ() {
     var s0, s1, s2, s3;
 
     var key    = peg$currPos * 244 + 237,
@@ -17324,18 +17327,6 @@ function peg$parse(input, options) {
   const invariant = require('invariant');
   const ast = require('../ast').default;
   const { makeEncoding } = require('../ast/encodings.js')
-
-  function literal(value) {
-    return { type: 'literal', value }
-  }
-
-  function unary(op, expr) {
-    return { type: 'unary', op, expr }
-  }
-
-  function binary(op, expr1, expr2) {
-    return { type: 'binary', op, expr1, expr2 }
-  }
 
   function generated(expr, mode) {
     return { type: 'generated', expr, mode }

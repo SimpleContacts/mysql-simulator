@@ -7,18 +7,6 @@ const invariant = require('invariant');
 const ast = require('../ast').default;
 const { makeEncoding } = require('../ast/encodings.js')
 
-function literal(value) {
-  return ast.Literal(value)
-}
-
-function unary(op, expr) {
-  return { type: 'unary', op, expr }
-}
-
-function binary(op, expr1, expr2) {
-  return { type: 'binary', op, expr1, expr2 }
-}
-
 function generated(expr, mode) {
   return { type: 'generated', expr, mode }
 }
@@ -146,14 +134,14 @@ Condition
   = BooleanLiteral
   / NOT Condition
   / LPAREN Condition RPAREN
-  / left:Expression ( EQ / NE / LTE / GTE / LT / GT ) right:Expression
+  / left:Expression ( EQ / STRICT_EQ / LTE / GTE / LT / GT ) right:Expression
 
 ExpressionList
   = first:Expression COMMA rest:ExpressionList { return [first, ...rest] }
   / only:Expression { return [only] }
 
 Expression
-  = expr1:BooleanPrimary op:BooleanOp expr2:BooleanPrimary { return binary(op, expr1, expr2) }
+  = expr1:BooleanPrimary op:BooleanOp expr2:BooleanPrimary { return ast.BinaryExpression(op, expr1, expr2) }
   / BooleanPrimary
 
 BooleanOp
@@ -164,16 +152,17 @@ BooleanOp
 BooleanPrimary
   = pred:Predicate IS check:( NULL / NOT_NULL ) {
       if (check === 'NULL') {
-        return unary('is null', pred)
+        return ast.UnaryExpression('is null', pred)
       } else {
-        return unary('is not null', pred)
+        return ast.UnaryExpression('is not null', pred)
       }
     }
-  / pred1:Predicate op:CmpOp pred2:Predicate { return binary(op, pred1, pred2) }
+  / pred1:Predicate op:CmpOp pred2:Predicate { return ast.BinaryExpression(op, pred1, pred2) }
   / Predicate
 
 CmpOp
   = EQ
+  / STRICT_EQ
   / NE1
   / NE2
   / GTE
@@ -192,7 +181,7 @@ BitExpr1
   // Mostly expressed like this to fight left-recursion in the grammer
   = expr1:BitExpr2 rest:( op:BitExprOp1 expr2:BitExpr2 { return { op, expr2 } } )* {
       return rest.reduce(
-        (acc, cur) => binary(cur.op, acc, cur.expr2),
+        (acc, cur) => ast.BinaryExpression(cur.op, acc, cur.expr2),
         expr1
       )
     }
@@ -201,7 +190,7 @@ BitExpr2
   // Mostly expressed like this to fight left-recursion in the grammer
   = expr1:SimpleExpr rest:( op:BitExprOp2 expr2:SimpleExpr { return { op, expr2 } } )* {
       return rest.reduce(
-        (acc, cur) => binary(cur.op, acc, cur.expr2),
+        (acc, cur) => ast.BinaryExpression(cur.op, acc, cur.expr2),
         expr1
       )
     }
@@ -250,10 +239,10 @@ SimpleExpr
   // / param_marker
   // / variable
   // / simple_expr || simple_expr
-  / PLUS expr:SimpleExpr { return unary('+', expr) }
-  / MINUS expr:SimpleExpr { return unary('-', expr) }
+  / PLUS expr:SimpleExpr { return ast.UnaryExpression('+', expr) }
+  / MINUS expr:SimpleExpr { return ast.UnaryExpression('-', expr) }
   // / ~ simple_expr
-  / BANG expr:SimpleExpr { return unary('!', expr) }
+  / BANG expr:SimpleExpr { return ast.UnaryExpression('!', expr) }
   // / BINARY simple_expr
   / LPAREN exprs:ExpressionList RPAREN { return exprs }
   // / ROW (expr, expr [, expr] ...)
@@ -300,21 +289,21 @@ FunctionName
 // ====================================================
 
 NullLiteral
-  = NULL { return literal(null) }
+  = NULL { return ast.Literal(null) }
 
 BooleanLiteral
-  = TRUE  { return literal(true) }
-  / FALSE { return literal(false) }
+  = TRUE  { return ast.Literal(true) }
+  / FALSE { return ast.Literal(false) }
 
 NumberLiteral
   = HexNumberLiteral
   / DecimalNumberLiteral
 
 DecimalNumberLiteral
-  = digits:[0-9]+ { return literal(parseInt(digits.join(''), 10)) }
+  = digits:[0-9]+ { return ast.Literal(parseInt(digits.join(''), 10)) }
 
 HexNumberLiteral
-  = '0x' digits:[0-9a-fA-F]+ { return literal(parseInt(digits.join(''), 16)) }
+  = '0x' digits:[0-9a-fA-F]+ { return ast.Literal(parseInt(digits.join(''), 16)) }
 
 StringLiteral
   = SingleQuotedStringLiteral
@@ -322,12 +311,12 @@ StringLiteral
 
 SingleQuotedStringLiteral
   = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" {
-    return literal(`'${seq.join('')}'`)
+    return ast.Literal(`'${seq.join('')}'`)
   }
 
 DoubleQuotedStringLiteral
   = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' {
-    return literal(`'${seq.join('')}'`)
+    return ast.Literal(`'${seq.join('')}'`)
   }
 
 StringLiteralList
@@ -1131,7 +1120,7 @@ LT         = _ '<' _    { return '<' }
 LTE        = _ '<=' _   { return '<=' }
 MINUS      = _ '-' _    { return '-' }
 MULT       = _ '*' _    { return '*' }
-NE         = _ '<=>' _  { return '<=>' }
+STRICT_EQ  = _ '<=>' _  { return '<=>' }
 NE1        = _ '<>' _   { return '<>' }
 NE2        = _ '!=' _   { return '<>' }
 PERCENTAGE = _ '%' _    { return '%' }

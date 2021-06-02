@@ -12,6 +12,13 @@ import invariant from 'invariant';
 import type { Encoding } from './encodings';
 import type { Precision } from './types';
 
+export type UnaryOp = '+' | '-' | '!' | 'is null' | 'is not null';
+
+type BooleanOp = 'AND' | 'OR' | 'XOR';
+type CmpOp = '=' | '<=>' | '!=' | '<>' | '>=' | '<=' | '<' | '>' | 'LIKE' | 'REGEXP' | 'RLIKE';
+type ArithmOp = '+' | '-' | '*' | '/' | '%' | 'DIV';
+export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
+
 function isBytes(node: Node): boolean %checks {
   return (
     node._kind === 'Blob' ||
@@ -35,7 +42,13 @@ function isDataType(node: Node): boolean %checks {
 }
 
 function isExpression(node: Node): boolean %checks {
-  return node._kind === 'Literal' || node._kind === 'Identifier' || node._kind === 'CallExpression';
+  return (
+    node._kind === 'Literal' ||
+    node._kind === 'Identifier' ||
+    node._kind === 'UnaryExpression' ||
+    node._kind === 'BinaryExpression' ||
+    node._kind === 'CallExpression'
+  );
 }
 
 function isInteger(node: Node): boolean %checks {
@@ -88,7 +101,7 @@ export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob
 
 export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
 
-export type Expression = Literal | Identifier | CallExpression;
+export type Expression = Literal | Identifier | UnaryExpression | BinaryExpression | CallExpression;
 
 export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt;
 
@@ -107,6 +120,7 @@ export type TextualOrEnum = Textual | Enum;
 export type Node =
   | BigInt
   | Binary
+  | BinaryExpression
   | Blob
   | BuiltInFunction
   | CallExpression
@@ -132,6 +146,7 @@ export type Node =
   | Timestamp
   | TinyBlob
   | TinyInt
+  | UnaryExpression
   | VarBinary
   | VarChar
   | Year;
@@ -140,6 +155,7 @@ function isNode(node: Node): boolean %checks {
   return (
     node._kind === 'BigInt' ||
     node._kind === 'Binary' ||
+    node._kind === 'BinaryExpression' ||
     node._kind === 'Blob' ||
     node._kind === 'BuiltInFunction' ||
     node._kind === 'CallExpression' ||
@@ -165,6 +181,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Timestamp' ||
     node._kind === 'TinyBlob' ||
     node._kind === 'TinyInt' ||
+    node._kind === 'UnaryExpression' ||
     node._kind === 'VarBinary' ||
     node._kind === 'VarChar' ||
     node._kind === 'Year'
@@ -182,6 +199,14 @@ export type Binary = {|
   _kind: 'Binary',
   baseType: 'binary',
   length: number,
+|};
+
+export type BinaryExpression = {|
+  _kind: 'BinaryExpression',
+  type: 'binary',
+  op: BinaryOp,
+  expr1: mixed,
+  expr2: mixed,
 |};
 
 export type Blob = {|
@@ -338,6 +363,13 @@ export type TinyInt = {|
   unsigned: boolean,
 |};
 
+export type UnaryExpression = {|
+  _kind: 'UnaryExpression',
+  type: 'unary',
+  op: UnaryOp,
+  expr: mixed,
+|};
+
 export type VarBinary = {|
   _kind: 'VarBinary',
   baseType: 'varbinary',
@@ -386,6 +418,16 @@ export default {
       _kind: 'Binary',
       baseType: 'binary',
       length,
+    };
+  },
+
+  BinaryExpression(op: BinaryOp, expr1: mixed, expr2: mixed): BinaryExpression {
+    return {
+      _kind: 'BinaryExpression',
+      type: 'binary',
+      op,
+      expr1,
+      expr2,
     };
   },
 
@@ -694,6 +736,15 @@ export default {
       baseType: 'tinyint',
       length,
       unsigned,
+    };
+  },
+
+  UnaryExpression(op: UnaryOp, expr: mixed): UnaryExpression {
+    return {
+      _kind: 'UnaryExpression',
+      type: 'unary',
+      op,
+      expr,
     };
   },
 

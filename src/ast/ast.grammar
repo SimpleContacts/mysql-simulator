@@ -1,8 +1,14 @@
 """
 import type { Encoding } from './encodings';
 import type { Precision } from './types';
+
+export type UnaryOp = "+" | "-" | "!" | "is null" | "is not null";
+
+type BooleanOp = "AND" | "OR" | "XOR";
+type CmpOp = "=" | "<=>" | "!=" | "<>" | ">=" | "<=" | "<" | ">" | "LIKE" | "REGEXP" | "RLIKE";
+type ArithmOp = "+" | "-" | "*" | "/" | "%" | "DIV";
+export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
 """
-# ^^^ This preamble will be included verbatim into the generated output.
 
 Literal:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
@@ -13,6 +19,22 @@ Identifier:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type  "identifier"
   name  string
+
+UnaryExpression:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "unary"
+  op    UnaryOp
+  # TODO: Replace with `@Expression`
+  expr  mixed
+
+BinaryExpression:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "binary"
+  op    BinaryOp
+  # TODO: Replace with `@Expression`
+  expr1  mixed
+  # TODO: Replace with `@Expression`
+  expr2  mixed
 
 CallExpression:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
@@ -32,6 +54,8 @@ BuiltInFunction:
 @Expression:
   | Literal
   | Identifier
+  | UnaryExpression
+  | BinaryExpression
   | CallExpression
 
 TinyInt:

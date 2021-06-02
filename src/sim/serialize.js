@@ -30,7 +30,9 @@ export function serialize(node: Expression): string {
         ? 'NULL'
         : typeof node.value === 'string'
         ? quoteInExpressionContext(unquote(node.value))
-        : node.value;
+        : typeof node.value === 'number'
+        ? String(node.value)
+        : String(node.value);
 
     case 'unary':
       if (node.op === 'is null') {
