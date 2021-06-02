@@ -229,7 +229,6 @@ BitExprOp2
 SimpleExpr
   = Literal
   / FunctionCall
-  / MemberAccess  // Not sure where this one fits
   / Identifier
   // / simple_expr COLLATE collation_name
   // / param_marker
@@ -266,10 +265,6 @@ FunctionCall
       }
       return rv
     }
-
-// Not sure where we can find this syntax in the MySQL manual, or what this is named
-MemberAccess
-  = object:Identifier '.' property:Identifier { return null }
 
 FunctionName
   = CHAR_LENGTH
