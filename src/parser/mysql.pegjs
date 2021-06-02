@@ -761,7 +761,7 @@ ColumnDefinition
     reference:ReferenceDefinition?
     onUpdate:( ON UPDATE expr:DefaultValueExpr { return expr } )?
     generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )?
-                { return ast.GeneratedClause(expr, mode || 'VIRTUAL') } )?
+                { return ast.GeneratedDefinition(expr, mode || 'VIRTUAL') } )?
     nullableClause2:( NULL / NOT_NULL )?
     {
       let nullable = null;

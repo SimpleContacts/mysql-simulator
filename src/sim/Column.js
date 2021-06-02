@@ -5,17 +5,12 @@ import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import ast from '../ast';
-import type { DataType } from '../ast';
+import type { GeneratedDefinition, DataType } from '../ast';
 import { formatDataType } from './DataType';
 import type { Encoding } from '../ast/encodings';
 // $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
 import { serialize } from './serialize';
 import { escape } from './utils';
-
-type Generated = {|
-  expr: string,
-  mode: 'STORED' | 'VIRTUAL',
-|};
 
 export default class Column {
   +name: string;
@@ -25,7 +20,7 @@ export default class Column {
   +onUpdate: null | string;
   +autoIncrement: boolean;
   +comment: null | string;
-  +generated: null | Generated;
+  +generated: null | GeneratedDefinition;
 
   constructor(
     name: string,
@@ -35,7 +30,7 @@ export default class Column {
     onUpdate: null | string,
     autoIncrement: boolean,
     comment: null | string,
-    generated: null | Generated,
+    generated: null | GeneratedDefinition,
   ) {
     invariant(!ast.isTextual(dataType) || dataType.encoding, 'Encoding must be explicitly set for textual columns');
     this.name = name;
@@ -60,7 +55,7 @@ export default class Column {
     +onUpdate?: null | string,
     +autoIncrement?: boolean,
     +comment?: null | string,
-    +generated?: null | Generated,
+    +generated?: null | GeneratedDefinition,
   |}): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,

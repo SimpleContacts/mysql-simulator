@@ -72,7 +72,7 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return node._kind === 'GeneratedClause' || isExpression(node);
+  return node._kind === 'GeneratedDefinition' || isExpression(node);
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -111,7 +111,7 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | GeneratedClause;
+export type Start = Expression | GeneratedDefinition;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -133,7 +133,7 @@ export type Node =
   | Double
   | Enum
   | Float
-  | GeneratedClause
+  | GeneratedDefinition
   | Identifier
   | Int
   | Json
@@ -169,7 +169,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Double' ||
     node._kind === 'Enum' ||
     node._kind === 'Float' ||
-    node._kind === 'GeneratedClause' ||
+    node._kind === 'GeneratedDefinition' ||
     node._kind === 'Identifier' ||
     node._kind === 'Int' ||
     node._kind === 'Json' ||
@@ -278,8 +278,8 @@ export type Float = {|
   unsigned: boolean,
 |};
 
-export type GeneratedClause = {|
-  _kind: 'GeneratedClause',
+export type GeneratedDefinition = {|
+  _kind: 'GeneratedDefinition',
   type: 'generated',
   expr: Expression,
   mode: GeneratedColumnMode,
@@ -597,16 +597,16 @@ export default {
     };
   },
 
-  GeneratedClause(expr: Expression, mode: GeneratedColumnMode): GeneratedClause {
+  GeneratedDefinition(expr: Expression, mode: GeneratedColumnMode): GeneratedDefinition {
     invariant(
       isExpression(expr),
-      `Invalid value for "expr" arg in "GeneratedClause" call.\nExpected: @Expression\nGot:      ${JSON.stringify(
+      `Invalid value for "expr" arg in "GeneratedDefinition" call.\nExpected: @Expression\nGot:      ${JSON.stringify(
         expr,
       )}`,
     );
 
     return {
-      _kind: 'GeneratedClause',
+      _kind: 'GeneratedDefinition',
       type: 'generated',
       expr,
       mode,

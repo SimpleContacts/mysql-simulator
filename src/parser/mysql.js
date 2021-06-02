@@ -507,7 +507,7 @@ function peg$parse(input, options) {
       peg$c114 = function(dataType, nullableClause, value) { return value },
       peg$c115 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, value) { return value.value },
       peg$c116 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, expr) { return expr },
-      peg$c117 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, onUpdate, expr, mode) { return ast.GeneratedClause(expr, mode || 'VIRTUAL') },
+      peg$c117 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, onUpdate, expr, mode) { return ast.GeneratedDefinition(expr, mode || 'VIRTUAL') },
       peg$c118 = function(dataType, nullableClause, defaultValue, isPrimary1, autoIncrement, isUnique, isPrimary2, comment, reference, onUpdate, generated, nullableClause2) {
             let nullable = null;
             if (nullableClause === 'NULL' || nullableClause2 === 'NULL') {

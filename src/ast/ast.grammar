@@ -56,7 +56,7 @@ BuiltInFunction:
   | BinaryExpression
   | CallExpression
 
-GeneratedClause:
+GeneratedDefinition:
   type  "generated"
   expr  @Expression
   mode  GeneratedColumnMode
@@ -227,4 +227,4 @@ Json:
 # or if we should explicitly define it.
 @Start:
   | @Expression
-  | GeneratedClause
+  | GeneratedDefinition
