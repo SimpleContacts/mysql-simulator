@@ -5,23 +5,34 @@ import invariant from 'invariant';
 import type { Expression } from '../ast';
 import { escape, insert, quote, quoteInExpressionContext, unquote } from './utils';
 
+type FormattingOptions = {|
+  lowerCaseFunctionNames: boolean,
+|};
+
 export { escape, insert, quote };
 
 // TODO: Type this file, and declare Node as a proper AST node here
-export function serializeExpression(node: Expression): string {
+export function serializeExpression(node: Expression, options?: FormattingOptions): string {
   invariant(node, 'expected a node');
 
+  // Helper to make recursing with the same options context easier
+  const recurse = (expr: Expression) => serializeExpression(expr, options);
+
   if (Array.isArray(node)) {
-    return node.map(serializeExpression).join(', ');
+    return node.map(recurse).join(', ');
   }
 
   switch (node.type) {
     case 'callExpression': {
-      let f = node.name.name.name.toLowerCase();
-      if (node.args !== null) {
-        f += `(${node.args.map(serializeExpression).join(',')})`;
+      let func = node.callee.name.name;
+      if (options?.lowerCaseFunctionNames) {
+        func = func.toLowerCase();
       }
-      return f;
+
+      if (node.args !== null) {
+        func += `(${node.args.map(recurse).join(',')})`;
+      }
+      return func;
     }
 
     case 'literal':
@@ -40,19 +51,19 @@ export function serializeExpression(node: Expression): string {
     case 'unary':
       if (node.op === 'is null') {
         // #lolmysql, go home
-        return `isnull(${serializeExpression(node.expr)})`;
+        return `isnull(${recurse(node.expr)})`;
       } else if (node.op === 'is not null') {
-        return `(${serializeExpression(node.expr)} is not null)`;
+        return `(${recurse(node.expr)} is not null)`;
       } else if (node.op === '!') {
         // #lolmysql, extra wrapping in parens
-        return `(not(${serializeExpression(node.expr)}))`;
+        return `(not(${recurse(node.expr)}))`;
       } else if (node.op === '+') {
         // #lolmysql, explicitly stripping the wrapping
-        return serializeExpression(node.expr);
+        return recurse(node.expr);
       }
 
       // "Normal" cases
-      return `${node.op}(${serializeExpression(node.expr)})`;
+      return `${node.op}(${recurse(node.expr)})`;
 
     case 'binary': {
       let op = node.op;
@@ -63,7 +74,7 @@ export function serializeExpression(node: Expression): string {
         op = op.toLowerCase();
       }
 
-      return `(${serializeExpression(node.expr1)} ${op} ${serializeExpression(node.expr2)})`;
+      return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
     }
 
     case 'identifier':

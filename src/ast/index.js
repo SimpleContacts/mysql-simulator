@@ -228,7 +228,7 @@ export type BuiltInFunction = {|
 export type CallExpression = {|
   _kind: 'CallExpression',
   type: 'callExpression',
-  name: BuiltInFunction,
+  callee: BuiltInFunction,
   args: Array<Expression> | null,
 |};
 
@@ -484,11 +484,11 @@ export default {
     };
   },
 
-  CallExpression(name: BuiltInFunction, args: Array<Expression> | null = null): CallExpression {
+  CallExpression(callee: BuiltInFunction, args: Array<Expression> | null = null): CallExpression {
     invariant(
-      name._kind === 'BuiltInFunction',
-      `Invalid value for "name" arg in "CallExpression" call.\nExpected: BuiltInFunction\nGot:      ${JSON.stringify(
-        name,
+      callee._kind === 'BuiltInFunction',
+      `Invalid value for "callee" arg in "CallExpression" call.\nExpected: BuiltInFunction\nGot:      ${JSON.stringify(
+        callee,
       )}`,
     );
 
@@ -502,7 +502,7 @@ export default {
     return {
       _kind: 'CallExpression',
       type: 'callExpression',
-      name,
+      callee,
       args,
     };
   },

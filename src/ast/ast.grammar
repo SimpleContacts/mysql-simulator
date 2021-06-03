@@ -37,12 +37,12 @@ BinaryExpression:
 
 CallExpression:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "callExpression"
-  name  BuiltInFunction
+  type    "callExpression"
+  callee  BuiltInFunction
   # The args are optional. For example, when null, this means a "call" like
   # `CURRENT_TIMESTAMP`. But when "empty" (e.g. []) this denotes a call like
   # `NOW()`.
-  args  @Expression*?
+  args    @Expression*?
 
 BuiltInFunction:
   # TODO: Remove this hardcoded "type" in favor of "_kind"

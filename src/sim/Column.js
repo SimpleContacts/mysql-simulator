@@ -134,7 +134,14 @@ export default class Column {
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
-      generated !== null ? `GENERATED ALWAYS AS (${serializeExpression(generated.expr)}) ${generated.mode}` : '',
+      generated !== null
+        ? `GENERATED ALWAYS AS (${serializeExpression(
+            generated.expr,
+            // NOTE: For some reason, here in these generated clause expressions,
+            // functions are getting lowercased. Beats me as to why.
+            { lowerCaseFunctionNames: true },
+          )}) ${generated.mode}`
+        : '',
       generated !== null ? nullable : '',
     ]
       .filter((x) => x)
