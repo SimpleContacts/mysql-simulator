@@ -6,6 +6,10 @@
   - Drop support for Node 13.x (= unstable)
   - Add support for Node 16.x
 
+- Bug fixes
+
+  - Fix: database name in `ALTER DATABASE database_name` is no longer mandatory
+
 # v1.8.2
 
 - Fix a bug where the datatype of a column may change after `CONVERT TO`

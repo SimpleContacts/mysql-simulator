@@ -492,7 +492,7 @@ WhileStatement
 // ====================================================
 
 AlterDatabase
-  = ALTER DATABASE dbName:Identifier options:AlterDbOption+ {
+  = ALTER DATABASE dbName:Identifier? options:AlterDbOption+ {
       return {
         type: 'ALTER DATABASE',
         dbName,

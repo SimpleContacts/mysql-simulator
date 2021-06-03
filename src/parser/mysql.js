@@ -4457,6 +4457,9 @@ function peg$parse(input, options) {
       s2 = peg$parseDATABASE();
       if (s2 !== peg$FAILED) {
         s3 = peg$parseIdentifier();
+        if (s3 === peg$FAILED) {
+          s3 = null;
+        }
         if (s3 !== peg$FAILED) {
           s4 = [];
           s5 = peg$parseAlterDbOption();
