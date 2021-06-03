@@ -3,21 +3,23 @@
 import invariant from 'invariant';
 
 import type { Expression } from '../ast';
-import { escape, quoteInExpressionContext, unquote } from './utils';
+import { escape, insert, quote, quoteInExpressionContext, unquote } from './utils';
+
+export { escape, insert, quote };
 
 // TODO: Type this file, and declare Node as a proper AST node here
-export function serialize(node: Expression): string {
+export function serializeExpression(node: Expression): string {
   invariant(node, 'expected a node');
 
   if (Array.isArray(node)) {
-    return node.map(serialize).join(', ');
+    return node.map(serializeExpression).join(', ');
   }
 
   switch (node.type) {
     case 'callExpression': {
       let f = node.name.name.name.toLowerCase();
       if (node.args !== null) {
-        f += `(${node.args.map(serialize).join(',')})`;
+        f += `(${node.args.map(serializeExpression).join(',')})`;
       }
       return f;
     }
@@ -38,19 +40,19 @@ export function serialize(node: Expression): string {
     case 'unary':
       if (node.op === 'is null') {
         // #lolmysql, go home
-        return `isnull(${serialize(node.expr)})`;
+        return `isnull(${serializeExpression(node.expr)})`;
       } else if (node.op === 'is not null') {
-        return `(${serialize(node.expr)} is not null)`;
+        return `(${serializeExpression(node.expr)} is not null)`;
       } else if (node.op === '!') {
         // #lolmysql, extra wrapping in parens
-        return `(not(${serialize(node.expr)}))`;
+        return `(not(${serializeExpression(node.expr)}))`;
       } else if (node.op === '+') {
         // #lolmysql, explicitly stripping the wrapping
-        return serialize(node.expr);
+        return serializeExpression(node.expr);
       }
 
       // "Normal" cases
-      return `${node.op}(${serialize(node.expr)})`;
+      return `${node.op}(${serializeExpression(node.expr)})`;
 
     case 'binary': {
       let op = node.op;
@@ -61,7 +63,7 @@ export function serialize(node: Expression): string {
         op = op.toLowerCase();
       }
 
-      return `(${serialize(node.expr1)} ${op} ${serialize(node.expr2)})`;
+      return `(${serializeExpression(node.expr1)} ${op} ${serializeExpression(node.expr2)})`;
     }
 
     case 'identifier':
@@ -69,7 +71,11 @@ export function serialize(node: Expression): string {
 
     default:
       throw new Error(
-        `Don't know how to serialize ${node.type} nodes yet. Please tell me. ${JSON.stringify({ node }, null, 2)}`,
+        `Don't know how to serialize ${node.type} expressions yet. Please tell me. ${JSON.stringify(
+          { node },
+          null,
+          2,
+        )}`,
       );
   }
 }

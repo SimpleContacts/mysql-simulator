@@ -7,6 +7,7 @@ import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
 import type { Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
+import { escape, insert } from '../printer';
 import Column from './Column';
 import Database from './Database';
 import { convertToEncoding, setEncoding } from './DataType';
@@ -14,7 +15,6 @@ import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
-import { escape, insert } from './utils';
 
 function indent(line: string) {
   return `  ${line}`;

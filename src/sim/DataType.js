@@ -7,7 +7,7 @@ import ast from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
 import { isWider } from '../ast/encodings';
-import { quote } from './utils';
+import { quote } from '../printer';
 
 export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): T {
   switch (dataType.baseType) {

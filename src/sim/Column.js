@@ -7,9 +7,8 @@ import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 import ast from '../ast';
 import type { DataType, GeneratedDefinition } from '../ast';
 import type { Encoding } from '../ast/encodings';
+import { escape, serializeExpression } from '../printer';
 import { formatDataType } from './DataType';
-import { serialize } from './serialize';
-import { escape } from './utils';
 
 export default class Column {
   +name: string;
@@ -135,7 +134,7 @@ export default class Column {
       this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
       this.autoIncrement ? 'AUTO_INCREMENT' : '',
       this.comment !== null ? `COMMENT ${this.comment}` : '',
-      generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr)}) ${generated.mode}` : '',
+      generated !== null ? `GENERATED ALWAYS AS (${serializeExpression(generated.expr)}) ${generated.mode}` : '',
       generated !== null ? nullable : '',
     ]
       .filter((x) => x)
