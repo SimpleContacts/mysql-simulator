@@ -5,67 +5,8 @@
  */
 const invariant = require('invariant');
 const ast = require('../ast').default;
+const { serializeExpression }  = require('../printer')
 const { makeEncoding } = require('../ast/encodings.js')
-
-//
-// HACK: Using this for now, because the Simulator internals aren't aware of
-// Nodes, so we'll have to convert this to strings before we pass it on.
-// However, it would be nice if they _would_ work with AST nodes instead, so
-// eventually™ we should remove this serialize*() helper family here.
-//
-
-function serialize(node) {
-  switch (node.type) {
-    case 'callExpression':
-      return serializeCallExpression(node)
-    case 'literal':
-      return node.value
-    case 'identifier':
-      return node.name
-    case 'builtinFunction':
-      return node.name.name
-    default:
-      throw new Error(`Don't know how to serialize ${node} nodes yet.  Please tell me.`);
-  }
-}
-
-//
-// HACK:
-// This is a huge hack because the defaultValue that the simulator expects vary
-// in types, and it's superinconsistent.
-//
-// - String literals are sent as quoted strings "'foobar'"
-// - Function calls are sent as strings, e.g. "CURRENT_TIMESTAMP"
-// - Booleans are sent as booleans literals, e.g. "FALSE"
-// - Numbers are sent as true numbers, e.g. 0
-// - `null` is sent as the string "NULL"
-//
-// 🙈
-//
-function serializeDefaultValue_HACK(node) {
-  switch (node.type) {
-    case 'literal':
-      return node.value === null
-        ? 'NULL'
-        : node.value === true
-        ? 'TRUE'
-        : node.value === false
-        ? 'FALSE'
-        : node.value
-    default:
-      // Defer to "normal" serializer
-      return serialize(node);
-  }
-}
-
-function serializeCallExpression(node) {
-  invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
-  let f = serialize(node.name)
-  if (node.args !== null) {
-    f += `(${node.args.map(serialize).join(', ')})`;
-  }
-  return f;
-}
 
 function unquote(quoted) {
   return quoted.substring(1, quoted.length - 1).replace("''", "'");
@@ -775,8 +716,8 @@ ColumnDefinition
       // now.  We changed the parser's output to produce better ASTs, but the
       // internal simulator data structures aren't aware and capable of
       // handling those yet.
-      defaultValue = defaultValue === null ? null : serializeDefaultValue_HACK(defaultValue)
-      onUpdate = onUpdate === null ? null : serializeDefaultValue_HACK(onUpdate)
+      defaultValue = defaultValue === null ? null : serializeExpression(defaultValue)
+      onUpdate = onUpdate === null ? null : serializeExpression(onUpdate)
 
       return {
         dataType,
