@@ -32,10 +32,12 @@ CREATE TABLE bbb (
   c07 VARCHAR(36) DEFAULT 'It''s a default',
   c08 VARCHAR(36) DEFAULT 'It\'s a default',
   c09 timestamp DEFAULT now(),
-  c10 timestamp DEFAULT current_timestamp,
-  c11 timestamp(6) DEFAULT current_timestamp(6),
-  c12 VARCHAR(36) NULL DEFAULT 'NULL',  -- The string NULL
-  c13 VARCHAR(36) NULL DEFAULT NULL,
-  c14 VARCHAR(36) NULL DEFAULT null,
-  c15 VARCHAR(36) NOT NULL
+  c10 timestamp DEFAULT current_timestamp ON UPDATE now(),
+  c11 timestamp DEFAULT current_timestamp,
+  c12 timestamp(6) DEFAULT current_timestamp(6),
+  c13 timestamp(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  c14 VARCHAR(36) NULL DEFAULT 'NULL',  -- The string NULL
+  c15 VARCHAR(36) NULL DEFAULT NULL,
+  c16 VARCHAR(36) NULL DEFAULT null,
+  c17 VARCHAR(36) NOT NULL
 );
