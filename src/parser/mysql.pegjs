@@ -203,24 +203,25 @@ SimpleExpr
 // / interval_expr
 
 FunctionCall
-  = name:FunctionName LPAREN exprs:ExpressionList RPAREN {
-      return ast.CallExpression(ast.BuiltInFunction(name), exprs)
+  = func:FunctionName LPAREN exprs:ExpressionList RPAREN {
+      return ast.CallExpression(func, exprs)
     }
+
+  /*
+  // TODO: When would we ever "call" an identifier, like `foo`() ?
   / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
       return ast.CallExpression(ast.BuiltInFunction(ident), exprs)
     }
+  */
 
   // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
   / ident:Identifier arrow:(ARROWW / ARROW) lit:StringLiteral {
-      let rv = ast.CallExpression(
-        ast.BuiltInFunction(ast.Identifier('JSON_EXTRACT')),
-        [ident, lit],
-      )
+      let rv = ast.CallExpression(ast.BuiltInFunction('JSON_EXTRACT'), [
+        ident,
+        lit,
+      ])
       if (arrow === '->>') {
-        rv = ast.CallExpression(
-          ast.BuiltInFunction(ast.Identifier('JSON_UNQUOTE')),
-          [rv],
-        )
+        rv = ast.CallExpression(ast.BuiltInFunction('JSON_UNQUOTE'), [rv])
       }
       return rv
     }
@@ -230,6 +231,9 @@ FunctionName
   / CONCAT
   / CONV
   / HEX
+  / IF
+  / JSON_EXTRACT
+  / JSON_UNQUOTE
   / SUBSTRING
   / UNHEX
 
@@ -1102,7 +1106,7 @@ CREATE = _ "CREATE"i !IdentifierChar _ { return 'CREATE' }
 
 CURRENT_TIMESTAMP
   = _ "CURRENT_TIMESTAMP"i !IdentifierChar _ {
-      return ast.BuiltInFunction(ast.Identifier('CURRENT_TIMESTAMP'))
+      return ast.BuiltInFunction('CURRENT_TIMESTAMP')
     }
 
 DATABASE = _ "DATABASE"i !IdentifierChar _ { return 'DATABASE' }
@@ -1169,7 +1173,7 @@ GENERATED = _ "GENERATED"i !IdentifierChar _ { return 'GENERATED' }
 
 HASH = _ "HASH"i !IdentifierChar _ { return 'HASH' }
 
-IF = _ "IF"i !IdentifierChar _ { return 'IF' }
+IF = _ "IF"i !IdentifierChar _ { return ast.BuiltInFunction('IF') }
 
 INDEX = _ "INDEX"i !IdentifierChar _ { return 'INDEX' }
 
@@ -1209,10 +1213,7 @@ NONE = _ "NONE"i !IdentifierChar _ { return 'NONE' }
 
 NOT = _ "NOT"i !IdentifierChar _ { return 'NOT' }
 
-NOW
-  = _ "NOW"i !IdentifierChar _ {
-      return ast.BuiltInFunction(ast.Identifier('NOW'))
-    }
+NOW = _ "NOW"i !IdentifierChar _ { return ast.BuiltInFunction('NOW') }
 
 NULL = _ "NULL"i !IdentifierChar _ { return 'NULL' }
 
@@ -1301,18 +1302,30 @@ XOR = _ "XOR"i !IdentifierChar _ { return 'XOR' }
 // Reserved built-in functions
 // TODO: Complete this list
 CHAR_LENGTH
-  = _ "CHAR_LENGTH"i !IdentifierChar _ { return ast.Identifier('CHAR_LENGTH') }
+  = _ "CHAR_LENGTH"i !IdentifierChar _ {
+      return ast.BuiltInFunction('CHAR_LENGTH')
+    }
 
-CONCAT = _ "CONCAT"i !IdentifierChar _ { return ast.Identifier('CONCAT') }
+CONCAT = _ "CONCAT"i !IdentifierChar _ { return ast.BuiltInFunction('CONCAT') }
 
-CONV = _ "CONV"i !IdentifierChar _ { return ast.Identifier('CONV') }
+CONV = _ "CONV"i !IdentifierChar _ { return ast.BuiltInFunction('CONV') }
 
-HEX = _ "HEX"i !IdentifierChar _ { return ast.Identifier('HEX') }
+HEX = _ "HEX"i !IdentifierChar _ { return ast.BuiltInFunction('HEX') }
 
 SUBSTRING
-  = _ "SUBSTRING"i !IdentifierChar _ { return ast.Identifier('SUBSTRING') }
+  = _ "SUBSTRING"i !IdentifierChar _ { return ast.BuiltInFunction('SUBSTRING') }
 
-UNHEX = _ "UNHEX"i !IdentifierChar _ { return ast.Identifier('UNHEX') }
+UNHEX = _ "UNHEX"i !IdentifierChar _ { return ast.BuiltInFunction('UNHEX') }
+
+JSON_EXTRACT
+  = _ "JSON_EXTRACT"i !IdentifierChar _ {
+      return ast.BuiltInFunction('JSON_EXTRACT')
+    }
+
+JSON_UNQUOTE
+  = _ "JSON_UNQUOTE"i !IdentifierChar _ {
+      return ast.BuiltInFunction('JSON_UNQUOTE')
+    }
 
 // Composite types
 NOT_NULL = NOT NULL { return 'NOT NULL' }

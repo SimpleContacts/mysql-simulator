@@ -113,7 +113,7 @@ export default class Column {
       } else if (node._kind === 'CallExpression') {
         return serializeExpression(node);
       } else if (node._kind === 'BuiltInFunction') {
-        return serializeExpression(node.name);
+        return node.name;
       }
 
       throw new Error('Invalid DefaultValue node. Got: ' + JSON.stringify({ node }, null, 2));
@@ -158,9 +158,11 @@ export default class Column {
       generated !== null
         ? `GENERATED ALWAYS AS (${serializeExpression(
             generated.expr,
-            // NOTE: For some reason, here in these generated clause expressions,
-            // functions are getting lowercased. Beats me as to why.
-            { lowerCaseFunctionNames: true },
+            // NOTE: For some reason, here in these generated clause
+            // expressions, functions are getting lowercased and strings with
+            // quote characters will get serialized differently. Beats me as to
+            // why.
+            { context: 'EXPRESSION' },
           )}) ${generated.mode}`
         : undefined,
       generated !== null ? nullable : undefined,

@@ -5,8 +5,21 @@ import invariant from 'invariant';
 import type { Expression } from '../ast';
 import { escape, insert, quote, quoteInExpressionContext } from './utils';
 
+//
+// NOTE:
+// For some reason, serialization of MySQL nodes happens slightly differently
+// in an "expression context" (like to serialize the contents of an expression
+// in a GENERATED AS clause vs in a "normal SQL" value position, like a default
+// value, or a comment.
+//
+// In an expression context, internal function names will get lowercased, and
+// strings with with quote characters will get serialized differently (as 'I\'m
+// a quote' vs 'I''m a quote').
+//
+// Absolutely no clue why.
+//
 type FormattingOptions = {|
-  lowerCaseFunctionNames: boolean,
+  context: 'EXPRESSION' | 'DEFAULT',
 |};
 
 export { escape, insert, quote };
@@ -24,8 +37,8 @@ export function serializeExpression(node: Expression, options?: FormattingOption
 
   switch (node.type) {
     case 'callExpression': {
-      let func = node.callee.name.name;
-      if (options?.lowerCaseFunctionNames) {
+      let func = node.callee.name;
+      if (options?.context === 'EXPRESSION') {
         func = func.toLowerCase();
       }
 
@@ -35,7 +48,8 @@ export function serializeExpression(node: Expression, options?: FormattingOption
       return func;
     }
 
-    case 'literal':
+    case 'literal': {
+      const serializeString = options?.context === 'EXPRESSION' ? quoteInExpressionContext : quote;
       return node.value === true
         ? 'TRUE'
         : node.value === false
@@ -43,10 +57,11 @@ export function serializeExpression(node: Expression, options?: FormattingOption
         : node.value === null
         ? 'NULL'
         : typeof node.value === 'string'
-        ? quoteInExpressionContext(node.value)
+        ? serializeString(node.value)
         : typeof node.value === 'number'
         ? String(node.value)
         : String(node.value);
+    }
 
     case 'unary':
       if (node.op === 'is null') {
