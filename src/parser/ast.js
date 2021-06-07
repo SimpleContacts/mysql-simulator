@@ -6,7 +6,7 @@
 // TODO
 // TODO
 
-import type { DefaultValue, DataType, GeneratedDefinition } from '../ast';
+import type { DataType, DefaultValue, GeneratedDefinition } from '../ast';
 
 export type ConstantExpr = string;
 export type NamedConstraint = string;

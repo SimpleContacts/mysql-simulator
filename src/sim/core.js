@@ -7,9 +7,9 @@ import invariant from 'invariant';
 import { maxBy, minBy, sortBy } from 'lodash';
 
 import type { DataType } from '../ast';
+import ast from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { makeEncoding } from '../ast/encodings';
-import ast from '../ast';
 import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';

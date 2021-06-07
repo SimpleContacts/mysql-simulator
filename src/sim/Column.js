@@ -5,7 +5,7 @@ import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import ast from '../ast';
-import type { DefaultValue, DataType, GeneratedDefinition } from '../ast';
+import type { DataType, DefaultValue, GeneratedDefinition } from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { escape, quote, serializeExpression } from '../printer';
 import { formatDataType } from './DataType';
