@@ -47,7 +47,7 @@ CallExpression:
 BuiltInFunction:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type  "builtinFunction"
-  name  Identifier
+  name  string
 
 @Expression:
   | Literal

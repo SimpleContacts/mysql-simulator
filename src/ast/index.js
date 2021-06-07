@@ -234,7 +234,7 @@ export type Blob = {|
 export type BuiltInFunction = {|
   _kind: 'BuiltInFunction',
   type: 'builtinFunction',
-  name: Identifier,
+  name: string,
 |};
 
 export type CallExpression = {|
@@ -481,12 +481,10 @@ export default {
     };
   },
 
-  BuiltInFunction(name: Identifier): BuiltInFunction {
+  BuiltInFunction(name: string): BuiltInFunction {
     invariant(
-      name._kind === 'Identifier',
-      `Invalid value for "name" arg in "BuiltInFunction" call.\nExpected: Identifier\nGot:      ${JSON.stringify(
-        name,
-      )}`,
+      typeof name === 'string',
+      `Invalid value for "name" arg in "BuiltInFunction" call.\nExpected: string\nGot:      ${JSON.stringify(name)}`,
     );
 
     return {
