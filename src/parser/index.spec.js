@@ -38,7 +38,16 @@ describe('Read documentation', () => {
             colName: 'date_created',
             definition: {
               dataType: { _kind: 'Timestamp', baseType: 'timestamp', fsp: null },
-              defaultValue: 'CURRENT_TIMESTAMP',
+              defaultValue: {
+                _kind: 'CallExpression',
+                args: null,
+                callee: {
+                  _kind: 'BuiltInFunction',
+                  name: 'CURRENT_TIMESTAMP',
+                  type: 'builtinFunction',
+                },
+                type: 'callExpression',
+              },
               nullable: false,
               isPrimary: false,
               autoIncrement: false,
@@ -145,7 +154,16 @@ describe('Read documentation', () => {
             definition: {
               dataType: { _kind: 'Timestamp', baseType: 'timestamp', fsp: null },
               nullable: false,
-              defaultValue: 'CURRENT_TIMESTAMP',
+              defaultValue: {
+                _kind: 'CallExpression',
+                args: null,
+                callee: {
+                  _kind: 'BuiltInFunction',
+                  name: 'CURRENT_TIMESTAMP',
+                  type: 'builtinFunction',
+                },
+                type: 'callExpression',
+              },
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,
@@ -161,7 +179,11 @@ describe('Read documentation', () => {
             definition: {
               dataType: { _kind: 'VarChar', baseType: 'varchar', length: 32, encoding: null },
               nullable: null,
-              defaultValue: 'NULL',
+              defaultValue: {
+                _kind: 'Literal',
+                type: 'literal',
+                value: null,
+              },
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,
