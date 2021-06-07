@@ -5,9 +5,9 @@ import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import ast from '../ast';
-import type { DataType, DefaultValue, GeneratedDefinition } from '../ast';
+import type { CurrentTimestamp, DataType, DefaultValue, GeneratedDefinition } from '../ast';
 import type { Encoding } from '../ast/encodings';
-import { escape, quote, serializeExpression } from '../printer';
+import { escape, quote, serializeCurrentTimestamp, serializeExpression } from '../printer';
 import { formatDataType } from './DataType';
 
 export default class Column {
@@ -15,7 +15,7 @@ export default class Column {
   +dataType: DataType;
   +nullable: boolean;
   +defaultValue: null | DefaultValue;
-  +onUpdate: null | string;
+  +onUpdate: null | CurrentTimestamp;
   +autoIncrement: boolean;
   +comment: null | string;
   +generated: null | GeneratedDefinition;
@@ -25,7 +25,7 @@ export default class Column {
     dataType: DataType,
     nullable: boolean,
     defaultValue: null | DefaultValue,
-    onUpdate: null | string,
+    onUpdate: null | CurrentTimestamp,
     autoIncrement: boolean,
     comment: null | string,
     generated: null | GeneratedDefinition,
@@ -50,7 +50,7 @@ export default class Column {
     +dataType?: DataType,
     +nullable?: boolean,
     +defaultValue?: null | DefaultValue,
-    +onUpdate?: null | string,
+    +onUpdate?: null | CurrentTimestamp,
     +autoIncrement?: boolean,
     +comment?: null | string,
     +generated?: null | GeneratedDefinition,
@@ -110,10 +110,8 @@ export default class Column {
         } else if (value === null) {
           return 'NULL';
         }
-      } else if (node._kind === 'CallExpression') {
-        return serializeExpression(node);
-      } else if (node._kind === 'BuiltInFunction') {
-        return node.name;
+      } else if (node._kind === 'CurrentTimestamp') {
+        return serializeCurrentTimestamp(node);
       }
 
       throw new Error('Invalid DefaultValue node. Got: ' + JSON.stringify({ node }, null, 2));
@@ -151,8 +149,7 @@ export default class Column {
       generated === null ? nullable : undefined,
       // Generated columns won't have a default value
       !generated ? defaultValueClause : undefined,
-      // JSON.stringify({ a: this.defaultValue, b: defaultValue, c: defaultValueClause }),
-      this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : undefined,
+      this.onUpdate !== null ? `ON UPDATE ${serializeCurrentTimestamp(this.onUpdate)}` : undefined,
       this.autoIncrement ? 'AUTO_INCREMENT' : undefined,
       this.comment !== null ? `COMMENT ${quote(this.comment)}` : undefined,
       generated !== null

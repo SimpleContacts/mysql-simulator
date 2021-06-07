@@ -6,9 +6,8 @@
 // TODO
 // TODO
 
-import type { DataType, DefaultValue, GeneratedDefinition } from '../ast';
+import type { CurrentTimestamp, DataType, DefaultValue, GeneratedDefinition } from '../ast';
 
-export type ConstantExpr = string;
 export type NamedConstraint = string;
 
 export type Direction = 'ASC' | 'DESC';
@@ -34,7 +33,7 @@ export type ColumnDefinition = {|
   dataType: DataType,
   nullable: boolean | null,
   defaultValue: DefaultValue | null,
-  onUpdate: ConstantExpr | null,
+  onUpdate: CurrentTimestamp | null,
   isUnique: boolean,
   isPrimary: boolean,
   autoIncrement: boolean,

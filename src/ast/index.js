@@ -32,10 +32,6 @@ function isBytes(node: Node): boolean %checks {
   );
 }
 
-function isCurrentTimestampish(node: Node): boolean %checks {
-  return node._kind === 'BuiltInFunction' || node._kind === 'CallExpression';
-}
-
 function isDataType(node: Node): boolean %checks {
   return (
     node._kind === 'Enum' ||
@@ -48,7 +44,7 @@ function isDataType(node: Node): boolean %checks {
 }
 
 function isDefaultValue(node: Node): boolean %checks {
-  return node._kind === 'Literal' || isCurrentTimestampish(node);
+  return node._kind === 'Literal' || node._kind === 'CurrentTimestamp';
 }
 
 function isExpression(node: Node): boolean %checks {
@@ -109,11 +105,9 @@ function isTextualOrEnum(node: Node): boolean %checks {
 
 export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
 
-export type CurrentTimestampish = BuiltInFunction | CallExpression;
-
 export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
 
-export type DefaultValue = Literal | CurrentTimestampish;
+export type DefaultValue = Literal | CurrentTimestamp;
 
 export type Expression = Literal | Identifier | UnaryExpression | BinaryExpression | CallExpression;
 
@@ -139,6 +133,7 @@ export type Node =
   | BuiltInFunction
   | CallExpression
   | Char
+  | CurrentTimestamp
   | Date
   | DateTime
   | Decimal
@@ -175,6 +170,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'BuiltInFunction' ||
     node._kind === 'CallExpression' ||
     node._kind === 'Char' ||
+    node._kind === 'CurrentTimestamp' ||
     node._kind === 'Date' ||
     node._kind === 'DateTime' ||
     node._kind === 'Decimal' ||
@@ -249,6 +245,11 @@ export type Char = {|
   baseType: 'char',
   length: number,
   encoding: Encoding | null,
+|};
+
+export type CurrentTimestamp = {|
+  _kind: 'CurrentTimestamp',
+  precision: number | null,
 |};
 
 export type Date = {|
@@ -528,6 +529,20 @@ export default {
       baseType: 'char',
       length,
       encoding,
+    };
+  },
+
+  CurrentTimestamp(precision: number | null = null): CurrentTimestamp {
+    invariant(
+      precision === null || typeof precision === 'number',
+      `Invalid value for "precision" arg in "CurrentTimestamp" call.\nExpected: number?\nGot:      ${JSON.stringify(
+        precision,
+      )}`,
+    );
+
+    return {
+      _kind: 'CurrentTimestamp',
+      precision,
     };
   },
 
@@ -845,7 +860,6 @@ export default {
   // Node groups
   isNode,
   isBytes,
-  isCurrentTimestampish,
   isDataType,
   isDefaultValue,
   isExpression,

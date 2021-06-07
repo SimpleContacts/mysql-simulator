@@ -2,7 +2,7 @@
 
 import invariant from 'invariant';
 
-import type { Expression } from '../ast';
+import type { CurrentTimestamp, Expression } from '../ast';
 import { escape, insert, quote, quoteInExpressionContext } from './utils';
 
 //
@@ -23,6 +23,14 @@ type FormattingOptions = {|
 |};
 
 export { escape, insert, quote };
+
+export function serializeCurrentTimestamp(node: CurrentTimestamp): string {
+  if (node.precision === null) {
+    return 'CURRENT_TIMESTAMP';
+  } else {
+    return `CURRENT_TIMESTAMP(${node.precision})`;
+  }
+}
 
 // TODO: Type this file, and declare Node as a proper AST node here
 export function serializeExpression(node: Expression, options?: FormattingOptions): string {

@@ -107,16 +107,8 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   if (dataType.baseType === 'timestamp') {
     if (!nullable && defaultValue === null) {
       // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      defaultValue = ast.BuiltInFunction('CURRENT_TIMESTAMP');
-      onUpdate = 'CURRENT_TIMESTAMP';
-    }
-
-    if (defaultValue !== null && defaultValue._kind === 'CallExpression' && defaultValue.callee.name === 'NOW') {
-      defaultValue = ast.BuiltInFunction('CURRENT_TIMESTAMP');
-    }
-
-    if (onUpdate === 'NOW()') {
-      onUpdate = 'CURRENT_TIMESTAMP';
+      defaultValue = ast.CurrentTimestamp(dataType.fsp);
+      onUpdate = ast.CurrentTimestamp(dataType.fsp);
     }
   }
 

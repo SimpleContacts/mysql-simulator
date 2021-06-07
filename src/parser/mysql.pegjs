@@ -4,7 +4,6 @@
    */
   const invariant = require('invariant')
   const ast = require('../ast').default
-  const { serializeExpression } = require('../printer')
   const { makeEncoding } = require('../ast/encodings.js')
 
   function unquote(quoted) {
@@ -769,7 +768,7 @@ ColumnDefinition
     isPrimary2:(PRIMARY KEY)?
     comment:(COMMENT value:StringLiteral { return value.value })?
     reference:ReferenceDefinition?
-    onUpdate:(ON UPDATE expr:CurrentTimestampish { return expr })?
+    onUpdate:(ON UPDATE expr:CurrentTimestamp { return expr })?
     generated:(
       (GENERATED ALWAYS)?
         AS
@@ -781,7 +780,6 @@ ColumnDefinition
         }
     )?
     nullability2:Nullability? {
-      onUpdate = onUpdate === null ? null : serializeExpression(onUpdate)
       return {
         dataType,
         nullable: nullability1 ?? nullability2,
@@ -944,20 +942,20 @@ Value = lit:Literal { return lit.value }
 
 DefaultValue
   = Literal
-  / CurrentTimestampish
+  / CurrentTimestamp
 
-CurrentTimestampish
-  // TODO: Any of the synonyms for CURRENT_TIMESTAMP have the same meaning as
-  // CURRENT_TIMESTAMP. These are CURRENT_TIMESTAMP(), NOW(), LOCALTIME,
-  // LOCALTIME(), LOCALTIMESTAMP, and LOCALTIMESTAMP().
-  = func:CURRENT_TIMESTAMP
-    precision:(LPAREN n:NumberLiteral? RPAREN { return n })? {
-      return ast.CallExpression(func, precision ? [precision] : null)
+CurrentTimestamp
+  // All of these are synonyms for CURRENT_TIMESTAMP: NOW(), LOCALTIME,
+  // LOCALTIME(), LOCALTIMESTAMP, LOCALTIMESTAMP(). Note that only `NOW` is
+  // a little bit different: it's the only one that cannot occur without
+  // parens!
+  = NOW LPAREN precision:NumberLiteral? RPAREN {
+      return ast.CurrentTimestamp(precision !== null ? precision.value : null)
     }
-  / CURRENT_TIMESTAMP
-  / NowCall
-
-NowCall = now:NOW LPAREN RPAREN { return ast.CallExpression(now, []) }
+  / (CURRENT_TIMESTAMP / LOCALTIMESTAMP / LOCALTIME)
+    precision:(LPAREN n:NumberLiteral? RPAREN { return n })? {
+      return ast.CurrentTimestamp(precision !== null ? precision.value : null)
+    }
 
 Nullability
   = NULL { return true }
@@ -1053,9 +1051,12 @@ CONVERT = _ "CONVERT"i !IdentifierChar _ { return 'CONVERT' }
 CREATE = _ "CREATE"i !IdentifierChar _ { return 'CREATE' }
 
 CURRENT_TIMESTAMP
-  = _ "CURRENT_TIMESTAMP"i !IdentifierChar _ {
-      return ast.BuiltInFunction('CURRENT_TIMESTAMP')
-    }
+  = _ "CURRENT_TIMESTAMP"i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
+
+LOCALTIME = _ "LOCALTIME"i !IdentifierChar _ { return 'LOCALTIME' }
+
+LOCALTIMESTAMP
+  = _ "LOCALTIMESTAMP"i !IdentifierChar _ { return 'LOCALTIMESTAMP' }
 
 DATABASE = _ "DATABASE"i !IdentifierChar _ { return 'DATABASE' }
 

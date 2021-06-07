@@ -38,16 +38,7 @@ describe('Read documentation', () => {
             colName: 'date_created',
             definition: {
               dataType: { _kind: 'Timestamp', baseType: 'timestamp', fsp: null },
-              defaultValue: {
-                _kind: 'CallExpression',
-                args: null,
-                callee: {
-                  _kind: 'BuiltInFunction',
-                  name: 'CURRENT_TIMESTAMP',
-                  type: 'builtinFunction',
-                },
-                type: 'callExpression',
-              },
+              defaultValue: { _kind: 'CurrentTimestamp', precision: null },
               nullable: false,
               isPrimary: false,
               autoIncrement: false,
@@ -154,16 +145,7 @@ describe('Read documentation', () => {
             definition: {
               dataType: { _kind: 'Timestamp', baseType: 'timestamp', fsp: null },
               nullable: false,
-              defaultValue: {
-                _kind: 'CallExpression',
-                args: null,
-                callee: {
-                  _kind: 'BuiltInFunction',
-                  name: 'CURRENT_TIMESTAMP',
-                  type: 'builtinFunction',
-                },
-                type: 'callExpression',
-              },
+              defaultValue: { _kind: 'CurrentTimestamp', precision: null },
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,

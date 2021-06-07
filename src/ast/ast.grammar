@@ -221,15 +221,20 @@ Json:
   | @Bytes
   | Json
 
-@CurrentTimestampish:
-  # e.g. "CURRENT_TIMESTAMP"
-  | BuiltInFunction
-  # e.g. "CURRENT_TIMESTAMP(6)" or "NOW()"
-  | CallExpression
+#
+# CURRENT_TIMESTAMP is special in MySQL. It has a few appearences, like:
+# - As a variable: CURRENT_TIMESTAMP
+# - As a function call: CURRENT_TIMESTAMP()
+# - As a function call with precision: CURRENT_TIMESTAMP(6)
+# - As one of its synonyms: LOCALTIME, LOCALTIMESTAMP
+# - As one of its synonyms: LOCALTIME(), LOCALTIMESTAMP(), NOW()
+#
+CurrentTimestamp:
+  precision  number?
 
 @DefaultValue:
   | Literal
-  | @CurrentTimestampish
+  | CurrentTimestamp
 
 # Artificially include a "@Start" group here now, to avoid ast-generator error
 # of "unused nodes". It will automatically combine everything into a "Node"
