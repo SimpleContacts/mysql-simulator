@@ -1014,7 +1014,7 @@ CurrentTimestamp
 
 NowCall
   = NOW LPAREN RPAREN {
-      return callExpression(ast.BuiltInFunction(ast.Identifier('NOW')), [])
+      return ast.CallExpression(ast.BuiltInFunction(ast.Identifier('NOW')), [])
     }
 
 // ====================================================
