@@ -4956,6 +4956,13 @@ prelude-ls@~1.1.2:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
 
+prettier-plugin-pegjs@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-pegjs/-/prettier-plugin-pegjs-0.4.0.tgz#ddb0c5ba4a42f05b8043f6f3e41676232d540c52"
+  integrity sha512-UKSk5NMfKR09PfcoZtj8h30oa6RY1eV+NYVCtYE99opN5N8cl0lEzYm5XXBiXN/spmM7I02AFDxMzHn11UwVgw==
+  dependencies:
+    prettier "^2.3.0"
+
 prettier@^1.19.1:
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
