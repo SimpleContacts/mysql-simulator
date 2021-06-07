@@ -6,7 +6,7 @@
 // TODO
 // TODO
 
-import type { DataType, GeneratedDefinition } from '../ast';
+import type { DefaultValue, DataType, GeneratedDefinition } from '../ast';
 
 export type ConstantExpr = string;
 export type NamedConstraint = string;
@@ -33,7 +33,7 @@ export type ReferenceDefinition = {|
 export type ColumnDefinition = {|
   dataType: DataType,
   nullable: boolean | null,
-  defaultValue: ConstantExpr | null,
+  defaultValue: DefaultValue | null,
   onUpdate: ConstantExpr | null,
   isUnique: boolean,
   isPrimary: boolean,

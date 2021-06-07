@@ -5,16 +5,16 @@ import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
 import ast from '../ast';
-import type { DataType, GeneratedDefinition } from '../ast';
+import type { DefaultValue, DataType, GeneratedDefinition } from '../ast';
 import type { Encoding } from '../ast/encodings';
-import { escape, serializeExpression } from '../printer';
+import { escape, quote, serializeExpression } from '../printer';
 import { formatDataType } from './DataType';
 
 export default class Column {
   +name: string;
   +dataType: DataType;
   +nullable: boolean;
-  +defaultValue: null | string;
+  +defaultValue: null | DefaultValue;
   +onUpdate: null | string;
   +autoIncrement: boolean;
   +comment: null | string;
@@ -24,7 +24,7 @@ export default class Column {
     name: string,
     dataType: DataType,
     nullable: boolean,
-    defaultValue: null | string,
+    defaultValue: null | DefaultValue,
     onUpdate: null | string,
     autoIncrement: boolean,
     comment: null | string,
@@ -49,7 +49,7 @@ export default class Column {
     +name?: string,
     +dataType?: DataType,
     +nullable?: boolean,
-    +defaultValue?: null | string,
+    +defaultValue?: null | DefaultValue,
     +onUpdate?: null | string,
     +autoIncrement?: boolean,
     +comment?: null | string,
@@ -84,19 +84,39 @@ export default class Column {
   getDefinition(tableEncoding?: Encoding): string {
     const dataType = this.dataType;
     const generated = this.generated;
-    let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
-    // MySQL outputs number constants as strings. No idea why that would make
-    // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-    if (typeof defaultValue === 'number') {
-      if (dataType.baseType === 'decimal') {
-        defaultValue = `'${defaultValue.toFixed(2)}'`;
-      } else {
-        defaultValue = `'${defaultValue}'`;
+    // TODO: Move to top!
+    function formatDefaultValue(node: DefaultValue): string {
+      if (node._kind === 'Literal') {
+        let value = node.value;
+        if (value === true) {
+          value = 1;
+        } else if (value === false) {
+          value = 0;
+        }
+
+        if (typeof value === 'string') {
+          return serializeExpression(node);
+        } else if (typeof value === 'number') {
+          // MySQL outputs number constants as strings. No idea why that would
+          // make sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
+          let node2 = node;
+          if (dataType.baseType === 'decimal') {
+            node2 = ast.Literal(value.toFixed(dataType.precision?.decimals ?? 2));
+          } else {
+            node2 = ast.Literal(String(value));
+          }
+          return serializeExpression(node2);
+        } else if (value === null) {
+          return 'NULL';
+        }
+      } else if (node._kind === 'CallExpression') {
+        return serializeExpression(node);
+      } else if (node._kind === 'BuiltInFunction') {
+        return serializeExpression(node.name);
       }
-    } else if (dataType.baseType === 'tinyint' && dataType.length === 1) {
-      if (defaultValue === 'FALSE') defaultValue = "'0'";
-      else if (defaultValue === 'TRUE') defaultValue = "'1'";
+
+      throw new Error('Invalid DefaultValue node. Got: ' + JSON.stringify({ node }, null, 2));
     }
 
     let nullable;
@@ -110,9 +130,8 @@ export default class Column {
           '';
     }
 
-    defaultValue =
-      // Generated columns won't have a default value
-      !generated && defaultValue ? `DEFAULT ${defaultValue}` : '';
+    const defaultValue = this.defaultValue ?? (this.nullable ? ast.Literal(null) : null);
+    let defaultValueClause = defaultValue ? `DEFAULT ${formatDefaultValue(defaultValue)}` : undefined;
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
@@ -122,18 +141,20 @@ export default class Column {
       dataType.baseType === 'longtext' ||
       dataType.baseType === 'blob'
     ) {
-      if (defaultValue === 'DEFAULT NULL') {
-        defaultValue = '';
+      if (defaultValueClause === 'DEFAULT NULL') {
+        defaultValueClause = undefined;
       }
     }
 
     return [
       formatDataType(dataType, tableEncoding),
-      generated === null ? nullable : '',
-      defaultValue,
-      this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
-      this.autoIncrement ? 'AUTO_INCREMENT' : '',
-      this.comment !== null ? `COMMENT ${this.comment}` : '',
+      generated === null ? nullable : undefined,
+      // Generated columns won't have a default value
+      !generated ? defaultValueClause : undefined,
+      // JSON.stringify({ a: this.defaultValue, b: defaultValue, c: defaultValueClause }),
+      this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : undefined,
+      this.autoIncrement ? 'AUTO_INCREMENT' : undefined,
+      this.comment !== null ? `COMMENT ${quote(this.comment)}` : undefined,
       generated !== null
         ? `GENERATED ALWAYS AS (${serializeExpression(
             generated.expr,
@@ -141,10 +162,10 @@ export default class Column {
             // functions are getting lowercased. Beats me as to why.
             { lowerCaseFunctionNames: true },
           )}) ${generated.mode}`
-        : '',
-      generated !== null ? nullable : '',
+        : undefined,
+      generated !== null ? nullable : undefined,
     ]
-      .filter((x) => x)
+      .filter(Boolean)
       .join(' ');
   }
 

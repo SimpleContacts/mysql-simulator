@@ -221,6 +221,16 @@ Json:
   | @Bytes
   | Json
 
+@CurrentTimestampish:
+  # e.g. "CURRENT_TIMESTAMP"
+  | BuiltInFunction
+  # e.g. "CURRENT_TIMESTAMP(6)" or "NOW()"
+  | CallExpression
+
+@DefaultValue:
+  | Literal
+  | @CurrentTimestampish
+
 # Artificially include a "@Start" group here now, to avoid ast-generator error
 # of "unused nodes". It will automatically combine everything into a "Node"
 # type already. I will need to figure out if that default behaviour is useful,

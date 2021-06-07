@@ -8,7 +8,7 @@
   const { makeEncoding } = require('../ast/encodings.js')
 
   function unquote(quoted) {
-    return quoted.substring(1, quoted.length - 1).replace("''", "'")
+    return quoted.replace("''", "'")
   }
 }
 
@@ -237,6 +237,7 @@ FunctionName
 // Constant literals
 // ====================================================
 
+// TODO: Replace this by letting `NULL` itself return a Literal
 NullLiteral = NULL { return ast.Literal(null) }
 
 BooleanLiteral
@@ -261,7 +262,7 @@ StringLiteral
 
 SingleQuotedStringLiteral
   = "'" seq:("''" / "\\'" { return "''" } / [^'])* "'" {
-      return ast.Literal(`'${seq.join('')}'`)
+      return ast.Literal(unquote(seq.join('')))
     }
 
 DoubleQuotedStringLiteral
@@ -272,7 +273,7 @@ DoubleQuotedStringLiteral
       / "'" { return "''" }
       / [^"]
     )*
-    "\"" { return ast.Literal(`'${seq.join('')}'`) }
+    "\"" { return ast.Literal(unquote(seq.join(''))) }
 
 StringLiteralList
   = first:StringLiteral COMMA rest:StringLiteralList { return [first, ...rest] }
@@ -801,14 +802,14 @@ CreateDefinition
 ColumnDefinition
   = dataType:DataType
     nullableClause:(NULL / NOT_NULL)?
-    defaultValue:(DEFAULT value:DefaultValueExpr { return value })?
+    defaultValue:(DEFAULT value:DefaultValue { return value })?
     isPrimary1:(PRIMARY KEY)?
     autoIncrement:AUTO_INCREMENT?
     isUnique:(UNIQUE KEY?)?
     isPrimary2:(PRIMARY KEY)?
     comment:(COMMENT value:StringLiteral { return value.value })?
     reference:ReferenceDefinition?
-    onUpdate:(ON UPDATE expr:DefaultValueExpr { return expr })?
+    onUpdate:(ON UPDATE expr:CurrentTimestampish { return expr })?
     generated:(
       (GENERATED ALWAYS)?
         AS
@@ -830,12 +831,6 @@ ColumnDefinition
         nullable = false
       }
 
-      // Unpack the defaultValue / onUpdate AST nodes into a string version for
-      // now.  We changed the parser's output to produce better ASTs, but the
-      // internal simulator data structures aren't aware and capable of
-      // handling those yet.
-      defaultValue =
-        defaultValue === null ? null : serializeExpression(defaultValue)
       onUpdate = onUpdate === null ? null : serializeExpression(onUpdate)
 
       return {
@@ -915,7 +910,7 @@ DataType
   / JSON { return ast.Json() }
   / ENUM LPAREN literals:StringLiteralList RPAREN encoding:Encoding? {
       return ast.Enum(
-        literals.map((lit) => unquote(lit.value)),
+        literals.map((lit) => lit.value),
         encoding,
       )
     }
@@ -998,24 +993,22 @@ Value = lit:Literal { return lit.value }
 
 /* System functions */
 
-DefaultValueExpr
+DefaultValue
   = Literal
-  / CurrentTimestamp
+  / CurrentTimestampish
+
+CurrentTimestampish
+  // TODO: Any of the synonyms for CURRENT_TIMESTAMP have the same meaning as
+  // CURRENT_TIMESTAMP. These are CURRENT_TIMESTAMP(), NOW(), LOCALTIME,
+  // LOCALTIME(), LOCALTIMESTAMP, and LOCALTIMESTAMP().
+  = func:CURRENT_TIMESTAMP
+    precision:(LPAREN n:NumberLiteral? RPAREN { return n })? {
+      return ast.CallExpression(func, precision ? [precision] : null)
+    }
+  / CURRENT_TIMESTAMP
   / NowCall
 
-CurrentTimestamp
-  = value:CURRENT_TIMESTAMP
-    precision:(LPAREN n:NumberLiteral? RPAREN { return n })? {
-      return ast.CallExpression(
-        ast.BuiltInFunction(value),
-        precision ? [precision] : null,
-      )
-    }
-
-NowCall
-  = NOW LPAREN RPAREN {
-      return ast.CallExpression(ast.BuiltInFunction(ast.Identifier('NOW')), [])
-    }
+NowCall = now:NOW LPAREN RPAREN { return ast.CallExpression(now, []) }
 
 // ====================================================
 // Util
@@ -1109,7 +1102,7 @@ CREATE = _ "CREATE"i !IdentifierChar _ { return 'CREATE' }
 
 CURRENT_TIMESTAMP
   = _ "CURRENT_TIMESTAMP"i !IdentifierChar _ {
-      return ast.Identifier('CURRENT_TIMESTAMP')
+      return ast.BuiltInFunction(ast.Identifier('CURRENT_TIMESTAMP'))
     }
 
 DATABASE = _ "DATABASE"i !IdentifierChar _ { return 'DATABASE' }
@@ -1216,7 +1209,10 @@ NONE = _ "NONE"i !IdentifierChar _ { return 'NONE' }
 
 NOT = _ "NOT"i !IdentifierChar _ { return 'NOT' }
 
-NOW = _ "NOW"i !IdentifierChar _ { return 'NOW' }
+NOW
+  = _ "NOW"i !IdentifierChar _ {
+      return ast.BuiltInFunction(ast.Identifier('NOW'))
+    }
 
 NULL = _ "NULL"i !IdentifierChar _ { return 'NULL' }
 

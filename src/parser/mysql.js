@@ -238,7 +238,7 @@ function peg$parse(input, options) {
       peg$c52 = /^[^']/,
       peg$c53 = peg$classExpectation(["'"], true, false),
       peg$c54 = function(seq) {
-            return ast.Literal(`'${seq.join('')}'`)
+            return ast.Literal(unquote(seq.join('')))
           },
       peg$c55 = "\"",
       peg$c56 = peg$literalExpectation("\"", false),
@@ -249,7 +249,7 @@ function peg$parse(input, options) {
       peg$c61 = peg$literalExpectation("\\\"", false),
       peg$c62 = /^[^"]/,
       peg$c63 = peg$classExpectation(["\""], true, false),
-      peg$c64 = function(seq) { return ast.Literal(`'${seq.join('')}'`) },
+      peg$c64 = function(seq) { return ast.Literal(unquote(seq.join(''))) },
       peg$c65 = function(tblName, newName) {
             return {
               type: 'RENAME TABLE',
@@ -542,12 +542,6 @@ function peg$parse(input, options) {
               nullable = false
             }
 
-            // Unpack the defaultValue / onUpdate AST nodes into a string version for
-            // now.  We changed the parser's output to produce better ASTs, but the
-            // internal simulator data structures aren't aware and capable of
-            // handling those yet.
-            defaultValue =
-              defaultValue === null ? null : serializeExpression(defaultValue)
             onUpdate = onUpdate === null ? null : serializeExpression(onUpdate)
 
             return {
@@ -608,7 +602,7 @@ function peg$parse(input, options) {
       peg$c145 = function() { return ast.Json() },
       peg$c146 = function(literals, encoding) {
             return ast.Enum(
-              literals.map((lit) => unquote(lit.value)),
+              literals.map((lit) => lit.value),
               encoding,
             )
           },
@@ -665,16 +659,11 @@ function peg$parse(input, options) {
       peg$c183 = peg$literalExpectation("utf8_unicode_ci", false),
       peg$c184 = function(collation) { return collation },
       peg$c185 = function(lit) { return lit.value },
-      peg$c186 = function(value, n) { return n },
-      peg$c187 = function(value, precision) {
-            return ast.CallExpression(
-              ast.BuiltInFunction(value),
-              precision ? [precision] : null,
-            )
+      peg$c186 = function(func, n) { return n },
+      peg$c187 = function(func, precision) {
+            return ast.CallExpression(func, precision ? [precision] : null)
           },
-      peg$c188 = function() {
-            return ast.CallExpression(ast.BuiltInFunction(ast.Identifier('NOW')), [])
-          },
+      peg$c188 = function(now) { return ast.CallExpression(now, []) },
       peg$c189 = peg$otherExpectation("whitespace"),
       peg$c190 = /^[ \t\r\n]/,
       peg$c191 = peg$classExpectation([" ", "\t", "\r", "\n"], false, false),
@@ -770,7 +759,7 @@ function peg$parse(input, options) {
       peg$c279 = "current_timestamp",
       peg$c280 = peg$literalExpectation("CURRENT_TIMESTAMP", true),
       peg$c281 = function() {
-            return ast.Identifier('CURRENT_TIMESTAMP')
+            return ast.BuiltInFunction(ast.Identifier('CURRENT_TIMESTAMP'))
           },
       peg$c282 = "database",
       peg$c283 = peg$literalExpectation("DATABASE", true),
@@ -930,7 +919,9 @@ function peg$parse(input, options) {
       peg$c437 = function() { return 'NOT' },
       peg$c438 = "now",
       peg$c439 = peg$literalExpectation("NOW", true),
-      peg$c440 = function() { return 'NOW' },
+      peg$c440 = function() {
+            return ast.BuiltInFunction(ast.Identifier('NOW'))
+          },
       peg$c441 = "null",
       peg$c442 = peg$literalExpectation("NULL", true),
       peg$c443 = function() { return 'NULL' },
@@ -6200,7 +6191,7 @@ function peg$parse(input, options) {
         s3 = peg$currPos;
         s4 = peg$parseDEFAULT();
         if (s4 !== peg$FAILED) {
-          s5 = peg$parseDefaultValueExpr();
+          s5 = peg$parseDefaultValue();
           if (s5 !== peg$FAILED) {
             peg$savedPos = s3;
             s4 = peg$c116(s1, s2, s5);
@@ -6312,7 +6303,7 @@ function peg$parse(input, options) {
                       if (s11 !== peg$FAILED) {
                         s12 = peg$parseUPDATE();
                         if (s12 !== peg$FAILED) {
-                          s13 = peg$parseDefaultValueExpr();
+                          s13 = peg$parseCurrentTimestampish();
                           if (s13 !== peg$FAILED) {
                             peg$savedPos = s10;
                             s11 = peg$c118(s1, s2, s3, s4, s5, s6, s7, s8, s9, s13);
@@ -8127,7 +8118,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseDefaultValueExpr() {
+  function peg$parseDefaultValue() {
     var s0;
 
     var key    = peg$currPos * 243 + 83,
@@ -8141,10 +8132,7 @@ function peg$parse(input, options) {
 
     s0 = peg$parseLiteral();
     if (s0 === peg$FAILED) {
-      s0 = peg$parseCurrentTimestamp();
-      if (s0 === peg$FAILED) {
-        s0 = peg$parseNowCall();
-      }
+      s0 = peg$parseCurrentTimestampish();
     }
 
     peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
@@ -8152,7 +8140,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseCurrentTimestamp() {
+  function peg$parseCurrentTimestampish() {
     var s0, s1, s2, s3, s4, s5;
 
     var key    = peg$currPos * 243 + 84,
@@ -8207,6 +8195,12 @@ function peg$parse(input, options) {
       peg$currPos = s0;
       s0 = peg$FAILED;
     }
+    if (s0 === peg$FAILED) {
+      s0 = peg$parseCURRENT_TIMESTAMP();
+      if (s0 === peg$FAILED) {
+        s0 = peg$parseNowCall();
+      }
+    }
 
     peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
 
@@ -8233,7 +8227,7 @@ function peg$parse(input, options) {
         s3 = peg$parseRPAREN();
         if (s3 !== peg$FAILED) {
           peg$savedPos = s0;
-          s1 = peg$c188();
+          s1 = peg$c188(s1);
           s0 = s1;
         } else {
           peg$currPos = s0;
@@ -17340,7 +17334,7 @@ function peg$parse(input, options) {
     const { makeEncoding } = require('../ast/encodings.js')
 
     function unquote(quoted) {
-      return quoted.substring(1, quoted.length - 1).replace("''", "'")
+      return quoted.replace("''", "'")
     }
 
 

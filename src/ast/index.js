@@ -32,6 +32,10 @@ function isBytes(node: Node): boolean %checks {
   );
 }
 
+function isCurrentTimestampish(node: Node): boolean %checks {
+  return node._kind === 'BuiltInFunction' || node._kind === 'CallExpression';
+}
+
 function isDataType(node: Node): boolean %checks {
   return (
     node._kind === 'Enum' ||
@@ -41,6 +45,10 @@ function isDataType(node: Node): boolean %checks {
     isTextual(node) ||
     isBytes(node)
   );
+}
+
+function isDefaultValue(node: Node): boolean %checks {
+  return node._kind === 'Literal' || isCurrentTimestampish(node);
 }
 
 function isExpression(node: Node): boolean %checks {
@@ -101,7 +109,11 @@ function isTextualOrEnum(node: Node): boolean %checks {
 
 export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
 
+export type CurrentTimestampish = BuiltInFunction | CallExpression;
+
 export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
+
+export type DefaultValue = Literal | CurrentTimestampish;
 
 export type Expression = Literal | Identifier | UnaryExpression | BinaryExpression | CallExpression;
 
@@ -835,7 +847,9 @@ export default {
   // Node groups
   isNode,
   isBytes,
+  isCurrentTimestampish,
   isDataType,
+  isDefaultValue,
   isExpression,
   isInteger,
   isNumeric,

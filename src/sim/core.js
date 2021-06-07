@@ -9,6 +9,7 @@ import { maxBy, minBy, sortBy } from 'lodash';
 import type { DataType } from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { makeEncoding } from '../ast/encodings';
+import ast from '../ast';
 import parseSql from '../parser';
 import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
@@ -106,12 +107,12 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   if (dataType.baseType === 'timestamp') {
     if (!nullable && defaultValue === null) {
       // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      defaultValue = 'CURRENT_TIMESTAMP';
+      defaultValue = ast.BuiltInFunction(ast.Identifier('CURRENT_TIMESTAMP'));
       onUpdate = 'CURRENT_TIMESTAMP';
     }
 
-    if (defaultValue === 'NOW()') {
-      defaultValue = 'CURRENT_TIMESTAMP';
+    if (defaultValue !== null && defaultValue._kind === 'CallExpression' && defaultValue.callee.name.name === 'NOW') {
+      defaultValue = ast.BuiltInFunction(ast.Identifier('CURRENT_TIMESTAMP'));
     }
 
     if (onUpdate === 'NOW()') {

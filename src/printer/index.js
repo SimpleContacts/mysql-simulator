@@ -3,7 +3,7 @@
 import invariant from 'invariant';
 
 import type { Expression } from '../ast';
-import { escape, insert, quote, quoteInExpressionContext, unquote } from './utils';
+import { escape, insert, quote, quoteInExpressionContext } from './utils';
 
 type FormattingOptions = {|
   lowerCaseFunctionNames: boolean,
@@ -43,7 +43,7 @@ export function serializeExpression(node: Expression, options?: FormattingOption
         : node.value === null
         ? 'NULL'
         : typeof node.value === 'string'
-        ? quoteInExpressionContext(unquote(node.value))
+        ? quoteInExpressionContext(node.value)
         : typeof node.value === 'number'
         ? String(node.value)
         : String(node.value);
