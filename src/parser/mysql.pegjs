@@ -97,8 +97,8 @@ BooleanOp
   / XOR
 
 BooleanPrimary
-  = pred:Predicate IS check:(NULL / NOT_NULL) {
-      if (check === 'NULL') {
+  = pred:Predicate IS nullTest:Nullability {
+      if (nullTest) {
         return ast.UnaryExpression('is null', pred)
       } else {
         return ast.UnaryExpression('is not null', pred)
@@ -805,7 +805,7 @@ CreateDefinition
 
 ColumnDefinition
   = dataType:DataType
-    nullableClause:(NULL / NOT_NULL)?
+    nullability1:Nullability?
     defaultValue:(DEFAULT value:DefaultValue { return value })?
     isPrimary1:(PRIMARY KEY)?
     autoIncrement:AUTO_INCREMENT?
@@ -824,22 +824,11 @@ ColumnDefinition
           return ast.GeneratedDefinition(expr, mode || 'VIRTUAL')
         }
     )?
-    nullableClause2:(NULL / NOT_NULL)? {
-      let nullable = null
-      if (nullableClause === 'NULL' || nullableClause2 === 'NULL') {
-        nullable = true
-      } else if (
-        nullableClause === 'NOT NULL' ||
-        nullableClause2 === 'NOT NULL'
-      ) {
-        nullable = false
-      }
-
+    nullability2:Nullability? {
       onUpdate = onUpdate === null ? null : serializeExpression(onUpdate)
-
       return {
         dataType,
-        nullable,
+        nullable: nullability1 ?? nullability2,
         defaultValue,
         onUpdate,
         isUnique: !!isUnique,
@@ -1013,6 +1002,10 @@ CurrentTimestampish
   / NowCall
 
 NowCall = now:NOW LPAREN RPAREN { return ast.CallExpression(now, []) }
+
+Nullability
+  = NULL { return true }
+  / NOT NULL { return false }
 
 // ====================================================
 // Util
@@ -1326,9 +1319,6 @@ JSON_UNQUOTE
   = _ "JSON_UNQUOTE"i !IdentifierChar _ {
       return ast.BuiltInFunction('JSON_UNQUOTE')
     }
-
-// Composite types
-NOT_NULL = NOT NULL { return 'NOT NULL' }
 
 // ====================================================
 // Tokens
