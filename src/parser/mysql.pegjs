@@ -157,62 +157,19 @@ BitExprOp2
   / PERCENTAGE
   / MOD { return '%' }
 
-/* ArithmeticOperator */
-/*   = PLUS */
-/*   / MINUS */
-// |
-// &
-// <<
-// >>
-// +
-// -
-// *
-// /
-// DIV
-// MOD
-// %
-// ^
-// +
-// -
-
-/* BitExpr */
-/*   = BitExpr ArithmeticOperator BitExpr */
-/*   / SimpleExpr */
-
 SimpleExpr
   = Literal
   / FunctionCall
   / Identifier
-  // / simple_expr COLLATE collation_name
-  // / param_marker
-  // / variable
-  // / simple_expr || simple_expr
   / PLUS expr:SimpleExpr { return ast.UnaryExpression('+', expr) }
   / MINUS expr:SimpleExpr { return ast.UnaryExpression('-', expr) }
-  // / ~ simple_expr
   / BANG expr:SimpleExpr { return ast.UnaryExpression('!', expr) }
-  // / BINARY simple_expr
   / LPAREN expr:Expression RPAREN { return expr }
-
-// / ROW (expr, expr [, expr] ...)
-// / (subquery)
-// / EXISTS (subquery)
-// / {identifier expr}
-// / match_expr
-// / case_expr
-// / interval_expr
 
 FunctionCall
   = func:FunctionName LPAREN exprs:ExpressionList RPAREN {
       return ast.CallExpression(func, exprs)
     }
-
-  /*
-  // TODO: When would we ever "call" an identifier, like `foo`() ?
-  / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
-      return ast.CallExpression(ast.BuiltInFunction(ident), exprs)
-    }
-  */
 
   // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
   / ident:Identifier arrow:(ARROWW / ARROW) lit:StringLiteral {
@@ -241,7 +198,6 @@ FunctionName
 // Constant literals
 // ====================================================
 
-// TODO: Replace this by letting `NULL` itself return a Literal
 NullLiteral = NULL { return ast.Literal(null) }
 
 BooleanLiteral
@@ -1017,7 +973,6 @@ Whitespace
   = [ \t\r\n]
   / Comment
 
-// TODO: Let this return identifier() nodes
 Identifier
   = QuotedIdentifier
   / NonQuotedIdentifier
