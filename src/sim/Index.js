@@ -1,6 +1,6 @@
 // @flow strict
 
-import { escape } from './utils';
+import { escape } from '../printer';
 
 export type IndexType = 'NORMAL' | 'UNIQUE' | 'FULLTEXT';
 

@@ -1,5 +1,10 @@
 # vNEXT
 
+- **Breaking API changes:**
+
+  - The `column.type` (raw type string) is no longer directly available. Use `column.dataType` instead.
+  - The internal AST tree for MySQL DataTypes has been cleaned up
+
 - **Changes in supported Node versions:**
 
   - Drop support for Node 10.x (= soon unsupported)

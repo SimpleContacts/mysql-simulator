@@ -2,7 +2,7 @@
 
 import invariant from 'invariant';
 
-import { escape } from './utils';
+import { escape } from '../printer';
 
 export type ReferenceOption =
   | 'RESTRICT' // The default

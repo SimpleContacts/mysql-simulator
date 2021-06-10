@@ -6,9 +6,9 @@ import path from 'path';
 import program from 'commander';
 import { dumpSchema } from 'rule-of-law';
 
+import { makeEncoding } from '../ast/encodings';
 import { applySqlFile, expandInputFiles } from './core';
 import Database from './Database';
-import { makeEncoding } from './encodings';
 
 const log = console.log;
 const error = console.error;

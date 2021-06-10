@@ -60,10 +60,13 @@ jobs:
         run: yarn run -s jest src
 
       - name: ESLint
-        run: yarn run -s eslint --report-unused-disable-directives src
-
-      - name: Prettier
-        run: yarn run -s prettier --check 'src/**/*.js' '!src/parser/mysql.js'
+        run: yarn run -s eslint --fix --report-unused-disable-directives src
 
       - name: Import-sort
-        run: yarn run -s import-sort --list-different 'src/**/*.js' '!src/parser/mysql.js'
+        run: yarn run -s import-sort --write 'src/**/*.js'
+
+      - name: Prettier
+        run: yarn run -s prettier --write 'src/**/*.js' '!src/parser/mysql.js'
+
+      - name: Make sure there are no local changes
+        run: git diff --exit-code
