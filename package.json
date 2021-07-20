@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.14.6",
-    "commander": "^7.2.0",
+    "commander": "^8.0.0",
     "invariant": "^2.2.4",
     "lodash": "^4.17.21",
     "rule-of-law": "^0.0.10"
