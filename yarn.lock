@@ -1671,15 +1671,15 @@ assign-symbols@^1.0.0:
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c=
 
-ast-generator@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/ast-generator/-/ast-generator-0.0.5.tgz#0149823deb8b2ea86e5a97c6b79b97b1ef45a944"
-  integrity sha512-ibi5pJ9elmnKtzWcVD3XkQGZRZIucxasUHG9XaX+Vf5IaWZIn+MvHTlI5ptHxDY4tlhUM4ZFEsCwNH4kA3OuGQ==
+ast-generator@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/ast-generator/-/ast-generator-0.0.6.tgz#929fe9544b1576df21bbc17ca64c12e7dd046b85"
+  integrity sha512-MoK3C6yT2N49YSJ0vGprqJAOm2eRz5oeAPxBOEyOdoap8zh29AWrashKYwaSmb4MWir5Qds7WVPKVV1rWcu95g==
   dependencies:
     chalk "^4.1.1"
     commander "^7.2.0"
     invariant "^2.2.4"
-    prettier "^2.3.0"
+    prettier "^2.3.2"
 
 astral-regex@^1.0.0:
   version "1.0.0"
