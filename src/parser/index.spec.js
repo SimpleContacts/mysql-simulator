@@ -18,9 +18,11 @@ describe('Read documentation', () => {
         ifNotExists: false,
         definitions: [
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'id',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'Int', baseType: 'int', length: 11, unsigned: false },
               defaultValue: null,
               nullable: false,
@@ -34,9 +36,11 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'date_created',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'Timestamp', baseType: 'timestamp', fsp: null },
               defaultValue: { _kind: 'CurrentTimestamp', precision: null },
               nullable: false,
@@ -50,9 +54,11 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'name',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'VarChar', baseType: 'varchar', length: 128, encoding: null },
               defaultValue: null,
               nullable: null,
@@ -66,9 +72,11 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'email',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'VarChar', baseType: 'varchar', length: 64, encoding: null },
               defaultValue: null,
               nullable: null,
@@ -108,9 +116,11 @@ describe('Read documentation', () => {
         ifNotExists: false,
         definitions: [
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'id',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'Int', baseType: 'int', length: 11, unsigned: false },
               nullable: false,
               defaultValue: null,
@@ -124,9 +134,11 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'user_id',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'Int', baseType: 'int', length: 11, unsigned: false },
               nullable: false,
               defaultValue: null,
@@ -140,9 +152,11 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'date_created',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'Timestamp', baseType: 'timestamp', fsp: null },
               nullable: false,
               defaultValue: { _kind: 'CurrentTimestamp', precision: null },
@@ -156,9 +170,11 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'Column',
             type: 'COLUMN',
             colName: 'text',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'VarChar', baseType: 'varchar', length: 32, encoding: null },
               nullable: null,
               defaultValue: {
@@ -229,6 +245,7 @@ describe('Read documentation', () => {
             type: 'ADD COLUMN',
             colName: 'foobar',
             definition: {
+              _kind: 'ColumnDefinition',
               dataType: { _kind: 'Int', baseType: 'int', length: 11, unsigned: false },
               autoIncrement: false,
               defaultValue: null,

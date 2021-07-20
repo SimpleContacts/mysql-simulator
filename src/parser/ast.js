@@ -6,47 +6,12 @@
 // TODO
 // TODO
 
-import type {
-  CurrentTimestamp,
-  DataType,
-  DefaultValue,
-  Direction,
-  GeneratedDefinition,
-  MatchMode,
-  ReferenceOption,
-} from '../ast';
+import type { Column, ColumnDefinition, IndexColName, ReferenceDefinition } from '../ast';
 
 export type NamedConstraint = string;
 
-export type IndexColName = {|
-  colName: string,
-  len: number,
-  direction: Direction | null,
-|};
-
-export type ReferenceDefinition = {|
-  tblName: string,
-  indexColNames: Array<IndexColName>,
-  matchMode: MatchMode | null,
-  onDelete: ReferenceOption,
-  onUpdate: ReferenceOption | null,
-|};
-
-export type ColumnDefinition = {|
-  dataType: DataType,
-  nullable: boolean | null,
-  defaultValue: DefaultValue | null,
-  onUpdate: CurrentTimestamp | null,
-  isUnique: boolean,
-  isPrimary: boolean,
-  autoIncrement: boolean,
-  comment: string | null,
-  reference: ReferenceDefinition | null,
-  generated: GeneratedDefinition | null,
-|};
-
 export type CreateTableDefinition =
-  | {| type: 'COLUMN', colName: string, definition: ColumnDefinition |}
+  | Column
   | {| type: 'PRIMARY KEY', indexColNames: Array<IndexColName> |}
   | {|
       type: 'INDEX',

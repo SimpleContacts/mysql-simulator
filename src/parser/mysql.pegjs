@@ -603,13 +603,7 @@ CreateDefinitionsList
   / only:CreateDefinition { return [only]; }
 
 CreateDefinition
-  = colName:Identifier _ columnDefinition:ColumnDefinition {
-      return {
-        type: 'COLUMN',
-        colName: colName.name,
-        definition: columnDefinition,
-      };
-    }
+  = colName:Identifier _ columnDefinition:ColumnDefinition { return ast.Column(colName.name, columnDefinition); }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
   / PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
       return {
@@ -679,18 +673,18 @@ ColumnDefinition
         }
     )?
     nullability2:Nullability? {
-      return {
+      return ast.ColumnDefinition(
         dataType,
-        nullable: nullability1 ?? nullability2,
+        nullability1 ?? nullability2,
         defaultValue,
         onUpdate,
-        isUnique: !!isUnique,
-        isPrimary: !!isPrimary1 || !!isPrimary2,
-        autoIncrement: !!autoIncrement,
+        !!isUnique,
+        !!isPrimary1 || !!isPrimary2,
+        !!autoIncrement,
         comment,
         reference,
         generated,
-      };
+      );
     }
 
 Len = LPAREN number:NumberLiteral RPAREN { return number.value; }

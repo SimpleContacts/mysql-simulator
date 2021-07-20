@@ -79,7 +79,7 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return node._kind === 'GeneratedDefinition' || isExpression(node);
+  return node._kind === 'Column' || isExpression(node);
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -120,7 +120,7 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | GeneratedDefinition;
+export type Start = Expression | Column;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -136,6 +136,8 @@ export type Node =
   | BuiltInFunction
   | CallExpression
   | Char
+  | Column
+  | ColumnDefinition
   | CurrentTimestamp
   | Date
   | DateTime
@@ -145,6 +147,7 @@ export type Node =
   | Float
   | GeneratedDefinition
   | Identifier
+  | IndexColName
   | Int
   | Json
   | Literal
@@ -153,6 +156,7 @@ export type Node =
   | MediumBlob
   | MediumInt
   | MediumText
+  | ReferenceDefinition
   | SmallInt
   | Text
   | Time
@@ -173,6 +177,8 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'BuiltInFunction' ||
     node._kind === 'CallExpression' ||
     node._kind === 'Char' ||
+    node._kind === 'Column' ||
+    node._kind === 'ColumnDefinition' ||
     node._kind === 'CurrentTimestamp' ||
     node._kind === 'Date' ||
     node._kind === 'DateTime' ||
@@ -182,6 +188,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Float' ||
     node._kind === 'GeneratedDefinition' ||
     node._kind === 'Identifier' ||
+    node._kind === 'IndexColName' ||
     node._kind === 'Int' ||
     node._kind === 'Json' ||
     node._kind === 'Literal' ||
@@ -190,6 +197,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'MediumBlob' ||
     node._kind === 'MediumInt' ||
     node._kind === 'MediumText' ||
+    node._kind === 'ReferenceDefinition' ||
     node._kind === 'SmallInt' ||
     node._kind === 'Text' ||
     node._kind === 'Time' ||
@@ -250,6 +258,27 @@ export type Char = {|
   encoding: Encoding | null,
 |};
 
+export type Column = {|
+  _kind: 'Column',
+  type: 'COLUMN',
+  colName: string,
+  definition: ColumnDefinition,
+|};
+
+export type ColumnDefinition = {|
+  _kind: 'ColumnDefinition',
+  dataType: DataType,
+  nullable: boolean | null,
+  defaultValue: DefaultValue | null,
+  onUpdate: CurrentTimestamp | null,
+  isUnique: boolean,
+  isPrimary: boolean,
+  autoIncrement: boolean,
+  comment: string | null,
+  reference: ReferenceDefinition | null,
+  generated: GeneratedDefinition | null,
+|};
+
 export type CurrentTimestamp = {|
   _kind: 'CurrentTimestamp',
   precision: number | null,
@@ -307,6 +336,13 @@ export type Identifier = {|
   name: string,
 |};
 
+export type IndexColName = {|
+  _kind: 'IndexColName',
+  colName: string,
+  len: number,
+  direction: Direction | null,
+|};
+
 export type Int = {|
   _kind: 'Int',
   baseType: 'int',
@@ -352,6 +388,15 @@ export type MediumText = {|
   _kind: 'MediumText',
   baseType: 'mediumtext',
   encoding: Encoding | null,
+|};
+
+export type ReferenceDefinition = {|
+  _kind: 'ReferenceDefinition',
+  tblName: string,
+  indexColNames: Array<IndexColName>,
+  matchMode: MatchMode | null,
+  onDelete: ReferenceOption,
+  onUpdate: ReferenceOption | null,
 |};
 
 export type SmallInt = {|
@@ -535,6 +580,124 @@ export default {
     };
   },
 
+  Column(colName: string, definition: ColumnDefinition): Column {
+    invariant(
+      typeof colName === 'string',
+      `Invalid value for "colName" arg in "Column" call.\nExpected: string\nGot:      ${JSON.stringify(colName)}`,
+    );
+
+    invariant(
+      definition._kind === 'ColumnDefinition',
+      `Invalid value for "definition" arg in "Column" call.\nExpected: ColumnDefinition\nGot:      ${JSON.stringify(
+        definition,
+      )}`,
+    );
+
+    return {
+      _kind: 'Column',
+      type: 'COLUMN',
+      colName,
+      definition,
+    };
+  },
+
+  ColumnDefinition(
+    dataType: DataType,
+    nullable: boolean | null,
+    defaultValue: DefaultValue | null,
+    onUpdate: CurrentTimestamp | null,
+    isUnique: boolean,
+    isPrimary: boolean,
+    autoIncrement: boolean,
+    comment: string | null = null,
+    reference: ReferenceDefinition | null = null,
+    generated: GeneratedDefinition | null = null,
+  ): ColumnDefinition {
+    invariant(
+      isDataType(dataType),
+      `Invalid value for "dataType" arg in "ColumnDefinition" call.\nExpected: @DataType\nGot:      ${JSON.stringify(
+        dataType,
+      )}`,
+    );
+
+    invariant(
+      nullable === null || typeof nullable === 'boolean',
+      `Invalid value for "nullable" arg in "ColumnDefinition" call.\nExpected: boolean?\nGot:      ${JSON.stringify(
+        nullable,
+      )}`,
+    );
+
+    invariant(
+      defaultValue === null || isDefaultValue(defaultValue),
+      `Invalid value for "defaultValue" arg in "ColumnDefinition" call.\nExpected: @DefaultValue?\nGot:      ${JSON.stringify(
+        defaultValue,
+      )}`,
+    );
+
+    invariant(
+      onUpdate === null || onUpdate._kind === 'CurrentTimestamp',
+      `Invalid value for "onUpdate" arg in "ColumnDefinition" call.\nExpected: CurrentTimestamp?\nGot:      ${JSON.stringify(
+        onUpdate,
+      )}`,
+    );
+
+    invariant(
+      typeof isUnique === 'boolean',
+      `Invalid value for "isUnique" arg in "ColumnDefinition" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        isUnique,
+      )}`,
+    );
+
+    invariant(
+      typeof isPrimary === 'boolean',
+      `Invalid value for "isPrimary" arg in "ColumnDefinition" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        isPrimary,
+      )}`,
+    );
+
+    invariant(
+      typeof autoIncrement === 'boolean',
+      `Invalid value for "autoIncrement" arg in "ColumnDefinition" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        autoIncrement,
+      )}`,
+    );
+
+    invariant(
+      comment === null || typeof comment === 'string',
+      `Invalid value for "comment" arg in "ColumnDefinition" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        comment,
+      )}`,
+    );
+
+    invariant(
+      reference === null || reference._kind === 'ReferenceDefinition',
+      `Invalid value for "reference" arg in "ColumnDefinition" call.\nExpected: ReferenceDefinition?\nGot:      ${JSON.stringify(
+        reference,
+      )}`,
+    );
+
+    invariant(
+      generated === null || generated._kind === 'GeneratedDefinition',
+      `Invalid value for "generated" arg in "ColumnDefinition" call.\nExpected: GeneratedDefinition?\nGot:      ${JSON.stringify(
+        generated,
+      )}`,
+    );
+
+    return {
+      _kind: 'ColumnDefinition',
+      dataType,
+      nullable,
+      defaultValue,
+      onUpdate,
+      isUnique,
+      isPrimary,
+      autoIncrement,
+      comment,
+      reference,
+      generated,
+    };
+  },
+
   CurrentTimestamp(precision: number | null = null): CurrentTimestamp {
     invariant(
       precision === null || typeof precision === 'number',
@@ -654,6 +817,25 @@ export default {
     };
   },
 
+  IndexColName(colName: string, len: number, direction: Direction | null = null): IndexColName {
+    invariant(
+      typeof colName === 'string',
+      `Invalid value for "colName" arg in "IndexColName" call.\nExpected: string\nGot:      ${JSON.stringify(colName)}`,
+    );
+
+    invariant(
+      typeof len === 'number',
+      `Invalid value for "len" arg in "IndexColName" call.\nExpected: number\nGot:      ${JSON.stringify(len)}`,
+    );
+
+    return {
+      _kind: 'IndexColName',
+      colName,
+      len,
+      direction,
+    };
+  },
+
   Int(length: number, unsigned: boolean): Int {
     invariant(
       typeof length === 'number',
@@ -734,6 +916,39 @@ export default {
       _kind: 'MediumText',
       baseType: 'mediumtext',
       encoding,
+    };
+  },
+
+  ReferenceDefinition(
+    tblName: string,
+    indexColNames: Array<IndexColName>,
+    matchMode: MatchMode | null,
+    onDelete: ReferenceOption,
+    onUpdate: ReferenceOption | null = null,
+  ): ReferenceDefinition {
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "ReferenceDefinition" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "ReferenceDefinition" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'ReferenceDefinition',
+      tblName,
+      indexColNames,
+      matchMode,
+      onDelete,
+      onUpdate,
     };
   },
 

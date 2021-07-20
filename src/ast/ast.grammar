@@ -59,6 +59,36 @@ BuiltInFunction:
   | BinaryExpression
   | CallExpression
 
+IndexColName:
+  colName    string
+  len        number
+  direction  Direction?
+
+Column:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type        "COLUMN"
+  colName     string
+  definition  ColumnDefinition
+
+ColumnDefinition:
+  dataType       @DataType
+  nullable       boolean?
+  defaultValue   @DefaultValue?
+  onUpdate       CurrentTimestamp?
+  isUnique       boolean
+  isPrimary      boolean
+  autoIncrement  boolean
+  comment        string?
+  reference      ReferenceDefinition?
+  generated      GeneratedDefinition?
+
+ReferenceDefinition:
+  tblName        string
+  indexColNames  IndexColName+
+  matchMode      MatchMode?
+  onDelete       ReferenceOption
+  onUpdate       ReferenceOption?
+
 GeneratedDefinition:
   type  "generated"
   expr  @Expression
@@ -245,4 +275,4 @@ CurrentTimestamp:
 # or if we should explicitly define it.
 @Start:
   | @Expression
-  | GeneratedDefinition
+  | Column

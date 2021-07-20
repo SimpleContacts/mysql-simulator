@@ -1,5 +1,6 @@
 // @flow strict
 
+import type { ColumnDefinition, IndexColName, ReferenceDefinition, ReferenceOption } from '../ast';
 import type {
   AlterAddColumn,
   AlterAddForeignKey,
@@ -16,7 +17,6 @@ import type {
   AlterRenameTable,
   AlterSpec,
   AlterTableStatement,
-  ColumnDefinition,
   CreateIndexStatement,
   CreateTableDefinition,
   CreateTableLikeStatement,
@@ -24,11 +24,8 @@ import type {
   CreateTriggerStatement,
   DropIndexStatement,
   DropTableStatement,
-  IndexColName,
   IndexType,
   NamedConstraint,
-  ReferenceDefinition,
-  ReferenceOption,
   RenameTableStatement,
   Statement,
   TableOptions,
