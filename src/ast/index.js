@@ -12,14 +12,17 @@ import invariant from 'invariant';
 import type { Encoding } from './encodings';
 import type { Precision } from './types';
 
+export type Direction = 'ASC' | 'DESC';
+export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
+export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
+export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
+
 export type UnaryOp = '+' | '-' | '!' | 'is null' | 'is not null';
 
 type BooleanOp = 'AND' | 'OR' | 'XOR';
 type CmpOp = '=' | '<=>' | '!=' | '<>' | '>=' | '<=' | '<' | '>' | 'LIKE' | 'REGEXP' | 'RLIKE';
 type ArithmOp = '+' | '-' | '*' | '/' | '%' | 'DIV';
 export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
-
-export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
 
 function isBytes(node: Node): boolean %checks {
   return (

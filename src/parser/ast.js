@@ -6,14 +6,17 @@
 // TODO
 // TODO
 
-import type { CurrentTimestamp, DataType, DefaultValue, GeneratedDefinition } from '../ast';
+import type {
+  CurrentTimestamp,
+  DataType,
+  DefaultValue,
+  Direction,
+  GeneratedDefinition,
+  MatchMode,
+  ReferenceOption,
+} from '../ast';
 
 export type NamedConstraint = string;
-
-export type Direction = 'ASC' | 'DESC';
-export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
-export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
-export type GeneratedMode = 'STORED' | 'VIRTUAL';
 
 export type IndexColName = {|
   colName: string,
