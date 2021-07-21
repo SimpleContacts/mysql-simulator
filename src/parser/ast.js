@@ -137,22 +137,22 @@ export type AlterDatabaseStatement = {|
 |};
 
 export type AlterSpec =
-  | AlterTableOptions
-  | AlterConvertTo
   | AlterAddColumn
+  | AlterAddForeignKey
+  | AlterAddFullTextIndex
   | AlterAddIndex
   | AlterAddPrimaryKey
   | AlterAddUniqueIndex
-  | AlterAddFullTextIndex
-  | AlterAddForeignKey
+  | AlterChangeColumn
+  | AlterConvertTo
+  | AlterDropColumn
   | AlterDropDefault
+  | AlterDropForeignKey
   | AlterDropIndex
   | AlterDropPrimaryKey
-  | AlterDropForeignKey
-  | AlterDropColumn
-  | AlterChangeColumn
   | AlterRenameIndex
-  | AlterRenameTable;
+  | AlterRenameTable
+  | AlterTableOptions;
 
 export type AlterTableStatement = {|
   type: 'ALTER TABLE',
