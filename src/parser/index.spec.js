@@ -246,6 +246,7 @@ describe('Read documentation', () => {
           { type: 'DROP COLUMN', colName: 'name' },
           { type: 'DROP COLUMN', colName: 'brand' },
           {
+            _kind: 'AlterAddColumn',
             type: 'ADD COLUMN',
             colName: 'foobar',
             definition: {
@@ -264,6 +265,7 @@ describe('Read documentation', () => {
             position: null,
           },
           {
+            _kind: 'AlterAddForeignKey',
             type: 'ADD FOREIGN KEY',
             constraintName: null,
             indexName: null,
