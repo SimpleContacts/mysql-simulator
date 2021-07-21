@@ -93,6 +93,9 @@ function isStart(node: Node): boolean %checks {
     node._kind === 'AlterAddUniqueIndex' ||
     node._kind === 'AlterAddFullTextIndex' ||
     node._kind === 'AlterAddForeignKey' ||
+    node._kind === 'AlterChangeColumn' ||
+    node._kind === 'AlterConvertTo' ||
+    node._kind === 'AlterTableOptions' ||
     isExpression(node)
   );
 }
@@ -148,7 +151,10 @@ export type Start =
   | AlterAddPrimaryKey
   | AlterAddUniqueIndex
   | AlterAddFullTextIndex
-  | AlterAddForeignKey;
+  | AlterAddForeignKey
+  | AlterChangeColumn
+  | AlterConvertTo
+  | AlterTableOptions;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -163,6 +169,9 @@ export type Node =
   | AlterAddIndex
   | AlterAddPrimaryKey
   | AlterAddUniqueIndex
+  | AlterChangeColumn
+  | AlterConvertTo
+  | AlterTableOptions
   | BigInt
   | Binary
   | BinaryExpression
@@ -196,6 +205,7 @@ export type Node =
   | PrimaryKey
   | ReferenceDefinition
   | SmallInt
+  | TableOptions
   | Text
   | Time
   | Timestamp
@@ -215,6 +225,9 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'AlterAddIndex' ||
     node._kind === 'AlterAddPrimaryKey' ||
     node._kind === 'AlterAddUniqueIndex' ||
+    node._kind === 'AlterChangeColumn' ||
+    node._kind === 'AlterConvertTo' ||
+    node._kind === 'AlterTableOptions' ||
     node._kind === 'BigInt' ||
     node._kind === 'Binary' ||
     node._kind === 'BinaryExpression' ||
@@ -248,6 +261,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'PrimaryKey' ||
     node._kind === 'ReferenceDefinition' ||
     node._kind === 'SmallInt' ||
+    node._kind === 'TableOptions' ||
     node._kind === 'Text' ||
     node._kind === 'Time' ||
     node._kind === 'Timestamp' ||
@@ -308,6 +322,28 @@ export type AlterAddUniqueIndex = {|
   indexName: string | null,
   indexType: IndexType | null,
   indexColNames: Array<IndexColName>,
+|};
+
+export type AlterChangeColumn = {|
+  _kind: 'AlterChangeColumn',
+  type: 'CHANGE COLUMN',
+  oldColName: string,
+  newColName: string,
+  definition: ColumnDefinition,
+  position: string | null,
+|};
+
+export type AlterConvertTo = {|
+  _kind: 'AlterConvertTo',
+  type: 'CONVERT TO',
+  charset: string,
+  collate: string | null,
+|};
+
+export type AlterTableOptions = {|
+  _kind: 'AlterTableOptions',
+  type: 'CHANGE TABLE OPTIONS',
+  options: TableOptions,
 |};
 
 export type BigInt = {|
@@ -532,6 +568,14 @@ export type SmallInt = {|
   baseType: 'smallint',
   length: number,
   unsigned: boolean,
+|};
+
+export type TableOptions = {|
+  _kind: 'TableOptions',
+  AUTO_INCREMENT: string | null,
+  ENGINE: string | null,
+  CHARSET: string | null,
+  COLLATE: string | null,
 |};
 
 export type Text = {|
@@ -795,6 +839,88 @@ export default {
       indexName,
       indexType,
       indexColNames,
+    };
+  },
+
+  AlterChangeColumn(
+    oldColName: string,
+    newColName: string,
+    definition: ColumnDefinition,
+    position: string | null = null,
+  ): AlterChangeColumn {
+    invariant(
+      typeof oldColName === 'string',
+      `Invalid value for "oldColName" arg in "AlterChangeColumn" call.\nExpected: string\nGot:      ${JSON.stringify(
+        oldColName,
+      )}`,
+    );
+
+    invariant(
+      typeof newColName === 'string',
+      `Invalid value for "newColName" arg in "AlterChangeColumn" call.\nExpected: string\nGot:      ${JSON.stringify(
+        newColName,
+      )}`,
+    );
+
+    invariant(
+      definition._kind === 'ColumnDefinition',
+      `Invalid value for "definition" arg in "AlterChangeColumn" call.\nExpected: ColumnDefinition\nGot:      ${JSON.stringify(
+        definition,
+      )}`,
+    );
+
+    invariant(
+      position === null || typeof position === 'string',
+      `Invalid value for "position" arg in "AlterChangeColumn" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        position,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterChangeColumn',
+      type: 'CHANGE COLUMN',
+      oldColName,
+      newColName,
+      definition,
+      position,
+    };
+  },
+
+  AlterConvertTo(charset: string, collate: string | null = null): AlterConvertTo {
+    invariant(
+      typeof charset === 'string',
+      `Invalid value for "charset" arg in "AlterConvertTo" call.\nExpected: string\nGot:      ${JSON.stringify(
+        charset,
+      )}`,
+    );
+
+    invariant(
+      collate === null || typeof collate === 'string',
+      `Invalid value for "collate" arg in "AlterConvertTo" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        collate,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterConvertTo',
+      type: 'CONVERT TO',
+      charset,
+      collate,
+    };
+  },
+
+  AlterTableOptions(options: TableOptions): AlterTableOptions {
+    invariant(
+      options._kind === 'TableOptions',
+      `Invalid value for "options" arg in "AlterTableOptions" call.\nExpected: TableOptions\nGot:      ${JSON.stringify(
+        options,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterTableOptions',
+      type: 'CHANGE TABLE OPTIONS',
+      options,
     };
   },
 
@@ -1416,6 +1542,47 @@ export default {
       baseType: 'smallint',
       length,
       unsigned,
+    };
+  },
+
+  TableOptions(
+    AUTO_INCREMENT: string | null = null,
+    ENGINE: string | null = null,
+    CHARSET: string | null = null,
+    COLLATE: string | null = null,
+  ): TableOptions {
+    invariant(
+      AUTO_INCREMENT === null || typeof AUTO_INCREMENT === 'string',
+      `Invalid value for "AUTO_INCREMENT" arg in "TableOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        AUTO_INCREMENT,
+      )}`,
+    );
+
+    invariant(
+      ENGINE === null || typeof ENGINE === 'string',
+      `Invalid value for "ENGINE" arg in "TableOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(ENGINE)}`,
+    );
+
+    invariant(
+      CHARSET === null || typeof CHARSET === 'string',
+      `Invalid value for "CHARSET" arg in "TableOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        CHARSET,
+      )}`,
+    );
+
+    invariant(
+      COLLATE === null || typeof COLLATE === 'string',
+      `Invalid value for "COLLATE" arg in "TableOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        COLLATE,
+      )}`,
+    );
+
+    return {
+      _kind: 'TableOptions',
+      AUTO_INCREMENT,
+      ENGINE,
+      CHARSET,
+      COLLATE,
     };
   },
 

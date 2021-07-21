@@ -170,6 +170,31 @@ AlterAddForeignKey:
   indexColNames   IndexColName+
   reference       ReferenceDefinition
 
+AlterChangeColumn:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type        "CHANGE COLUMN"
+  oldColName  string
+  newColName  string
+  definition  ColumnDefinition
+  position    string?
+
+AlterConvertTo:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "CONVERT TO"
+  charset  string
+  collate  string?
+
+AlterTableOptions:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "CHANGE TABLE OPTIONS"
+  options  TableOptions
+
+TableOptions:
+  AUTO_INCREMENT  string?
+  ENGINE          string?
+  CHARSET         string?
+  COLLATE         string?
+
 TinyInt:
   baseType  "tinyint"
   length    number
@@ -363,3 +388,6 @@ CurrentTimestamp:
   | AlterAddUniqueIndex
   | AlterAddFullTextIndex
   | AlterAddForeignKey
+  | AlterChangeColumn
+  | AlterConvertTo
+  | AlterTableOptions

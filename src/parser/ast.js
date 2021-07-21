@@ -13,24 +13,19 @@ import type {
   AlterAddIndex,
   AlterAddPrimaryKey,
   AlterAddUniqueIndex,
+  AlterChangeColumn,
+  AlterConvertTo,
   Column,
-  ColumnDefinition,
   ForeignKey,
   FullTextIndex,
   Index,
   IndexColName,
   PrimaryKey,
+  TableOptions,
   UniqueIndex,
 } from '../ast';
 
 export type CreateTableDefinition = Column | PrimaryKey | Index | UniqueIndex | FullTextIndex | ForeignKey;
-
-export type TableOptions = {|
-  AUTO_INCREMENT?: string | null,
-  ENGINE?: 'InnoDB',
-  CHARSET?: string,
-  COLLATE?: string,
-|};
 
 export type CreateTableStatement = {|
   type: 'CREATE TABLE',
@@ -71,28 +66,9 @@ export type RenameTableStatement = {|
   newName: string,
 |};
 
-export type AlterTableOptions = {|
-  type: 'CHANGE TABLE OPTIONS',
-  options: TableOptions,
-|};
-
-export type AlterConvertTo = {|
-  type: 'CONVERT TO',
-  charset: string,
-  collate?: string,
-|};
-
 export type AlterDropDefault = {|
   type: 'DROP DEFAULT',
   colName: string,
-|};
-
-export type AlterChangeColumn = {|
-  type: 'CHANGE COLUMN',
-  oldColName: string,
-  newColName: string,
-  definition: ColumnDefinition,
-  position: string | null,
 |};
 
 export type AlterDropIndex = {|

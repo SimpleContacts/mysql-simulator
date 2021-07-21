@@ -444,10 +444,7 @@ AlterSpecs
  */
 AlterSpec
   = options:TableOptions {
-      return {
-        type: 'CHANGE TABLE OPTIONS',
-        options: Object.assign({}, ...options),
-      }
+      return ast.AlterTableOptions(Object.assign({}, ...options))
     }
   / ADD
     COLUMN?
@@ -604,11 +601,7 @@ AlterSpec
     SET
     charset:CharsetName
     collate:(COLLATE collate:CollationName { return collate })? {
-      return {
-        type: 'CONVERT TO',
-        charset,
-        collate,
-      }
+      return ast.AlterConvertTo(charset, collate)
     }
 
 NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol?.name ?? null }
