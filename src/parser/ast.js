@@ -7,22 +7,7 @@
 // TODO
 
 import type {
-  AlterAddColumn,
-  AlterAddForeignKey,
-  AlterAddFullTextIndex,
-  AlterAddIndex,
-  AlterAddPrimaryKey,
-  AlterAddUniqueIndex,
-  AlterChangeColumn,
-  AlterConvertTo,
-  AlterDropColumn,
-  AlterDropDefault,
-  AlterDropForeignKey,
-  AlterDropIndex,
-  AlterDropPrimaryKey,
-  AlterRenameIndex,
-  AlterRenameTable,
-  AlterTableOptions,
+  AlterSpec,
   Column,
   ForeignKey,
   FullTextIndex,
@@ -84,24 +69,6 @@ export type AlterDatabaseStatement = {|
   dbName: string,
   options: Array<AlterDbOption>,
 |};
-
-export type AlterSpec =
-  | AlterAddColumn
-  | AlterAddForeignKey
-  | AlterAddFullTextIndex
-  | AlterAddIndex
-  | AlterAddPrimaryKey
-  | AlterAddUniqueIndex
-  | AlterChangeColumn
-  | AlterConvertTo
-  | AlterDropColumn
-  | AlterDropDefault
-  | AlterDropForeignKey
-  | AlterDropIndex
-  | AlterDropPrimaryKey
-  | AlterRenameIndex
-  | AlterRenameTable
-  | AlterTableOptions;
 
 export type AlterTableStatement = {|
   type: 'ALTER TABLE',

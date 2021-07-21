@@ -14,6 +14,7 @@ import type {
   AlterDropIndex,
   AlterRenameIndex,
   AlterRenameTable,
+  AlterSpec,
   ColumnDefinition,
   IndexColName,
   IndexType,
@@ -22,7 +23,6 @@ import type {
   TableOptions,
 } from '../ast';
 import type {
-  AlterSpec,
   AlterTableStatement,
   CreateIndexStatement,
   CreateTableDefinition,

@@ -127,6 +127,24 @@ ForeignKey:
   indexColNames   IndexColName+
   reference       ReferenceDefinition
 
+@AlterSpec:
+  | AlterAddIndex
+  | AlterAddColumn
+  | AlterAddPrimaryKey
+  | AlterAddUniqueIndex
+  | AlterAddFullTextIndex
+  | AlterAddForeignKey
+  | AlterChangeColumn
+  | AlterConvertTo
+  | AlterDropColumn
+  | AlterDropDefault
+  | AlterDropForeignKey
+  | AlterDropIndex
+  | AlterDropPrimaryKey
+  | AlterRenameIndex
+  | AlterRenameTable
+  | AlterTableOptions
+
 AlterAddIndex:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type           "ADD INDEX"
@@ -417,19 +435,4 @@ CurrentTimestamp:
   | UniqueIndex
   | FullTextIndex
   | ForeignKey
-  | AlterAddIndex
-  | AlterAddColumn
-  | AlterAddPrimaryKey
-  | AlterAddUniqueIndex
-  | AlterAddFullTextIndex
-  | AlterAddForeignKey
-  | AlterChangeColumn
-  | AlterConvertTo
-  | AlterDropColumn
-  | AlterDropDefault
-  | AlterDropForeignKey
-  | AlterDropIndex
-  | AlterDropPrimaryKey
-  | AlterRenameIndex
-  | AlterRenameTable
-  | AlterTableOptions
+  | @AlterSpec

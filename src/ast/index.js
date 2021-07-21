@@ -25,6 +25,27 @@ type CmpOp = '=' | '<=>' | '!=' | '<>' | '>=' | '<=' | '<' | '>' | 'LIKE' | 'REG
 type ArithmOp = '+' | '-' | '*' | '/' | '%' | 'DIV';
 export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
 
+function isAlterSpec(node: Node): boolean %checks {
+  return (
+    node._kind === 'AlterAddIndex' ||
+    node._kind === 'AlterAddColumn' ||
+    node._kind === 'AlterAddPrimaryKey' ||
+    node._kind === 'AlterAddUniqueIndex' ||
+    node._kind === 'AlterAddFullTextIndex' ||
+    node._kind === 'AlterAddForeignKey' ||
+    node._kind === 'AlterChangeColumn' ||
+    node._kind === 'AlterConvertTo' ||
+    node._kind === 'AlterDropColumn' ||
+    node._kind === 'AlterDropDefault' ||
+    node._kind === 'AlterDropForeignKey' ||
+    node._kind === 'AlterDropIndex' ||
+    node._kind === 'AlterDropPrimaryKey' ||
+    node._kind === 'AlterRenameIndex' ||
+    node._kind === 'AlterRenameTable' ||
+    node._kind === 'AlterTableOptions'
+  );
+}
+
 function isBytes(node: Node): boolean %checks {
   return (
     node._kind === 'Blob' ||
@@ -87,23 +108,8 @@ function isStart(node: Node): boolean %checks {
     node._kind === 'UniqueIndex' ||
     node._kind === 'FullTextIndex' ||
     node._kind === 'ForeignKey' ||
-    node._kind === 'AlterAddIndex' ||
-    node._kind === 'AlterAddColumn' ||
-    node._kind === 'AlterAddPrimaryKey' ||
-    node._kind === 'AlterAddUniqueIndex' ||
-    node._kind === 'AlterAddFullTextIndex' ||
-    node._kind === 'AlterAddForeignKey' ||
-    node._kind === 'AlterChangeColumn' ||
-    node._kind === 'AlterConvertTo' ||
-    node._kind === 'AlterDropColumn' ||
-    node._kind === 'AlterDropDefault' ||
-    node._kind === 'AlterDropForeignKey' ||
-    node._kind === 'AlterDropIndex' ||
-    node._kind === 'AlterDropPrimaryKey' ||
-    node._kind === 'AlterRenameIndex' ||
-    node._kind === 'AlterRenameTable' ||
-    node._kind === 'AlterTableOptions' ||
-    isExpression(node)
+    isExpression(node) ||
+    isAlterSpec(node)
   );
 }
 
@@ -131,28 +137,7 @@ function isTextualOrEnum(node: Node): boolean %checks {
   return node._kind === 'Enum' || isTextual(node);
 }
 
-export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
-
-export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
-
-export type DefaultValue = Literal | CurrentTimestamp;
-
-export type Expression = Literal | Identifier | UnaryExpression | BinaryExpression | CallExpression;
-
-export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt;
-
-export type Numeric = Integer | Real;
-
-export type Real = Decimal | Float | Double;
-
-export type Start =
-  | Expression
-  | Column
-  | PrimaryKey
-  | Index
-  | UniqueIndex
-  | FullTextIndex
-  | ForeignKey
+export type AlterSpec =
   | AlterAddIndex
   | AlterAddColumn
   | AlterAddPrimaryKey
@@ -169,6 +154,22 @@ export type Start =
   | AlterRenameIndex
   | AlterRenameTable
   | AlterTableOptions;
+
+export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
+
+export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
+
+export type DefaultValue = Literal | CurrentTimestamp;
+
+export type Expression = Literal | Identifier | UnaryExpression | BinaryExpression | CallExpression;
+
+export type Integer = TinyInt | MediumInt | SmallInt | Int | BigInt;
+
+export type Numeric = Integer | Real;
+
+export type Real = Decimal | Float | Double;
+
+export type Start = Expression | Column | PrimaryKey | Index | UniqueIndex | FullTextIndex | ForeignKey | AlterSpec;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -1904,6 +1905,7 @@ export default {
 
   // Node groups
   isNode,
+  isAlterSpec,
   isBytes,
   isDataType,
   isDefaultValue,
