@@ -65,6 +65,14 @@ IndexColName:
   len        number?
   direction  Direction?
 
+@CreateTableDefinition:
+  | Column
+  | PrimaryKey
+  | Index
+  | UniqueIndex
+  | FullTextIndex
+  | ForeignKey
+
 Column:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type        "COLUMN"
@@ -429,10 +437,5 @@ CurrentTimestamp:
 # or if we should explicitly define it.
 @Start:
   | @Expression
-  | Column
-  | PrimaryKey
-  | Index
-  | UniqueIndex
-  | FullTextIndex
-  | ForeignKey
+  | @CreateTableDefinition
   | @AlterSpec

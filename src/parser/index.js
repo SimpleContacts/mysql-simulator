@@ -16,6 +16,7 @@ import type {
   AlterRenameTable,
   AlterSpec,
   ColumnDefinition,
+  CreateTableDefinition,
   IndexColName,
   IndexType,
   ReferenceDefinition,
@@ -25,7 +26,6 @@ import type {
 import type {
   AlterTableStatement,
   CreateIndexStatement,
-  CreateTableDefinition,
   CreateTableLikeStatement,
   CreateTableStatement,
   CreateTriggerStatement,

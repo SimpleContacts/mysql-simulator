@@ -6,19 +6,7 @@
 // TODO
 // TODO
 
-import type {
-  AlterSpec,
-  Column,
-  ForeignKey,
-  FullTextIndex,
-  Index,
-  IndexColName,
-  PrimaryKey,
-  TableOptions,
-  UniqueIndex,
-} from '../ast';
-
-export type CreateTableDefinition = Column | PrimaryKey | Index | UniqueIndex | FullTextIndex | ForeignKey;
+import type { AlterSpec, CreateTableDefinition, IndexColName, TableOptions } from '../ast';
 
 export type CreateTableStatement = {|
   type: 'CREATE TABLE',

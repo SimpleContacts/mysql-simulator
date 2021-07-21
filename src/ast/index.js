@@ -57,6 +57,17 @@ function isBytes(node: Node): boolean %checks {
   );
 }
 
+function isCreateTableDefinition(node: Node): boolean %checks {
+  return (
+    node._kind === 'Column' ||
+    node._kind === 'PrimaryKey' ||
+    node._kind === 'Index' ||
+    node._kind === 'UniqueIndex' ||
+    node._kind === 'FullTextIndex' ||
+    node._kind === 'ForeignKey'
+  );
+}
+
 function isDataType(node: Node): boolean %checks {
   return (
     node._kind === 'Enum' ||
@@ -101,16 +112,7 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return (
-    node._kind === 'Column' ||
-    node._kind === 'PrimaryKey' ||
-    node._kind === 'Index' ||
-    node._kind === 'UniqueIndex' ||
-    node._kind === 'FullTextIndex' ||
-    node._kind === 'ForeignKey' ||
-    isExpression(node) ||
-    isAlterSpec(node)
-  );
+  return isExpression(node) || isCreateTableDefinition(node) || isAlterSpec(node);
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -157,6 +159,8 @@ export type AlterSpec =
 
 export type Bytes = Blob | Binary | VarBinary | TinyBlob | MediumBlob | LongBlob;
 
+export type CreateTableDefinition = Column | PrimaryKey | Index | UniqueIndex | FullTextIndex | ForeignKey;
+
 export type DataType = Numeric | Temporal | Textual | Enum | Bytes | Json;
 
 export type DefaultValue = Literal | CurrentTimestamp;
@@ -169,7 +173,7 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | Column | PrimaryKey | Index | UniqueIndex | FullTextIndex | ForeignKey | AlterSpec;
+export type Start = Expression | CreateTableDefinition | AlterSpec;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -1907,6 +1911,7 @@ export default {
   isNode,
   isAlterSpec,
   isBytes,
+  isCreateTableDefinition,
   isDataType,
   isDefaultValue,
   isExpression,
