@@ -128,7 +128,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const tblName = stm.tblName;
   let encoding;
   if (stm.options?.CHARSET || stm.options?.COLLATE) {
-    encoding = makeEncoding(stm.options.CHARSET, stm.options.COLLATE);
+    encoding = makeEncoding(stm.options.CHARSET ?? undefined, stm.options.COLLATE ?? undefined);
   } else {
     encoding = db_.defaultEncoding;
   }
@@ -306,14 +306,14 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'RENAME INDEX') {
           db = db.renameIndex(stm.tblName, change.oldIndexName, change.newIndexName);
         } else if (change.type === 'CHANGE TABLE OPTIONS') {
-          const charset = change.options.CHARSET;
-          const collate = change.options.COLLATE;
+          const charset = change.options.CHARSET ?? undefined;
+          const collate = change.options.COLLATE ?? undefined;
           if (charset || collate) {
             db = db.setDefaultTableEncoding(stm.tblName, charset, collate);
           }
         } else if (change.type === 'CONVERT TO') {
           const charset = change.charset;
-          const collate = change.collate;
+          const collate = change.collate ?? undefined;
           db = db.convertToEncoding(stm.tblName, charset, collate);
         } else {
           // Log details to the console (useful for debugging)

@@ -190,7 +190,7 @@ AlterTableOptions:
   options  TableOptions
 
 TableOptions:
-  AUTO_INCREMENT  string?
+  AUTO_INCREMENT  number?
   ENGINE          string?
   CHARSET         string?
   COLLATE         string?

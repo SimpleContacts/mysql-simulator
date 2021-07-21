@@ -572,7 +572,7 @@ export type SmallInt = {|
 
 export type TableOptions = {|
   _kind: 'TableOptions',
-  AUTO_INCREMENT: string | null,
+  AUTO_INCREMENT: number | null,
   ENGINE: string | null,
   CHARSET: string | null,
   COLLATE: string | null,
@@ -1546,14 +1546,14 @@ export default {
   },
 
   TableOptions(
-    AUTO_INCREMENT: string | null = null,
+    AUTO_INCREMENT: number | null = null,
     ENGINE: string | null = null,
     CHARSET: string | null = null,
     COLLATE: string | null = null,
   ): TableOptions {
     invariant(
-      AUTO_INCREMENT === null || typeof AUTO_INCREMENT === 'string',
-      `Invalid value for "AUTO_INCREMENT" arg in "TableOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(
+      AUTO_INCREMENT === null || typeof AUTO_INCREMENT === 'number',
+      `Invalid value for "AUTO_INCREMENT" arg in "TableOptions" call.\nExpected: number?\nGot:      ${JSON.stringify(
         AUTO_INCREMENT,
       )}`,
     );

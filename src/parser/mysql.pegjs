@@ -444,7 +444,14 @@ AlterSpecs
  */
 AlterSpec
   = options:TableOptions {
-      return ast.AlterTableOptions(Object.assign({}, ...options))
+      return ast.AlterTableOptions(
+        ast.TableOptions(
+          options.map((opt) => opt.AUTO_INCREMENT).find((x) => x) ?? null,
+          options.map((opt) => opt.ENGINE).find((x) => x) ?? null,
+          options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
+          options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
+        ),
+      )
     }
   / ADD
     COLUMN?

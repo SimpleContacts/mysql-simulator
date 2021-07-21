@@ -15,6 +15,7 @@ import type {
   AlterAddUniqueIndex,
   AlterChangeColumn,
   AlterConvertTo,
+  AlterTableOptions,
   Column,
   ForeignKey,
   FullTextIndex,

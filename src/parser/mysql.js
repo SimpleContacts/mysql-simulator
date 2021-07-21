@@ -325,10 +325,14 @@ function peg$parse(input, options) {
           },
       peg$c79 = function(only) { return [only].filter(Boolean) },
       peg$c80 = function(options) {
-            return {
-              type: 'CHANGE TABLE OPTIONS',
-              options: Object.assign({}, ...options),
-            }
+            return ast.AlterTableOptions(
+              ast.TableOptions(
+                options.map((opt) => opt.AUTO_INCREMENT).find((x) => x) ?? null,
+                options.map((opt) => opt.ENGINE).find((x) => x) ?? null,
+                options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
+                options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
+              ),
+            )
           },
       peg$c81 = function(colName, columnDefinition, ident) { return `AFTER ${ident.name}` },
       peg$c82 = function(colName, columnDefinition) { return 'FIRST' },
@@ -428,11 +432,7 @@ function peg$parse(input, options) {
           },
       peg$c102 = function(charset, collate) { return collate },
       peg$c103 = function(charset, collate) {
-            return {
-              type: 'CONVERT TO',
-              charset,
-              collate,
-            }
+            return ast.AlterConvertTo(charset, collate)
           },
       peg$c104 = function(symbol) { return symbol?.name ?? null },
       peg$c105 = function(ifNotExists, tblName, definitions, tableOptions) {

@@ -7,14 +7,15 @@ import type {
   AlterAddIndex,
   AlterAddPrimaryKey,
   AlterAddUniqueIndex,
+  AlterChangeColumn,
   ColumnDefinition,
   IndexColName,
   IndexType,
   ReferenceDefinition,
   ReferenceOption,
+  TableOptions,
 } from '../ast';
 import type {
-  AlterChangeColumn,
   AlterDropColumn,
   AlterDropDefault,
   AlterDropForeignKey,
@@ -32,7 +33,6 @@ import type {
   DropTableStatement,
   RenameTableStatement,
   Statement,
-  TableOptions,
 } from './ast';
 // $FlowFixMe[untyped-import] - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
