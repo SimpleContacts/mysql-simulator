@@ -4,6 +4,7 @@ import type { Precision } from './types';
 
 export type Direction = 'ASC' | 'DESC';
 export type GeneratedColumnMode = "STORED" | "VIRTUAL";
+export type IndexType = 'BTREE' | 'HASH';
 export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
 export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
 
@@ -121,6 +122,49 @@ FulltextIndex:
 ForeignKey:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type            "FOREIGN KEY"
+  constraintName  string?
+  indexName       string?
+  indexColNames   IndexColName+
+  reference       ReferenceDefinition
+
+AlterAddIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type           "ADD INDEX"
+  indexName      string?
+  indexType      IndexType?
+  indexColNames  IndexColName+
+
+AlterAddColumn:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type        "ADD COLUMN"
+  colName     string
+  definition  ColumnDefinition
+  position    string?
+
+AlterAddPrimaryKey:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type            "ADD PRIMARY KEY"
+  constraintName  string?
+  indexType       IndexType?
+  indexColNames   IndexColName+
+
+AlterAddUniqueIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type            "ADD UNIQUE INDEX"
+  constraintName  string?
+  indexName       string?
+  indexType       IndexType?
+  indexColNames   IndexColName+
+
+AlterAddFullTextIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type           "ADD FULLTEXT INDEX"
+  indexName      string?
+  indexColNames  IndexColName+
+
+AlterAddForeignKey:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type            "ADD FOREIGN KEY"
   constraintName  string?
   indexName       string?
   indexColNames   IndexColName+
@@ -313,3 +357,9 @@ CurrentTimestamp:
   | UniqueIndex
   | FulltextIndex
   | ForeignKey
+  | AlterAddIndex
+  | AlterAddColumn
+  | AlterAddPrimaryKey
+  | AlterAddUniqueIndex
+  | AlterAddFullTextIndex
+  | AlterAddForeignKey

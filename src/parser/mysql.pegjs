@@ -456,14 +456,7 @@ AlterSpec
     position:(
       AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
-    )? {
-      return {
-        type: 'ADD COLUMN',
-        colName: colName.name,
-        definition: columnDefinition,
-        position,
-      }
-    }
+    )? { return ast.AlterAddColumn(colName.name, columnDefinition, position) }
   / ADD
     (INDEX / KEY)
     indexName:Identifier?
@@ -471,12 +464,11 @@ AlterSpec
     LPAREN
     indexColNames:IndexColNames
     RPAREN {
-      return {
-        type: 'ADD INDEX',
-        indexName: indexName?.name ?? null,
+      return ast.AlterAddIndex(
+        indexName?.name ?? null,
         indexType,
         indexColNames,
-      }
+      )
     }
   / ADD
     constraintName:NamedConstraint?
@@ -486,12 +478,7 @@ AlterSpec
     LPAREN
     indexColNames:IndexColNames
     RPAREN {
-      return {
-        type: 'ADD PRIMARY KEY',
-        constraintName,
-        indexType,
-        indexColNames,
-      }
+      return ast.AlterAddPrimaryKey(constraintName, indexType, indexColNames)
     }
   / ADD
     constraintName:NamedConstraint?
@@ -502,13 +489,12 @@ AlterSpec
     LPAREN
     indexColNames:IndexColNames
     RPAREN {
-      return {
-        type: 'ADD UNIQUE INDEX',
+      return ast.AlterAddUniqueIndex(
         constraintName,
-        indexName: indexName?.name ?? null,
+        indexName?.name ?? null,
         indexType,
         indexColNames,
-      }
+      )
     }
   / ADD
     FULLTEXT
@@ -517,11 +503,7 @@ AlterSpec
     LPAREN
     indexColNames:IndexColNames
     RPAREN {
-      return {
-        type: 'ADD FULLTEXT INDEX',
-        indexName: indexName?.name ?? null,
-        indexColNames,
-      }
+      return ast.AlterAddFulltextIndex(indexName?.name ?? null, indexColNames)
     }
   / ADD
     constraintName:NamedConstraint?
@@ -532,13 +514,12 @@ AlterSpec
     indexColNames:IndexColNames
     RPAREN
     reference:ReferenceDefinition {
-      return {
-        type: 'ADD FOREIGN KEY',
+      return ast.AlterAddForeignKey(
         constraintName,
-        indexName: indexName?.name ?? null,
+        indexName?.name ?? null,
         indexColNames,
         reference,
-      }
+      )
     }
   // / ALGORITHM
   / ALTER COLUMN? colName:Identifier DROP DEFAULT {

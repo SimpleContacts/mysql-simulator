@@ -14,6 +14,7 @@ import type { Precision } from './types';
 
 export type Direction = 'ASC' | 'DESC';
 export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
+export type IndexType = 'BTREE' | 'HASH';
 export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
 export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
 
@@ -86,6 +87,12 @@ function isStart(node: Node): boolean %checks {
     node._kind === 'UniqueIndex' ||
     node._kind === 'FulltextIndex' ||
     node._kind === 'ForeignKey' ||
+    node._kind === 'AlterAddIndex' ||
+    node._kind === 'AlterAddColumn' ||
+    node._kind === 'AlterAddPrimaryKey' ||
+    node._kind === 'AlterAddUniqueIndex' ||
+    node._kind === 'AlterAddFullTextIndex' ||
+    node._kind === 'AlterAddForeignKey' ||
     isExpression(node)
   );
 }
@@ -128,7 +135,20 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | Column | PrimaryKey | Index | UniqueIndex | FulltextIndex | ForeignKey;
+export type Start =
+  | Expression
+  | Column
+  | PrimaryKey
+  | Index
+  | UniqueIndex
+  | FulltextIndex
+  | ForeignKey
+  | AlterAddIndex
+  | AlterAddColumn
+  | AlterAddPrimaryKey
+  | AlterAddUniqueIndex
+  | AlterAddFullTextIndex
+  | AlterAddForeignKey;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -137,6 +157,12 @@ export type Textual = Char | VarChar | Text | MediumText | LongText;
 export type TextualOrEnum = Textual | Enum;
 
 export type Node =
+  | AlterAddColumn
+  | AlterAddForeignKey
+  | AlterAddFullTextIndex
+  | AlterAddIndex
+  | AlterAddPrimaryKey
+  | AlterAddUniqueIndex
   | BigInt
   | Binary
   | BinaryExpression
@@ -183,6 +209,12 @@ export type Node =
 
 function isNode(node: Node): boolean %checks {
   return (
+    node._kind === 'AlterAddColumn' ||
+    node._kind === 'AlterAddForeignKey' ||
+    node._kind === 'AlterAddFullTextIndex' ||
+    node._kind === 'AlterAddIndex' ||
+    node._kind === 'AlterAddPrimaryKey' ||
+    node._kind === 'AlterAddUniqueIndex' ||
     node._kind === 'BigInt' ||
     node._kind === 'Binary' ||
     node._kind === 'BinaryExpression' ||
@@ -228,6 +260,55 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Year'
   );
 }
+
+export type AlterAddColumn = {|
+  _kind: 'AlterAddColumn',
+  type: 'ADD COLUMN',
+  colName: string,
+  definition: ColumnDefinition,
+  position: string | null,
+|};
+
+export type AlterAddForeignKey = {|
+  _kind: 'AlterAddForeignKey',
+  type: 'ADD FOREIGN KEY',
+  constraintName: string | null,
+  indexName: string | null,
+  indexColNames: Array<IndexColName>,
+  reference: ReferenceDefinition,
+|};
+
+export type AlterAddFullTextIndex = {|
+  _kind: 'AlterAddFullTextIndex',
+  type: 'ADD FULLTEXT INDEX',
+  indexName: string | null,
+  indexColNames: Array<IndexColName>,
+|};
+
+export type AlterAddIndex = {|
+  _kind: 'AlterAddIndex',
+  type: 'ADD INDEX',
+  indexName: string | null,
+  indexType: IndexType | null,
+  indexColNames: Array<IndexColName>,
+|};
+
+export type AlterAddPrimaryKey = {|
+  _kind: 'AlterAddPrimaryKey',
+  type: 'ADD PRIMARY KEY',
+  constraintName: string | null,
+  indexType: IndexType | null,
+  indexColNames: Array<IndexColName>,
+|};
+
+export type AlterAddUniqueIndex = {|
+  _kind: 'AlterAddUniqueIndex',
+  type: 'ADD UNIQUE INDEX',
+  constraintName: string | null,
+  indexName: string | null,
+  indexType: IndexType | null,
+  indexColNames: Array<IndexColName>,
+|};
 
 export type BigInt = {|
   _kind: 'BigInt',
@@ -516,6 +597,207 @@ export type Year = {|
 |};
 
 export default {
+  AlterAddColumn(colName: string, definition: ColumnDefinition, position: string | null = null): AlterAddColumn {
+    invariant(
+      typeof colName === 'string',
+      `Invalid value for "colName" arg in "AlterAddColumn" call.\nExpected: string\nGot:      ${JSON.stringify(
+        colName,
+      )}`,
+    );
+
+    invariant(
+      definition._kind === 'ColumnDefinition',
+      `Invalid value for "definition" arg in "AlterAddColumn" call.\nExpected: ColumnDefinition\nGot:      ${JSON.stringify(
+        definition,
+      )}`,
+    );
+
+    invariant(
+      position === null || typeof position === 'string',
+      `Invalid value for "position" arg in "AlterAddColumn" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        position,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterAddColumn',
+      type: 'ADD COLUMN',
+      colName,
+      definition,
+      position,
+    };
+  },
+
+  AlterAddForeignKey(
+    constraintName: string | null,
+    indexName: string | null,
+    indexColNames: Array<IndexColName>,
+    reference: ReferenceDefinition,
+  ): AlterAddForeignKey {
+    invariant(
+      constraintName === null || typeof constraintName === 'string',
+      `Invalid value for "constraintName" arg in "AlterAddForeignKey" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        constraintName,
+      )}`,
+    );
+
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "AlterAddForeignKey" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "AlterAddForeignKey" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    invariant(
+      reference._kind === 'ReferenceDefinition',
+      `Invalid value for "reference" arg in "AlterAddForeignKey" call.\nExpected: ReferenceDefinition\nGot:      ${JSON.stringify(
+        reference,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterAddForeignKey',
+      type: 'ADD FOREIGN KEY',
+      constraintName,
+      indexName,
+      indexColNames,
+      reference,
+    };
+  },
+
+  AlterAddFullTextIndex(indexName: string | null, indexColNames: Array<IndexColName>): AlterAddFullTextIndex {
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "AlterAddFullTextIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "AlterAddFullTextIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterAddFullTextIndex',
+      type: 'ADD FULLTEXT INDEX',
+      indexName,
+      indexColNames,
+    };
+  },
+
+  AlterAddIndex(
+    indexName: string | null,
+    indexType: IndexType | null,
+    indexColNames: Array<IndexColName>,
+  ): AlterAddIndex {
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "AlterAddIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "AlterAddIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterAddIndex',
+      type: 'ADD INDEX',
+      indexName,
+      indexType,
+      indexColNames,
+    };
+  },
+
+  AlterAddPrimaryKey(
+    constraintName: string | null,
+    indexType: IndexType | null,
+    indexColNames: Array<IndexColName>,
+  ): AlterAddPrimaryKey {
+    invariant(
+      constraintName === null || typeof constraintName === 'string',
+      `Invalid value for "constraintName" arg in "AlterAddPrimaryKey" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        constraintName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "AlterAddPrimaryKey" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterAddPrimaryKey',
+      type: 'ADD PRIMARY KEY',
+      constraintName,
+      indexType,
+      indexColNames,
+    };
+  },
+
+  AlterAddUniqueIndex(
+    constraintName: string | null,
+    indexName: string | null,
+    indexType: IndexType | null,
+    indexColNames: Array<IndexColName>,
+  ): AlterAddUniqueIndex {
+    invariant(
+      constraintName === null || typeof constraintName === 'string',
+      `Invalid value for "constraintName" arg in "AlterAddUniqueIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        constraintName,
+      )}`,
+    );
+
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "AlterAddUniqueIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "AlterAddUniqueIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterAddUniqueIndex',
+      type: 'ADD UNIQUE INDEX',
+      constraintName,
+      indexName,
+      indexType,
+      indexColNames,
+    };
+  },
+
   BigInt(length: number, unsigned: boolean): BigInt {
     invariant(
       typeof length === 'number',

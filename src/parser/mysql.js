@@ -341,12 +341,11 @@ function peg$parse(input, options) {
             }
           },
       peg$c84 = function(indexName, indexType, indexColNames) {
-            return {
-              type: 'ADD INDEX',
-              indexName: indexName?.name ?? null,
+            return ast.AlterAddIndex(
+              indexName?.name ?? null,
               indexType,
               indexColNames,
-            }
+            )
           },
       peg$c85 = function(constraintName, indexType, indexColNames) {
             return {

@@ -7,6 +7,12 @@
 // TODO
 
 import type {
+  AlterAddColumn,
+  AlterAddForeignKey,
+  AlterAddFullTextIndex,
+  AlterAddIndex,
+  AlterAddPrimaryKey,
+  AlterAddUniqueIndex,
   Column,
   ColumnDefinition,
   ForeignKey,
@@ -14,7 +20,6 @@ import type {
   Index,
   IndexColName,
   PrimaryKey,
-  ReferenceDefinition,
   UniqueIndex,
 } from '../ast';
 
@@ -75,51 +80,6 @@ export type AlterConvertTo = {|
   type: 'CONVERT TO',
   charset: string,
   collate?: string,
-|};
-
-export type AlterAddColumn = {|
-  type: 'ADD COLUMN',
-  colName: string,
-  definition: ColumnDefinition,
-  position: string | null,
-|};
-
-export type IndexType = 'BTREE' | 'HASH';
-
-export type AlterAddIndex = {|
-  type: 'ADD INDEX',
-  indexName: string | null,
-  indexType: IndexType | null,
-  indexColNames: Array<IndexColName>,
-|};
-
-export type AlterAddPrimaryKey = {|
-  type: 'ADD PRIMARY KEY',
-  constraintName: string | null,
-  indexType: IndexType | null,
-  indexColNames: Array<IndexColName>,
-|};
-
-export type AlterAddUniqueIndex = {|
-  type: 'ADD UNIQUE INDEX',
-  constraintName: string | null,
-  indexName: string | null,
-  indexType: IndexType | null,
-  indexColNames: Array<IndexColName>,
-|};
-
-export type AlterAddFullTextIndex = {|
-  type: 'ADD FULLTEXT INDEX',
-  indexName: string | null,
-  indexColNames: Array<IndexColName>,
-|};
-
-export type AlterAddForeignKey = {|
-  type: 'ADD FOREIGN KEY',
-  constraintName: string | null,
-  indexName: string | null,
-  indexColNames: Array<IndexColName>,
-  reference: ReferenceDefinition,
 |};
 
 export type AlterDropDefault = {|
