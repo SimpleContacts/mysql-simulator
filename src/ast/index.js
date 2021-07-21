@@ -79,7 +79,15 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return node._kind === 'Column' || isExpression(node);
+  return (
+    node._kind === 'Column' ||
+    node._kind === 'PrimaryKey' ||
+    node._kind === 'Index' ||
+    node._kind === 'UniqueIndex' ||
+    node._kind === 'FulltextIndex' ||
+    node._kind === 'ForeignKey' ||
+    isExpression(node)
+  );
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -120,7 +128,7 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | Column;
+export type Start = Expression | Column | PrimaryKey | Index | UniqueIndex | FulltextIndex | ForeignKey;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -145,8 +153,11 @@ export type Node =
   | Double
   | Enum
   | Float
+  | ForeignKey
+  | FulltextIndex
   | GeneratedDefinition
   | Identifier
+  | Index
   | IndexColName
   | Int
   | Json
@@ -156,6 +167,7 @@ export type Node =
   | MediumBlob
   | MediumInt
   | MediumText
+  | PrimaryKey
   | ReferenceDefinition
   | SmallInt
   | Text
@@ -164,6 +176,7 @@ export type Node =
   | TinyBlob
   | TinyInt
   | UnaryExpression
+  | UniqueIndex
   | VarBinary
   | VarChar
   | Year;
@@ -186,8 +199,11 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Double' ||
     node._kind === 'Enum' ||
     node._kind === 'Float' ||
+    node._kind === 'ForeignKey' ||
+    node._kind === 'FulltextIndex' ||
     node._kind === 'GeneratedDefinition' ||
     node._kind === 'Identifier' ||
+    node._kind === 'Index' ||
     node._kind === 'IndexColName' ||
     node._kind === 'Int' ||
     node._kind === 'Json' ||
@@ -197,6 +213,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'MediumBlob' ||
     node._kind === 'MediumInt' ||
     node._kind === 'MediumText' ||
+    node._kind === 'PrimaryKey' ||
     node._kind === 'ReferenceDefinition' ||
     node._kind === 'SmallInt' ||
     node._kind === 'Text' ||
@@ -205,6 +222,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'TinyBlob' ||
     node._kind === 'TinyInt' ||
     node._kind === 'UnaryExpression' ||
+    node._kind === 'UniqueIndex' ||
     node._kind === 'VarBinary' ||
     node._kind === 'VarChar' ||
     node._kind === 'Year'
@@ -323,6 +341,22 @@ export type Float = {|
   unsigned: boolean,
 |};
 
+export type ForeignKey = {|
+  _kind: 'ForeignKey',
+  type: 'FOREIGN KEY',
+  constraintName: string | null,
+  indexName: string | null,
+  indexColNames: Array<IndexColName>,
+  reference: ReferenceDefinition,
+|};
+
+export type FulltextIndex = {|
+  _kind: 'FulltextIndex',
+  type: 'FULLTEXT INDEX',
+  indexName: string | null,
+  indexColNames: Array<IndexColName>,
+|};
+
 export type GeneratedDefinition = {|
   _kind: 'GeneratedDefinition',
   type: 'generated',
@@ -336,10 +370,17 @@ export type Identifier = {|
   name: string,
 |};
 
+export type Index = {|
+  _kind: 'Index',
+  type: 'INDEX',
+  indexName: string | null,
+  indexColNames: Array<IndexColName>,
+|};
+
 export type IndexColName = {|
   _kind: 'IndexColName',
   colName: string,
-  len: number,
+  len: number | null,
   direction: Direction | null,
 |};
 
@@ -388,6 +429,12 @@ export type MediumText = {|
   _kind: 'MediumText',
   baseType: 'mediumtext',
   encoding: Encoding | null,
+|};
+
+export type PrimaryKey = {|
+  _kind: 'PrimaryKey',
+  type: 'PRIMARY KEY',
+  indexColNames: Array<IndexColName>,
 |};
 
 export type ReferenceDefinition = {|
@@ -440,6 +487,14 @@ export type UnaryExpression = {|
   type: 'unary',
   op: UnaryOp,
   expr: Expression,
+|};
+
+export type UniqueIndex = {|
+  _kind: 'UniqueIndex',
+  type: 'UNIQUE INDEX',
+  constraintName: string | null,
+  indexName: string | null,
+  indexColNames: Array<IndexColName>,
 |};
 
 export type VarBinary = {|
@@ -788,6 +843,77 @@ export default {
     };
   },
 
+  ForeignKey(
+    constraintName: string | null,
+    indexName: string | null,
+    indexColNames: Array<IndexColName>,
+    reference: ReferenceDefinition,
+  ): ForeignKey {
+    invariant(
+      constraintName === null || typeof constraintName === 'string',
+      `Invalid value for "constraintName" arg in "ForeignKey" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        constraintName,
+      )}`,
+    );
+
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "ForeignKey" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "ForeignKey" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    invariant(
+      reference._kind === 'ReferenceDefinition',
+      `Invalid value for "reference" arg in "ForeignKey" call.\nExpected: ReferenceDefinition\nGot:      ${JSON.stringify(
+        reference,
+      )}`,
+    );
+
+    return {
+      _kind: 'ForeignKey',
+      type: 'FOREIGN KEY',
+      constraintName,
+      indexName,
+      indexColNames,
+      reference,
+    };
+  },
+
+  FulltextIndex(indexName: string | null, indexColNames: Array<IndexColName>): FulltextIndex {
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "FulltextIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "FulltextIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'FulltextIndex',
+      type: 'FULLTEXT INDEX',
+      indexName,
+      indexColNames,
+    };
+  },
+
   GeneratedDefinition(expr: Expression, mode: GeneratedColumnMode): GeneratedDefinition {
     invariant(
       isExpression(expr),
@@ -817,15 +943,38 @@ export default {
     };
   },
 
-  IndexColName(colName: string, len: number, direction: Direction | null = null): IndexColName {
+  Index(indexName: string | null, indexColNames: Array<IndexColName>): Index {
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "Index" call.\nExpected: string?\nGot:      ${JSON.stringify(indexName)}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "Index" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'Index',
+      type: 'INDEX',
+      indexName,
+      indexColNames,
+    };
+  },
+
+  IndexColName(colName: string, len: number | null = null, direction: Direction | null = null): IndexColName {
     invariant(
       typeof colName === 'string',
       `Invalid value for "colName" arg in "IndexColName" call.\nExpected: string\nGot:      ${JSON.stringify(colName)}`,
     );
 
     invariant(
-      typeof len === 'number',
-      `Invalid value for "len" arg in "IndexColName" call.\nExpected: number\nGot:      ${JSON.stringify(len)}`,
+      len === null || typeof len === 'number',
+      `Invalid value for "len" arg in "IndexColName" call.\nExpected: number?\nGot:      ${JSON.stringify(len)}`,
     );
 
     return {
@@ -916,6 +1065,23 @@ export default {
       _kind: 'MediumText',
       baseType: 'mediumtext',
       encoding,
+    };
+  },
+
+  PrimaryKey(indexColNames: Array<IndexColName>): PrimaryKey {
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "PrimaryKey" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'PrimaryKey',
+      type: 'PRIMARY KEY',
+      indexColNames,
     };
   },
 
@@ -1038,6 +1204,43 @@ export default {
       type: 'unary',
       op,
       expr,
+    };
+  },
+
+  UniqueIndex(
+    constraintName: string | null,
+    indexName: string | null,
+    indexColNames: Array<IndexColName>,
+  ): UniqueIndex {
+    invariant(
+      constraintName === null || typeof constraintName === 'string',
+      `Invalid value for "constraintName" arg in "UniqueIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        constraintName,
+      )}`,
+    );
+
+    invariant(
+      indexName === null || typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "UniqueIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "UniqueIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'UniqueIndex',
+      type: 'UNIQUE INDEX',
+      constraintName,
+      indexName,
+      indexColNames,
     };
   },
 

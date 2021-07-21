@@ -6,36 +6,19 @@
 // TODO
 // TODO
 
-import type { Column, ColumnDefinition, IndexColName, ReferenceDefinition } from '../ast';
+import type {
+  Column,
+  ColumnDefinition,
+  ForeignKey,
+  FulltextIndex,
+  Index,
+  IndexColName,
+  PrimaryKey,
+  ReferenceDefinition,
+  UniqueIndex,
+} from '../ast';
 
-export type NamedConstraint = string;
-
-export type CreateTableDefinition =
-  | Column
-  | {| type: 'PRIMARY KEY', indexColNames: Array<IndexColName> |}
-  | {|
-      type: 'INDEX',
-      indexName: string | null,
-      indexColNames: Array<IndexColName>,
-    |}
-  | {|
-      type: 'UNIQUE INDEX',
-      constraint: NamedConstraint | null,
-      indexName: string | null,
-      indexColNames: Array<IndexColName>,
-    |}
-  | {|
-      type: 'FULLTEXT INDEX',
-      indexName: string | null,
-      indexColNames: Array<IndexColName>,
-    |}
-  | {|
-      type: 'FOREIGN KEY',
-      constraint: NamedConstraint | null,
-      indexName: string | null,
-      indexColNames: Array<IndexColName>,
-      reference: ReferenceDefinition,
-    |};
+export type CreateTableDefinition = Column | PrimaryKey | Index | UniqueIndex | FulltextIndex | ForeignKey;
 
 export type TableOptions = {|
   AUTO_INCREMENT?: string | null,
@@ -112,14 +95,14 @@ export type AlterAddIndex = {|
 
 export type AlterAddPrimaryKey = {|
   type: 'ADD PRIMARY KEY',
-  constraint: NamedConstraint | null,
+  constraintName: string | null,
   indexType: IndexType | null,
   indexColNames: Array<IndexColName>,
 |};
 
 export type AlterAddUniqueIndex = {|
   type: 'ADD UNIQUE INDEX',
-  constraint: NamedConstraint | null,
+  constraintName: string | null,
   indexName: string | null,
   indexType: IndexType | null,
   indexColNames: Array<IndexColName>,
@@ -133,7 +116,7 @@ export type AlterAddFullTextIndex = {|
 
 export type AlterAddForeignKey = {|
   type: 'ADD FOREIGN KEY',
-  constraint: NamedConstraint | null,
+  constraintName: string | null,
   indexName: string | null,
   indexColNames: Array<IndexColName>,
   reference: ReferenceDefinition,

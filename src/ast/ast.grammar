@@ -61,7 +61,7 @@ BuiltInFunction:
 
 IndexColName:
   colName    string
-  len        number
+  len        number?
   direction  Direction?
 
 Column:
@@ -93,6 +93,38 @@ GeneratedDefinition:
   type  "generated"
   expr  @Expression
   mode  GeneratedColumnMode
+
+PrimaryKey:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type           "PRIMARY KEY"
+  indexColNames  IndexColName+
+
+Index:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type           "INDEX"
+  indexName      string?
+  indexColNames  IndexColName+
+
+UniqueIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type            "UNIQUE INDEX"
+  constraintName  string?
+  indexName       string?
+  indexColNames   IndexColName+
+
+FulltextIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type           "FULLTEXT INDEX"
+  indexName      string?
+  indexColNames  IndexColName+
+
+ForeignKey:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type            "FOREIGN KEY"
+  constraintName  string?
+  indexName       string?
+  indexColNames   IndexColName+
+  reference       ReferenceDefinition
 
 TinyInt:
   baseType  "tinyint"
@@ -276,3 +308,8 @@ CurrentTimestamp:
 @Start:
   | @Expression
   | Column
+  | PrimaryKey
+  | Index
+  | UniqueIndex
+  | FulltextIndex
+  | ForeignKey

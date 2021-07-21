@@ -192,20 +192,24 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'ForeignKey',
             type: 'FOREIGN KEY',
-            constraint: null,
+            constraintName: null,
             indexName: null,
             indexColNames: [
               {
+                _kind: 'IndexColName',
                 colName: 'user_id',
                 direction: null,
                 len: null,
               },
             ],
             reference: {
+              _kind: 'ReferenceDefinition',
               tblName: 'users',
               indexColNames: [
                 {
+                  _kind: 'IndexColName',
                   colName: 'id',
                   direction: null,
                   len: null,
@@ -261,19 +265,22 @@ describe('Read documentation', () => {
           },
           {
             type: 'ADD FOREIGN KEY',
-            constraint: null,
+            constraintName: null,
             indexName: null,
             indexColNames: [
               {
+                _kind: 'IndexColName',
                 colName: 'product_id',
                 direction: null,
                 len: null,
               },
             ],
             reference: {
+              _kind: 'ReferenceDefinition',
               tblName: 'products',
               indexColNames: [
                 {
+                  _kind: 'IndexColName',
                   colName: 'id',
                   direction: null,
                   len: null,

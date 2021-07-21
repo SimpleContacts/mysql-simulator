@@ -479,7 +479,7 @@ AlterSpec
       }
     }
   / ADD
-    constraint:NamedConstraint?
+    constraintName:NamedConstraint?
     PRIMARY
     KEY
     indexType:IndexType?
@@ -488,13 +488,13 @@ AlterSpec
     RPAREN {
       return {
         type: 'ADD PRIMARY KEY',
-        constraint,
+        constraintName,
         indexType,
         indexColNames,
       }
     }
   / ADD
-    constraint:NamedConstraint?
+    constraintName:NamedConstraint?
     UNIQUE
     (INDEX / KEY)?
     indexName:Identifier?
@@ -504,7 +504,7 @@ AlterSpec
     RPAREN {
       return {
         type: 'ADD UNIQUE INDEX',
-        constraint,
+        constraintName,
         indexName: indexName?.name ?? null,
         indexType,
         indexColNames,
@@ -524,7 +524,7 @@ AlterSpec
       }
     }
   / ADD
-    constraint:NamedConstraint?
+    constraintName:NamedConstraint?
     FOREIGN
     KEY
     indexName:Identifier?
@@ -534,7 +534,7 @@ AlterSpec
     reference:ReferenceDefinition {
       return {
         type: 'ADD FOREIGN KEY',
-        constraint,
+        constraintName,
         indexName: indexName?.name ?? null,
         indexColNames,
         reference,
@@ -689,51 +689,35 @@ CreateDefinition
     }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
   / PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'PRIMARY KEY',
-        indexColNames,
-      }
+      return ast.PrimaryKey(indexColNames)
     }
   // / {INDEX|KEY} [index_name] [index_type] (index_col_name, ...)
   / (INDEX / KEY)
     indexName:Identifier?
     LPAREN
     indexColNames:IndexColNames
-    RPAREN {
-      return {
-        type: 'INDEX',
-        indexName: indexName?.name ?? null,
-        indexColNames,
-      }
-    }
+    RPAREN { return ast.Index(indexName?.name ?? null, indexColNames) }
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
-  / constraint:NamedConstraint?
+  / constraintName:NamedConstraint?
     UNIQUE
     (INDEX / KEY)?
     indexName:Identifier?
     LPAREN
     indexColNames:IndexColNames
     RPAREN {
-      return {
-        type: 'UNIQUE INDEX',
-        constraint,
-        indexName: indexName?.name ?? null,
+      return ast.UniqueIndex(
+        constraintName,
+        indexName?.name ?? null,
         indexColNames,
-      }
+      )
     }
   / FULLTEXT
     (INDEX / KEY)?
     indexName:Identifier?
     LPAREN
     indexColNames:IndexColNames
-    RPAREN {
-      return {
-        type: 'FULLTEXT INDEX',
-        indexName: indexName?.name ?? null,
-        indexColNames,
-      }
-    }
-  / constraint:NamedConstraint?
+    RPAREN { return ast.FulltextIndex(indexName?.name ?? null, indexColNames) }
+  / constraintName:NamedConstraint?
     FOREIGN
     KEY
     indexName:Identifier?
@@ -741,13 +725,12 @@ CreateDefinition
     indexColNames:IndexColNames
     RPAREN
     reference:ReferenceDefinition {
-      return {
-        type: 'FOREIGN KEY',
-        constraint,
-        indexName: indexName?.name ?? null,
+      return ast.ForeignKey(
+        constraintName,
+        indexName?.name ?? null,
         indexColNames,
         reference,
-      }
+      )
     }
 
 // / CHECK (expr)
@@ -864,7 +847,7 @@ IndexColNames
 
 IndexColName
   = colName:Identifier len:Len? direction:(ASC / DESC)? {
-      return { colName: colName.name, len, direction }
+      return ast.IndexColName(colName.name, len, direction)
     }
 
 ReferenceDefinition
@@ -876,13 +859,13 @@ ReferenceDefinition
     matchMode:(MATCH (FULL / PARTIAL / SIMPLE))?
     onDelete:(ON DELETE x:ReferenceOption { return x })?
     onUpdate:(ON UPDATE x:ReferenceOption { return x })? {
-      return {
-        tblName: tblName.name,
+      return ast.ReferenceDefinition(
+        tblName.name,
         indexColNames,
         matchMode,
-        onDelete: onDelete ?? 'RESTRICT',
+        onDelete ?? 'RESTRICT',
         onUpdate,
-      }
+      )
     }
 
 ReferenceOption

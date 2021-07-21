@@ -148,7 +148,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const pks = [
     // (1) Explicit PRIMARY KEY definitions
     ...stm.definitions
-      .map((def) => (def.type === 'PRIMARY KEY' ? def.indexColNames.map((def) => def.colName) : null))
+      .map((def) => (def._kind === 'PrimaryKey' ? def.indexColNames.map((def) => def.colName) : null))
       .filter(Boolean),
 
     // (2) Primary key can also be defined on a column declaratively
@@ -168,16 +168,19 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   // a column directly (2).
   const indexes = stm.definitions
     .map((def) =>
-      def.type === 'FOREIGN KEY' || def.type === 'FULLTEXT INDEX' || def.type === 'UNIQUE INDEX' || def.type === 'INDEX'
+      def._kind === 'ForeignKey' ||
+      def._kind === 'FulltextIndex' ||
+      def._kind === 'UniqueIndex' ||
+      def._kind === 'Index'
         ? def
         : null,
     )
     .filter(Boolean);
   for (const index of indexes) {
-    if (index.type === 'FOREIGN KEY') {
+    if (index._kind === 'ForeignKey') {
       db = db.addForeignKey(
         tblName,
-        index.constraint,
+        index.constraintName,
         index.indexName,
         index.indexColNames.map((def) => def.colName), // Local columns
         index.reference.tblName, // Foreign/target table
@@ -185,7 +188,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
         index.reference.onDelete,
       );
     } else {
-      const type = index.type === 'UNIQUE INDEX' ? 'UNIQUE' : index.type === 'FULLTEXT INDEX' ? 'FULLTEXT' : 'NORMAL';
+      const type = index._kind === 'UniqueIndex' ? 'UNIQUE' : index._kind === 'FulltextIndex' ? 'FULLTEXT' : 'NORMAL';
       const $$locked = true;
       db = db.addIndex(
         tblName,
@@ -261,7 +264,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'ADD FOREIGN KEY') {
           db = db.addForeignKey(
             stm.tblName,
-            change.constraint,
+            change.constraintName,
             change.indexName,
             change.indexColNames.map((def) => def.colName),
             change.reference.tblName,
@@ -271,7 +274,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         } else if (change.type === 'ADD UNIQUE INDEX') {
           db = db.addIndex(
             stm.tblName,
-            change.constraint || change.indexName,
+            change.constraintName || change.indexName,
             'UNIQUE',
             change.indexColNames.map((def) => def.colName),
             true, // UNIQUE indexes are always explicit
