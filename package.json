@@ -6,9 +6,7 @@
   "bin": {
     "mysql-simulate": "dist/sim/cli.js"
   },
-  "files": [
-    "dist/"
-  ],
+  "files": ["dist/"],
   "scripts": {
     "build": "yarn run build:clean && yarn run build:ast && yarn run build:parser && yarn run build:dist && yarn run build:flow",
     "build:clean": "rimraf dist",
@@ -33,11 +31,7 @@
     "url": "git+https://github.com/SimpleContacts/mysql-simulator"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "pegjs",
-      "doc"
-    ]
+    "moduleFileExtensions": ["js", "pegjs", "doc"]
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
