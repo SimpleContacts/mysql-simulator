@@ -95,6 +95,13 @@ function isStart(node: Node): boolean %checks {
     node._kind === 'AlterAddForeignKey' ||
     node._kind === 'AlterChangeColumn' ||
     node._kind === 'AlterConvertTo' ||
+    node._kind === 'AlterDropColumn' ||
+    node._kind === 'AlterDropDefault' ||
+    node._kind === 'AlterDropForeignKey' ||
+    node._kind === 'AlterDropIndex' ||
+    node._kind === 'AlterDropPrimaryKey' ||
+    node._kind === 'AlterRenameIndex' ||
+    node._kind === 'AlterRenameTable' ||
     node._kind === 'AlterTableOptions' ||
     isExpression(node)
   );
@@ -154,6 +161,13 @@ export type Start =
   | AlterAddForeignKey
   | AlterChangeColumn
   | AlterConvertTo
+  | AlterDropColumn
+  | AlterDropDefault
+  | AlterDropForeignKey
+  | AlterDropIndex
+  | AlterDropPrimaryKey
+  | AlterRenameIndex
+  | AlterRenameTable
   | AlterTableOptions;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
@@ -171,6 +185,13 @@ export type Node =
   | AlterAddUniqueIndex
   | AlterChangeColumn
   | AlterConvertTo
+  | AlterDropColumn
+  | AlterDropDefault
+  | AlterDropForeignKey
+  | AlterDropIndex
+  | AlterDropPrimaryKey
+  | AlterRenameIndex
+  | AlterRenameTable
   | AlterTableOptions
   | BigInt
   | Binary
@@ -227,6 +248,13 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'AlterAddUniqueIndex' ||
     node._kind === 'AlterChangeColumn' ||
     node._kind === 'AlterConvertTo' ||
+    node._kind === 'AlterDropColumn' ||
+    node._kind === 'AlterDropDefault' ||
+    node._kind === 'AlterDropForeignKey' ||
+    node._kind === 'AlterDropIndex' ||
+    node._kind === 'AlterDropPrimaryKey' ||
+    node._kind === 'AlterRenameIndex' ||
+    node._kind === 'AlterRenameTable' ||
     node._kind === 'AlterTableOptions' ||
     node._kind === 'BigInt' ||
     node._kind === 'Binary' ||
@@ -338,6 +366,48 @@ export type AlterConvertTo = {|
   type: 'CONVERT TO',
   charset: string,
   collate: string | null,
+|};
+
+export type AlterDropColumn = {|
+  _kind: 'AlterDropColumn',
+  type: 'DROP COLUMN',
+  colName: string,
+|};
+
+export type AlterDropDefault = {|
+  _kind: 'AlterDropDefault',
+  type: 'DROP DEFAULT',
+  colName: string,
+|};
+
+export type AlterDropForeignKey = {|
+  _kind: 'AlterDropForeignKey',
+  type: 'DROP FOREIGN KEY',
+  symbol: string,
+|};
+
+export type AlterDropIndex = {|
+  _kind: 'AlterDropIndex',
+  type: 'DROP INDEX',
+  indexName: string,
+|};
+
+export type AlterDropPrimaryKey = {|
+  _kind: 'AlterDropPrimaryKey',
+  type: 'DROP PRIMARY KEY',
+|};
+
+export type AlterRenameIndex = {|
+  _kind: 'AlterRenameIndex',
+  type: 'RENAME INDEX',
+  oldIndexName: string,
+  newIndexName: string,
+|};
+
+export type AlterRenameTable = {|
+  _kind: 'AlterRenameTable',
+  type: 'RENAME TABLE',
+  newTblName: string,
 |};
 
 export type AlterTableOptions = {|
@@ -906,6 +976,111 @@ export default {
       type: 'CONVERT TO',
       charset,
       collate,
+    };
+  },
+
+  AlterDropColumn(colName: string): AlterDropColumn {
+    invariant(
+      typeof colName === 'string',
+      `Invalid value for "colName" arg in "AlterDropColumn" call.\nExpected: string\nGot:      ${JSON.stringify(
+        colName,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterDropColumn',
+      type: 'DROP COLUMN',
+      colName,
+    };
+  },
+
+  AlterDropDefault(colName: string): AlterDropDefault {
+    invariant(
+      typeof colName === 'string',
+      `Invalid value for "colName" arg in "AlterDropDefault" call.\nExpected: string\nGot:      ${JSON.stringify(
+        colName,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterDropDefault',
+      type: 'DROP DEFAULT',
+      colName,
+    };
+  },
+
+  AlterDropForeignKey(symbol: string): AlterDropForeignKey {
+    invariant(
+      typeof symbol === 'string',
+      `Invalid value for "symbol" arg in "AlterDropForeignKey" call.\nExpected: string\nGot:      ${JSON.stringify(
+        symbol,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterDropForeignKey',
+      type: 'DROP FOREIGN KEY',
+      symbol,
+    };
+  },
+
+  AlterDropIndex(indexName: string): AlterDropIndex {
+    invariant(
+      typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "AlterDropIndex" call.\nExpected: string\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterDropIndex',
+      type: 'DROP INDEX',
+      indexName,
+    };
+  },
+
+  AlterDropPrimaryKey(): AlterDropPrimaryKey {
+    return {
+      _kind: 'AlterDropPrimaryKey',
+      type: 'DROP PRIMARY KEY',
+    };
+  },
+
+  AlterRenameIndex(oldIndexName: string, newIndexName: string): AlterRenameIndex {
+    invariant(
+      typeof oldIndexName === 'string',
+      `Invalid value for "oldIndexName" arg in "AlterRenameIndex" call.\nExpected: string\nGot:      ${JSON.stringify(
+        oldIndexName,
+      )}`,
+    );
+
+    invariant(
+      typeof newIndexName === 'string',
+      `Invalid value for "newIndexName" arg in "AlterRenameIndex" call.\nExpected: string\nGot:      ${JSON.stringify(
+        newIndexName,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterRenameIndex',
+      type: 'RENAME INDEX',
+      oldIndexName,
+      newIndexName,
+    };
+  },
+
+  AlterRenameTable(newTblName: string): AlterRenameTable {
+    invariant(
+      typeof newTblName === 'string',
+      `Invalid value for "newTblName" arg in "AlterRenameTable" call.\nExpected: string\nGot:      ${JSON.stringify(
+        newTblName,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterRenameTable',
+      type: 'RENAME TABLE',
+      newTblName,
     };
   },
 

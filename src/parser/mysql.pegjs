@@ -527,10 +527,7 @@ AlterSpec
     }
   // / ALGORITHM
   / ALTER COLUMN? colName:Identifier DROP DEFAULT {
-      return {
-        type: 'DROP DEFAULT',
-        colName: colName.name,
-      }
+      return ast.AlterDropDefault(colName.name)
     }
   / CHANGE
     COLUMN?
@@ -541,33 +538,21 @@ AlterSpec
       AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
     )? {
-      return {
-        type: 'CHANGE COLUMN',
-        oldColName: oldColName.name,
-        newColName: newColName.name,
+      return ast.AlterChangeColumn(
+        oldColName.name,
+        newColName.name,
         definition,
         position,
-      }
+      )
     }
   / DROP (INDEX / KEY) indexName:Identifier {
-      return {
-        type: 'DROP INDEX',
-        indexName: indexName.name,
-      }
+      return ast.AlterDropIndex(indexName.name)
     }
-  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
+  / DROP PRIMARY KEY { return ast.AlterDropPrimaryKey() }
   / DROP FOREIGN KEY symbol:Identifier {
-      return {
-        type: 'DROP FOREIGN KEY',
-        symbol: symbol.name,
-      }
+      return ast.AlterDropForeignKey(symbol.name)
     }
-  / DROP COLUMN? colName:Identifier {
-      return {
-        type: 'DROP COLUMN',
-        colName: colName.name,
-      }
-    }
+  / DROP COLUMN? colName:Identifier { return ast.AlterDropColumn(colName.name) }
   / MODIFY
     COLUMN?
     colName:Identifier
@@ -580,26 +565,18 @@ AlterSpec
       // cannot be used to rename a column.  We'll therefore parse any MODIFY
       // COLUMN statement as a CHANGE COLUMN statement where old + new columns
       // are identical (i.e. no rename).
-      return {
-        type: 'CHANGE COLUMN',
-        oldColName: colName.name,
-        newColName: colName.name,
+      return ast.AlterChangeColumn(
+        colName.name,
+        colName.name,
         definition,
         position,
-      }
+      )
     }
   / RENAME (INDEX / KEY) oldIndexName:Identifier TO newIndexName:Identifier {
-      return {
-        type: 'RENAME INDEX',
-        oldIndexName: oldIndexName.name,
-        newIndexName: newIndexName.name,
-      }
+      return ast.AlterRenameIndex(oldIndexName.name, newIndexName.name)
     }
   / RENAME (TO / AS)? newTblName:Identifier {
-      return {
-        type: 'RENAME TABLE',
-        newTblName: newTblName.name,
-      }
+      return ast.AlterRenameTable(newTblName.name)
     }
   / LOCK EQ? (DEFAULT / NONE / SHARED / EXCLUSIVE) { return null }
   / CONVERT

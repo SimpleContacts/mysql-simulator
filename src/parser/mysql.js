@@ -367,41 +367,26 @@ function peg$parse(input, options) {
             )
           },
       peg$c89 = function(colName) {
-            return {
-              type: 'DROP DEFAULT',
-              colName: colName.name,
-            }
+            return ast.AlterDropDefault(colName.name)
           },
       peg$c90 = function(oldColName, newColName, definition, ident) { return `AFTER ${ident.name}` },
       peg$c91 = function(oldColName, newColName, definition) { return 'FIRST' },
       peg$c92 = function(oldColName, newColName, definition, position) {
-            return {
-              type: 'CHANGE COLUMN',
-              oldColName: oldColName.name,
-              newColName: newColName.name,
+            return ast.AlterChangeColumn(
+              oldColName.name,
+              newColName.name,
               definition,
               position,
-            }
+            )
           },
       peg$c93 = function(indexName) {
-            return {
-              type: 'DROP INDEX',
-              indexName: indexName.name,
-            }
+            return ast.AlterDropIndex(indexName.name)
           },
-      peg$c94 = function() { return { type: 'DROP PRIMARY KEY' } },
+      peg$c94 = function() { return ast.AlterDropPrimaryKey() },
       peg$c95 = function(symbol) {
-            return {
-              type: 'DROP FOREIGN KEY',
-              symbol: symbol.name,
-            }
+            return ast.AlterDropForeignKey(symbol.name)
           },
-      peg$c96 = function(colName) {
-            return {
-              type: 'DROP COLUMN',
-              colName: colName.name,
-            }
-          },
+      peg$c96 = function(colName) { return ast.AlterDropColumn(colName.name) },
       peg$c97 = function(colName, definition, ident) { return `AFTER ${ident.name}` },
       peg$c98 = function(colName, definition) { return 'FIRST' },
       peg$c99 = function(colName, definition, position) {
@@ -409,26 +394,18 @@ function peg$parse(input, options) {
             // cannot be used to rename a column.  We'll therefore parse any MODIFY
             // COLUMN statement as a CHANGE COLUMN statement where old + new columns
             // are identical (i.e. no rename).
-            return {
-              type: 'CHANGE COLUMN',
-              oldColName: colName.name,
-              newColName: colName.name,
+            return ast.AlterChangeColumn(
+              colName.name,
+              colName.name,
               definition,
               position,
-            }
+            )
           },
       peg$c100 = function(oldIndexName, newIndexName) {
-            return {
-              type: 'RENAME INDEX',
-              oldIndexName: oldIndexName.name,
-              newIndexName: newIndexName.name,
-            }
+            return ast.AlterRenameIndex(oldIndexName.name, newIndexName.name)
           },
       peg$c101 = function(newTblName) {
-            return {
-              type: 'RENAME TABLE',
-              newTblName: newTblName.name,
-            }
+            return ast.AlterRenameTable(newTblName.name)
           },
       peg$c102 = function(charset, collate) { return collate },
       peg$c103 = function(charset, collate) {

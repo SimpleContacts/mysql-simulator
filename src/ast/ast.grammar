@@ -184,6 +184,41 @@ AlterConvertTo:
   charset  string
   collate  string?
 
+AlterDropColumn:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "DROP COLUMN"
+  colName  string
+
+AlterDropDefault:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "DROP DEFAULT"
+  colName  string
+
+AlterDropForeignKey:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type    "DROP FOREIGN KEY"
+  symbol  string
+
+AlterDropIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type       "DROP INDEX"
+  indexName  string
+
+AlterDropPrimaryKey:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "DROP PRIMARY KEY"
+
+AlterRenameIndex:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type          "RENAME INDEX"
+  oldIndexName  string
+  newIndexName  string
+
+AlterRenameTable:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type        "RENAME TABLE"
+  newTblName  string
+
 AlterTableOptions:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type     "CHANGE TABLE OPTIONS"
@@ -390,4 +425,11 @@ CurrentTimestamp:
   | AlterAddForeignKey
   | AlterChangeColumn
   | AlterConvertTo
+  | AlterDropColumn
+  | AlterDropDefault
+  | AlterDropForeignKey
+  | AlterDropIndex
+  | AlterDropPrimaryKey
+  | AlterRenameIndex
+  | AlterRenameTable
   | AlterTableOptions

@@ -15,6 +15,13 @@ import type {
   AlterAddUniqueIndex,
   AlterChangeColumn,
   AlterConvertTo,
+  AlterDropColumn,
+  AlterDropDefault,
+  AlterDropForeignKey,
+  AlterDropIndex,
+  AlterDropPrimaryKey,
+  AlterRenameIndex,
+  AlterRenameTable,
   AlterTableOptions,
   Column,
   ForeignKey,
@@ -65,41 +72,6 @@ export type RenameTableStatement = {|
   type: 'RENAME TABLE',
   tblName: string,
   newName: string,
-|};
-
-export type AlterDropDefault = {|
-  type: 'DROP DEFAULT',
-  colName: string,
-|};
-
-export type AlterDropIndex = {|
-  type: 'DROP INDEX',
-  indexName: string,
-|};
-
-export type AlterDropPrimaryKey = {|
-  type: 'DROP PRIMARY KEY',
-|};
-
-export type AlterDropForeignKey = {|
-  type: 'DROP FOREIGN KEY',
-  symbol: string,
-|};
-
-export type AlterDropColumn = {|
-  type: 'DROP COLUMN',
-  colName: string,
-|};
-
-export type AlterRenameIndex = {|
-  type: 'RENAME INDEX',
-  oldIndexName: string,
-  newIndexName: string,
-|};
-
-export type AlterRenameTable = {|
-  type: 'RENAME TABLE',
-  newTblName: string,
 |};
 
 export type AlterDbOption = {|

@@ -243,8 +243,8 @@ describe('Read documentation', () => {
         type: 'ALTER TABLE',
         tblName: 'products',
         changes: [
-          { type: 'DROP COLUMN', colName: 'name' },
-          { type: 'DROP COLUMN', colName: 'brand' },
+          { _kind: 'AlterDropColumn', type: 'DROP COLUMN', colName: 'name' },
+          { _kind: 'AlterDropColumn', type: 'DROP COLUMN', colName: 'brand' },
           {
             _kind: 'AlterAddColumn',
             type: 'ADD COLUMN',
@@ -294,9 +294,10 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'AlterRenameIndex',
+            type: 'RENAME INDEX',
             newIndexName: 'boofar_uniq',
             oldIndexName: 'foobar_uniq',
-            type: 'RENAME INDEX',
           },
         ],
       },
