@@ -503,7 +503,7 @@ AlterSpec
     LPAREN
     indexColNames:IndexColNames
     RPAREN {
-      return ast.AlterAddFulltextIndex(indexName?.name ?? null, indexColNames)
+      return ast.AlterAddFullTextIndex(indexName?.name ?? null, indexColNames)
     }
   / ADD
     constraintName:NamedConstraint?
@@ -697,7 +697,7 @@ CreateDefinition
     indexName:Identifier?
     LPAREN
     indexColNames:IndexColNames
-    RPAREN { return ast.FulltextIndex(indexName?.name ?? null, indexColNames) }
+    RPAREN { return ast.FullTextIndex(indexName?.name ?? null, indexColNames) }
   / constraintName:NamedConstraint?
     FOREIGN
     KEY

@@ -16,14 +16,14 @@ import type {
   Column,
   ColumnDefinition,
   ForeignKey,
-  FulltextIndex,
+  FullTextIndex,
   Index,
   IndexColName,
   PrimaryKey,
   UniqueIndex,
 } from '../ast';
 
-export type CreateTableDefinition = Column | PrimaryKey | Index | UniqueIndex | FulltextIndex | ForeignKey;
+export type CreateTableDefinition = Column | PrimaryKey | Index | UniqueIndex | FullTextIndex | ForeignKey;
 
 export type TableOptions = {|
   AUTO_INCREMENT?: string | null,

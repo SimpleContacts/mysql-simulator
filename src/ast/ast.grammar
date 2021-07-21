@@ -113,7 +113,7 @@ UniqueIndex:
   indexName       string?
   indexColNames   IndexColName+
 
-FulltextIndex:
+FullTextIndex:
   # TODO: Remove this hardcoded "type" in favor of "_kind"
   type           "FULLTEXT INDEX"
   indexName      string?
@@ -355,7 +355,7 @@ CurrentTimestamp:
   | PrimaryKey
   | Index
   | UniqueIndex
-  | FulltextIndex
+  | FullTextIndex
   | ForeignKey
   | AlterAddIndex
   | AlterAddColumn

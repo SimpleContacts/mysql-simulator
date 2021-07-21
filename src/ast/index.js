@@ -85,7 +85,7 @@ function isStart(node: Node): boolean %checks {
     node._kind === 'PrimaryKey' ||
     node._kind === 'Index' ||
     node._kind === 'UniqueIndex' ||
-    node._kind === 'FulltextIndex' ||
+    node._kind === 'FullTextIndex' ||
     node._kind === 'ForeignKey' ||
     node._kind === 'AlterAddIndex' ||
     node._kind === 'AlterAddColumn' ||
@@ -141,7 +141,7 @@ export type Start =
   | PrimaryKey
   | Index
   | UniqueIndex
-  | FulltextIndex
+  | FullTextIndex
   | ForeignKey
   | AlterAddIndex
   | AlterAddColumn
@@ -180,7 +180,7 @@ export type Node =
   | Enum
   | Float
   | ForeignKey
-  | FulltextIndex
+  | FullTextIndex
   | GeneratedDefinition
   | Identifier
   | Index
@@ -232,7 +232,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Enum' ||
     node._kind === 'Float' ||
     node._kind === 'ForeignKey' ||
-    node._kind === 'FulltextIndex' ||
+    node._kind === 'FullTextIndex' ||
     node._kind === 'GeneratedDefinition' ||
     node._kind === 'Identifier' ||
     node._kind === 'Index' ||
@@ -431,8 +431,8 @@ export type ForeignKey = {|
   reference: ReferenceDefinition,
 |};
 
-export type FulltextIndex = {|
-  _kind: 'FulltextIndex',
+export type FullTextIndex = {|
+  _kind: 'FullTextIndex',
   type: 'FULLTEXT INDEX',
   indexName: string | null,
   indexColNames: Array<IndexColName>,
@@ -1171,10 +1171,10 @@ export default {
     };
   },
 
-  FulltextIndex(indexName: string | null, indexColNames: Array<IndexColName>): FulltextIndex {
+  FullTextIndex(indexName: string | null, indexColNames: Array<IndexColName>): FullTextIndex {
     invariant(
       indexName === null || typeof indexName === 'string',
-      `Invalid value for "indexName" arg in "FulltextIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
+      `Invalid value for "indexName" arg in "FullTextIndex" call.\nExpected: string?\nGot:      ${JSON.stringify(
         indexName,
       )}`,
     );
@@ -1183,13 +1183,13 @@ export default {
       Array.isArray(indexColNames) &&
         indexColNames.length > 0 &&
         indexColNames.every((item) => item._kind === 'IndexColName'),
-      `Invalid value for "indexColNames" arg in "FulltextIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+      `Invalid value for "indexColNames" arg in "FullTextIndex" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
         indexColNames,
       )}`,
     );
 
     return {
-      _kind: 'FulltextIndex',
+      _kind: 'FullTextIndex',
       type: 'FULLTEXT INDEX',
       indexName,
       indexColNames,

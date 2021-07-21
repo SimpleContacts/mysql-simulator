@@ -332,14 +332,7 @@ function peg$parse(input, options) {
           },
       peg$c81 = function(colName, columnDefinition, ident) { return `AFTER ${ident.name}` },
       peg$c82 = function(colName, columnDefinition) { return 'FIRST' },
-      peg$c83 = function(colName, columnDefinition, position) {
-            return {
-              type: 'ADD COLUMN',
-              colName: colName.name,
-              definition: columnDefinition,
-              position,
-            }
-          },
+      peg$c83 = function(colName, columnDefinition, position) { return ast.AlterAddColumn(colName.name, columnDefinition, position) },
       peg$c84 = function(indexName, indexType, indexColNames) {
             return ast.AlterAddIndex(
               indexName?.name ?? null,
@@ -348,37 +341,26 @@ function peg$parse(input, options) {
             )
           },
       peg$c85 = function(constraintName, indexType, indexColNames) {
-            return {
-              type: 'ADD PRIMARY KEY',
-              constraintName,
-              indexType,
-              indexColNames,
-            }
+            return ast.AlterAddPrimaryKey(constraintName, indexType, indexColNames)
           },
       peg$c86 = function(constraintName, indexName, indexType, indexColNames) {
-            return {
-              type: 'ADD UNIQUE INDEX',
+            return ast.AlterAddUniqueIndex(
               constraintName,
-              indexName: indexName?.name ?? null,
+              indexName?.name ?? null,
               indexType,
               indexColNames,
-            }
+            )
           },
       peg$c87 = function(indexName, indexColNames) {
-            return {
-              type: 'ADD FULLTEXT INDEX',
-              indexName: indexName?.name ?? null,
-              indexColNames,
-            }
+            return ast.AlterAddFullTextIndex(indexName?.name ?? null, indexColNames)
           },
       peg$c88 = function(constraintName, indexName, indexColNames, reference) {
-            return {
-              type: 'ADD FOREIGN KEY',
+            return ast.AlterAddForeignKey(
               constraintName,
-              indexName: indexName?.name ?? null,
+              indexName?.name ?? null,
               indexColNames,
               reference,
-            }
+            )
           },
       peg$c89 = function(colName) {
             return {
@@ -488,7 +470,7 @@ function peg$parse(input, options) {
               indexColNames,
             )
           },
-      peg$c113 = function(indexName, indexColNames) { return ast.FulltextIndex(indexName?.name ?? null, indexColNames) },
+      peg$c113 = function(indexName, indexColNames) { return ast.FullTextIndex(indexName?.name ?? null, indexColNames) },
       peg$c114 = function(constraintName, indexName, indexColNames, reference) {
             return ast.ForeignKey(
               constraintName,

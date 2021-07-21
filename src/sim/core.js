@@ -169,7 +169,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   const indexes = stm.definitions
     .map((def) =>
       def._kind === 'ForeignKey' ||
-      def._kind === 'FulltextIndex' ||
+      def._kind === 'FullTextIndex' ||
       def._kind === 'UniqueIndex' ||
       def._kind === 'Index'
         ? def
@@ -188,7 +188,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
         index.reference.onDelete,
       );
     } else {
-      const type = index._kind === 'UniqueIndex' ? 'UNIQUE' : index._kind === 'FulltextIndex' ? 'FULLTEXT' : 'NORMAL';
+      const type = index._kind === 'UniqueIndex' ? 'UNIQUE' : index._kind === 'FullTextIndex' ? 'FULLTEXT' : 'NORMAL';
       const $$locked = true;
       db = db.addIndex(
         tblName,
