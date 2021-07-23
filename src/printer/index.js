@@ -32,7 +32,6 @@ export function serializeCurrentTimestamp(node: CurrentTimestamp): string {
   }
 }
 
-// TODO: Type this file, and declare Node as a proper AST node here
 export function serializeExpression(node: Expression, options?: FormattingOptions): string {
   invariant(node, 'expected a node');
 
@@ -43,8 +42,8 @@ export function serializeExpression(node: Expression, options?: FormattingOption
     return node.map(recurse).join(', ');
   }
 
-  switch (node.type) {
-    case 'callExpression': {
+  switch (node._kind) {
+    case 'CallExpression': {
       let func = node.callee.name;
       if (options?.context === 'EXPRESSION') {
         func = func.toLowerCase();
@@ -56,7 +55,7 @@ export function serializeExpression(node: Expression, options?: FormattingOption
       return func;
     }
 
-    case 'literal': {
+    case 'Literal': {
       const serializeString = options?.context === 'EXPRESSION' ? quoteInExpressionContext : quote;
       return node.value === true
         ? 'TRUE'
@@ -71,7 +70,7 @@ export function serializeExpression(node: Expression, options?: FormattingOption
         : String(node.value);
     }
 
-    case 'unary':
+    case 'UnaryExpression':
       if (node.op === 'is null') {
         // #lolmysql, go home
         return `isnull(${recurse(node.expr)})`;
@@ -88,7 +87,7 @@ export function serializeExpression(node: Expression, options?: FormattingOption
       // "Normal" cases
       return `${node.op}(${recurse(node.expr)})`;
 
-    case 'binary': {
+    case 'BinaryExpression': {
       let op = node.op;
 
       // #lolmysql, for some reason it only lowercases these op names, but not
@@ -100,16 +99,12 @@ export function serializeExpression(node: Expression, options?: FormattingOption
       return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
     }
 
-    case 'identifier':
+    case 'Identifier':
       return escape(node.name);
 
     default:
       throw new Error(
-        `Don't know how to serialize ${node.type} expressions yet. Please tell me. ${JSON.stringify(
-          { node },
-          null,
-          2,
-        )}`,
+        `Don't know how to serialize ${node._kind} nodes yet. Please tell me. ${JSON.stringify({ node }, null, 2)}`,
       );
   }
 }

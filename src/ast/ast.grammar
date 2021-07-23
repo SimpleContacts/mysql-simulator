@@ -18,31 +18,21 @@ export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
 """
 
 Literal:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type   "literal"
   value  mixed
 
 Identifier:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "identifier"
   name  string
 
 UnaryExpression:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "unary"
   op    UnaryOp
   expr  @Expression
 
 BinaryExpression:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type   "binary"
   op     BinaryOp
   expr1  @Expression
   expr2  @Expression
 
 CallExpression:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type    "callExpression"
   callee  BuiltInFunction
   # The args are optional. For example, when null, this means a "call" like
   # `CURRENT_TIMESTAMP`. But when "empty" (e.g. []) this denotes a call like
@@ -50,8 +40,6 @@ CallExpression:
   args    @Expression*?
 
 BuiltInFunction:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "builtinFunction"
   name  string
 
 @Expression:

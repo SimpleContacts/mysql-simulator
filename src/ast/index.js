@@ -500,7 +500,6 @@ export type Binary = {|
 
 export type BinaryExpression = {|
   _kind: 'BinaryExpression',
-  type: 'binary',
   op: BinaryOp,
   expr1: Expression,
   expr2: Expression,
@@ -514,13 +513,11 @@ export type Blob = {|
 
 export type BuiltInFunction = {|
   _kind: 'BuiltInFunction',
-  type: 'builtinFunction',
   name: string,
 |};
 
 export type CallExpression = {|
   _kind: 'CallExpression',
-  type: 'callExpression',
   callee: BuiltInFunction,
   args: Array<Expression> | null,
 |};
@@ -680,7 +677,6 @@ export type GeneratedDefinition = {|
 
 export type Identifier = {|
   _kind: 'Identifier',
-  type: 'identifier',
   name: string,
 |};
 
@@ -712,7 +708,6 @@ export type Json = {|
 
 export type Literal = {|
   _kind: 'Literal',
-  type: 'literal',
   value: mixed,
 |};
 
@@ -813,7 +808,6 @@ export type TinyInt = {|
 
 export type UnaryExpression = {|
   _kind: 'UnaryExpression',
-  type: 'unary',
   op: UnaryOp,
   expr: Expression,
 |};
@@ -1328,7 +1322,6 @@ export default {
 
     return {
       _kind: 'BinaryExpression',
-      type: 'binary',
       op,
       expr1,
       expr2,
@@ -1356,7 +1349,6 @@ export default {
 
     return {
       _kind: 'BuiltInFunction',
-      type: 'builtinFunction',
       name,
     };
   },
@@ -1378,7 +1370,6 @@ export default {
 
     return {
       _kind: 'CallExpression',
-      type: 'callExpression',
       callee,
       args,
     };
@@ -1919,7 +1910,6 @@ export default {
 
     return {
       _kind: 'Identifier',
-      type: 'identifier',
       name,
     };
   },
@@ -1995,7 +1985,6 @@ export default {
   Literal(value: mixed): Literal {
     return {
       _kind: 'Literal',
-      type: 'literal',
       value,
     };
   },
@@ -2246,7 +2235,6 @@ export default {
 
     return {
       _kind: 'UnaryExpression',
-      type: 'unary',
       op,
       expr,
     };

@@ -183,7 +183,6 @@ describe('Read documentation', () => {
               nullable: null,
               defaultValue: {
                 _kind: 'Literal',
-                type: 'literal',
                 value: null,
               },
               isPrimary: false,
