@@ -88,7 +88,7 @@ CreateTriggerStatement:
   tblName      string
 
 CreateFunctionStatement:
-  dummy  "ignore_me"
+  # no fields
 
 RenameTableStatement:
   tblName  string
@@ -244,7 +244,7 @@ AlterDropIndex:
   indexName  string
 
 AlterDropPrimaryKey:
-  dummy  "ignore_me"
+  # no fields
 
 AlterRenameIndex:
   oldIndexName  string

@@ -443,7 +443,6 @@ export type AlterDropIndex = {|
 
 export type AlterDropPrimaryKey = {|
   _kind: 'AlterDropPrimaryKey',
-  dummy: 'ignore_me',
 |};
 
 export type AlterRenameIndex = {|
@@ -534,7 +533,6 @@ export type ColumnDefinition = {|
 
 export type CreateFunctionStatement = {|
   _kind: 'CreateFunctionStatement',
-  dummy: 'ignore_me',
 |};
 
 export type CreateIndexStatement = {|
@@ -1150,7 +1148,6 @@ export default {
   AlterDropPrimaryKey(): AlterDropPrimaryKey {
     return {
       _kind: 'AlterDropPrimaryKey',
-      dummy: 'ignore_me',
     };
   },
 
@@ -1462,7 +1459,6 @@ export default {
   CreateFunctionStatement(): CreateFunctionStatement {
     return {
       _kind: 'CreateFunctionStatement',
-      dummy: 'ignore_me',
     };
   },
 
