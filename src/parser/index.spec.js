@@ -14,13 +14,11 @@ describe('Read documentation', () => {
     ).toEqual([
       {
         _kind: 'CreateTableStatement',
-        type: 'CREATE TABLE',
         tblName: 'users',
         ifNotExists: false,
         definitions: [
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'id',
             definition: {
               _kind: 'ColumnDefinition',
@@ -38,7 +36,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'date_created',
             definition: {
               _kind: 'ColumnDefinition',
@@ -56,7 +53,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'name',
             definition: {
               _kind: 'ColumnDefinition',
@@ -74,7 +70,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'email',
             definition: {
               _kind: 'ColumnDefinition',
@@ -115,13 +110,11 @@ describe('Read documentation', () => {
     ).toEqual([
       {
         _kind: 'CreateTableStatement',
-        type: 'CREATE TABLE',
         tblName: 'whatever',
         ifNotExists: false,
         definitions: [
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'id',
             definition: {
               _kind: 'ColumnDefinition',
@@ -139,7 +132,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'user_id',
             definition: {
               _kind: 'ColumnDefinition',
@@ -157,7 +149,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'date_created',
             definition: {
               _kind: 'ColumnDefinition',
@@ -175,7 +166,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'Column',
-            type: 'COLUMN',
             colName: 'text',
             definition: {
               _kind: 'ColumnDefinition',
@@ -196,7 +186,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'ForeignKey',
-            type: 'FOREIGN KEY',
             constraintName: null,
             indexName: null,
             indexColNames: [
@@ -246,14 +235,12 @@ describe('Read documentation', () => {
     ).toEqual([
       {
         _kind: 'AlterTableStatement',
-        type: 'ALTER TABLE',
         tblName: 'products',
         changes: [
-          { _kind: 'AlterDropColumn', type: 'DROP COLUMN', colName: 'name' },
-          { _kind: 'AlterDropColumn', type: 'DROP COLUMN', colName: 'brand' },
+          { _kind: 'AlterDropColumn', colName: 'name' },
+          { _kind: 'AlterDropColumn', colName: 'brand' },
           {
             _kind: 'AlterAddColumn',
-            type: 'ADD COLUMN',
             colName: 'foobar',
             definition: {
               _kind: 'ColumnDefinition',
@@ -272,7 +259,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'AlterAddForeignKey',
-            type: 'ADD FOREIGN KEY',
             constraintName: null,
             indexName: null,
             indexColNames: [
@@ -301,7 +287,6 @@ describe('Read documentation', () => {
           },
           {
             _kind: 'AlterRenameIndex',
-            type: 'RENAME INDEX',
             newIndexName: 'boofar_uniq',
             oldIndexName: 'foobar_uniq',
           },

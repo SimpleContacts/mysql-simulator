@@ -136,7 +136,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   let db = db_.createTable(tblName, encoding);
 
   // One-by-one, add the columns to the table
-  const columns = stm.definitions.map((def) => (def.type === 'COLUMN' ? def : null)).filter(Boolean);
+  const columns = stm.definitions.map((def) => (def._kind === 'Column' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
     const table = db.getTable(tblName);
     db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaultEncoding), null);
@@ -211,24 +211,24 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
       continue;
     }
 
-    if (stm.type === 'CREATE TABLE') {
+    if (stm._kind === 'CreateTableStatement') {
       db = handleCreateTable(db, stm);
-    } else if (stm.type === 'CREATE TABLE LIKE') {
+    } else if (stm._kind === 'CreateTableLikeStatement') {
       db = db.cloneTable(stm.oldTblName, stm.tblName);
-    } else if (stm.type === 'DROP TABLE') {
+    } else if (stm._kind === 'DropTableStatement') {
       db = db.removeTable(stm.tblName, stm.ifExists);
-    } else if (stm.type === 'ALTER DATABASE') {
+    } else if (stm._kind === 'AlterDatabaseStatement') {
       const charset = stm.options.CHARSET ?? undefined;
       const collate = stm.options.COLLATE ?? undefined;
       const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
       db = db.setEncoding(encoding);
-    } else if (stm.type === 'ALTER TABLE') {
+    } else if (stm._kind === 'AlterTableStatement') {
       const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
-      const changes = sortBy(stm.changes, (change) => order.indexOf(change.type));
+      const changes = sortBy(stm.changes, (change) => order.indexOf(change._kind));
       for (const change of changes) {
-        if (change.type === 'RENAME TABLE') {
+        if (change._kind === 'AlterRenameTable') {
           db = db.renameTable(stm.tblName, change.newTblName);
-        } else if (change.type === 'ADD COLUMN') {
+        } else if (change._kind === 'AlterAddColumn') {
           const table = db.getTable(stm.tblName);
           const column = makeColumn(change.colName, change.definition, table.defaultEncoding);
           db = db.addColumn(stm.tblName, column, change.position);
@@ -237,23 +237,23 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
           } else if (change.definition.isUnique) {
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
           }
-        } else if (change.type === 'CHANGE COLUMN') {
+        } else if (change._kind === 'AlterChangeColumn') {
           const table = db.getTable(stm.tblName);
           const column = makeColumn(change.newColName, change.definition, table.defaultEncoding);
           db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
           if (change.definition.isUnique) {
             db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);
           }
-        } else if (change.type === 'DROP COLUMN') {
+        } else if (change._kind === 'AlterDropColumn') {
           db = db.removeColumn(stm.tblName, change.colName);
-        } else if (change.type === 'ADD PRIMARY KEY') {
+        } else if (change._kind === 'AlterAddPrimaryKey') {
           db = db.addPrimaryKey(
             stm.tblName,
             change.indexColNames.map((col) => col.colName),
           );
-        } else if (change.type === 'DROP PRIMARY KEY') {
+        } else if (change._kind === 'AlterDropPrimaryKey') {
           db = db.dropPrimaryKey(stm.tblName);
-        } else if (change.type === 'ADD FOREIGN KEY') {
+        } else if (change._kind === 'AlterAddForeignKey') {
           db = db.addForeignKey(
             stm.tblName,
             change.constraintName,
@@ -263,7 +263,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             change.reference.indexColNames.map((def) => def.colName),
             change.reference.onDelete,
           );
-        } else if (change.type === 'ADD UNIQUE INDEX') {
+        } else if (change._kind === 'AlterAddUniqueIndex') {
           db = db.addIndex(
             stm.tblName,
             change.constraintName || change.indexName,
@@ -271,7 +271,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             change.indexColNames.map((def) => def.colName),
             true, // UNIQUE indexes are always explicit
           );
-        } else if (change.type === 'ADD FULLTEXT INDEX') {
+        } else if (change._kind === 'AlterAddFullTextIndex') {
           const $$locked = false;
           db = db.addIndex(
             stm.tblName,
@@ -280,7 +280,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             change.indexColNames.map((def) => def.colName),
             $$locked,
           );
-        } else if (change.type === 'ADD INDEX') {
+        } else if (change._kind === 'AlterAddIndex') {
           const $$locked = !!change.indexName;
           db = db.addIndex(
             stm.tblName,
@@ -289,36 +289,36 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
             change.indexColNames.map((def) => def.colName),
             $$locked,
           );
-        } else if (change.type === 'DROP INDEX') {
+        } else if (change._kind === 'AlterDropIndex') {
           db = db.dropIndex(stm.tblName, change.indexName);
-        } else if (change.type === 'DROP FOREIGN KEY') {
+        } else if (change._kind === 'AlterDropForeignKey') {
           db = db.dropForeignKey(stm.tblName, change.symbol);
-        } else if (change.type === 'DROP DEFAULT') {
+        } else if (change._kind === 'AlterDropDefault') {
           db = db.dropDefault(stm.tblName, change.colName);
-        } else if (change.type === 'RENAME INDEX') {
+        } else if (change._kind === 'AlterRenameIndex') {
           db = db.renameIndex(stm.tblName, change.oldIndexName, change.newIndexName);
-        } else if (change.type === 'CHANGE TABLE OPTIONS') {
+        } else if (change._kind === 'AlterTableOptions') {
           const charset = change.options.CHARSET ?? undefined;
           const collate = change.options.COLLATE ?? undefined;
           if (charset || collate) {
             db = db.setDefaultTableEncoding(stm.tblName, charset, collate);
           }
-        } else if (change.type === 'CONVERT TO') {
+        } else if (change._kind === 'AlterConvertTo') {
           const charset = change.charset;
           const collate = change.collate ?? undefined;
           db = db.convertToEncoding(stm.tblName, charset, collate);
         } else {
           // Log details to the console (useful for debugging)
-          error(`Unknown change type: ${change.type}`);
+          error(`Unknown alter spec: ${change._kind}`);
           error(JSON.stringify({ stm, change }, null, 2));
 
           // Error out
-          throw new Error(`Unknown change type: ${change.type}`);
+          throw new Error(`Unknown alter spec: ${change._kind}`);
         }
       }
-    } else if (stm.type === 'RENAME TABLE') {
+    } else if (stm._kind === 'RenameTableStatement') {
       db = db.renameTable(stm.tblName, stm.newName);
-    } else if (stm.type === 'CREATE INDEX') {
+    } else if (stm._kind === 'CreateIndexStatement') {
       const $$locked = !!stm.indexName;
       db = db.addIndex(
         stm.tblName,
@@ -327,17 +327,17 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
         stm.indexColNames.map((def) => def.colName),
         $$locked,
       );
-    } else if (stm.type === 'DROP INDEX') {
+    } else if (stm._kind === 'DropIndexStatement') {
       db = db.dropIndex(stm.tblName, stm.indexName);
-    } else if (stm.type === 'CREATE FUNCTION') {
+    } else if (stm._kind === 'CreateFunctionStatement') {
       // Ignore
-    } else if (stm.type === 'CREATE TRIGGER') {
+    } else if (stm._kind === 'CreateTriggerStatement') {
       // Ignore
     } else {
       // Log details to the console (useful for debugging)
-      error(`Unknown expression type: ${stm.type}`);
+      error(`Unknown statement type: ${stm._kind}`);
       error(JSON.stringify({ stm }, null, 2));
-      throw new Error(`Unknown expression type: ${stm.type}`);
+      throw new Error(`Unknown statement type: ${stm._kind}`);
     }
   }
 

@@ -360,7 +360,6 @@ function isNode(node: Node): boolean %checks {
 
 export type AlterAddColumn = {|
   _kind: 'AlterAddColumn',
-  type: 'ADD COLUMN',
   colName: string,
   definition: ColumnDefinition,
   position: string | null,
@@ -368,7 +367,6 @@ export type AlterAddColumn = {|
 
 export type AlterAddForeignKey = {|
   _kind: 'AlterAddForeignKey',
-  type: 'ADD FOREIGN KEY',
   constraintName: string | null,
   indexName: string | null,
   indexColNames: Array<IndexColName>,
@@ -377,14 +375,12 @@ export type AlterAddForeignKey = {|
 
 export type AlterAddFullTextIndex = {|
   _kind: 'AlterAddFullTextIndex',
-  type: 'ADD FULLTEXT INDEX',
   indexName: string | null,
   indexColNames: Array<IndexColName>,
 |};
 
 export type AlterAddIndex = {|
   _kind: 'AlterAddIndex',
-  type: 'ADD INDEX',
   indexName: string | null,
   indexType: IndexType | null,
   indexColNames: Array<IndexColName>,
@@ -392,7 +388,6 @@ export type AlterAddIndex = {|
 
 export type AlterAddPrimaryKey = {|
   _kind: 'AlterAddPrimaryKey',
-  type: 'ADD PRIMARY KEY',
   constraintName: string | null,
   indexType: IndexType | null,
   indexColNames: Array<IndexColName>,
@@ -400,7 +395,6 @@ export type AlterAddPrimaryKey = {|
 
 export type AlterAddUniqueIndex = {|
   _kind: 'AlterAddUniqueIndex',
-  type: 'ADD UNIQUE INDEX',
   constraintName: string | null,
   indexName: string | null,
   indexType: IndexType | null,
@@ -409,7 +403,6 @@ export type AlterAddUniqueIndex = {|
 
 export type AlterChangeColumn = {|
   _kind: 'AlterChangeColumn',
-  type: 'CHANGE COLUMN',
   oldColName: string,
   newColName: string,
   definition: ColumnDefinition,
@@ -418,69 +411,59 @@ export type AlterChangeColumn = {|
 
 export type AlterConvertTo = {|
   _kind: 'AlterConvertTo',
-  type: 'CONVERT TO',
   charset: string,
   collate: string | null,
 |};
 
 export type AlterDatabaseStatement = {|
   _kind: 'AlterDatabaseStatement',
-  type: 'ALTER DATABASE',
   dbName: string,
   options: DatabaseOptions,
 |};
 
 export type AlterDropColumn = {|
   _kind: 'AlterDropColumn',
-  type: 'DROP COLUMN',
   colName: string,
 |};
 
 export type AlterDropDefault = {|
   _kind: 'AlterDropDefault',
-  type: 'DROP DEFAULT',
   colName: string,
 |};
 
 export type AlterDropForeignKey = {|
   _kind: 'AlterDropForeignKey',
-  type: 'DROP FOREIGN KEY',
   symbol: string,
 |};
 
 export type AlterDropIndex = {|
   _kind: 'AlterDropIndex',
-  type: 'DROP INDEX',
   indexName: string,
 |};
 
 export type AlterDropPrimaryKey = {|
   _kind: 'AlterDropPrimaryKey',
-  type: 'DROP PRIMARY KEY',
+  dummy: 'ignore_me',
 |};
 
 export type AlterRenameIndex = {|
   _kind: 'AlterRenameIndex',
-  type: 'RENAME INDEX',
   oldIndexName: string,
   newIndexName: string,
 |};
 
 export type AlterRenameTable = {|
   _kind: 'AlterRenameTable',
-  type: 'RENAME TABLE',
   newTblName: string,
 |};
 
 export type AlterTableOptions = {|
   _kind: 'AlterTableOptions',
-  type: 'CHANGE TABLE OPTIONS',
   options: TableOptions,
 |};
 
 export type AlterTableStatement = {|
   _kind: 'AlterTableStatement',
-  type: 'ALTER TABLE',
   tblName: string,
   changes: Array<AlterSpec>,
 |};
@@ -531,7 +514,6 @@ export type Char = {|
 
 export type Column = {|
   _kind: 'Column',
-  type: 'COLUMN',
   colName: string,
   definition: ColumnDefinition,
 |};
@@ -552,12 +534,11 @@ export type ColumnDefinition = {|
 
 export type CreateFunctionStatement = {|
   _kind: 'CreateFunctionStatement',
-  type: 'CREATE FUNCTION',
+  dummy: 'ignore_me',
 |};
 
 export type CreateIndexStatement = {|
   _kind: 'CreateIndexStatement',
-  type: 'CREATE INDEX',
   indexName: string,
   indexKind: IndexKind,
   tblName: string,
@@ -566,7 +547,6 @@ export type CreateIndexStatement = {|
 
 export type CreateTableLikeStatement = {|
   _kind: 'CreateTableLikeStatement',
-  type: 'CREATE TABLE LIKE',
   tblName: string,
   oldTblName: string,
   ifNotExists: boolean | null,
@@ -574,7 +554,6 @@ export type CreateTableLikeStatement = {|
 
 export type CreateTableStatement = {|
   _kind: 'CreateTableStatement',
-  type: 'CREATE TABLE',
   tblName: string,
   definitions: Array<CreateTableDefinition>,
   options: TableOptions | null,
@@ -583,7 +562,6 @@ export type CreateTableStatement = {|
 
 export type CreateTriggerStatement = {|
   _kind: 'CreateTriggerStatement',
-  type: 'CREATE TRIGGER',
   triggerName: string,
   tblName: string,
 |};
@@ -626,14 +604,12 @@ export type Double = {|
 
 export type DropIndexStatement = {|
   _kind: 'DropIndexStatement',
-  type: 'DROP INDEX',
   indexName: string,
   tblName: string,
 |};
 
 export type DropTableStatement = {|
   _kind: 'DropTableStatement',
-  type: 'DROP TABLE',
   tblName: string,
   ifExists: boolean,
 |};
@@ -654,7 +630,6 @@ export type Float = {|
 
 export type ForeignKey = {|
   _kind: 'ForeignKey',
-  type: 'FOREIGN KEY',
   constraintName: string | null,
   indexName: string | null,
   indexColNames: Array<IndexColName>,
@@ -663,7 +638,6 @@ export type ForeignKey = {|
 
 export type FullTextIndex = {|
   _kind: 'FullTextIndex',
-  type: 'FULLTEXT INDEX',
   indexName: string | null,
   indexColNames: Array<IndexColName>,
 |};
@@ -682,7 +656,6 @@ export type Identifier = {|
 
 export type Index = {|
   _kind: 'Index',
-  type: 'INDEX',
   indexName: string | null,
   indexColNames: Array<IndexColName>,
 |};
@@ -742,7 +715,6 @@ export type MediumText = {|
 
 export type PrimaryKey = {|
   _kind: 'PrimaryKey',
-  type: 'PRIMARY KEY',
   indexColNames: Array<IndexColName>,
 |};
 
@@ -757,7 +729,6 @@ export type ReferenceDefinition = {|
 
 export type RenameTableStatement = {|
   _kind: 'RenameTableStatement',
-  type: 'RENAME TABLE',
   tblName: string,
   newName: string,
 |};
@@ -814,7 +785,6 @@ export type UnaryExpression = {|
 
 export type UniqueIndex = {|
   _kind: 'UniqueIndex',
-  type: 'UNIQUE INDEX',
   constraintName: string | null,
   indexName: string | null,
   indexColNames: Array<IndexColName>,
@@ -863,7 +833,6 @@ export default {
 
     return {
       _kind: 'AlterAddColumn',
-      type: 'ADD COLUMN',
       colName,
       definition,
       position,
@@ -908,7 +877,6 @@ export default {
 
     return {
       _kind: 'AlterAddForeignKey',
-      type: 'ADD FOREIGN KEY',
       constraintName,
       indexName,
       indexColNames,
@@ -935,7 +903,6 @@ export default {
 
     return {
       _kind: 'AlterAddFullTextIndex',
-      type: 'ADD FULLTEXT INDEX',
       indexName,
       indexColNames,
     };
@@ -964,7 +931,6 @@ export default {
 
     return {
       _kind: 'AlterAddIndex',
-      type: 'ADD INDEX',
       indexName,
       indexType,
       indexColNames,
@@ -994,7 +960,6 @@ export default {
 
     return {
       _kind: 'AlterAddPrimaryKey',
-      type: 'ADD PRIMARY KEY',
       constraintName,
       indexType,
       indexColNames,
@@ -1032,7 +997,6 @@ export default {
 
     return {
       _kind: 'AlterAddUniqueIndex',
-      type: 'ADD UNIQUE INDEX',
       constraintName,
       indexName,
       indexType,
@@ -1076,7 +1040,6 @@ export default {
 
     return {
       _kind: 'AlterChangeColumn',
-      type: 'CHANGE COLUMN',
       oldColName,
       newColName,
       definition,
@@ -1101,7 +1064,6 @@ export default {
 
     return {
       _kind: 'AlterConvertTo',
-      type: 'CONVERT TO',
       charset,
       collate,
     };
@@ -1124,7 +1086,6 @@ export default {
 
     return {
       _kind: 'AlterDatabaseStatement',
-      type: 'ALTER DATABASE',
       dbName,
       options,
     };
@@ -1140,7 +1101,6 @@ export default {
 
     return {
       _kind: 'AlterDropColumn',
-      type: 'DROP COLUMN',
       colName,
     };
   },
@@ -1155,7 +1115,6 @@ export default {
 
     return {
       _kind: 'AlterDropDefault',
-      type: 'DROP DEFAULT',
       colName,
     };
   },
@@ -1170,7 +1129,6 @@ export default {
 
     return {
       _kind: 'AlterDropForeignKey',
-      type: 'DROP FOREIGN KEY',
       symbol,
     };
   },
@@ -1185,7 +1143,6 @@ export default {
 
     return {
       _kind: 'AlterDropIndex',
-      type: 'DROP INDEX',
       indexName,
     };
   },
@@ -1193,7 +1150,7 @@ export default {
   AlterDropPrimaryKey(): AlterDropPrimaryKey {
     return {
       _kind: 'AlterDropPrimaryKey',
-      type: 'DROP PRIMARY KEY',
+      dummy: 'ignore_me',
     };
   },
 
@@ -1214,7 +1171,6 @@ export default {
 
     return {
       _kind: 'AlterRenameIndex',
-      type: 'RENAME INDEX',
       oldIndexName,
       newIndexName,
     };
@@ -1230,7 +1186,6 @@ export default {
 
     return {
       _kind: 'AlterRenameTable',
-      type: 'RENAME TABLE',
       newTblName,
     };
   },
@@ -1245,7 +1200,6 @@ export default {
 
     return {
       _kind: 'AlterTableOptions',
-      type: 'CHANGE TABLE OPTIONS',
       options,
     };
   },
@@ -1267,7 +1221,6 @@ export default {
 
     return {
       _kind: 'AlterTableStatement',
-      type: 'ALTER TABLE',
       tblName,
       changes,
     };
@@ -1404,7 +1357,6 @@ export default {
 
     return {
       _kind: 'Column',
-      type: 'COLUMN',
       colName,
       definition,
     };
@@ -1510,7 +1462,7 @@ export default {
   CreateFunctionStatement(): CreateFunctionStatement {
     return {
       _kind: 'CreateFunctionStatement',
-      type: 'CREATE FUNCTION',
+      dummy: 'ignore_me',
     };
   },
 
@@ -1545,7 +1497,6 @@ export default {
 
     return {
       _kind: 'CreateIndexStatement',
-      type: 'CREATE INDEX',
       indexName,
       indexKind,
       tblName,
@@ -1581,7 +1532,6 @@ export default {
 
     return {
       _kind: 'CreateTableLikeStatement',
-      type: 'CREATE TABLE LIKE',
       tblName,
       oldTblName,
       ifNotExists,
@@ -1626,7 +1576,6 @@ export default {
 
     return {
       _kind: 'CreateTableStatement',
-      type: 'CREATE TABLE',
       tblName,
       definitions,
       options,
@@ -1651,7 +1600,6 @@ export default {
 
     return {
       _kind: 'CreateTriggerStatement',
-      type: 'CREATE TRIGGER',
       triggerName,
       tblName,
     };
@@ -1758,7 +1706,6 @@ export default {
 
     return {
       _kind: 'DropIndexStatement',
-      type: 'DROP INDEX',
       indexName,
       tblName,
     };
@@ -1781,7 +1728,6 @@ export default {
 
     return {
       _kind: 'DropTableStatement',
-      type: 'DROP TABLE',
       tblName,
       ifExists,
     };
@@ -1853,7 +1799,6 @@ export default {
 
     return {
       _kind: 'ForeignKey',
-      type: 'FOREIGN KEY',
       constraintName,
       indexName,
       indexColNames,
@@ -1880,7 +1825,6 @@ export default {
 
     return {
       _kind: 'FullTextIndex',
-      type: 'FULLTEXT INDEX',
       indexName,
       indexColNames,
     };
@@ -1931,7 +1875,6 @@ export default {
 
     return {
       _kind: 'Index',
-      type: 'INDEX',
       indexName,
       indexColNames,
     };
@@ -2050,7 +1993,6 @@ export default {
 
     return {
       _kind: 'PrimaryKey',
-      type: 'PRIMARY KEY',
       indexColNames,
     };
   },
@@ -2105,7 +2047,6 @@ export default {
 
     return {
       _kind: 'RenameTableStatement',
-      type: 'RENAME TABLE',
       tblName,
       newName,
     };
@@ -2270,7 +2211,6 @@ export default {
 
     return {
       _kind: 'UniqueIndex',
-      type: 'UNIQUE INDEX',
       constraintName,
       indexName,
       indexColNames,

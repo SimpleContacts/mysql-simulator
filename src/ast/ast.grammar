@@ -67,47 +67,34 @@ IndexColName:
   | DropIndexStatement
 
 CreateTableStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type         "CREATE TABLE"
   tblName      string
   definitions  @CreateTableDefinition+
   options      TableOptions?
   ifNotExists  boolean
 
 CreateTableLikeStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type         "CREATE TABLE LIKE"
   tblName      string
   oldTblName   string
   ifNotExists  boolean?
 
 CreateIndexStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type           "CREATE INDEX"
   indexName      string
   indexKind      IndexKind
   tblName        string
   indexColNames  IndexColName+
 
 CreateTriggerStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type         "CREATE TRIGGER"
   triggerName  string
   tblName      string
 
 CreateFunctionStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "CREATE FUNCTION"
+  dummy  "ignore_me"
 
 RenameTableStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "RENAME TABLE"
   tblName  string
   newName  string
 
 AlterDatabaseStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "ALTER DATABASE"
   dbName   string
   options  DatabaseOptions
 
@@ -116,20 +103,14 @@ DatabaseOptions:
   COLLATE  string?
 
 AlterTableStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "ALTER TABLE"
   tblName  string
   changes  @AlterSpec+
 
 DropTableStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type      "DROP TABLE"
   tblName   string
   ifExists  boolean
 
 DropIndexStatement:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type       "DROP INDEX"
   indexName  string
   tblName    string
 
@@ -142,8 +123,6 @@ DropIndexStatement:
   | ForeignKey
 
 Column:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type        "COLUMN"
   colName     string
   definition  ColumnDefinition
 
@@ -172,32 +151,22 @@ GeneratedDefinition:
   mode  GeneratedColumnMode
 
 PrimaryKey:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type           "PRIMARY KEY"
   indexColNames  IndexColName+
 
 Index:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type           "INDEX"
   indexName      string?
   indexColNames  IndexColName+
 
 UniqueIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type            "UNIQUE INDEX"
   constraintName  string?
   indexName       string?
   indexColNames   IndexColName+
 
 FullTextIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type           "FULLTEXT INDEX"
   indexName      string?
   indexColNames  IndexColName+
 
 ForeignKey:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type            "FOREIGN KEY"
   constraintName  string?
   indexName       string?
   indexColNames   IndexColName+
@@ -222,100 +191,69 @@ ForeignKey:
   | AlterTableOptions
 
 AlterAddIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type           "ADD INDEX"
   indexName      string?
   indexType      IndexType?
   indexColNames  IndexColName+
 
 AlterAddColumn:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type        "ADD COLUMN"
   colName     string
   definition  ColumnDefinition
   position    string?
 
 AlterAddPrimaryKey:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type            "ADD PRIMARY KEY"
   constraintName  string?
   indexType       IndexType?
   indexColNames   IndexColName+
 
 AlterAddUniqueIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type            "ADD UNIQUE INDEX"
   constraintName  string?
   indexName       string?
   indexType       IndexType?
   indexColNames   IndexColName+
 
 AlterAddFullTextIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type           "ADD FULLTEXT INDEX"
   indexName      string?
   indexColNames  IndexColName+
 
 AlterAddForeignKey:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type            "ADD FOREIGN KEY"
   constraintName  string?
   indexName       string?
   indexColNames   IndexColName+
   reference       ReferenceDefinition
 
 AlterChangeColumn:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type        "CHANGE COLUMN"
   oldColName  string
   newColName  string
   definition  ColumnDefinition
   position    string?
 
 AlterConvertTo:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "CONVERT TO"
   charset  string
   collate  string?
 
 AlterDropColumn:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "DROP COLUMN"
   colName  string
 
 AlterDropDefault:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "DROP DEFAULT"
   colName  string
 
 AlterDropForeignKey:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type    "DROP FOREIGN KEY"
   symbol  string
 
 AlterDropIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type       "DROP INDEX"
   indexName  string
 
 AlterDropPrimaryKey:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type  "DROP PRIMARY KEY"
+  dummy  "ignore_me"
 
 AlterRenameIndex:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type          "RENAME INDEX"
   oldIndexName  string
   newIndexName  string
 
 AlterRenameTable:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type        "RENAME TABLE"
   newTblName  string
 
 AlterTableOptions:
-  # TODO: Remove this hardcoded "type" in favor of "_kind"
-  type     "CHANGE TABLE OPTIONS"
   options  TableOptions
 
 TableOptions:
@@ -379,8 +317,6 @@ Year:
   baseType  "year"
 
 Time:
-  # TODO: This may officially take an fsp, but we're not parsing it?
-  # fsp  number
   baseType  "time"
 
 @Real:
