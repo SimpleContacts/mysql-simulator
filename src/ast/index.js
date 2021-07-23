@@ -113,7 +113,7 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return isExpression(node) || isStatement(node) || isAlterSpec(node);
+  return isExpression(node) || isStatement(node);
 }
 
 function isStatement(node: Node): boolean %checks {
@@ -189,7 +189,7 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | Statement | AlterSpec;
+export type Start = Expression | Statement;
 
 export type Statement =
   | CreateTableStatement

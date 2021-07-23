@@ -506,4 +506,3 @@ CurrentTimestamp:
 @Start:
   | @Expression
   | @Statement
-  | @AlterSpec
