@@ -10,22 +10,22 @@ import { isWider } from '../ast/encodings';
 import { quote } from '../printer';
 
 export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): T {
-  switch (dataType.baseType) {
-    case 'char':
+  switch (dataType._kind) {
+    case 'Char':
       return { ...dataType, encoding };
-    case 'varchar':
+    case 'VarChar':
       return { ...dataType, encoding };
-    case 'text':
+    case 'Text':
       return { ...dataType, encoding };
-    case 'mediumtext':
+    case 'MediumText':
       return { ...dataType, encoding };
-    case 'longtext':
+    case 'LongText':
       return { ...dataType, encoding };
-    case 'enum':
+    case 'Enum':
       return { ...dataType, encoding };
   }
 
-  throw new Error('Unknown string column: ' + dataType.baseType);
+  throw new Error('Unknown string column: ' + dataType._kind);
 }
 
 /**
@@ -49,12 +49,12 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
   }
 
   // Pick the next tier
-  switch (dataType.baseType) {
-    case 'text':
+  switch (dataType._kind) {
+    case 'Text':
       // TEXT -> MEDIUMTEXT
       return ast.MediumText(newEncoding);
 
-    case 'mediumtext':
+    case 'MediumText':
       // MEDIUMTEXT -> LONGTEXT
       return ast.LongText(newEncoding);
 
@@ -69,24 +69,24 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
  * does, depending on whether it's equal to the table default encoding or not.
  */
 export function formatDataType(dataType: DataType, tableEncoding?: Encoding): string {
-  const baseType = dataType.baseType;
+  const baseType = dataType._kind.toLowerCase();
   let params = '';
   let options = '';
 
   // Dispatch based on the type
-  switch (dataType.baseType) {
-    case 'tinyint':
-    case 'smallint':
-    case 'mediumint':
-    case 'int':
-    case 'bigint':
+  switch (dataType._kind) {
+    case 'TinyInt':
+    case 'SmallInt':
+    case 'MediumInt':
+    case 'Int':
+    case 'BigInt':
       params = dataType.length;
       options = [dataType.unsigned ? 'unsigned' : ''].filter(Boolean).join(' ');
       break;
 
-    case 'float':
-    case 'double':
-    case 'decimal':
+    case 'Float':
+    case 'Double':
+    case 'Decimal':
       if (dataType.precision) {
         params = [dataType.precision.length, dataType.precision.decimals].join(',');
       }
@@ -94,14 +94,14 @@ export function formatDataType(dataType: DataType, tableEncoding?: Encoding): st
       break;
 
     // case 'date': // NOTE: "date" does not belong here! It's a "paramless" type.
-    case 'time':
-    case 'timestamp':
-    case 'datetime':
+    case 'Time':
+    case 'Timestamp':
+    case 'DateTime':
       params = dataType.fsp || '';
       break;
 
-    case 'char':
-    case 'varchar': {
+    case 'Char':
+    case 'VarChar': {
       params = dataType.length || '';
 
       const encoding = dataType.encoding;
@@ -123,9 +123,9 @@ export function formatDataType(dataType: DataType, tableEncoding?: Encoding): st
       break;
     }
 
-    case 'text':
-    case 'mediumtext':
-    case 'longtext': {
+    case 'Text':
+    case 'MediumText':
+    case 'LongText': {
       params = '';
 
       const encoding = dataType.encoding;
@@ -147,13 +147,13 @@ export function formatDataType(dataType: DataType, tableEncoding?: Encoding): st
       break;
     }
 
-    case 'binary':
-    case 'varbinary':
-    case 'blob':
+    case 'Binary':
+    case 'VarBinary':
+    case 'Blob':
       params = dataType.length || '';
       break;
 
-    case 'enum': {
+    case 'Enum': {
       params = dataType.values.map(quote).join(',');
 
       const encoding = dataType.encoding;

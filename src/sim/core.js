@@ -22,12 +22,12 @@ function setEncodingIfNull<T: DataType>(dataType: T, encoding: Encoding): T {
       // TODO: Ideally, just use `isTextualOrEnum()` here, but Flow's %checks
       // predicates don't work across module boundaries :(
       (
-        dataType.baseType === 'char' ||
-        dataType.baseType === 'varchar' ||
-        dataType.baseType === 'text' ||
-        dataType.baseType === 'mediumtext' ||
-        dataType.baseType === 'longtext' ||
-        dataType.baseType === 'enum'
+        dataType._kind === 'Char' ||
+        dataType._kind === 'VarChar' ||
+        dataType._kind === 'Text' ||
+        dataType._kind === 'MediumText' ||
+        dataType._kind === 'LongText' ||
+        dataType._kind === 'Enum'
       )
     )
   ) {
@@ -101,10 +101,10 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   // specified.  All other types are NULL unless explicitly specified.
   let nullable = def.nullable;
   if (nullable === null) {
-    nullable = dataType.baseType !== 'timestamp'; // Could also be "timestamp(6)"
+    nullable = dataType._kind !== 'Timestamp'; // Could also be "timestamp(6)"
   }
 
-  if (dataType.baseType === 'timestamp') {
+  if (dataType._kind === 'Timestamp') {
     if (!nullable && defaultValue === null) {
       // If explicit default value is missing, then MySQL assumes the DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       defaultValue = ast.CurrentTimestamp(dataType.fsp);

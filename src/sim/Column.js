@@ -101,7 +101,7 @@ export default class Column {
           // MySQL outputs number constants as strings. No idea why that would
           // make sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
           let node2 = node;
-          if (dataType.baseType === 'decimal') {
+          if (dataType._kind === 'Decimal') {
             node2 = ast.Literal(value.toFixed(dataType.precision?.decimals ?? 2));
           } else {
             node2 = ast.Literal(String(value));
@@ -118,7 +118,7 @@ export default class Column {
     }
 
     let nullable;
-    if (dataType.baseType === 'timestamp') {
+    if (dataType._kind === 'Timestamp') {
       nullable = !this.nullable ? 'NOT NULL' : 'NULL';
     } else {
       nullable = !this.nullable
@@ -134,10 +134,10 @@ export default class Column {
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
     if (
-      dataType.baseType === 'text' ||
-      dataType.baseType === 'mediumtext' ||
-      dataType.baseType === 'longtext' ||
-      dataType.baseType === 'blob'
+      dataType._kind === 'Text' ||
+      dataType._kind === 'MediumText' ||
+      dataType._kind === 'LongText' ||
+      dataType._kind === 'Blob'
     ) {
       if (defaultValueClause === 'DEFAULT NULL') {
         defaultValueClause = undefined;
@@ -172,49 +172,47 @@ export default class Column {
     const info = this.dataType;
 
     // NOTE: MySQL represents boolean columns with TINYINT(1) specifically
-    if (info.baseType === 'tinyint' && info.length === 1) {
+    if (info._kind === 'TinyInt' && info.length === 1) {
       return t.Bool();
     }
 
-    switch (info.baseType) {
-      case 'tinyint':
-      case 'smallint':
-      case 'mediumint':
-      case 'int':
-      case 'bigint':
-      case 'float':
-      case 'double':
-      case 'decimal':
+    switch (info._kind) {
+      case 'TinyInt':
+      case 'SmallInt':
+      case 'MediumInt':
+      case 'Int':
+      case 'BigInt':
+      case 'Float':
+      case 'Double':
+      case 'Decimal':
         return t.Int();
 
-      case 'char':
-      case 'varchar':
-      case 'text':
-      case 'mediumtext':
-      case 'longtext':
-      case 'enum':
+      case 'Char':
+      case 'VarChar':
+      case 'Text':
+      case 'MediumText':
+      case 'LongText':
+      case 'Enum':
         return t.String();
 
-      case 'time':
-      case 'timestamp':
-      case 'datetime':
-      case 'date':
-      case 'year':
+      case 'Time':
+      case 'Timestamp':
+      case 'DateTime':
+      case 'Date':
+      case 'Year':
         return t.Date();
 
-      case 'blob':
-      case 'binary':
-      case 'varbinary':
-      case 'tinyblob':
-      case 'mediumblob':
-      case 'longblob':
-      case 'json':
+      case 'Blob':
+      case 'Binary':
+      case 'VarBinary':
+      case 'TinyBlob':
+      case 'MediumBlob':
+      case 'LongBlob':
+      case 'Json':
         throw new Error('Not yet supported');
 
       default:
-        throw new Error(
-          `Don't know how to translate base type ${info.baseType} to rule-of-law compatible type info yet`,
-        );
+        throw new Error(`Don't know how to translate base type ${info._kind} to rule-of-law compatible type info yet`);
     }
   }
 

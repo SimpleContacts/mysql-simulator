@@ -60,12 +60,12 @@ export default class Table {
         // TODO: Ideally, just use `isTextualOrEnum()` here, but Flow's %checks
         // predicates don't work across module boundaries :(
         !(
-          dataType.baseType === 'char' ||
-          dataType.baseType === 'varchar' ||
-          dataType.baseType === 'text' ||
-          dataType.baseType === 'mediumtext' ||
-          dataType.baseType === 'longtext' ||
-          dataType.baseType === 'enum'
+          dataType._kind === 'Char' ||
+          dataType._kind === 'VarChar' ||
+          dataType._kind === 'Text' ||
+          dataType._kind === 'MediumText' ||
+          dataType._kind === 'LongText' ||
+          dataType._kind === 'Enum'
         )
       ) {
         return column;
@@ -93,7 +93,7 @@ export default class Table {
       }
 
       // If no explicit encoding is set for this column, just keep it that way
-      if (dataType.baseType === 'enum') {
+      if (dataType._kind === 'Enum') {
         return column.patch({ dataType: setEncoding(dataType, newEncoding) });
       } else {
         return column.patch({ dataType: convertToEncoding(dataType, newEncoding) });

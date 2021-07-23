@@ -469,14 +469,12 @@ export type AlterTableStatement = {|
 
 export type BigInt = {|
   _kind: 'BigInt',
-  baseType: 'bigint',
   length: number,
   unsigned: boolean,
 |};
 
 export type Binary = {|
   _kind: 'Binary',
-  baseType: 'binary',
   length: number,
 |};
 
@@ -489,7 +487,6 @@ export type BinaryExpression = {|
 
 export type Blob = {|
   _kind: 'Blob',
-  baseType: 'blob',
   length: number,
 |};
 
@@ -506,7 +503,6 @@ export type CallExpression = {|
 
 export type Char = {|
   _kind: 'Char',
-  baseType: 'char',
   length: number,
   encoding: Encoding | null,
 |};
@@ -577,25 +573,21 @@ export type DatabaseOptions = {|
 
 export type Date = {|
   _kind: 'Date',
-  baseType: 'date',
 |};
 
 export type DateTime = {|
   _kind: 'DateTime',
-  baseType: 'datetime',
   fsp: number | null,
 |};
 
 export type Decimal = {|
   _kind: 'Decimal',
-  baseType: 'decimal',
   precision: Precision | null,
   unsigned: boolean,
 |};
 
 export type Double = {|
   _kind: 'Double',
-  baseType: 'double',
   precision: Precision | null,
   unsigned: boolean,
 |};
@@ -614,14 +606,12 @@ export type DropTableStatement = {|
 
 export type Enum = {|
   _kind: 'Enum',
-  baseType: 'enum',
   values: Array<string>,
   encoding: Encoding | null,
 |};
 
 export type Float = {|
   _kind: 'Float',
-  baseType: 'float',
   precision: Precision | null,
   unsigned: boolean,
 |};
@@ -667,14 +657,12 @@ export type IndexColName = {|
 
 export type Int = {|
   _kind: 'Int',
-  baseType: 'int',
   length: number,
   unsigned: boolean,
 |};
 
 export type Json = {|
   _kind: 'Json',
-  baseType: 'json',
 |};
 
 export type Literal = {|
@@ -684,30 +672,25 @@ export type Literal = {|
 
 export type LongBlob = {|
   _kind: 'LongBlob',
-  baseType: 'longblob',
 |};
 
 export type LongText = {|
   _kind: 'LongText',
-  baseType: 'longtext',
   encoding: Encoding | null,
 |};
 
 export type MediumBlob = {|
   _kind: 'MediumBlob',
-  baseType: 'mediumblob',
 |};
 
 export type MediumInt = {|
   _kind: 'MediumInt',
-  baseType: 'mediumint',
   length: number,
   unsigned: boolean,
 |};
 
 export type MediumText = {|
   _kind: 'MediumText',
-  baseType: 'mediumtext',
   encoding: Encoding | null,
 |};
 
@@ -733,7 +716,6 @@ export type RenameTableStatement = {|
 
 export type SmallInt = {|
   _kind: 'SmallInt',
-  baseType: 'smallint',
   length: number,
   unsigned: boolean,
 |};
@@ -748,29 +730,24 @@ export type TableOptions = {|
 
 export type Text = {|
   _kind: 'Text',
-  baseType: 'text',
   encoding: Encoding | null,
 |};
 
 export type Time = {|
   _kind: 'Time',
-  baseType: 'time',
 |};
 
 export type Timestamp = {|
   _kind: 'Timestamp',
-  baseType: 'timestamp',
   fsp: number | null,
 |};
 
 export type TinyBlob = {|
   _kind: 'TinyBlob',
-  baseType: 'tinyblob',
 |};
 
 export type TinyInt = {|
   _kind: 'TinyInt',
-  baseType: 'tinyint',
   length: number,
   unsigned: boolean,
 |};
@@ -790,20 +767,17 @@ export type UniqueIndex = {|
 
 export type VarBinary = {|
   _kind: 'VarBinary',
-  baseType: 'varbinary',
   length: number,
 |};
 
 export type VarChar = {|
   _kind: 'VarChar',
-  baseType: 'varchar',
   length: number,
   encoding: Encoding | null,
 |};
 
 export type Year = {|
   _kind: 'Year',
-  baseType: 'year',
 |};
 
 export default {
@@ -1236,7 +1210,6 @@ export default {
 
     return {
       _kind: 'BigInt',
-      baseType: 'bigint',
       length,
       unsigned,
     };
@@ -1250,7 +1223,6 @@ export default {
 
     return {
       _kind: 'Binary',
-      baseType: 'binary',
       length,
     };
   },
@@ -1286,7 +1258,6 @@ export default {
 
     return {
       _kind: 'Blob',
-      baseType: 'blob',
       length,
     };
   },
@@ -1333,7 +1304,6 @@ export default {
 
     return {
       _kind: 'Char',
-      baseType: 'char',
       length,
       encoding,
     };
@@ -1640,7 +1610,6 @@ export default {
   Date(): Date {
     return {
       _kind: 'Date',
-      baseType: 'date',
     };
   },
 
@@ -1652,7 +1621,6 @@ export default {
 
     return {
       _kind: 'DateTime',
-      baseType: 'datetime',
       fsp,
     };
   },
@@ -1665,7 +1633,6 @@ export default {
 
     return {
       _kind: 'Decimal',
-      baseType: 'decimal',
       precision,
       unsigned,
     };
@@ -1679,7 +1646,6 @@ export default {
 
     return {
       _kind: 'Double',
-      baseType: 'double',
       precision,
       unsigned,
     };
@@ -1737,7 +1703,6 @@ export default {
 
     return {
       _kind: 'Enum',
-      baseType: 'enum',
       values,
       encoding,
     };
@@ -1751,7 +1716,6 @@ export default {
 
     return {
       _kind: 'Float',
-      baseType: 'float',
       precision,
       unsigned,
     };
@@ -1908,7 +1872,6 @@ export default {
 
     return {
       _kind: 'Int',
-      baseType: 'int',
       length,
       unsigned,
     };
@@ -1917,7 +1880,6 @@ export default {
   Json(): Json {
     return {
       _kind: 'Json',
-      baseType: 'json',
     };
   },
 
@@ -1931,14 +1893,12 @@ export default {
   LongBlob(): LongBlob {
     return {
       _kind: 'LongBlob',
-      baseType: 'longblob',
     };
   },
 
   LongText(encoding: Encoding | null = null): LongText {
     return {
       _kind: 'LongText',
-      baseType: 'longtext',
       encoding,
     };
   },
@@ -1946,7 +1906,6 @@ export default {
   MediumBlob(): MediumBlob {
     return {
       _kind: 'MediumBlob',
-      baseType: 'mediumblob',
     };
   },
 
@@ -1963,7 +1922,6 @@ export default {
 
     return {
       _kind: 'MediumInt',
-      baseType: 'mediumint',
       length,
       unsigned,
     };
@@ -1972,7 +1930,6 @@ export default {
   MediumText(encoding: Encoding | null = null): MediumText {
     return {
       _kind: 'MediumText',
-      baseType: 'mediumtext',
       encoding,
     };
   },
@@ -2061,7 +2018,6 @@ export default {
 
     return {
       _kind: 'SmallInt',
-      baseType: 'smallint',
       length,
       unsigned,
     };
@@ -2111,7 +2067,6 @@ export default {
   Text(encoding: Encoding | null = null): Text {
     return {
       _kind: 'Text',
-      baseType: 'text',
       encoding,
     };
   },
@@ -2119,7 +2074,6 @@ export default {
   Time(): Time {
     return {
       _kind: 'Time',
-      baseType: 'time',
     };
   },
 
@@ -2131,7 +2085,6 @@ export default {
 
     return {
       _kind: 'Timestamp',
-      baseType: 'timestamp',
       fsp,
     };
   },
@@ -2139,7 +2092,6 @@ export default {
   TinyBlob(): TinyBlob {
     return {
       _kind: 'TinyBlob',
-      baseType: 'tinyblob',
     };
   },
 
@@ -2156,7 +2108,6 @@ export default {
 
     return {
       _kind: 'TinyInt',
-      baseType: 'tinyint',
       length,
       unsigned,
     };
@@ -2221,7 +2172,6 @@ export default {
 
     return {
       _kind: 'VarBinary',
-      baseType: 'varbinary',
       length,
     };
   },
@@ -2234,7 +2184,6 @@ export default {
 
     return {
       _kind: 'VarChar',
-      baseType: 'varchar',
       length,
       encoding,
     };
@@ -2243,7 +2192,6 @@ export default {
   Year(): Year {
     return {
       _kind: 'Year',
-      baseType: 'year',
     };
   },
 

@@ -263,61 +263,51 @@ TableOptions:
   COLLATE         string?
 
 TinyInt:
-  baseType  "tinyint"
   length    number
   unsigned  boolean
 
 SmallInt:
-  baseType  "smallint"
   length    number
   unsigned  boolean
 
 MediumInt:
-  baseType  "mediumint"
   length    number
   unsigned  boolean
 
 Int:
-  baseType  "int"
   length    number
   unsigned  boolean
 
 BigInt:
-  baseType  "bigint"
   length    number
   unsigned  boolean
 
 Decimal:
-  baseType   "decimal"
   precision  Precision?
   unsigned   boolean
 
 Float:
-  baseType   "float"
   precision  Precision?
   unsigned   boolean
 
 Double:
-  baseType   "double"
   precision  Precision?
   unsigned   boolean
 
 DateTime:
-  baseType  "datetime"
   fsp       number?
 
 Timestamp:
-  baseType  "timestamp"
   fsp       number?
 
 Date:
-  baseType  "date"
+  # no fields
 
 Year:
-  baseType  "year"
+  # no fields
 
 Time:
-  baseType  "time"
+  # no fields
 
 @Real:
   | Decimal
@@ -343,29 +333,23 @@ Time:
   | Time
 
 Text:
-  baseType  "text"
   encoding  Encoding?
 
 MediumText:
-  baseType  "mediumtext"
   encoding  Encoding?
 
 LongText:
-  baseType  "longtext"
   encoding  Encoding?
 
 Char:
-  baseType  "char"
   length    number
   encoding  Encoding?
 
 VarChar:
-  baseType  "varchar"
   length    number
   encoding  Encoding?
 
 Enum:
-  baseType  "enum"
   values    string+
   encoding  Encoding?
 
@@ -381,24 +365,21 @@ Enum:
   | Enum
 
 TinyBlob:
-  baseType  "tinyblob"
+  # no fields
 
 MediumBlob:
-  baseType  "mediumblob"
+  # no fields
 
 LongBlob:
-  baseType  "longblob"
+  # no fields
 
 Blob:
-  baseType  "blob"
   length    number
 
 Binary:
-  baseType  "binary"
   length    number
 
 VarBinary:
-  baseType  "varbinary"
   length    number
 
 @Bytes:
@@ -410,7 +391,7 @@ VarBinary:
   | LongBlob
 
 Json:
-  baseType  "json"
+  # no fields
 
 @DataType:
   | @Numeric
