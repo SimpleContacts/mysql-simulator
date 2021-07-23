@@ -3,16 +3,17 @@ import type { Encoding } from './encodings';
 import type { Precision } from './types';
 
 export type Direction = 'ASC' | 'DESC';
-export type GeneratedColumnMode = "STORED" | "VIRTUAL";
+export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
+export type IndexKind = 'NORMAL' | 'UNIQUE' | 'FULLTEXT'
 export type IndexType = 'BTREE' | 'HASH';
 export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
 export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
 
-export type UnaryOp = "+" | "-" | "!" | "is null" | "is not null";
+export type UnaryOp = '+' | '-' | '!' | 'is null' | 'is not null';
 
-type BooleanOp = "AND" | "OR" | "XOR";
-type CmpOp = "=" | "<=>" | "!=" | "<>" | ">=" | "<=" | "<" | ">" | "LIKE" | "REGEXP" | "RLIKE";
-type ArithmOp = "+" | "-" | "*" | "/" | "%" | "DIV";
+type BooleanOp = 'AND' | 'OR' | 'XOR';
+type CmpOp = '=' | '<=>' | '!=' | '<>' | '>=' | '<=' | '<' | '>' | 'LIKE' | 'REGEXP' | 'RLIKE';
+type ArithmOp = '+' | '-' | '*' | '/' | '%' | 'DIV';
 export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
 """
 
@@ -64,6 +65,85 @@ IndexColName:
   colName    string
   len        number?
   direction  Direction?
+
+@Statement:
+  | CreateTableStatement
+  | CreateTableLikeStatement
+  | CreateIndexStatement
+  | CreateTriggerStatement
+  | CreateFunctionStatement
+  | RenameTableStatement
+  | AlterDatabaseStatement
+  | AlterTableStatement
+  | DropTableStatement
+  | DropIndexStatement
+
+CreateTableStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type         "CREATE TABLE"
+  tblName      string
+  definitions  @CreateTableDefinition+
+  options      TableOptions?
+  ifNotExists  boolean
+
+CreateTableLikeStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type         "CREATE TABLE LIKE"
+  tblName      string
+  oldTblName   string
+  ifNotExists  boolean?
+
+CreateIndexStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type           "CREATE INDEX"
+  indexName      string
+  indexKind      IndexKind
+  tblName        string
+  indexColNames  IndexColName+
+
+CreateTriggerStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type         "CREATE TRIGGER"
+  triggerName  string
+  tblName      string
+
+CreateFunctionStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type  "CREATE FUNCTION"
+
+RenameTableStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "RENAME TABLE"
+  tblName  string
+  newName  string
+
+AlterDatabaseStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "ALTER DATABASE"
+  dbName   string
+  options  DatabaseOptions
+
+DatabaseOptions:
+  CHARSET  string?
+  COLLATE  string?
+
+AlterTableStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type     "ALTER TABLE"
+  tblName  string
+  changes  @AlterSpec+
+
+DropTableStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type      "DROP TABLE"
+  tblName   string
+  ifExists  boolean
+
+DropIndexStatement:
+  # TODO: Remove this hardcoded "type" in favor of "_kind"
+  type       "DROP INDEX"
+  indexName  string
+  tblName    string
 
 @CreateTableDefinition:
   | Column
@@ -437,5 +517,5 @@ CurrentTimestamp:
 # or if we should explicitly define it.
 @Start:
   | @Expression
-  | @CreateTableDefinition
+  | @Statement
   | @AlterSpec

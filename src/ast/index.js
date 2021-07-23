@@ -14,6 +14,7 @@ import type { Precision } from './types';
 
 export type Direction = 'ASC' | 'DESC';
 export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
+export type IndexKind = 'NORMAL' | 'UNIQUE' | 'FULLTEXT';
 export type IndexType = 'BTREE' | 'HASH';
 export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
 export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
@@ -112,7 +113,22 @@ function isReal(node: Node): boolean %checks {
 }
 
 function isStart(node: Node): boolean %checks {
-  return isExpression(node) || isCreateTableDefinition(node) || isAlterSpec(node);
+  return isExpression(node) || isStatement(node) || isAlterSpec(node);
+}
+
+function isStatement(node: Node): boolean %checks {
+  return (
+    node._kind === 'CreateTableStatement' ||
+    node._kind === 'CreateTableLikeStatement' ||
+    node._kind === 'CreateIndexStatement' ||
+    node._kind === 'CreateTriggerStatement' ||
+    node._kind === 'CreateFunctionStatement' ||
+    node._kind === 'RenameTableStatement' ||
+    node._kind === 'AlterDatabaseStatement' ||
+    node._kind === 'AlterTableStatement' ||
+    node._kind === 'DropTableStatement' ||
+    node._kind === 'DropIndexStatement'
+  );
 }
 
 function isTemporal(node: Node): boolean %checks {
@@ -173,7 +189,19 @@ export type Numeric = Integer | Real;
 
 export type Real = Decimal | Float | Double;
 
-export type Start = Expression | CreateTableDefinition | AlterSpec;
+export type Start = Expression | Statement | AlterSpec;
+
+export type Statement =
+  | CreateTableStatement
+  | CreateTableLikeStatement
+  | CreateIndexStatement
+  | CreateTriggerStatement
+  | CreateFunctionStatement
+  | RenameTableStatement
+  | AlterDatabaseStatement
+  | AlterTableStatement
+  | DropTableStatement
+  | DropIndexStatement;
 
 export type Temporal = DateTime | Timestamp | Date | Year | Time;
 
@@ -190,6 +218,7 @@ export type Node =
   | AlterAddUniqueIndex
   | AlterChangeColumn
   | AlterConvertTo
+  | AlterDatabaseStatement
   | AlterDropColumn
   | AlterDropDefault
   | AlterDropForeignKey
@@ -198,6 +227,7 @@ export type Node =
   | AlterRenameIndex
   | AlterRenameTable
   | AlterTableOptions
+  | AlterTableStatement
   | BigInt
   | Binary
   | BinaryExpression
@@ -207,11 +237,19 @@ export type Node =
   | Char
   | Column
   | ColumnDefinition
+  | CreateFunctionStatement
+  | CreateIndexStatement
+  | CreateTableLikeStatement
+  | CreateTableStatement
+  | CreateTriggerStatement
   | CurrentTimestamp
+  | DatabaseOptions
   | Date
   | DateTime
   | Decimal
   | Double
+  | DropIndexStatement
+  | DropTableStatement
   | Enum
   | Float
   | ForeignKey
@@ -230,6 +268,7 @@ export type Node =
   | MediumText
   | PrimaryKey
   | ReferenceDefinition
+  | RenameTableStatement
   | SmallInt
   | TableOptions
   | Text
@@ -253,6 +292,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'AlterAddUniqueIndex' ||
     node._kind === 'AlterChangeColumn' ||
     node._kind === 'AlterConvertTo' ||
+    node._kind === 'AlterDatabaseStatement' ||
     node._kind === 'AlterDropColumn' ||
     node._kind === 'AlterDropDefault' ||
     node._kind === 'AlterDropForeignKey' ||
@@ -261,6 +301,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'AlterRenameIndex' ||
     node._kind === 'AlterRenameTable' ||
     node._kind === 'AlterTableOptions' ||
+    node._kind === 'AlterTableStatement' ||
     node._kind === 'BigInt' ||
     node._kind === 'Binary' ||
     node._kind === 'BinaryExpression' ||
@@ -270,11 +311,19 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'Char' ||
     node._kind === 'Column' ||
     node._kind === 'ColumnDefinition' ||
+    node._kind === 'CreateFunctionStatement' ||
+    node._kind === 'CreateIndexStatement' ||
+    node._kind === 'CreateTableLikeStatement' ||
+    node._kind === 'CreateTableStatement' ||
+    node._kind === 'CreateTriggerStatement' ||
     node._kind === 'CurrentTimestamp' ||
+    node._kind === 'DatabaseOptions' ||
     node._kind === 'Date' ||
     node._kind === 'DateTime' ||
     node._kind === 'Decimal' ||
     node._kind === 'Double' ||
+    node._kind === 'DropIndexStatement' ||
+    node._kind === 'DropTableStatement' ||
     node._kind === 'Enum' ||
     node._kind === 'Float' ||
     node._kind === 'ForeignKey' ||
@@ -293,6 +342,7 @@ function isNode(node: Node): boolean %checks {
     node._kind === 'MediumText' ||
     node._kind === 'PrimaryKey' ||
     node._kind === 'ReferenceDefinition' ||
+    node._kind === 'RenameTableStatement' ||
     node._kind === 'SmallInt' ||
     node._kind === 'TableOptions' ||
     node._kind === 'Text' ||
@@ -373,6 +423,13 @@ export type AlterConvertTo = {|
   collate: string | null,
 |};
 
+export type AlterDatabaseStatement = {|
+  _kind: 'AlterDatabaseStatement',
+  type: 'ALTER DATABASE',
+  dbName: string,
+  options: DatabaseOptions,
+|};
+
 export type AlterDropColumn = {|
   _kind: 'AlterDropColumn',
   type: 'DROP COLUMN',
@@ -419,6 +476,13 @@ export type AlterTableOptions = {|
   _kind: 'AlterTableOptions',
   type: 'CHANGE TABLE OPTIONS',
   options: TableOptions,
+|};
+
+export type AlterTableStatement = {|
+  _kind: 'AlterTableStatement',
+  type: 'ALTER TABLE',
+  tblName: string,
+  changes: Array<AlterSpec>,
 |};
 
 export type BigInt = {|
@@ -489,9 +553,53 @@ export type ColumnDefinition = {|
   generated: GeneratedDefinition | null,
 |};
 
+export type CreateFunctionStatement = {|
+  _kind: 'CreateFunctionStatement',
+  type: 'CREATE FUNCTION',
+|};
+
+export type CreateIndexStatement = {|
+  _kind: 'CreateIndexStatement',
+  type: 'CREATE INDEX',
+  indexName: string,
+  indexKind: IndexKind,
+  tblName: string,
+  indexColNames: Array<IndexColName>,
+|};
+
+export type CreateTableLikeStatement = {|
+  _kind: 'CreateTableLikeStatement',
+  type: 'CREATE TABLE LIKE',
+  tblName: string,
+  oldTblName: string,
+  ifNotExists: boolean | null,
+|};
+
+export type CreateTableStatement = {|
+  _kind: 'CreateTableStatement',
+  type: 'CREATE TABLE',
+  tblName: string,
+  definitions: Array<CreateTableDefinition>,
+  options: TableOptions | null,
+  ifNotExists: boolean,
+|};
+
+export type CreateTriggerStatement = {|
+  _kind: 'CreateTriggerStatement',
+  type: 'CREATE TRIGGER',
+  triggerName: string,
+  tblName: string,
+|};
+
 export type CurrentTimestamp = {|
   _kind: 'CurrentTimestamp',
   precision: number | null,
+|};
+
+export type DatabaseOptions = {|
+  _kind: 'DatabaseOptions',
+  CHARSET: string | null,
+  COLLATE: string | null,
 |};
 
 export type Date = {|
@@ -517,6 +625,20 @@ export type Double = {|
   baseType: 'double',
   precision: Precision | null,
   unsigned: boolean,
+|};
+
+export type DropIndexStatement = {|
+  _kind: 'DropIndexStatement',
+  type: 'DROP INDEX',
+  indexName: string,
+  tblName: string,
+|};
+
+export type DropTableStatement = {|
+  _kind: 'DropTableStatement',
+  type: 'DROP TABLE',
+  tblName: string,
+  ifExists: boolean,
 |};
 
 export type Enum = {|
@@ -636,6 +758,13 @@ export type ReferenceDefinition = {|
   matchMode: MatchMode | null,
   onDelete: ReferenceOption,
   onUpdate: ReferenceOption | null,
+|};
+
+export type RenameTableStatement = {|
+  _kind: 'RenameTableStatement',
+  type: 'RENAME TABLE',
+  tblName: string,
+  newName: string,
 |};
 
 export type SmallInt = {|
@@ -984,6 +1113,29 @@ export default {
     };
   },
 
+  AlterDatabaseStatement(dbName: string, options: DatabaseOptions): AlterDatabaseStatement {
+    invariant(
+      typeof dbName === 'string',
+      `Invalid value for "dbName" arg in "AlterDatabaseStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        dbName,
+      )}`,
+    );
+
+    invariant(
+      options._kind === 'DatabaseOptions',
+      `Invalid value for "options" arg in "AlterDatabaseStatement" call.\nExpected: DatabaseOptions\nGot:      ${JSON.stringify(
+        options,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterDatabaseStatement',
+      type: 'ALTER DATABASE',
+      dbName,
+      options,
+    };
+  },
+
   AlterDropColumn(colName: string): AlterDropColumn {
     invariant(
       typeof colName === 'string',
@@ -1101,6 +1253,29 @@ export default {
       _kind: 'AlterTableOptions',
       type: 'CHANGE TABLE OPTIONS',
       options,
+    };
+  },
+
+  AlterTableStatement(tblName: string, changes: Array<AlterSpec>): AlterTableStatement {
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "AlterTableStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(changes) && changes.length > 0 && changes.every((item) => isAlterSpec(item)),
+      `Invalid value for "changes" arg in "AlterTableStatement" call.\nExpected: @AlterSpec+\nGot:      ${JSON.stringify(
+        changes,
+      )}`,
+    );
+
+    return {
+      _kind: 'AlterTableStatement',
+      type: 'ALTER TABLE',
+      tblName,
+      changes,
     };
   },
 
@@ -1341,6 +1516,156 @@ export default {
     };
   },
 
+  CreateFunctionStatement(): CreateFunctionStatement {
+    return {
+      _kind: 'CreateFunctionStatement',
+      type: 'CREATE FUNCTION',
+    };
+  },
+
+  CreateIndexStatement(
+    indexName: string,
+    indexKind: IndexKind,
+    tblName: string,
+    indexColNames: Array<IndexColName>,
+  ): CreateIndexStatement {
+    invariant(
+      typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "CreateIndexStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "CreateIndexStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(indexColNames) &&
+        indexColNames.length > 0 &&
+        indexColNames.every((item) => item._kind === 'IndexColName'),
+      `Invalid value for "indexColNames" arg in "CreateIndexStatement" call.\nExpected: IndexColName+\nGot:      ${JSON.stringify(
+        indexColNames,
+      )}`,
+    );
+
+    return {
+      _kind: 'CreateIndexStatement',
+      type: 'CREATE INDEX',
+      indexName,
+      indexKind,
+      tblName,
+      indexColNames,
+    };
+  },
+
+  CreateTableLikeStatement(
+    tblName: string,
+    oldTblName: string,
+    ifNotExists: boolean | null = null,
+  ): CreateTableLikeStatement {
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "CreateTableLikeStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      typeof oldTblName === 'string',
+      `Invalid value for "oldTblName" arg in "CreateTableLikeStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        oldTblName,
+      )}`,
+    );
+
+    invariant(
+      ifNotExists === null || typeof ifNotExists === 'boolean',
+      `Invalid value for "ifNotExists" arg in "CreateTableLikeStatement" call.\nExpected: boolean?\nGot:      ${JSON.stringify(
+        ifNotExists,
+      )}`,
+    );
+
+    return {
+      _kind: 'CreateTableLikeStatement',
+      type: 'CREATE TABLE LIKE',
+      tblName,
+      oldTblName,
+      ifNotExists,
+    };
+  },
+
+  CreateTableStatement(
+    tblName: string,
+    definitions: Array<CreateTableDefinition>,
+    options: TableOptions | null,
+    ifNotExists: boolean,
+  ): CreateTableStatement {
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "CreateTableStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      Array.isArray(definitions) &&
+        definitions.length > 0 &&
+        definitions.every((item) => isCreateTableDefinition(item)),
+      `Invalid value for "definitions" arg in "CreateTableStatement" call.\nExpected: @CreateTableDefinition+\nGot:      ${JSON.stringify(
+        definitions,
+      )}`,
+    );
+
+    invariant(
+      options === null || options._kind === 'TableOptions',
+      `Invalid value for "options" arg in "CreateTableStatement" call.\nExpected: TableOptions?\nGot:      ${JSON.stringify(
+        options,
+      )}`,
+    );
+
+    invariant(
+      typeof ifNotExists === 'boolean',
+      `Invalid value for "ifNotExists" arg in "CreateTableStatement" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        ifNotExists,
+      )}`,
+    );
+
+    return {
+      _kind: 'CreateTableStatement',
+      type: 'CREATE TABLE',
+      tblName,
+      definitions,
+      options,
+      ifNotExists,
+    };
+  },
+
+  CreateTriggerStatement(triggerName: string, tblName: string): CreateTriggerStatement {
+    invariant(
+      typeof triggerName === 'string',
+      `Invalid value for "triggerName" arg in "CreateTriggerStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        triggerName,
+      )}`,
+    );
+
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "CreateTriggerStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    return {
+      _kind: 'CreateTriggerStatement',
+      type: 'CREATE TRIGGER',
+      triggerName,
+      tblName,
+    };
+  },
+
   CurrentTimestamp(precision: number | null = null): CurrentTimestamp {
     invariant(
       precision === null || typeof precision === 'number',
@@ -1352,6 +1677,28 @@ export default {
     return {
       _kind: 'CurrentTimestamp',
       precision,
+    };
+  },
+
+  DatabaseOptions(CHARSET: string | null = null, COLLATE: string | null = null): DatabaseOptions {
+    invariant(
+      CHARSET === null || typeof CHARSET === 'string',
+      `Invalid value for "CHARSET" arg in "DatabaseOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        CHARSET,
+      )}`,
+    );
+
+    invariant(
+      COLLATE === null || typeof COLLATE === 'string',
+      `Invalid value for "COLLATE" arg in "DatabaseOptions" call.\nExpected: string?\nGot:      ${JSON.stringify(
+        COLLATE,
+      )}`,
+    );
+
+    return {
+      _kind: 'DatabaseOptions',
+      CHARSET,
+      COLLATE,
     };
   },
 
@@ -1400,6 +1747,52 @@ export default {
       baseType: 'double',
       precision,
       unsigned,
+    };
+  },
+
+  DropIndexStatement(indexName: string, tblName: string): DropIndexStatement {
+    invariant(
+      typeof indexName === 'string',
+      `Invalid value for "indexName" arg in "DropIndexStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        indexName,
+      )}`,
+    );
+
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "DropIndexStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    return {
+      _kind: 'DropIndexStatement',
+      type: 'DROP INDEX',
+      indexName,
+      tblName,
+    };
+  },
+
+  DropTableStatement(tblName: string, ifExists: boolean): DropTableStatement {
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "DropTableStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      typeof ifExists === 'boolean',
+      `Invalid value for "ifExists" arg in "DropTableStatement" call.\nExpected: boolean\nGot:      ${JSON.stringify(
+        ifExists,
+      )}`,
+    );
+
+    return {
+      _kind: 'DropTableStatement',
+      type: 'DROP TABLE',
+      tblName,
+      ifExists,
     };
   },
 
@@ -1706,6 +2099,29 @@ export default {
     };
   },
 
+  RenameTableStatement(tblName: string, newName: string): RenameTableStatement {
+    invariant(
+      typeof tblName === 'string',
+      `Invalid value for "tblName" arg in "RenameTableStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        tblName,
+      )}`,
+    );
+
+    invariant(
+      typeof newName === 'string',
+      `Invalid value for "newName" arg in "RenameTableStatement" call.\nExpected: string\nGot:      ${JSON.stringify(
+        newName,
+      )}`,
+    );
+
+    return {
+      _kind: 'RenameTableStatement',
+      type: 'RENAME TABLE',
+      tblName,
+      newName,
+    };
+  },
+
   SmallInt(length: number, unsigned: boolean): SmallInt {
     invariant(
       typeof length === 'number',
@@ -1919,6 +2335,7 @@ export default {
   isNumeric,
   isReal,
   isStart,
+  isStatement,
   isTemporal,
   isTextual,
   isTextualOrEnum,

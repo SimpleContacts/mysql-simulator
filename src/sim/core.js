@@ -218,16 +218,8 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
     } else if (stm.type === 'DROP TABLE') {
       db = db.removeTable(stm.tblName, stm.ifExists);
     } else if (stm.type === 'ALTER DATABASE') {
-      let charset;
-      let collate;
-      for (const option of stm.options) {
-        if (option.CHARSET) {
-          charset = option.CHARSET;
-        }
-        if (option.COLLATE) {
-          collate = option.COLLATE;
-        }
-      }
+      const charset = stm.options.CHARSET ?? undefined;
+      const collate = stm.options.COLLATE ?? undefined;
       const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
       db = db.setEncoding(encoding);
     } else if (stm.type === 'ALTER TABLE') {

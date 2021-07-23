@@ -13,6 +13,7 @@ describe('Read documentation', () => {
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`),
     ).toEqual([
       {
+        _kind: 'CreateTableStatement',
         type: 'CREATE TABLE',
         tblName: 'users',
         ifNotExists: false,
@@ -91,9 +92,11 @@ describe('Read documentation', () => {
           },
         ],
         options: {
-          ENGINE: 'InnoDB',
+          _kind: 'TableOptions',
+          AUTO_INCREMENT: null,
           CHARSET: 'utf8',
           COLLATE: 'utf8_general_ci',
+          ENGINE: 'InnoDB',
         },
       },
     ]);
@@ -111,6 +114,7 @@ describe('Read documentation', () => {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`),
     ).toEqual([
       {
+        _kind: 'CreateTableStatement',
         type: 'CREATE TABLE',
         tblName: 'whatever',
         ifNotExists: false,
@@ -222,9 +226,11 @@ describe('Read documentation', () => {
           },
         ],
         options: {
-          ENGINE: 'InnoDB',
+          _kind: 'TableOptions',
+          AUTO_INCREMENT: null,
           CHARSET: 'utf8',
           COLLATE: 'utf8_bin',
+          ENGINE: 'InnoDB',
         },
       },
     ]);
@@ -240,6 +246,7 @@ describe('Read documentation', () => {
         RENAME INDEX \`foobar_uniq\` TO \`boofar_uniq\`;`),
     ).toEqual([
       {
+        _kind: 'AlterTableStatement',
         type: 'ALTER TABLE',
         tblName: 'products',
         changes: [

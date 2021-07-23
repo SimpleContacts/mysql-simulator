@@ -250,11 +250,7 @@ Literal
 
 RenameTable
   = RENAME TABLE tblName:Identifier TO newName:Identifier {
-      return {
-        type: 'RENAME TABLE',
-        tblName: tblName.name,
-        newName: newName.name,
-      }
+      return ast.RenameTableStatement(tblName.name, newName.name)
     }
 
 // ====================================================
@@ -262,11 +258,7 @@ RenameTable
 // ====================================================
 DropIndex
   = DROP INDEX indexName:Identifier ON tblName:Identifier {
-      return {
-        type: 'DROP INDEX',
-        indexName: indexName.name,
-        tblName: tblName.name,
-      }
+      return ast.DropIndexStatement(indexName.name, tblName.name)
     }
 
 // ====================================================
@@ -275,11 +267,7 @@ DropIndex
 
 DropTable
   = DROP TABLE ifExists:(IF EXISTS)? tblName:Identifier {
-      return {
-        type: 'DROP TABLE',
-        tblName: tblName.name,
-        ifExists: !!ifExists,
-      }
+      return ast.DropTableStatement(tblName.name, !!ifExists)
     }
 
 // ====================================================
@@ -297,13 +285,12 @@ CreateIndex
     indexColNames:IndexColNames
     RPAREN {
       indexKind = indexKind || 'NORMAL'
-      return {
-        type: 'CREATE INDEX',
-        indexName: indexName.name,
+      return ast.CreateIndexStatement(
+        indexName.name,
         indexKind,
-        tblName: tblName.name,
+        tblName.name,
         indexColNames,
-      }
+      )
     }
 
 // ====================================================
@@ -323,11 +310,7 @@ CreateTrigger
     ROW
     ((FOLLOWS / PRECEDES) Identifier)?
     triggerBody:Statement {
-      return {
-        type: 'CREATE TRIGGER',
-        triggerName: triggerName.name,
-        tblName: tblName.name,
-      }
+      return ast.CreateTriggerStatement(triggerName.name, tblName.name)
     }
 
 // ====================================================
@@ -355,13 +338,7 @@ CreateFunction
     DataType
     characteristic:CreateFunctionCharacteristic
     body:FunctionBody {
-      return {
-        type: 'CREATE FUNCTION',
-        spName: spName.name,
-        params,
-        characteristic,
-        // body,
-      }
+      return ast.CreateFunctionStatement(/* spName.name, params, characteristic */)
     }
 
 CreateFunctionCharacteristic = NOT? DETERMINISTIC
@@ -408,17 +385,9 @@ WhileStatement = WHILE Condition DO FunctionStatementList END WHILE
 // ====================================================
 
 AlterDatabase
-  = ALTER DATABASE dbName:Identifier? options:AlterDbOption+ {
-      return {
-        type: 'ALTER DATABASE',
-        dbName: dbName.name,
-        options,
-      }
+  = ALTER DATABASE dbName:Identifier? options:DatabaseOptions {
+      return ast.AlterDatabaseStatement(dbName.name, options)
     }
-
-AlterDbOption
-  = DEFAULT? CHARACTER SET EQ? CHARSET:CharsetName { return { CHARSET } }
-  / DEFAULT? COLLATE EQ? COLLATE:CollationName { return { COLLATE } }
 
 // ====================================================
 // ALTER TABLE
@@ -426,11 +395,7 @@ AlterDbOption
 
 AlterTable
   = ALTER TABLE tblName:Identifier changes:AlterSpecs {
-      return {
-        type: 'ALTER TABLE',
-        tblName: tblName.name,
-        changes,
-      }
+      return ast.AlterTableStatement(tblName.name, changes)
     }
 
 AlterSpecs
@@ -443,16 +408,7 @@ AlterSpecs
  * See https://dev.mysql.com/doc/refman/5.7/en/alter-table.html
  */
 AlterSpec
-  = options:TableOptions {
-      return ast.AlterTableOptions(
-        ast.TableOptions(
-          options.map((opt) => opt.AUTO_INCREMENT).find((x) => x) ?? null,
-          options.map((opt) => opt.ENGINE).find((x) => x) ?? null,
-          options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
-          options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
-        ),
-      )
-    }
+  = options:TableOptions { return ast.AlterTableOptions(options) }
   / ADD
     COLUMN?
     colName:Identifier
@@ -610,14 +566,12 @@ CreateTable1
     RPAREN
     tableOptions:TableOptions? {
       // Turn the list-of-option-pairs into an object
-      const options = Object.assign({}, ...(tableOptions || []))
-      return {
-        type: 'CREATE TABLE',
-        tblName: tblName.name,
+      return ast.CreateTableStatement(
+        tblName.name,
         definitions,
-        options,
-        ifNotExists: !!ifNotExists,
-      }
+        tableOptions,
+        !!ifNotExists,
+      )
     }
 
 CreateTable3
@@ -627,12 +581,11 @@ CreateTable3
     tblName:Identifier
     LIKE
     oldTblName:Identifier {
-      return {
-        type: 'CREATE TABLE LIKE', // Copy table
-        tblName: tblName.name,
-        oldTblName: oldTblName.name,
+      return ast.CreateTableLikeStatement(
+        tblName.name,
+        oldTblName.name,
         ifNotExists,
-      }
+      )
     }
 
 CreateDefinitionsList
@@ -836,8 +789,36 @@ ReferenceOption
 // rejected by InnoDB tables.
 // / SET DEFAULT { return 'SET DEFAULT' }
 
+DatabaseOptions
+  = options:DatabaseOptionsList {
+      return ast.DatabaseOptions(
+        options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
+        options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
+      )
+    }
+
+DatabaseOptionsList
+  = first:DatabaseOption COMMA? rest:DatabaseOptionsList {
+      return [first, ...rest]
+    }
+  / only:DatabaseOption { return [only] }
+
+DatabaseOption
+  = DEFAULT? CHARACTER SET EQ? CHARSET:CharsetName { return { CHARSET } }
+  / DEFAULT? COLLATE EQ? COLLATE:CollationName { return { COLLATE } }
+
 TableOptions
-  = first:TableOption COMMA? rest:TableOptions { return [first, ...rest] }
+  = options:TableOptionsList {
+      return ast.TableOptions(
+        options.map((opt) => opt.AUTO_INCREMENT).find((x) => x) ?? null,
+        options.map((opt) => opt.ENGINE).find((x) => x) ?? null,
+        options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
+        options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
+      )
+    }
+
+TableOptionsList
+  = first:TableOption COMMA? rest:TableOptionsList { return [first, ...rest] }
   / only:TableOption { return [only] }
 
 TableOption

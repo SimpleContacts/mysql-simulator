@@ -15,25 +15,23 @@ import type {
   AlterRenameIndex,
   AlterRenameTable,
   AlterSpec,
-  ColumnDefinition,
-  CreateTableDefinition,
-  IndexColName,
-  IndexType,
-  ReferenceDefinition,
-  ReferenceOption,
-  TableOptions,
-} from '../ast';
-import type {
   AlterTableStatement,
+  ColumnDefinition,
   CreateIndexStatement,
+  CreateTableDefinition,
   CreateTableLikeStatement,
   CreateTableStatement,
   CreateTriggerStatement,
   DropIndexStatement,
   DropTableStatement,
+  IndexColName,
+  IndexType,
+  ReferenceDefinition,
+  ReferenceOption,
   RenameTableStatement,
   Statement,
-} from './ast';
+  TableOptions,
+} from '../ast';
 // $FlowFixMe[untyped-import] - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
 
