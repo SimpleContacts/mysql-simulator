@@ -11,7 +11,7 @@ import ast from '../ast';
 import type { Encoding } from '../ast/encodings';
 import { makeEncoding } from '../ast/encodings';
 import parseSql from '../parser';
-import type { ColumnDefinition, CreateTableStatement, Statement } from '../parser';
+import type { AlterSpec, AlterTableStatement, ColumnDefinition, CreateTableStatement, Statement } from '../parser';
 import Column from './Column';
 import Database from './Database';
 import { setEncoding } from './DataType';
@@ -203,142 +203,196 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
   return db;
 }
 
+function applyAlterStatement(db: Database, statement: AlterTableStatement, change: AlterSpec): Database {
+  switch (change._kind) {
+    case 'AlterRenameTable':
+      return db.renameTable(statement.tblName, change.newTblName);
+
+    case 'AlterAddColumn': {
+      const table = db.getTable(statement.tblName);
+      const column = makeColumn(change.colName, change.definition, table.defaultEncoding);
+      let newDb = db.addColumn(statement.tblName, column, change.position);
+      if (change.definition.isPrimary) {
+        return newDb.addPrimaryKey(statement.tblName, [change.colName]);
+      } else if (change.definition.isUnique) {
+        return newDb.addIndex(statement.tblName, null, 'UNIQUE', [change.colName], true);
+      } else {
+        return newDb;
+      }
+    }
+
+    case 'AlterChangeColumn': {
+      const table = db.getTable(statement.tblName);
+      const column = makeColumn(change.newColName, change.definition, table.defaultEncoding);
+      let newDb = db.replaceColumn(statement.tblName, change.oldColName, column, change.position);
+      if (change.definition.isUnique) {
+        return newDb.addIndex(statement.tblName, null, 'UNIQUE', [change.newColName], true);
+      } else {
+        return newDb;
+      }
+    }
+
+    case 'AlterDropColumn':
+      return db.removeColumn(statement.tblName, change.colName);
+
+    case 'AlterAddPrimaryKey':
+      return db.addPrimaryKey(
+        statement.tblName,
+        change.indexColNames.map((col) => col.colName),
+      );
+
+    case 'AlterDropPrimaryKey':
+      return db.dropPrimaryKey(statement.tblName);
+
+    case 'AlterAddForeignKey':
+      return db.addForeignKey(
+        statement.tblName,
+        change.constraintName,
+        change.indexName,
+        change.indexColNames.map((def) => def.colName),
+        change.reference.tblName,
+        change.reference.indexColNames.map((def) => def.colName),
+        change.reference.onDelete,
+      );
+
+    case 'AlterAddUniqueIndex':
+      return db.addIndex(
+        statement.tblName,
+        change.constraintName || change.indexName,
+        'UNIQUE',
+        change.indexColNames.map((def) => def.colName),
+        true, // UNIQUE indexes are always explicit
+      );
+
+    case 'AlterAddFullTextIndex': {
+      const $$locked = false;
+      return db.addIndex(
+        statement.tblName,
+        change.indexName,
+        'FULLTEXT',
+        change.indexColNames.map((def) => def.colName),
+        $$locked,
+      );
+    }
+
+    case 'AlterAddIndex': {
+      const $$locked = !!change.indexName;
+      return db.addIndex(
+        statement.tblName,
+        change.indexName,
+        'NORMAL',
+        change.indexColNames.map((def) => def.colName),
+        $$locked,
+      );
+    }
+
+    case 'AlterDropIndex':
+      return db.dropIndex(statement.tblName, change.indexName);
+
+    case 'AlterDropForeignKey':
+      return db.dropForeignKey(statement.tblName, change.symbol);
+
+    case 'AlterDropDefault':
+      return db.dropDefault(statement.tblName, change.colName);
+
+    case 'AlterRenameIndex':
+      return db.renameIndex(statement.tblName, change.oldIndexName, change.newIndexName);
+
+    case 'AlterTableOptions': {
+      const charset = change.options.CHARSET ?? undefined;
+      const collate = change.options.COLLATE ?? undefined;
+      if (charset || collate) {
+        return db.setDefaultTableEncoding(statement.tblName, charset, collate);
+      } else {
+        return db;
+      }
+    }
+
+    case 'AlterConvertTo': {
+      const charset = change.charset;
+      const collate = change.collate ?? undefined;
+      return db.convertToEncoding(statement.tblName, charset, collate);
+    }
+
+    default: {
+      // Log details to the console (useful for debugging)
+      error(`Unknown alter spec: ${change._kind}`);
+      error(JSON.stringify({ statement, change }, null, 2));
+
+      // Error out
+      throw new Error(`Unknown alter spec: ${change._kind}`);
+    }
+  }
+}
+
+function applyStatement(db: Database, statement: Statement): Database {
+  switch (statement._kind) {
+    case 'CreateTableStatement':
+      return handleCreateTable(db, statement);
+
+    case 'CreateTableLikeStatement':
+      return db.cloneTable(statement.oldTblName, statement.tblName);
+
+    case 'DropTableStatement':
+      return db.removeTable(statement.tblName, statement.ifExists);
+
+    case 'AlterDatabaseStatement': {
+      const charset = statement.options.CHARSET ?? undefined;
+      const collate = statement.options.COLLATE ?? undefined;
+      const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
+      return db.setEncoding(encoding);
+    }
+
+    case 'AlterTableStatement': {
+      const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
+      const changes = sortBy(statement.changes, (change) => order.indexOf(change._kind));
+      let newDb = db;
+      for (const change of changes) {
+        newDb = applyAlterStatement(newDb, statement, change);
+      }
+      return newDb;
+    }
+
+    case 'RenameTableStatement':
+      return db.renameTable(statement.tblName, statement.newName);
+
+    case 'CreateIndexStatement': {
+      const $$locked = !!statement.indexName;
+      return db.addIndex(
+        statement.tblName,
+        statement.indexName,
+        statement.indexKind,
+        statement.indexColNames.map((def) => def.colName),
+        $$locked,
+      );
+    }
+
+    case 'DropIndexStatement':
+      return db.dropIndex(statement.tblName, statement.indexName);
+
+    case 'CreateFunctionStatement':
+    case 'CreateTriggerStatement':
+      // Ignore these, these are no-ops
+      return db;
+
+    default: {
+      // Log details to the console (useful for debugging)
+      error(`Unknown statement type: ${statement._kind}`);
+      error(JSON.stringify({ statement }, null, 2));
+      throw new Error(`Unknown statement type: ${statement._kind}`);
+    }
+  }
+}
+
 function applySqlStatements(db_: Database, statements: Array<Statement>): Database {
   let db = db_; // So we can keep re-assigning this variable
 
-  for (const stm of statements) {
-    if (stm === null) {
+  for (const statement of statements) {
+    if (statement === null) {
       continue;
     }
 
-    if (stm._kind === 'CreateTableStatement') {
-      db = handleCreateTable(db, stm);
-    } else if (stm._kind === 'CreateTableLikeStatement') {
-      db = db.cloneTable(stm.oldTblName, stm.tblName);
-    } else if (stm._kind === 'DropTableStatement') {
-      db = db.removeTable(stm.tblName, stm.ifExists);
-    } else if (stm._kind === 'AlterDatabaseStatement') {
-      const charset = stm.options.CHARSET ?? undefined;
-      const collate = stm.options.COLLATE ?? undefined;
-      const encoding = charset || collate ? makeEncoding(charset, collate) : db.defaultEncoding;
-      db = db.setEncoding(encoding);
-    } else if (stm._kind === 'AlterTableStatement') {
-      const order = ['*', 'DROP FOREIGN KEY', 'DROP COLUMN'];
-      const changes = sortBy(stm.changes, (change) => order.indexOf(change._kind));
-      for (const change of changes) {
-        if (change._kind === 'AlterRenameTable') {
-          db = db.renameTable(stm.tblName, change.newTblName);
-        } else if (change._kind === 'AlterAddColumn') {
-          const table = db.getTable(stm.tblName);
-          const column = makeColumn(change.colName, change.definition, table.defaultEncoding);
-          db = db.addColumn(stm.tblName, column, change.position);
-          if (change.definition.isPrimary) {
-            db = db.addPrimaryKey(stm.tblName, [change.colName]);
-          } else if (change.definition.isUnique) {
-            db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.colName], true);
-          }
-        } else if (change._kind === 'AlterChangeColumn') {
-          const table = db.getTable(stm.tblName);
-          const column = makeColumn(change.newColName, change.definition, table.defaultEncoding);
-          db = db.replaceColumn(stm.tblName, change.oldColName, column, change.position);
-          if (change.definition.isUnique) {
-            db = db.addIndex(stm.tblName, null, 'UNIQUE', [change.newColName], true);
-          }
-        } else if (change._kind === 'AlterDropColumn') {
-          db = db.removeColumn(stm.tblName, change.colName);
-        } else if (change._kind === 'AlterAddPrimaryKey') {
-          db = db.addPrimaryKey(
-            stm.tblName,
-            change.indexColNames.map((col) => col.colName),
-          );
-        } else if (change._kind === 'AlterDropPrimaryKey') {
-          db = db.dropPrimaryKey(stm.tblName);
-        } else if (change._kind === 'AlterAddForeignKey') {
-          db = db.addForeignKey(
-            stm.tblName,
-            change.constraintName,
-            change.indexName,
-            change.indexColNames.map((def) => def.colName),
-            change.reference.tblName,
-            change.reference.indexColNames.map((def) => def.colName),
-            change.reference.onDelete,
-          );
-        } else if (change._kind === 'AlterAddUniqueIndex') {
-          db = db.addIndex(
-            stm.tblName,
-            change.constraintName || change.indexName,
-            'UNIQUE',
-            change.indexColNames.map((def) => def.colName),
-            true, // UNIQUE indexes are always explicit
-          );
-        } else if (change._kind === 'AlterAddFullTextIndex') {
-          const $$locked = false;
-          db = db.addIndex(
-            stm.tblName,
-            change.indexName,
-            'FULLTEXT',
-            change.indexColNames.map((def) => def.colName),
-            $$locked,
-          );
-        } else if (change._kind === 'AlterAddIndex') {
-          const $$locked = !!change.indexName;
-          db = db.addIndex(
-            stm.tblName,
-            change.indexName,
-            'NORMAL',
-            change.indexColNames.map((def) => def.colName),
-            $$locked,
-          );
-        } else if (change._kind === 'AlterDropIndex') {
-          db = db.dropIndex(stm.tblName, change.indexName);
-        } else if (change._kind === 'AlterDropForeignKey') {
-          db = db.dropForeignKey(stm.tblName, change.symbol);
-        } else if (change._kind === 'AlterDropDefault') {
-          db = db.dropDefault(stm.tblName, change.colName);
-        } else if (change._kind === 'AlterRenameIndex') {
-          db = db.renameIndex(stm.tblName, change.oldIndexName, change.newIndexName);
-        } else if (change._kind === 'AlterTableOptions') {
-          const charset = change.options.CHARSET ?? undefined;
-          const collate = change.options.COLLATE ?? undefined;
-          if (charset || collate) {
-            db = db.setDefaultTableEncoding(stm.tblName, charset, collate);
-          }
-        } else if (change._kind === 'AlterConvertTo') {
-          const charset = change.charset;
-          const collate = change.collate ?? undefined;
-          db = db.convertToEncoding(stm.tblName, charset, collate);
-        } else {
-          // Log details to the console (useful for debugging)
-          error(`Unknown alter spec: ${change._kind}`);
-          error(JSON.stringify({ stm, change }, null, 2));
-
-          // Error out
-          throw new Error(`Unknown alter spec: ${change._kind}`);
-        }
-      }
-    } else if (stm._kind === 'RenameTableStatement') {
-      db = db.renameTable(stm.tblName, stm.newName);
-    } else if (stm._kind === 'CreateIndexStatement') {
-      const $$locked = !!stm.indexName;
-      db = db.addIndex(
-        stm.tblName,
-        stm.indexName,
-        stm.indexKind,
-        stm.indexColNames.map((def) => def.colName),
-        $$locked,
-      );
-    } else if (stm._kind === 'DropIndexStatement') {
-      db = db.dropIndex(stm.tblName, stm.indexName);
-    } else if (stm._kind === 'CreateFunctionStatement') {
-      // Ignore
-    } else if (stm._kind === 'CreateTriggerStatement') {
-      // Ignore
-    } else {
-      // Log details to the console (useful for debugging)
-      error(`Unknown statement type: ${stm._kind}`);
-      error(JSON.stringify({ stm }, null, 2));
-      throw new Error(`Unknown statement type: ${stm._kind}`);
-    }
+    db = applyStatement(db, statement);
   }
 
   return db;
