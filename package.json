@@ -60,8 +60,8 @@
     "jest": "^27.5.1",
     "onchange": "^7.1.0",
     "pegjs": "^0.10.0",
-    "prettier": "^2.3.2",
-    "prettier-plugin-pegjs": "^0.4.0",
+    "prettier": "^2.5.1",
+    "prettier-plugin-pegjs": "^0.5.0",
     "rimraf": "^3.0.2"
   },
   "dependencies": {
