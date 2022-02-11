@@ -183,15 +183,7 @@ FunctionCall
     }
 
 FunctionName
-  = CHAR_LENGTH
-  / CONCAT
-  / CONV
-  / HEX
-  / IF
-  / JSON_EXTRACT
-  / JSON_UNQUOTE
-  / SUBSTRING
-  / UNHEX
+  = id:Identifier { return ast.BuiltInFunction(id.name.toUpperCase()) }
 
 // ====================================================
 // Constant literals
@@ -1165,34 +1157,6 @@ VIRTUAL = _ "VIRTUAL"i !IdentifierChar _ { return 'VIRTUAL' }
 WHILE = _ "WHILE"i !IdentifierChar _ { return 'WHILE' }
 
 XOR = _ "XOR"i !IdentifierChar _ { return 'XOR' }
-
-// Reserved built-in functions
-// TODO: Complete this list
-CHAR_LENGTH
-  = _ "CHAR_LENGTH"i !IdentifierChar _ {
-      return ast.BuiltInFunction('CHAR_LENGTH')
-    }
-
-CONCAT = _ "CONCAT"i !IdentifierChar _ { return ast.BuiltInFunction('CONCAT') }
-
-CONV = _ "CONV"i !IdentifierChar _ { return ast.BuiltInFunction('CONV') }
-
-HEX = _ "HEX"i !IdentifierChar _ { return ast.BuiltInFunction('HEX') }
-
-SUBSTRING
-  = _ "SUBSTRING"i !IdentifierChar _ { return ast.BuiltInFunction('SUBSTRING') }
-
-UNHEX = _ "UNHEX"i !IdentifierChar _ { return ast.BuiltInFunction('UNHEX') }
-
-JSON_EXTRACT
-  = _ "JSON_EXTRACT"i !IdentifierChar _ {
-      return ast.BuiltInFunction('JSON_EXTRACT')
-    }
-
-JSON_UNQUOTE
-  = _ "JSON_UNQUOTE"i !IdentifierChar _ {
-      return ast.BuiltInFunction('JSON_UNQUOTE')
-    }
 
 // ====================================================
 // Tokens
