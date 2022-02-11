@@ -6,6 +6,7 @@ flow-typed/
 
 [ignore]
 <PROJECT_ROOT>/dist/
+.*/malformed_package_json/.*
 *.json
 
 [lints]
