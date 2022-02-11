@@ -11,5 +11,6 @@ import Table from './sim/Table';
 
 export type { DataType, IndexType };
 export { applySql, applySqlFile, applySqlFiles, getMigrations, simulate, Column, Database, ForeignKey, Index, Table };
+export type { DefaultValue } from './ast';
 export type { MigrationInfo } from './sim/core';
 export default simulate;
