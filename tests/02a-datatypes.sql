@@ -21,3 +21,25 @@ CREATE TABLE aaa (
   -- BOOLEANs are really just TINYINT(1)s
   enabled BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE TABLE bbb (
+  c01 INT DEFAULT 1234,
+  c02 BOOLEAN DEFAULT TRUE,
+  c03 BOOLEAN DEFAULT false,
+  c04 VARCHAR(36) DEFAULT "Test",
+  c05 VARCHAR(36) DEFAULT "",
+  c06 VARCHAR(36) DEFAULT "It's a default",
+  c07 VARCHAR(36) DEFAULT 'It''s a default',
+  c08 VARCHAR(36) DEFAULT 'It\'s a default',
+  c09 timestamp DEFAULT now(),
+  c10 timestamp DEFAULT current_timestamp ON UPDATE now(),
+  c11 timestamp DEFAULT current_timestamp,
+  c12 timestamp DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  c13 timestamp(6) DEFAULT current_timestamp(6),
+  c14 timestamp(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  c15 timestamp(6) DEFAULT localtime(6) ON UPDATE now(6),
+  c16 VARCHAR(36) NULL DEFAULT 'NULL',  -- The string NULL
+  c17 VARCHAR(36) NULL DEFAULT NULL,
+  c18 VARCHAR(36) NULL DEFAULT null,
+  c19 VARCHAR(36) NOT NULL
+);

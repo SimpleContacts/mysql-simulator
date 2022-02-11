@@ -13,15 +13,16 @@ describe('Read documentation', () => {
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`),
     ).toEqual([
       {
-        type: 'CREATE TABLE',
+        _kind: 'CreateTableStatement',
         tblName: 'users',
         ifNotExists: false,
         definitions: [
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'id',
             definition: {
-              dataType: 'INT',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'Int', length: 11, unsigned: false },
               defaultValue: null,
               nullable: false,
               isPrimary: true,
@@ -34,11 +35,12 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'date_created',
             definition: {
-              dataType: 'TIMESTAMP',
-              defaultValue: 'CURRENT_TIMESTAMP',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'Timestamp', fsp: null },
+              defaultValue: { _kind: 'CurrentTimestamp', precision: null },
               nullable: false,
               isPrimary: false,
               autoIncrement: false,
@@ -50,10 +52,11 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'name',
             definition: {
-              dataType: 'VARCHAR(128)',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'VarChar', length: 128, encoding: null },
               defaultValue: null,
               nullable: null,
               isPrimary: false,
@@ -66,10 +69,11 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'email',
             definition: {
-              dataType: 'VARCHAR(64)',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'VarChar', length: 64, encoding: null },
               defaultValue: null,
               nullable: null,
               isPrimary: false,
@@ -83,9 +87,11 @@ describe('Read documentation', () => {
           },
         ],
         options: {
-          ENGINE: 'InnoDB',
+          _kind: 'TableOptions',
+          AUTO_INCREMENT: null,
           CHARSET: 'utf8',
           COLLATE: 'utf8_general_ci',
+          ENGINE: 'InnoDB',
         },
       },
     ]);
@@ -103,15 +109,16 @@ describe('Read documentation', () => {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`),
     ).toEqual([
       {
-        type: 'CREATE TABLE',
+        _kind: 'CreateTableStatement',
         tblName: 'whatever',
         ifNotExists: false,
         definitions: [
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'id',
             definition: {
-              dataType: 'INT(11)',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'Int', length: 11, unsigned: false },
               nullable: false,
               defaultValue: null,
               isPrimary: true,
@@ -124,10 +131,11 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'user_id',
             definition: {
-              dataType: 'INT',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'Int', length: 11, unsigned: false },
               nullable: false,
               defaultValue: null,
               isPrimary: false,
@@ -140,12 +148,13 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'date_created',
             definition: {
-              dataType: 'TIMESTAMP',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'Timestamp', fsp: null },
               nullable: false,
-              defaultValue: 'CURRENT_TIMESTAMP',
+              defaultValue: { _kind: 'CurrentTimestamp', precision: null },
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,
@@ -156,12 +165,16 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'COLUMN',
+            _kind: 'Column',
             colName: 'text',
             definition: {
-              dataType: 'VARCHAR(32)',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'VarChar', length: 32, encoding: null },
               nullable: null,
-              defaultValue: 'NULL',
+              defaultValue: {
+                _kind: 'Literal',
+                value: null,
+              },
               isPrimary: false,
               autoIncrement: false,
               isUnique: false,
@@ -172,20 +185,23 @@ describe('Read documentation', () => {
             },
           },
           {
-            type: 'FOREIGN KEY',
-            constraint: null,
+            _kind: 'ForeignKey',
+            constraintName: null,
             indexName: null,
             indexColNames: [
               {
+                _kind: 'IndexColName',
                 colName: 'user_id',
                 direction: null,
                 len: null,
               },
             ],
             reference: {
+              _kind: 'ReferenceDefinition',
               tblName: 'users',
               indexColNames: [
                 {
+                  _kind: 'IndexColName',
                   colName: 'id',
                   direction: null,
                   len: null,
@@ -198,9 +214,11 @@ describe('Read documentation', () => {
           },
         ],
         options: {
-          ENGINE: 'InnoDB',
+          _kind: 'TableOptions',
+          AUTO_INCREMENT: null,
           CHARSET: 'utf8',
           COLLATE: 'utf8_bin',
+          ENGINE: 'InnoDB',
         },
       },
     ]);
@@ -216,16 +234,17 @@ describe('Read documentation', () => {
         RENAME INDEX \`foobar_uniq\` TO \`boofar_uniq\`;`),
     ).toEqual([
       {
-        type: 'ALTER TABLE',
+        _kind: 'AlterTableStatement',
         tblName: 'products',
         changes: [
-          { type: 'DROP COLUMN', colName: 'name' },
-          { type: 'DROP COLUMN', colName: 'brand' },
+          { _kind: 'AlterDropColumn', colName: 'name' },
+          { _kind: 'AlterDropColumn', colName: 'brand' },
           {
-            type: 'ADD COLUMN',
+            _kind: 'AlterAddColumn',
             colName: 'foobar',
             definition: {
-              dataType: 'INT',
+              _kind: 'ColumnDefinition',
+              dataType: { _kind: 'Int', length: 11, unsigned: false },
               autoIncrement: false,
               defaultValue: null,
               nullable: null,
@@ -239,20 +258,23 @@ describe('Read documentation', () => {
             position: null,
           },
           {
-            type: 'ADD FOREIGN KEY',
-            constraint: null,
+            _kind: 'AlterAddForeignKey',
+            constraintName: null,
             indexName: null,
             indexColNames: [
               {
+                _kind: 'IndexColName',
                 colName: 'product_id',
                 direction: null,
                 len: null,
               },
             ],
             reference: {
+              _kind: 'ReferenceDefinition',
               tblName: 'products',
               indexColNames: [
                 {
+                  _kind: 'IndexColName',
                   colName: 'id',
                   direction: null,
                   len: null,
@@ -264,9 +286,9 @@ describe('Read documentation', () => {
             },
           },
           {
+            _kind: 'AlterRenameIndex',
             newIndexName: 'boofar_uniq',
             oldIndexName: 'foobar_uniq',
-            type: 'RENAME INDEX',
           },
         ],
       },

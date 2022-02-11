@@ -1,0 +1,425 @@
+"""
+import type { Encoding } from './encodings';
+import type { Precision } from './types';
+
+export type Direction = 'ASC' | 'DESC';
+export type GeneratedColumnMode = 'STORED' | 'VIRTUAL';
+export type IndexKind = 'NORMAL' | 'UNIQUE' | 'FULLTEXT'
+export type IndexType = 'BTREE' | 'HASH';
+export type MatchMode = 'MATCH' | 'FULL' | 'PARTIAL' | 'SIMPLE';
+export type ReferenceOption = 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'SET DEFAULT';
+
+export type UnaryOp = '+' | '-' | '!' | 'is null' | 'is not null';
+
+type BooleanOp = 'AND' | 'OR' | 'XOR';
+type CmpOp = '=' | '<=>' | '!=' | '<>' | '>=' | '<=' | '<' | '>' | 'LIKE' | 'REGEXP' | 'RLIKE';
+type ArithmOp = '+' | '-' | '*' | '/' | '%' | 'DIV';
+export type BinaryOp = BooleanOp | CmpOp | ArithmOp;
+"""
+
+Literal:
+  value  mixed
+
+Identifier:
+  name  string
+
+UnaryExpression:
+  op    UnaryOp
+  expr  @Expression
+
+BinaryExpression:
+  op     BinaryOp
+  expr1  @Expression
+  expr2  @Expression
+
+CallExpression:
+  callee  BuiltInFunction
+  # The args are optional. For example, when null, this means a "call" like
+  # `CURRENT_TIMESTAMP`. But when "empty" (e.g. []) this denotes a call like
+  # `NOW()`.
+  args    @Expression*?
+
+BuiltInFunction:
+  name  string
+
+@Expression:
+  | Literal
+  | Identifier
+  | UnaryExpression
+  | BinaryExpression
+  | CallExpression
+
+IndexColName:
+  colName    string
+  len        number?
+  direction  Direction?
+
+@Statement:
+  | CreateTableStatement
+  | CreateTableLikeStatement
+  | CreateIndexStatement
+  | CreateTriggerStatement
+  | CreateFunctionStatement
+  | RenameTableStatement
+  | AlterDatabaseStatement
+  | AlterTableStatement
+  | DropTableStatement
+  | DropIndexStatement
+
+CreateTableStatement:
+  tblName      string
+  definitions  @CreateTableDefinition+
+  options      TableOptions?
+  ifNotExists  boolean
+
+CreateTableLikeStatement:
+  tblName      string
+  oldTblName   string
+  ifNotExists  boolean?
+
+CreateIndexStatement:
+  indexName      string
+  indexKind      IndexKind
+  tblName        string
+  indexColNames  IndexColName+
+
+CreateTriggerStatement:
+  triggerName  string
+  tblName      string
+
+CreateFunctionStatement:
+  # no fields
+
+RenameTableStatement:
+  tblName  string
+  newName  string
+
+AlterDatabaseStatement:
+  dbName   string
+  options  DatabaseOptions
+
+DatabaseOptions:
+  CHARSET  string?
+  COLLATE  string?
+
+AlterTableStatement:
+  tblName  string
+  changes  @AlterSpec+
+
+DropTableStatement:
+  tblName   string
+  ifExists  boolean
+
+DropIndexStatement:
+  indexName  string
+  tblName    string
+
+@CreateTableDefinition:
+  | Column
+  | PrimaryKey
+  | Index
+  | UniqueIndex
+  | FullTextIndex
+  | ForeignKey
+
+Column:
+  colName     string
+  definition  ColumnDefinition
+
+ColumnDefinition:
+  dataType       @DataType
+  nullable       boolean?
+  defaultValue   @DefaultValue?
+  onUpdate       CurrentTimestamp?
+  isUnique       boolean
+  isPrimary      boolean
+  autoIncrement  boolean
+  comment        string?
+  reference      ReferenceDefinition?
+  generated      GeneratedDefinition?
+
+ReferenceDefinition:
+  tblName        string
+  indexColNames  IndexColName+
+  matchMode      MatchMode?
+  onDelete       ReferenceOption
+  onUpdate       ReferenceOption?
+
+GeneratedDefinition:
+  type  "generated"
+  expr  @Expression
+  mode  GeneratedColumnMode
+
+PrimaryKey:
+  indexColNames  IndexColName+
+
+Index:
+  indexName      string?
+  indexColNames  IndexColName+
+
+UniqueIndex:
+  constraintName  string?
+  indexName       string?
+  indexColNames   IndexColName+
+
+FullTextIndex:
+  indexName      string?
+  indexColNames  IndexColName+
+
+ForeignKey:
+  constraintName  string?
+  indexName       string?
+  indexColNames   IndexColName+
+  reference       ReferenceDefinition
+
+@AlterSpec:
+  | AlterAddIndex
+  | AlterAddColumn
+  | AlterAddPrimaryKey
+  | AlterAddUniqueIndex
+  | AlterAddFullTextIndex
+  | AlterAddForeignKey
+  | AlterChangeColumn
+  | AlterConvertTo
+  | AlterDropColumn
+  | AlterDropDefault
+  | AlterDropForeignKey
+  | AlterDropIndex
+  | AlterDropPrimaryKey
+  | AlterRenameIndex
+  | AlterRenameTable
+  | AlterTableOptions
+
+AlterAddIndex:
+  indexName      string?
+  indexType      IndexType?
+  indexColNames  IndexColName+
+
+AlterAddColumn:
+  colName     string
+  definition  ColumnDefinition
+  position    string?
+
+AlterAddPrimaryKey:
+  constraintName  string?
+  indexType       IndexType?
+  indexColNames   IndexColName+
+
+AlterAddUniqueIndex:
+  constraintName  string?
+  indexName       string?
+  indexType       IndexType?
+  indexColNames   IndexColName+
+
+AlterAddFullTextIndex:
+  indexName      string?
+  indexColNames  IndexColName+
+
+AlterAddForeignKey:
+  constraintName  string?
+  indexName       string?
+  indexColNames   IndexColName+
+  reference       ReferenceDefinition
+
+AlterChangeColumn:
+  oldColName  string
+  newColName  string
+  definition  ColumnDefinition
+  position    string?
+
+AlterConvertTo:
+  charset  string
+  collate  string?
+
+AlterDropColumn:
+  colName  string
+
+AlterDropDefault:
+  colName  string
+
+AlterDropForeignKey:
+  symbol  string
+
+AlterDropIndex:
+  indexName  string
+
+AlterDropPrimaryKey:
+  # no fields
+
+AlterRenameIndex:
+  oldIndexName  string
+  newIndexName  string
+
+AlterRenameTable:
+  newTblName  string
+
+AlterTableOptions:
+  options  TableOptions
+
+TableOptions:
+  AUTO_INCREMENT  number?
+  ENGINE          string?
+  CHARSET         string?
+  COLLATE         string?
+
+TinyInt:
+  length    number
+  unsigned  boolean
+
+SmallInt:
+  length    number
+  unsigned  boolean
+
+MediumInt:
+  length    number
+  unsigned  boolean
+
+Int:
+  length    number
+  unsigned  boolean
+
+BigInt:
+  length    number
+  unsigned  boolean
+
+Decimal:
+  precision  Precision?
+  unsigned   boolean
+
+Float:
+  precision  Precision?
+  unsigned   boolean
+
+Double:
+  precision  Precision?
+  unsigned   boolean
+
+DateTime:
+  fsp       number?
+
+Timestamp:
+  fsp       number?
+
+Date:
+  # no fields
+
+Year:
+  # no fields
+
+Time:
+  # no fields
+
+@Real:
+  | Decimal
+  | Float
+  | Double
+
+@Integer:
+  | TinyInt
+  | MediumInt
+  | SmallInt
+  | Int
+  | BigInt
+
+@Numeric:
+  | @Integer
+  | @Real
+
+@Temporal:
+  | DateTime
+  | Timestamp
+  | Date
+  | Year
+  | Time
+
+Text:
+  encoding  Encoding?
+
+MediumText:
+  encoding  Encoding?
+
+LongText:
+  encoding  Encoding?
+
+Char:
+  length    number
+  encoding  Encoding?
+
+VarChar:
+  length    number
+  encoding  Encoding?
+
+Enum:
+  values    string+
+  encoding  Encoding?
+
+@Textual:
+  | Char
+  | VarChar
+  | Text
+  | MediumText
+  | LongText
+
+@TextualOrEnum:
+  | @Textual
+  | Enum
+
+TinyBlob:
+  # no fields
+
+MediumBlob:
+  # no fields
+
+LongBlob:
+  # no fields
+
+Blob:
+  length    number
+
+Binary:
+  length    number
+
+VarBinary:
+  length    number
+
+@Bytes:
+  | Blob
+  | Binary
+  | VarBinary
+  | TinyBlob
+  | MediumBlob
+  | LongBlob
+
+Json:
+  # no fields
+
+@DataType:
+  | @Numeric
+  | @Temporal
+  | @Textual
+  | Enum
+  | @Bytes
+  | Json
+
+#
+# CURRENT_TIMESTAMP is special in MySQL. It has a few appearences, like:
+# - As a variable: CURRENT_TIMESTAMP
+# - As a function call: CURRENT_TIMESTAMP()
+# - As a function call with precision: CURRENT_TIMESTAMP(6)
+# - As one of its synonyms: LOCALTIME, LOCALTIMESTAMP
+# - As one of its synonyms: LOCALTIME(), LOCALTIMESTAMP(), NOW()
+#
+CurrentTimestamp:
+  precision  number?
+
+@DefaultValue:
+  | Literal
+  | CurrentTimestamp
+
+# Artificially include a "@Start" group here now, to avoid ast-generator error
+# of "unused nodes". It will automatically combine everything into a "Node"
+# type already. I will need to figure out if that default behaviour is useful,
+# or if we should explicitly define it.
+@Start:
+  | @Expression
+  | @Statement

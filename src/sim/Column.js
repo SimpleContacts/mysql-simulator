@@ -1,123 +1,124 @@
 // @flow strict
 
+import invariant from 'invariant';
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
-import { formatDataType, parseDataType } from './DataType';
-import type { TypeInfo } from './DataType';
-import type { Encoding } from './encodings';
-// $FlowFixMe[untyped-import] - serialize module isn't typed at all yet!
-import { serialize } from './serialize';
-import { escape } from './utils';
-
-type Generated = {|
-  expr: string,
-  mode: 'STORED' | 'VIRTUAL',
-|};
+import ast from '../ast';
+import type { CurrentTimestamp, DataType, DefaultValue, GeneratedDefinition } from '../ast';
+import type { Encoding } from '../ast/encodings';
+import { escape, quote, serializeCurrentTimestamp, serializeExpression } from '../printer';
+import { formatDataType } from './DataType';
 
 export default class Column {
   +name: string;
-  +type: string;
+  +dataType: DataType;
   +nullable: boolean;
-  +defaultValue: null | string;
-  +onUpdate: null | string;
+  +defaultValue: null | DefaultValue;
+  +onUpdate: null | CurrentTimestamp;
   +autoIncrement: boolean;
   +comment: null | string;
-  +generated: null | Generated;
-
-  // TODO: This should honestly be a property on the "typeInfo" and only apply
-  // to text-based fields
-  +tableDefaultEncoding: Encoding;
+  +generated: null | GeneratedDefinition;
 
   constructor(
     name: string,
-    type: string,
+    dataType: DataType,
     nullable: boolean,
-    defaultValue: null | string,
-    onUpdate: null | string,
+    defaultValue: null | DefaultValue,
+    onUpdate: null | CurrentTimestamp,
     autoIncrement: boolean,
     comment: null | string,
-    generated: null | Generated,
-    tableDefaultEncoding: Encoding,
+    generated: null | GeneratedDefinition,
   ) {
+    invariant(!ast.isTextual(dataType) || dataType.encoding, 'Encoding must be explicitly set for textual columns');
     this.name = name;
-    this.type = type;
+    this.dataType = dataType;
     this.nullable = nullable;
     this.defaultValue = defaultValue;
     this.onUpdate = onUpdate;
     this.autoIncrement = autoIncrement;
     this.comment = comment;
     this.generated = generated;
-    this.tableDefaultEncoding = tableDefaultEncoding;
   }
 
   /**
    * Helper method that returns a new Column instance with the given fields
    * replaced.
    */
-  patch(
-    record: {|
-      +name?: string,
-      +type?: string,
-      +nullable?: boolean,
-      +defaultValue?: null | string,
-      +onUpdate?: null | string,
-      +autoIncrement?: boolean,
-      +comment?: null | string,
-      +generated?: null | Generated,
-    |},
-    tableDefaultEncoding: Encoding,
-  ): Column {
+  patch(record: {|
+    +name?: string,
+    +dataType?: DataType,
+    +nullable?: boolean,
+    +defaultValue?: null | DefaultValue,
+    +onUpdate?: null | CurrentTimestamp,
+    +autoIncrement?: boolean,
+    +comment?: null | string,
+    +generated?: null | GeneratedDefinition,
+  |}): Column {
     return new Column(
       record.name !== undefined ? record.name : this.name,
-      record.type !== undefined ? record.type : this.type,
+      record.dataType !== undefined ? record.dataType : this.dataType,
       record.nullable !== undefined ? record.nullable : this.nullable,
       record.defaultValue !== undefined ? record.defaultValue : this.defaultValue,
       record.onUpdate !== undefined ? record.onUpdate : this.onUpdate,
       record.autoIncrement !== undefined ? record.autoIncrement : this.autoIncrement,
       record.comment !== undefined ? record.comment : this.comment,
       record.generated !== undefined ? record.generated : this.generated,
-      tableDefaultEncoding,
     );
   }
 
   /**
    * Get the normalized type, not the raw type for this column.
+   * e.g. returns "int(11)" or "varchar(16) CHARACTER SET utf8"
    */
-  getType(fullyResolved: boolean = false): string {
-    // TODO: Note that it might be better to "unify" this type in the
-    // constructor.  That way, there simply won't be a way of distinguishing
-    // between them, i.e. column.type === column.getType(), always.
-    return formatDataType(parseDataType(this.type), this.tableDefaultEncoding, fullyResolved);
-  }
-
-  getTypeInfo(): TypeInfo {
-    return parseDataType(this.type);
+  getType(): string {
+    return formatDataType(this.dataType);
   }
 
   /**
-   * Get the full-blown column definition, without the name.
+   * Get the full-blown column definition, without the name. When the table's
+   * default encoding value is passed, it will conditionally format the
+   * encodings of text columns, based on whether they differ from the table or
+   * not.
    */
-  getDefinition(): string {
-    const typeInfo = this.getTypeInfo();
+  getDefinition(tableEncoding?: Encoding): string {
+    const dataType = this.dataType;
     const generated = this.generated;
-    let defaultValue = this.defaultValue !== null ? this.defaultValue : this.nullable ? 'NULL' : null;
 
-    // MySQL outputs number constants as strings. No idea why that would make
-    // sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-    if (typeof defaultValue === 'number') {
-      if (typeInfo.baseType === 'decimal') {
-        defaultValue = `'${defaultValue.toFixed(2)}'`;
-      } else {
-        defaultValue = `'${defaultValue}'`;
+    // TODO: Move to top!
+    function formatDefaultValue(node: DefaultValue): string {
+      if (node._kind === 'Literal') {
+        let value = node.value;
+        if (value === true) {
+          value = 1;
+        } else if (value === false) {
+          value = 0;
+        }
+
+        if (typeof value === 'string') {
+          return serializeExpression(node);
+        } else if (typeof value === 'number') {
+          // MySQL outputs number constants as strings. No idea why that would
+          // make sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
+          let node2 = node;
+          if (dataType._kind === 'Decimal') {
+            node2 = ast.Literal(value.toFixed(dataType.precision?.decimals ?? 2));
+          } else {
+            node2 = ast.Literal(String(value));
+          }
+          return serializeExpression(node2);
+        } else if (value === null) {
+          return 'NULL';
+        }
+      } else if (node._kind === 'CurrentTimestamp') {
+        return serializeCurrentTimestamp(node);
       }
-    } else if (typeInfo.baseType === 'tinyint' && typeInfo.length === 1) {
-      if (defaultValue === 'FALSE') defaultValue = "'0'";
-      else if (defaultValue === 'TRUE') defaultValue = "'1'";
+
+      throw new Error('Invalid DefaultValue node. Got: ' + JSON.stringify({ node }, null, 2));
     }
 
     let nullable;
-    if (typeInfo.baseType === 'timestamp') {
+    if (dataType._kind === 'Timestamp') {
       nullable = !this.nullable ? 'NOT NULL' : 'NULL';
     } else {
       nullable = !this.nullable
@@ -127,84 +128,91 @@ export default class Column {
           '';
     }
 
-    defaultValue =
-      // Generated columns won't have a default value
-      !generated && defaultValue ? `DEFAULT ${defaultValue}` : '';
+    const defaultValue = this.defaultValue ?? (this.nullable ? ast.Literal(null) : null);
+    let defaultValueClause = defaultValue ? `DEFAULT ${formatDefaultValue(defaultValue)}` : undefined;
 
     // Special case: MySQL does not omit an explicit DEFAULT NULL for
     // TEXT/BLOB/JSON columns
     if (
-      typeInfo.baseType === 'text' ||
-      typeInfo.baseType === 'mediumtext' ||
-      typeInfo.baseType === 'longtext' ||
-      typeInfo.baseType === 'blob'
+      dataType._kind === 'Text' ||
+      dataType._kind === 'MediumText' ||
+      dataType._kind === 'LongText' ||
+      dataType._kind === 'Blob'
     ) {
-      if (defaultValue === 'DEFAULT NULL') {
-        defaultValue = '';
+      if (defaultValueClause === 'DEFAULT NULL') {
+        defaultValueClause = undefined;
       }
     }
 
     return [
-      formatDataType(typeInfo, this.tableDefaultEncoding, false),
-      generated === null ? nullable : '',
-      defaultValue,
-      this.onUpdate !== null ? `ON UPDATE ${this.onUpdate}` : '',
-      this.autoIncrement ? 'AUTO_INCREMENT' : '',
-      this.comment !== null ? `COMMENT ${this.comment}` : '',
-      generated !== null ? `GENERATED ALWAYS AS (${serialize(generated.expr)}) ${generated.mode}` : '',
-      generated !== null ? nullable : '',
+      formatDataType(dataType, tableEncoding),
+      generated === null ? nullable : undefined,
+      // Generated columns won't have a default value
+      !generated ? defaultValueClause : undefined,
+      this.onUpdate !== null ? `ON UPDATE ${serializeCurrentTimestamp(this.onUpdate)}` : undefined,
+      this.autoIncrement ? 'AUTO_INCREMENT' : undefined,
+      this.comment !== null ? `COMMENT ${quote(this.comment)}` : undefined,
+      generated !== null
+        ? `GENERATED ALWAYS AS (${serializeExpression(
+            generated.expr,
+            // NOTE: For some reason, here in these generated clause
+            // expressions, functions are getting lowercased and strings with
+            // quote characters will get serialized differently. Beats me as to
+            // why.
+            { context: 'EXPRESSION' },
+          )}) ${generated.mode}`
+        : undefined,
+      generated !== null ? nullable : undefined,
     ]
-      .filter((x) => x)
+      .filter(Boolean)
       .join(' ');
   }
 
   toSchemaBaseType(): ROLTypeInfo {
-    const info = this.getTypeInfo();
+    const info = this.dataType;
 
     // NOTE: MySQL represents boolean columns with TINYINT(1) specifically
-    if (info.baseType === 'tinyint' && info.length === 1) {
+    if (info._kind === 'TinyInt' && info.length === 1) {
       return t.Bool();
     }
 
-    switch (info.baseType) {
-      case 'tinyint':
-      case 'smallint':
-      case 'mediumint':
-      case 'int':
-      case 'bigint':
-      case 'float':
-      case 'double':
-      case 'decimal':
+    switch (info._kind) {
+      case 'TinyInt':
+      case 'SmallInt':
+      case 'MediumInt':
+      case 'Int':
+      case 'BigInt':
+      case 'Float':
+      case 'Double':
+      case 'Decimal':
         return t.Int();
 
-      case 'char':
-      case 'varchar':
-      case 'text':
-      case 'mediumtext':
-      case 'longtext':
-      case 'enum':
+      case 'Char':
+      case 'VarChar':
+      case 'Text':
+      case 'MediumText':
+      case 'LongText':
+      case 'Enum':
         return t.String();
 
-      case 'time':
-      case 'timestamp':
-      case 'datetime':
-      case 'date':
-      case 'year':
+      case 'Time':
+      case 'Timestamp':
+      case 'DateTime':
+      case 'Date':
+      case 'Year':
         return t.Date();
 
-      case 'blob':
-      case 'binary':
-      case 'varbinary':
-      case 'tinyblob':
-      case 'mediumblob':
-      case 'longblob':
-      case 'json':
+      case 'Blob':
+      case 'Binary':
+      case 'VarBinary':
+      case 'TinyBlob':
+      case 'MediumBlob':
+      case 'LongBlob':
+      case 'Json':
         throw new Error('Not yet supported');
 
       default:
-        throw new Error(
-          `Don't know how to translate base type ${info.baseType} to rule-of-law compatible type info yet`,
-        );
+        throw new Error(`Don't know how to translate base type ${info._kind} to rule-of-law compatible type info yet`);
     }
   }
 
@@ -213,7 +221,7 @@ export default class Column {
     return this.nullable ? t.Nullable(baseType) : baseType;
   }
 
-  toString(): string {
-    return `${escape(this.name)} ${this.getDefinition()}`;
+  toString(tableEncoding: Encoding): string {
+    return `${escape(this.name)} ${this.getDefinition(tableEncoding)}`;
   }
 }

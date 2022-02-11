@@ -1,29 +1,29 @@
 {
   "name": "@simplehealth/mysql-simulator",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
     "mysql-simulate": "dist/sim/cli.js"
   },
-  "files": [
-    "dist/"
-  ],
+  "files": ["dist/"],
   "scripts": {
-    "build": "yarn run build:clean && yarn run build:parser && yarn run build:dist && yarn run build:flow",
+    "build": "yarn run build:clean && yarn run build:ast && yarn run build:parser && yarn run build:dist && yarn run build:flow",
     "build:clean": "rimraf dist",
-    "build:parser": "pegjs --allowed-start-rules start,StringLiteralList --cache src/parser/mysql.pegjs",
+    "build:ast": "yarn run -s generate-ast --builtin Encoding --builtin Precision --builtin UnaryOp --builtin BinaryOp --builtin GeneratedColumnMode --builtin Direction --builtin MatchMode --builtin ReferenceOption --builtin IndexKind --builtin IndexType src/ast/ast.grammar src/ast/index.js && import-sort --write src/ast/index.js && prettier --write src/ast/index.js",
+    "build:parser": "pegjs --allowed-start-rules start --cache src/parser/mysql.pegjs",
     "build:flow": "flow-copy-source -v -i '**/__tests__/**' -i '**/*.spec.*' src dist",
     "build:dist": "babel -d dist src --ignore '**/__tests__/**' --ignore '**/*.spec.*'",
     "check": "yarn run check:eslint && yarn run check:prettier && yarn run check:import-sort",
     "check:eslint": "eslint --report-unused-disable-directives src",
     "check:import-sort": "import-sort --list-different 'src/**/*.js' '!src/parser/mysql.js'",
-    "check:prettier": "prettier --list-different 'src/**/*.js' '!src/parser/mysql.js'",
+    "check:prettier": "prettier --list-different 'src/**/*.js' 'src/**/*.pegjs' '!src/parser/mysql.js'",
     "tdd": "onchange 'src/**' 'tests/*.sql' -- './test.sh'",
     "test": "./test.sh -s utf8 && yarn run -s check && yarn run -s flow && jest src",
     "flow": "flow --include-warnings",
     "prepublish": "in-publish && yarn run actually-prepublish || not-in-publish",
-    "actually-prepublish": "yarn run build && yarn run test && yarn run build"
+    "actually-prepublish": "yarn run build && yarn run test && yarn run build",
+    "format": "yarn run -s eslint --fix --report-unused-disable-directives src && yarn run -s import-sort --write 'src/**/*.js' && yarn run -s prettier --write 'src/**/*.js' 'src/**/*.pegjs' '!src/parser/mysql.js'"
   },
   "homepage": "https://github.com/SimpleContacts/mysql-simulator",
   "repository": {
@@ -31,17 +31,14 @@
     "url": "git+https://github.com/SimpleContacts/mysql-simulator"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "pegjs",
-      "doc"
-    ]
+    "moduleFileExtensions": ["js", "pegjs", "doc"]
   },
   "devDependencies": {
     "@babel/cli": "^7.15.4",
     "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/preset-env": "^7.15.4",
     "@babel/preset-flow": "^7.14.5",
+    "ast-generator": "^0.0.6",
     "babel-eslint": "^10.1.0",
     "colordiff": "^1.0.4",
     "eslint": "^7.32.0",
@@ -58,6 +55,7 @@
     "onchange": "^7.1.0",
     "pegjs": "^0.10.0",
     "prettier": "^2.3.2",
+    "prettier-plugin-pegjs": "^0.4.0",
     "rimraf": "^3.0.2"
   },
   "dependencies": {

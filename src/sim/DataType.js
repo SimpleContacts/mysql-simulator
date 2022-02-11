@@ -1,325 +1,174 @@
 // @flow strict
 
-import type { Encoding } from './encodings';
-import { getDefaultCollationForCharset, makeEncoding } from './encodings';
-import { parseEnumValues, quote } from './utils';
+import invariant from 'invariant';
 
-export type IntDataType = {
-  baseType: 'tinyint' | 'smallint' | 'mediumint' | 'int' | 'bigint',
-  length: number,
-  unsigned: boolean,
-  zeroFill: boolean,
-};
+import type { DataType, Textual, TextualOrEnum } from '../ast';
+import ast from '../ast';
+import type { Encoding } from '../ast/encodings';
+import { getDefaultCollationForCharset } from '../ast/encodings';
+import { isWider } from '../ast/encodings';
+import { quote } from '../printer';
 
-export type RealDataType = {
-  baseType: 'float' | 'double' | 'decimal',
-  precision: {
-    length: number,
-    decimals: number,
-  } | null,
-  unsigned: boolean,
-  zeroFill: boolean,
-};
-
-export type DateTimeDataType = {
-  // NOTE: "DATE" does not belong here! It's an OtherDataType, as it does not
-  // have any parameters!
-  baseType: 'time' | 'timestamp' | 'datetime',
-  fsp: number | null,
-};
-
-export type TextDataType = {
-  baseType: 'char' | 'varchar' | 'text' | 'mediumtext' | 'longtext',
-  length: number | null,
-  encoding?: Encoding,
-};
-
-export type BinaryDataType = {
-  baseType: 'blob' | 'binary' | 'varbinary',
-  length: number | null,
-};
-
-export type EnumDataType = {
-  baseType: 'enum',
-  values: Array<string>,
-  encoding?: Encoding,
-};
-
-// These data types have no params
-export type OtherDataType = {
-  baseType: 'date' | 'year' | 'tinyblob' | 'mediumblob' | 'longblob' | 'json',
-};
-
-export type TypeInfo =
-  | IntDataType
-  | RealDataType
-  | DateTimeDataType
-  | TextDataType
-  | BinaryDataType
-  | EnumDataType
-  | OtherDataType;
-
-const DEFAULT_INT_LENGTHS = {
-  bigint: 20,
-  int: 11,
-  mediumint: 9,
-  smallint: 6,
-  tinyint: 4,
-};
-
-function asInt(baseType: $PropertyType<IntDataType, 'baseType'>, params: string, options: string): IntDataType {
-  const unsigned = /unsigned/i.test(options);
-  const zeroFill = /zerofill/i.test(options);
-
-  let length;
-  if (params) {
-    length = parseInt(params, 10);
-  } else {
-    // Try to figure out the default length for this data type
-    length = DEFAULT_INT_LENGTHS[baseType] || 11;
-    if (unsigned) length -= 1;
+export function setEncoding<T: TextualOrEnum>(dataType: T, encoding: Encoding): T {
+  switch (dataType._kind) {
+    case 'Char':
+      return { ...dataType, encoding };
+    case 'VarChar':
+      return { ...dataType, encoding };
+    case 'Text':
+      return { ...dataType, encoding };
+    case 'MediumText':
+      return { ...dataType, encoding };
+    case 'LongText':
+      return { ...dataType, encoding };
+    case 'Enum':
+      return { ...dataType, encoding };
   }
 
-  return { baseType, length, unsigned, zeroFill };
-}
-
-function asReal(baseType: $PropertyType<RealDataType, 'baseType'>, params: string, options: string): RealDataType {
-  const unsigned = /unsigned/i.test(options);
-  const zeroFill = /zerofill/i.test(options);
-
-  let precision = null;
-  if (params) {
-    const [first, second] = params.split(',').map((s) => s.trim());
-    const length = parseInt(first, 10);
-    const decimals = second ? parseInt(second, 10) : 0;
-    precision = { length, decimals };
-  }
-
-  return { baseType, precision, unsigned, zeroFill };
-}
-
-function asDateTime(
-  baseType: $PropertyType<DateTimeDataType, 'baseType'>,
-  params: string,
-  // options: string,
-): DateTimeDataType {
-  const fsp = params ? parseInt(params, 10) : null;
-  return { baseType, fsp };
-}
-
-function asText(baseType: $PropertyType<TextDataType, 'baseType'>, params: string, options: string): TextDataType {
-  let length = null;
-  if (params) {
-    length = parseInt(params, 10);
-  }
-
-  // Sanitization / sanity checks
-  if (baseType === 'char' && length === null) {
-    // CHAR means CHAR(1)
-    length = 1;
-  }
-
-  if (baseType === 'varchar' && !length) {
-    // VARCHAR without a length is invalid MySQL
-    throw new Error('VARCHAR must have valid length, please use VARCHAR(n)');
-  }
-
-  const encoding = parseEncodingOptions(options);
-  return { baseType, length, encoding };
-}
-
-function asBinary(baseType: $PropertyType<BinaryDataType, 'baseType'>, params: string): BinaryDataType {
-  let length = null;
-  if (params) {
-    length = parseInt(params, 10);
-  }
-
-  // Sanitization / sanity checks
-  if (baseType === 'varbinary' && !length) {
-    // VARBINARY without a length is invalid MySQL
-    throw new Error('VARBINARY must have valid length, please use VARBINARY(n)');
-  }
-
-  return { baseType, length };
-}
-
-// TODO: Honestly, why are we not just doing this at the parser level?
-function parseEncodingOptions(options: string): Encoding | void {
-  let charset;
-  let collate;
-
-  const matchCharset = options.match(/CHARACTER SET\s+([\w_]+)/i);
-  if (matchCharset) {
-    charset = matchCharset[1];
-  }
-
-  const matchCollate = options.match(/COLLATE\s+([\w_]+)/i);
-  if (matchCollate) {
-    collate = matchCollate[1];
-  }
-
-  if (charset || collate) {
-    return makeEncoding(charset, collate);
-  } else {
-    return undefined;
-  }
-}
-
-function asEnum(baseType: $PropertyType<EnumDataType, 'baseType'>, params: string, options: string): EnumDataType {
-  if (!params) {
-    throw new Error('ENUMs must have at least one value');
-  }
-
-  const values = parseEnumValues(params);
-  const encoding = parseEncodingOptions(options);
-  return { baseType, values, encoding };
+  throw new Error('Unknown string column: ' + dataType._kind);
 }
 
 /**
- * Parse and return type information for the given type string.
+ * Like setEncoding(), but potentially changes the datatype along the way, if
+ * this is necessary to switch to a wider charset.
  */
-export function parseDataType(type: string): TypeInfo {
-  const matches = type.match(/^([^ (]+)(?:\s*[(]([^)]+)[)])?(.*)?$/);
-  if (!matches) {
-    throw new Error(`Error parsing data type: ${type}`);
+export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Textual {
+  const currentEncoding = dataType.encoding;
+  invariant(
+    currentEncoding !== null,
+    'Expected current encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2),
+  );
+
+  // Converting to another encoding can cause MySQL to grow the datatype's
+  // size to the next tier, and this explicit conversion helps to avoid
+  // truncation. See https://bugs.mysql.com/bug.php?id=31291
+  if (!isWider(newEncoding.charset, currentEncoding.charset)) {
+    // If the charset didn't grow wider, just updating the encoding is
+    // fine. The base type of the column won't change.
+    return setEncoding(dataType, newEncoding);
   }
 
-  let baseType = matches[1];
-  let params = matches[2];
-  let options = matches[3];
+  // Pick the next tier
+  switch (dataType._kind) {
+    case 'Text':
+      // TEXT -> MEDIUMTEXT
+      return ast.MediumText(newEncoding);
 
-  // Unify
-  baseType = baseType.toLowerCase();
-  params = params ? params.trim() : '';
-  options = options ? options.trim().toLowerCase() : '';
-
-  // Dispatch based on the type
-  switch (baseType) {
-    case 'tinyint':
-    case 'smallint':
-    case 'mediumint':
-    case 'int':
-    case 'bigint':
-      return asInt(baseType, params, options);
-
-    case 'float':
-    case 'double':
-    case 'decimal':
-      return asReal(baseType, params, options);
-
-    // case 'date': // NOTE: "date" does not belong here! It's a "paramless" type.
-    case 'time':
-    case 'timestamp':
-    case 'datetime':
-      return asDateTime(baseType, params /* , options */);
-
-    case 'char':
-    case 'varchar':
-    case 'text':
-    case 'mediumtext':
-    case 'longtext':
-      return asText(baseType, params, options);
-
-    case 'binary':
-    case 'varbinary':
-    case 'blob':
-      return asBinary(baseType, params);
-
-    case 'enum':
-      return asEnum(baseType, params, options);
-
-    case 'date':
-    case 'year':
-    case 'tinyblob':
-    case 'mediumblob':
-    case 'longblob':
-    case 'json':
-      return { baseType };
+    case 'MediumText':
+      // MEDIUMTEXT -> LONGTEXT
+      return ast.LongText(newEncoding);
 
     default:
-      throw new Error(`Unrecognized MySQL data type: ${baseType}`);
+      return setEncoding(dataType, newEncoding);
   }
 }
 
 /**
- * Format type information back to a printable string.
+ * Format type information back to a printable string. When tableEncoding is
+ * provided, it will conditionally output the encoding information, like MySQL
+ * does, depending on whether it's equal to the table default encoding or not.
  */
-export function formatDataType(info: TypeInfo, tableEncoding: Encoding, fullyResolved: boolean = false): string {
-  const baseType = info.baseType;
+export function formatDataType(dataType: DataType, tableEncoding?: Encoding): string {
+  const baseType = dataType._kind.toLowerCase();
   let params = '';
   let options = '';
 
   // Dispatch based on the type
-  switch (info.baseType) {
-    case 'tinyint':
-    case 'smallint':
-    case 'mediumint':
-    case 'int':
-    case 'bigint':
-      params = info.length;
-      options = [info.unsigned ? 'unsigned' : '', info.zeroFill ? 'zerofill' : ''].filter(Boolean).join(' ');
+  switch (dataType._kind) {
+    case 'TinyInt':
+    case 'SmallInt':
+    case 'MediumInt':
+    case 'Int':
+    case 'BigInt':
+      params = dataType.length;
+      options = [dataType.unsigned ? 'unsigned' : ''].filter(Boolean).join(' ');
       break;
 
-    case 'float':
-    case 'double':
-    case 'decimal':
-      if (info.precision) {
-        params = [info.precision.length, info.precision.decimals].join(',');
+    case 'Float':
+    case 'Double':
+    case 'Decimal':
+      if (dataType.precision) {
+        params = [dataType.precision.length, dataType.precision.decimals].join(',');
       }
-      options = [info.unsigned ? 'unsigned' : '', info.zeroFill ? 'zerofill' : ''].filter(Boolean).join(' ');
+      options = [dataType.unsigned ? 'unsigned' : ''].filter(Boolean).join(' ');
       break;
 
     // case 'date': // NOTE: "date" does not belong here! It's a "paramless" type.
-    case 'time':
-    case 'timestamp':
-    case 'datetime':
-      params = info.fsp || '';
+    case 'Time':
+    case 'Timestamp':
+    case 'DateTime':
+      params = dataType.fsp || '';
       break;
 
-    case 'char':
-    case 'varchar':
-    case 'text':
-    case 'mediumtext':
-    case 'longtext': {
-      params = info.length || '';
+    case 'Char':
+    case 'VarChar': {
+      params = dataType.length || '';
 
-      const encoding = info.encoding ?? tableEncoding;
+      const encoding = dataType.encoding;
+      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
-      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+      let outputCharset =
+        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');
       break;
     }
 
-    case 'binary':
-    case 'varbinary':
-    case 'blob':
-      params = info.length || '';
-      break;
+    case 'Text':
+    case 'MediumText':
+    case 'LongText': {
+      params = '';
 
-    case 'enum': {
-      params = info.values.map(quote).join(',');
-
-      const encoding = info.encoding ?? tableEncoding;
+      const encoding = dataType.encoding;
+      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
 
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset = info.encoding !== undefined && info.encoding.collate !== tableEncoding.collate;
-      let outputCollation = encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+      let outputCharset =
+        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
-        fullyResolved || outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
-        fullyResolved || outputCollation ? `COLLATE ${encoding.collate}` : null,
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
+      ]
+        .filter(Boolean)
+        .join(' ');
+      break;
+    }
+
+    case 'Binary':
+    case 'VarBinary':
+    case 'Blob':
+      params = dataType.length || '';
+      break;
+
+    case 'Enum': {
+      params = dataType.values.map(quote).join(',');
+
+      const encoding = dataType.encoding;
+      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
+
+      // NOTE: This is some weird MySQL quirk... if an encoding is set
+      // explicitly, then the *collate* defines what gets displayed, otherwise
+      // the *charset* difference will determine it
+      let outputCharset =
+        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
+
+      options = [
+        outputCharset ? `CHARACTER SET ${encoding.charset}` : null,
+        outputCollation ? `COLLATE ${encoding.collate}` : null,
       ]
         .filter(Boolean)
         .join(' ');

@@ -5,17 +5,16 @@ import { maxBy, sortBy } from 'lodash';
 import t from 'rule-of-law/types';
 import type { RecordTypeInfo as ROLRecordTypeInfo } from 'rule-of-law/types';
 
+import type { Encoding } from '../ast/encodings';
+import { getDefaultCollationForCharset } from '../ast/encodings';
+import { escape, insert } from '../printer';
 import Column from './Column';
 import Database from './Database';
-import { formatDataType } from './DataType';
-import type { TextDataType } from './DataType';
-import type { Encoding } from './encodings';
-import { getDefaultCollationForCharset, isWider } from './encodings';
+import { convertToEncoding, setEncoding } from './DataType';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
 import Index from './Index';
-import { escape, insert } from './utils';
 
 function indent(line: string) {
   return `  ${line}`;
@@ -51,117 +50,31 @@ export default class Table {
     // happening by changing the encoding. However, any columns that don't have
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
-    const columns = this.columns.map((column) => {
-      // TODO: Make explicit
-      const typeInfo = column.getTypeInfo();
-      if (
-        !(
-          typeInfo.baseType === 'char' ||
-          typeInfo.baseType === 'varchar' ||
-          typeInfo.baseType === 'text' ||
-          typeInfo.baseType === 'mediumtext' ||
-          typeInfo.baseType === 'longtext' ||
-          typeInfo.baseType === 'enum'
-        )
-      ) {
-        return column.patch({}, newEncoding);
-      }
-
-      // NOTE: This implementation is correct, and 100% matches MySQL's
-      // behavior. Still...
-      // TODO: SIMPLIFY THIS!
-      if (
-        typeInfo.encoding === undefined ||
-        (typeInfo.encoding.charset === column.tableDefaultEncoding.charset &&
-          typeInfo.encoding.collate === column.tableDefaultEncoding.collate)
-      ) {
-        if (typeInfo.baseType !== 'enum') {
-          return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
-            },
-            newEncoding,
-          );
-        } else {
-          return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: this.defaultEncoding }, newEncoding),
-            },
-            newEncoding,
-          );
-        }
-      } else if (
-        typeInfo.encoding !== undefined &&
-        typeInfo.encoding.charset === newEncoding.charset &&
-        typeInfo.encoding.collate === newEncoding.collate
-      ) {
-        if (typeInfo.baseType !== 'enum') {
-          return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
-            },
-            newEncoding,
-          );
-        } else {
-          return column.patch(
-            {
-              type: formatDataType({ ...typeInfo, encoding: undefined }, newEncoding),
-            },
-            newEncoding,
-          );
-        }
-      } else {
-        return column;
-      }
-    });
-    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(this.name, newEncoding, this.columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
-    function computeNewType(
-      typeInfo: TextDataType,
-      tableDefaultEncoding: Encoding,
-      newEncoding: Encoding,
-    ): TextDataType {
-      const currentEncoding = typeInfo.encoding ?? tableDefaultEncoding;
-
-      // Converting to another encoding can cause MySQL to grow the datatype's
-      // size to the next tier, and this explicit conversion helps to avoid
-      // truncation. See https://bugs.mysql.com/bug.php?id=31291
-      if (!isWider(newEncoding.charset, currentEncoding.charset)) {
-        // If the charset didn't grow wider, just updating the encoding is
-        // fine. The base type of the column won't change.
-        return { ...typeInfo, encoding: newEncoding };
-      }
-
-      // Pick the next tier
-      const baseType =
-        typeInfo.baseType === 'text'
-          ? 'mediumtext'
-          : typeInfo.baseType === 'mediumtext'
-          ? 'longtext'
-          : typeInfo.baseType;
-      return {
-        ...typeInfo,
-        baseType,
-        encoding: newEncoding,
-      };
-    }
-
     const columns = this.columns.map((column) => {
-      const typeInfo = column.getTypeInfo();
+      const dataType = column.dataType;
       if (
+        // TODO: Ideally, just use `isTextualOrEnum()` here, but Flow's %checks
+        // predicates don't work across module boundaries :(
         !(
-          typeInfo.baseType === 'char' ||
-          typeInfo.baseType === 'varchar' ||
-          typeInfo.baseType === 'text' ||
-          typeInfo.baseType === 'mediumtext' ||
-          typeInfo.baseType === 'longtext' ||
-          typeInfo.baseType === 'enum'
+          dataType._kind === 'Char' ||
+          dataType._kind === 'VarChar' ||
+          dataType._kind === 'Text' ||
+          dataType._kind === 'MediumText' ||
+          dataType._kind === 'LongText' ||
+          dataType._kind === 'Enum'
         )
       ) {
-        return column.patch({}, newEncoding);
+        return column;
       }
+
+      invariant(
+        dataType.encoding !== null,
+        'Encoding must be set by now, but found: ' + JSON.stringify({ dataType }, null, 2),
+      );
 
       // NOTE: The implementation below is correct, and 100% matches MySQL's
       // behavior. Still...
@@ -169,11 +82,8 @@ export default class Table {
 
       // Also, if the new encoding is the same as the old one, just wipe it (no
       // real change is happening here)
-      if (
-        (typeInfo.encoding?.charset ?? column.tableDefaultEncoding.charset) === newEncoding.charset &&
-        (typeInfo.encoding?.collate ?? column.tableDefaultEncoding.collate) === newEncoding.collate
-      ) {
-        return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
+      if (dataType.encoding.charset === newEncoding.charset && dataType.encoding.collate === newEncoding.collate) {
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) });
       }
 
       // Otherwise, some conversion is actually imminent. We can only continue
@@ -183,20 +93,13 @@ export default class Table {
       }
 
       // If no explicit encoding is set for this column, just keep it that way
-      if (typeInfo.baseType === 'enum') {
-        if (typeInfo.encoding === undefined) {
-          return column.patch({ type: formatDataType(typeInfo, newEncoding) }, newEncoding);
-        } else {
-          const newType = { ...typeInfo, encoding: newEncoding };
-          return column.patch({ type: formatDataType(newType, column.tableDefaultEncoding) }, newEncoding);
-        }
+      if (dataType._kind === 'Enum') {
+        return column.patch({ dataType: setEncoding(dataType, newEncoding) });
       } else {
-        return column.patch(
-          { type: formatDataType(computeNewType(typeInfo, column.tableDefaultEncoding, newEncoding), newEncoding) },
-          newEncoding,
-        );
+        return column.patch({ dataType: convertToEncoding(dataType, newEncoding) });
       }
     });
+
     return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
 
@@ -353,7 +256,7 @@ export default class Table {
         return column;
       }
 
-      return column.patch({ name: newName }, column.tableDefaultEncoding);
+      return column.patch({ name: newName });
     });
 
     // Replace all references to this column if they're used in any of the
@@ -401,8 +304,8 @@ export default class Table {
     if (fks.length > 0) {
       // If the type changes, some MySQL servers might throw
       // a ER_FK_COLUMN_CANNOT_CHANGE error.  Therefore, throw a warning.
-      const oldType = oldColumn.getDefinition();
-      const newType = newColumn.getDefinition();
+      const oldType = oldColumn.getDefinition(table.defaultEncoding);
+      const newType = newColumn.getDefinition(table.defaultEncoding);
       if (oldType !== newType) {
         console.warn('');
         console.warn(`WARNING: Column type change detected on column "${table.name}.${oldColName}" used in FK:`);
@@ -454,7 +357,7 @@ export default class Table {
    */
   dropDefault(colName: string): Table {
     const column = this.getColumn(colName);
-    const newColumn = column.patch({ defaultValue: null }, column.tableDefaultEncoding);
+    const newColumn = column.patch({ defaultValue: null });
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
     return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
   }
@@ -512,7 +415,7 @@ export default class Table {
       if (!columnNames.includes(c.name)) {
         return c;
       }
-      return c.patch({ nullable: false }, c.tableDefaultEncoding);
+      return c.patch({ nullable: false });
     });
 
     return new Table(
@@ -772,7 +675,7 @@ export default class Table {
   serializeDefinitions(printOptions?: {| includeForeignKeys?: boolean |}): Array<string> {
     const includeFKs = printOptions?.includeForeignKeys ?? true;
     return [
-      ...this.columns.map((col) => col.toString()),
+      ...this.columns.map((col) => col.toString(this.defaultEncoding)),
       ...(this.primaryKey ? [`PRIMARY KEY (${this.primaryKey.map(escape).join(',')})`] : []),
 
       ...this.getUniqueIndexes().map((index) => index.toString()),

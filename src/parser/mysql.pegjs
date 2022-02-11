@@ -1,103 +1,14 @@
 {
+  /**
+   * Helper functions to more succinctly produce nodes
+   */
+  const invariant = require('invariant')
+  const ast = require('../ast').default
+  const { makeEncoding } = require('../ast/encodings.js')
 
-/**
- * Helper functions to more succinctly produce nodes
- */
-const invariant = require('invariant');
-
-function identifier(name) {
-  return {
-    type: 'identifier',
-    name,
-    id: name,   // Deprecate in favor of `name`
+  function unquote(quoted) {
+    return quoted.replace("''", "'")
   }
-}
-
-function literal(value) {
-  return { type: 'literal', value }
-}
-
-function unary(op, expr) {
-  return { type: 'unary', op, expr }
-}
-
-function binary(op, expr1, expr2) {
-  return { type: 'binary', op, expr1, expr2 }
-}
-
-function callExpression(name, args) {
-  invariant(name.type === 'builtinFunction', `requires builtinFunction node as first arg, got ${name}`)
-  return { type: 'callExpression', name, args }
-}
-
-function builtinFunction(name) {
-  return { type: 'builtinFunction', name }
-}
-
-function generated(expr, mode) {
-  return { type: 'generated', expr, mode }
-}
-
-//
-// HACK: Using this for now, because the Simulator internals aren't aware of
-// Nodes, so we'll have to convert this to strings before we pass it on.
-// However, it would be nice if they _would_ work with AST nodes instead, so
-// eventually™ we should remove this serialize*() helper family here.
-//
-
-function serialize(node) {
-  switch (node.type) {
-    case 'callExpression':
-      return serializeCallExpression(node)
-    case 'literal':
-      return node.value
-    case 'identifier':
-      return node.name
-    case 'builtinFunction':
-      return node.name
-    default:
-      throw new Error(`Don't know how to serialize ${node} nodes yet.  Please tell me.`);
-  }
-}
-
-//
-// HACK:
-// This is a huge hack because the defaultValue that the simulator expects vary
-// in types, and it's superinconsistent.
-//
-// - String literals are sent as quoted strings "'foobar'"
-// - Function calls are sent as strings, e.g. "CURRENT_TIMESTAMP"
-// - Booleans are sent as booleans literals, e.g. "FALSE"
-// - Numbers are sent as true numbers, e.g. 0
-// - `null` is sent as the string "NULL"
-//
-// 🙈
-//
-function serializeDefaultValue_HACK(node) {
-  switch (node.type) {
-    case 'literal':
-      return node.value === null
-        ? 'NULL'
-        : node.value === true
-        ? 'TRUE'
-        : node.value === false
-        ? 'FALSE'
-        : node.value
-    default:
-      // Defer to "normal" serializer
-      return serialize(node);
-  }
-}
-
-function serializeCallExpression(node) {
-  invariant(node.type === 'callExpression', `not a call expression node: ${node}`);
-  let f = serialize(node.name)
-  if (node.args !== undefined) {
-    f += `(${node.args.map(serialize).join(', ')})`;
-  }
-  return f;
-}
-
 }
 
 start = StatementList
@@ -128,43 +39,55 @@ Statement
 
 CompoundStatement
   = BEGIN statements:StatementList END {
-    return {
-      type: 'BEGIN ... END',
-      statements,
+      return {
+        type: 'BEGIN ... END',
+        statements,
+      }
     }
-  }
 
 Comment
   = SingleLineComment
   / MultiLineComment
 
 SingleLineComment
-  = ( '//' / '--' ) p:([^\n]*) { return { type: 'comment', raw: p.join('').trim() } }
+  = ("//" / "--") p:[^\n]* {
+      return { type: 'comment', raw: p.join('').trim() }
+    }
 
 MultiLineComment
-  = "/*" inner:(!"*/" i:. { return i } )* "*/" { return { type: 'comment', raw: inner.join('') } }
+  = "/*" inner:(!"*/" i:. { return i })* "*/" {
+      return { type: 'comment', raw: inner.join('') }
+    }
 
 // We ignore select/insert/delete statements for now
-SelectStatement = SELECT [^;]* { return null; }
-UpdateStatement = UPDATE [^;]* { return null; }
-InsertStatement = INSERT [^;]* { return null; }
-DeleteStatement = DELETE [^;]* { return null; }
-SetStatement = SET [^;]* { return null; }
-LockStatement = LOCK [^;]* { return null; }
-UnlockStatement = UNLOCK [^;]* { return null; }
+SelectStatement = SELECT [^;]* { return null }
+
+UpdateStatement = UPDATE [^;]* { return null }
+
+InsertStatement = INSERT [^;]* { return null }
+
+DeleteStatement = DELETE [^;]* { return null }
+
+SetStatement = SET [^;]* { return null }
+
+LockStatement = LOCK [^;]* { return null }
+
+UnlockStatement = UNLOCK [^;]* { return null }
 
 Condition
   = BooleanLiteral
   / NOT Condition
   / LPAREN Condition RPAREN
-  / left:Expression ( EQ / NE / LTE / GTE / LT / GT ) right:Expression
+  / left:Expression (EQ / STRICT_EQ / LTE / GTE / LT / GT) right:Expression
 
 ExpressionList
   = first:Expression COMMA rest:ExpressionList { return [first, ...rest] }
   / only:Expression { return [only] }
 
 Expression
-  = expr1:BooleanPrimary op:BooleanOp expr2:BooleanPrimary { return binary(op, expr1, expr2) }
+  = expr1:BooleanPrimary op:BooleanOp expr2:BooleanPrimary {
+      return ast.BinaryExpression(op, expr1, expr2)
+    }
   / BooleanPrimary
 
 BooleanOp
@@ -173,18 +96,21 @@ BooleanOp
   / XOR
 
 BooleanPrimary
-  = pred:Predicate IS check:( NULL / NOT_NULL ) {
-      if (check === 'NULL') {
-        return unary('is null', pred)
+  = pred:Predicate IS nullTest:Nullability {
+      if (nullTest) {
+        return ast.UnaryExpression('is null', pred)
       } else {
-        return unary('is not null', pred)
+        return ast.UnaryExpression('is not null', pred)
       }
     }
-  / pred1:Predicate op:CmpOp pred2:Predicate { return binary(op, pred1, pred2) }
+  / pred1:Predicate op:CmpOp pred2:Predicate {
+      return ast.BinaryExpression(op, pred1, pred2)
+    }
   / Predicate
 
 CmpOp
   = EQ
+  / STRICT_EQ
   / NE1
   / NE2
   / GTE
@@ -193,27 +119,27 @@ CmpOp
   / LT
   / LIKE
   / REGEXP
-  / RLIKE  // RLIKE is a synonym for REGEXP
-    { return 'REGEXP' }
+  / RLIKE { return 'REGEXP' } // RLIKE is a synonym for REGEXP
 
-Predicate
-  = BitExpr1
+Predicate = BitExpr1
 
 BitExpr1
   // Mostly expressed like this to fight left-recursion in the grammer
-  = expr1:BitExpr2 rest:( op:BitExprOp1 expr2:BitExpr2 { return { op, expr2 } } )* {
+  = expr1:BitExpr2
+    rest:(op:BitExprOp1 expr2:BitExpr2 { return { op, expr2 } })* {
       return rest.reduce(
-        (acc, cur) => binary(cur.op, acc, cur.expr2),
-        expr1
+        (acc, cur) => ast.BinaryExpression(cur.op, acc, cur.expr2),
+        expr1,
       )
     }
 
 BitExpr2
   // Mostly expressed like this to fight left-recursion in the grammer
-  = expr1:SimpleExpr rest:( op:BitExprOp2 expr2:SimpleExpr { return { op, expr2 } } )* {
+  = expr1:SimpleExpr
+    rest:(op:BitExprOp2 expr2:SimpleExpr { return { op, expr2 } })* {
       return rest.reduce(
-        (acc, cur) => binary(cur.op, acc, cur.expr2),
-        expr1
+        (acc, cur) => ast.BinaryExpression(cur.op, acc, cur.expr2),
+        expr1,
       )
     }
 
@@ -230,116 +156,75 @@ BitExprOp2
   / PERCENTAGE
   / MOD { return '%' }
 
-/* ArithmeticOperator */
-/*   = PLUS */
-/*   / MINUS */
-  // |
-  // &
-  // <<
-  // >>
-  // +
-  // -
-  // *
-  // /
-  // DIV
-  // MOD
-  // %
-  // ^
-  // +
-  // -
-
-/* BitExpr */
-/*   = BitExpr ArithmeticOperator BitExpr */
-/*   / SimpleExpr */
-
 SimpleExpr
   = Literal
   / FunctionCall
-  / MemberAccess  // Not sure where this one fits
-  / name:Identifier { return identifier(name) }
-  // / simple_expr COLLATE collation_name
-  // / param_marker
-  // / variable
-  // / simple_expr || simple_expr
-  / PLUS expr:SimpleExpr { return unary('+', expr) }
-  / MINUS expr:SimpleExpr { return unary('-', expr) }
-  // / ~ simple_expr
-  / BANG expr:SimpleExpr { return unary('!', expr) }
-  // / BINARY simple_expr
-  / LPAREN exprs:ExpressionList RPAREN { return exprs }
-  // / ROW (expr, expr [, expr] ...)
-  // / (subquery)
-  // / EXISTS (subquery)
-  // / {identifier expr}
-  // / match_expr
-  // / case_expr
-  // / interval_expr
+  / Identifier
+  / PLUS expr:SimpleExpr { return ast.UnaryExpression('+', expr) }
+  / MINUS expr:SimpleExpr { return ast.UnaryExpression('-', expr) }
+  / BANG expr:SimpleExpr { return ast.UnaryExpression('!', expr) }
+  / LPAREN expr:Expression RPAREN { return expr }
 
 FunctionCall
-  = name:FunctionName LPAREN exprs:ExpressionList RPAREN {
-      return callExpression(builtinFunction(name), exprs)
-    }
-
-  / ident:Identifier LPAREN exprs:ExpressionList RPAREN {
-      return callExpression(builtinFunction(ident), exprs)
+  = func:FunctionName LPAREN exprs:ExpressionList RPAREN {
+      return ast.CallExpression(func, exprs)
     }
 
   // JSON_EXTRACT shorthand syntax (e.g. foo->'$.bar', or foo->>'$.bar')
-  / ident:Identifier arrow:( ARROWW / ARROW ) lit:StringLiteral {
-      let rv = callExpression(builtinFunction('JSON_EXTRACT'), [identifier(ident), lit])
+  / ident:Identifier arrow:(ARROWW / ARROW) lit:StringLiteral {
+      let rv = ast.CallExpression(ast.BuiltInFunction('JSON_EXTRACT'), [
+        ident,
+        lit,
+      ])
       if (arrow === '->>') {
-        rv = callExpression(builtinFunction('JSON_UNQUOTE'), [rv])
+        rv = ast.CallExpression(ast.BuiltInFunction('JSON_UNQUOTE'), [rv])
       }
       return rv
     }
 
-// Not sure where we can find this syntax in the MySQL manual, or what this is named
-MemberAccess
-  = object:Identifier '.' property:Identifier { return null }
-
 FunctionName
-  = CHAR_LENGTH
-  / CONCAT
-  / CONV
-  / HEX
-  / SUBSTRING
-  / UNHEX
-
+  = id:Identifier { return ast.BuiltInFunction(id.name.toUpperCase()) }
 
 // ====================================================
 // Constant literals
 // ====================================================
 
-NullLiteral
-  = NULL { return literal(null) }
+NullLiteral = NULL { return ast.Literal(null) }
 
 BooleanLiteral
-  = TRUE  { return literal(true) }
-  / FALSE { return literal(false) }
+  = TRUE { return ast.Literal(true) }
+  / FALSE { return ast.Literal(false) }
 
 NumberLiteral
   = HexNumberLiteral
   / DecimalNumberLiteral
 
 DecimalNumberLiteral
-  = digits:[0-9]+ { return literal(parseInt(digits.join(''), 10)) }
+  = digits:[0-9]+ { return ast.Literal(parseInt(digits.join(''), 10)) }
 
 HexNumberLiteral
-  = '0x' digits:[0-9a-fA-F]+ { return literal(parseInt(digits.join(''), 16)) }
+  = "0x" digits:[0-9a-fA-F]+ {
+      return ast.Literal(parseInt(digits.join(''), 16))
+    }
 
 StringLiteral
   = SingleQuotedStringLiteral
   / DoubleQuotedStringLiteral
 
 SingleQuotedStringLiteral
-  = "'" seq:( "''" / "\\'" { return "''" } / [^'] )* "'" {
-    return literal(`'${seq.join('')}'`)
-  }
+  = "'" seq:("''" / "\\'" { return "''" } / [^'])* "'" {
+      return ast.Literal(unquote(seq.join('')))
+    }
 
 DoubleQuotedStringLiteral
-  = '"' seq:( '""' { return '"' } / '\\"' { return '"' } / "'" { return "''" } / [^"] )* '"' {
-    return literal(`'${seq.join('')}'`)
-  }
+  = "\""
+    seq:(
+      "\"\"" { return '"' }
+      / "\\\"" { return '"' }
+      / "'" { return "''" }
+      / [^"]
+    )*
+    "\"" { return ast.Literal(unquote(seq.join(''))) }
 
 StringLiteralList
   = first:StringLiteral COMMA rest:StringLiteralList { return [first, ...rest] }
@@ -351,32 +236,22 @@ Literal
   / NumberLiteral
   / StringLiteral
 
-
 // ====================================================
 // Rename table
 // ====================================================
 
 RenameTable
-  = RENAME TABLE tblName:Identifier TO newName:Identifier
-    {
-      return {
-        type: 'RENAME TABLE',
-        tblName,
-        newName,
-      }
+  = RENAME TABLE tblName:Identifier TO newName:Identifier {
+      return ast.RenameTableStatement(tblName.name, newName.name)
     }
-
 
 // ====================================================
 // Drop Index
 // ====================================================
-DropIndex = DROP INDEX indexName:Identifier ON tblName:Identifier {
-  return {
-    type: 'DROP INDEX',
-    indexName,
-    tblName
-  }
-}
+DropIndex
+  = DROP INDEX indexName:Identifier ON tblName:Identifier {
+      return ast.DropIndexStatement(indexName.name, tblName.name)
+    }
 
 // ====================================================
 // Drop Table
@@ -384,45 +259,51 @@ DropIndex = DROP INDEX indexName:Identifier ON tblName:Identifier {
 
 DropTable
   = DROP TABLE ifExists:(IF EXISTS)? tblName:Identifier {
-    return {
-      type: 'DROP TABLE',
-      tblName,
-      ifExists: !!ifExists,
+      return ast.DropTableStatement(tblName.name, !!ifExists)
     }
-  }
 
 // ====================================================
 // Create Index
 // ====================================================
 
 CreateIndex
-  = CREATE indexKind:( UNIQUE / FULLTEXT )? INDEX indexName:Identifier ON tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN {
-    indexKind = indexKind || 'NORMAL'
-    return {
-      type: 'CREATE INDEX',
-      indexName,
-      indexKind,
-      tblName,
-      indexColNames,
+  = CREATE
+    indexKind:(UNIQUE / FULLTEXT)?
+    INDEX
+    indexName:Identifier
+    ON
+    tblName:Identifier
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN {
+      indexKind = indexKind || 'NORMAL'
+      return ast.CreateIndexStatement(
+        indexName.name,
+        indexKind,
+        tblName.name,
+        indexColNames,
+      )
     }
-  }
 
 // ====================================================
 // Create Trigger
 // ====================================================
 
 CreateTrigger
-  = CREATE TRIGGER triggerName:Identifier
-    ( BEFORE / AFTER )
-    ( INSERT / UPDATE / DELETE )
-    ON tblName:Identifier FOR EACH ROW ( ( FOLLOWS / PRECEDES ) otherTrigger:Identifier )?
+  = CREATE
+    TRIGGER
+    triggerName:Identifier
+    (BEFORE / AFTER)
+    (INSERT / UPDATE / DELETE)
+    ON
+    tblName:Identifier
+    FOR
+    EACH
+    ROW
+    ((FOLLOWS / PRECEDES) Identifier)?
     triggerBody:Statement {
-    return {
-      type: 'CREATE TRIGGER',
-      triggerName,
-      tblName,
+      return ast.CreateTriggerStatement(triggerName.name, tblName.name)
     }
-  }
 
 // ====================================================
 // Create Function
@@ -433,31 +314,33 @@ FunctionParamList
   / only:FunctionParam { return [only] }
 
 FunctionParam
-  = paramName:Identifier type:DataType { return { paramName, type } }
+  = paramName:Identifier type:DataType {
+      return {
+        paramName: paramName.name,
+        type,
+      }
+    }
 
 CreateFunction
-  = CREATE FUNCTION spName:Identifier
-    params:( LPAREN params:FunctionParamList RPAREN { return params })
-    RETURNS DataType
+  = CREATE
+    FUNCTION
+    spName:Identifier
+    params:(LPAREN params:FunctionParamList RPAREN { return params })
+    RETURNS
+    DataType
     characteristic:CreateFunctionCharacteristic
     body:FunctionBody {
-    return {
-      type: 'CREATE FUNCTION',
-      spName,
-      params,
-      characteristic,
-      // body,
+      return ast.CreateFunctionStatement(/* spName.name, params, characteristic */)
     }
-  }
 
-CreateFunctionCharacteristic
-  = NOT? DETERMINISTIC
+CreateFunctionCharacteristic = NOT? DETERMINISTIC
 
-FunctionBody
-  = BEGIN statements:FunctionStatementList END
+FunctionBody = BEGIN statements:FunctionStatementList END
 
 FunctionStatementList
-  = first:FunctionStatement SEMICOLON? rest:FunctionStatementList { return [first, ...rest] }
+  = first:FunctionStatement SEMICOLON? rest:FunctionStatementList {
+      return [first, ...rest]
+    }
   / only:FunctionStatement SEMICOLON? { return [only] }
 
 FunctionStatement
@@ -473,40 +356,29 @@ AssignmentList
   / only:Assignment { return [only] }
 
 Assignment
-  = Identifier EQ Expression
+  = ident:Identifier second:EQ third:Expression {
+      return [ident.name, second, third]
+    }
 
 IfStatement
-  = IF Condition THEN
-      FunctionStatementList
-    (ELSEIF Condition THEN FunctionStatementList )*
+  = IF
+    Condition
+    THEN
+    FunctionStatementList
+    (ELSEIF Condition THEN FunctionStatementList)*
     (ELSE FunctionStatementList)?
-    END IF
+    END
+    IF
 
-WhileStatement
-  = WHILE Condition DO
-      FunctionStatementList
-    END WHILE
+WhileStatement = WHILE Condition DO FunctionStatementList END WHILE
 
 // ====================================================
 // ALTER DATABASE
 // ====================================================
 
 AlterDatabase
-  = ALTER DATABASE dbName:Identifier? options:AlterDbOption+ {
-      return {
-        type: 'ALTER DATABASE',
-        dbName,
-        options
-      }
-    }
-
-AlterDbOption
-  = DEFAULT? CHARACTER SET EQ? CHARSET:CharsetName {
-      return { CHARSET }
-    }
-
-  / DEFAULT? COLLATE EQ? COLLATE:CollationName {
-      return { COLLATE }
+  = ALTER DATABASE dbName:Identifier? options:DatabaseOptions {
+      return ast.AlterDatabaseStatement(dbName.name, options)
     }
 
 // ====================================================
@@ -515,383 +387,361 @@ AlterDbOption
 
 AlterTable
   = ALTER TABLE tblName:Identifier changes:AlterSpecs {
-    return {
-      type: 'ALTER TABLE',
-      tblName,
-      changes
+      return ast.AlterTableStatement(tblName.name, changes)
     }
-  }
 
 AlterSpecs
-  = first:AlterSpec COMMA rest:AlterSpecs { return [first, ...rest].filter(Boolean) }
+  = first:AlterSpec COMMA rest:AlterSpecs {
+      return [first, ...rest].filter(Boolean)
+    }
   / only:AlterSpec { return [only].filter(Boolean) }
 
 /**
  * See https://dev.mysql.com/doc/refman/5.7/en/alter-table.html
  */
 AlterSpec
-  = options:TableOptions {
-      return {
-        type: 'CHANGE TABLE OPTIONS',
-        options: Object.assign({}, ...options),
-      }
-    }
-  / ADD COLUMN? colName:Identifier columnDefinition:ColumnDefinition
+  = options:TableOptions { return ast.AlterTableOptions(options) }
+  / ADD
+    COLUMN?
+    colName:Identifier
+    columnDefinition:ColumnDefinition
     position:(
-      AFTER ident:Identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
-    )? {
-      return {
-        type: 'ADD COLUMN',
-        colName,
-        definition: columnDefinition,
-        position,
-      }
-    }
-  / ADD ( INDEX / KEY ) indexName:Identifier? indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'ADD INDEX',
-        indexName,
+    )? { return ast.AlterAddColumn(colName.name, columnDefinition, position) }
+  / ADD
+    (INDEX / KEY)
+    indexName:Identifier?
+    indexType:IndexType?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN {
+      return ast.AlterAddIndex(
+        indexName?.name ?? null,
         indexType,
         indexColNames,
-      }
+      )
     }
-  / ADD constraint:NamedConstraint? PRIMARY KEY indexType:IndexType? LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'ADD PRIMARY KEY',
-        constraint,
+  / ADD
+    constraintName:NamedConstraint?
+    PRIMARY
+    KEY
+    indexType:IndexType?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN {
+      return ast.AlterAddPrimaryKey(constraintName, indexType, indexColNames)
+    }
+  / ADD
+    constraintName:NamedConstraint?
+    UNIQUE
+    (INDEX / KEY)?
+    indexName:Identifier?
+    indexType:IndexType?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN {
+      return ast.AlterAddUniqueIndex(
+        constraintName,
+        indexName?.name ?? null,
         indexType,
         indexColNames,
-      }
+      )
     }
-  / ADD constraint:NamedConstraint?
-    UNIQUE ( INDEX / KEY )? indexName:Identifier? indexType:IndexType?
-    LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'ADD UNIQUE INDEX',
-        constraint,
-        indexName,
-        indexType,
-        indexColNames,
-      }
+  / ADD
+    FULLTEXT
+    (INDEX / KEY)?
+    indexName:Identifier?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN {
+      return ast.AlterAddFullTextIndex(indexName?.name ?? null, indexColNames)
     }
-  / ADD FULLTEXT ( INDEX / KEY )? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'ADD FULLTEXT INDEX',
-        indexName,
-        indexColNames,
-      }
-    }
-  / ADD constraint:NamedConstraint?
-    FOREIGN KEY indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN
+  / ADD
+    constraintName:NamedConstraint?
+    FOREIGN
+    KEY
+    indexName:Identifier?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN
     reference:ReferenceDefinition {
-      return {
-        type: 'ADD FOREIGN KEY',
-        constraint,
-        indexName,
+      return ast.AlterAddForeignKey(
+        constraintName,
+        indexName?.name ?? null,
         indexColNames,
         reference,
-      }
+      )
     }
   // / ALGORITHM
   / ALTER COLUMN? colName:Identifier DROP DEFAULT {
-      return {
-        type: 'DROP DEFAULT',
-        colName,
-      }
+      return ast.AlterDropDefault(colName.name)
     }
-  / CHANGE COLUMN? oldColName:Identifier newColName:Identifier definition:ColumnDefinition
+  / CHANGE
+    COLUMN?
+    oldColName:Identifier
+    newColName:Identifier
+    definition:ColumnDefinition
     position:(
-      AFTER ident:Identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
     )? {
-      return {
-        type: 'CHANGE COLUMN',
-        oldColName,
-        newColName,
+      return ast.AlterChangeColumn(
+        oldColName.name,
+        newColName.name,
         definition,
         position,
-      }
+      )
     }
   / DROP (INDEX / KEY) indexName:Identifier {
-      return {
-        type: 'DROP INDEX',
-        indexName,
-      }
+      return ast.AlterDropIndex(indexName.name)
     }
-  / DROP PRIMARY KEY { return { type: 'DROP PRIMARY KEY' } }
+  / DROP PRIMARY KEY { return ast.AlterDropPrimaryKey() }
   / DROP FOREIGN KEY symbol:Identifier {
-      return {
-        type: 'DROP FOREIGN KEY',
-        symbol,
-      }
+      return ast.AlterDropForeignKey(symbol.name)
     }
-  / DROP COLUMN? colName:Identifier {
-      return {
-        type: 'DROP COLUMN',
-        colName,
-      }
-    }
-  / MODIFY COLUMN? colName:Identifier definition:ColumnDefinition
+  / DROP COLUMN? colName:Identifier { return ast.AlterDropColumn(colName.name) }
+  / MODIFY
+    COLUMN?
+    colName:Identifier
+    definition:ColumnDefinition
     position:(
-      AFTER ident:Identifier { return `AFTER ${ident}` }
+      AFTER ident:Identifier { return `AFTER ${ident.name}` }
       / FIRST { return 'FIRST' }
     )? {
       // MODIFY COLUMN is like CHANGE COLUMN in every way, except that it
       // cannot be used to rename a column.  We'll therefore parse any MODIFY
       // COLUMN statement as a CHANGE COLUMN statement where old + new columns
       // are identical (i.e. no rename).
-      return {
-        type: 'CHANGE COLUMN',
-        oldColName: colName,
-        newColName: colName,
+      return ast.AlterChangeColumn(
+        colName.name,
+        colName.name,
         definition,
         position,
-      }
+      )
     }
-  / RENAME ( INDEX / KEY ) oldIndexName:Identifier TO newIndexName:Identifier {
-      return {
-        type: 'RENAME INDEX',
-        oldIndexName,
-        newIndexName,
-      }
+  / RENAME (INDEX / KEY) oldIndexName:Identifier TO newIndexName:Identifier {
+      return ast.AlterRenameIndex(oldIndexName.name, newIndexName.name)
     }
-  / RENAME ( TO / AS )? newTblName:Identifier {
-      return {
-        type: 'RENAME TABLE',
-        newTblName,
-      }
+  / RENAME (TO / AS)? newTblName:Identifier {
+      return ast.AlterRenameTable(newTblName.name)
     }
-  / LOCK EQ? ( DEFAULT / NONE / SHARED / EXCLUSIVE ) { return null; }
-  / CONVERT TO CHARACTER SET
+  / LOCK EQ? (DEFAULT / NONE / SHARED / EXCLUSIVE) { return null }
+  / CONVERT
+    TO
+    CHARACTER
+    SET
     charset:CharsetName
-    collate:( COLLATE collate:CollationName { return collate } )? {
-      return {
-        type: 'CONVERT TO',
-        charset,
-        collate,
-      }
+    collate:(COLLATE collate:CollationName { return collate })? {
+      return ast.AlterConvertTo(charset, collate)
     }
 
-NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol }
+NamedConstraint = CONSTRAINT symbol:Identifier? { return symbol?.name ?? null }
 
-IndexType = USING ( BTREE / HASH )
-
+IndexType = USING (BTREE / HASH)
 
 // ====================================================
 // Create TABLE
 // ====================================================
 CreateTable
-  = CreateTable1   // CREATE TABLE
+  = CreateTable1 // CREATE TABLE
   // CreateTable2  // See https://dev.mysql.com/doc/refman/5.7/en/create-table.html
-  / CreateTable3   // CREATE TABLE ... LIKE
+  / CreateTable3 // CREATE TABLE ... LIKE
 
 CreateTable1
-  = CREATE TABLE
+  = CREATE
+    TABLE
     ifNotExists:(IF NOT EXISTS)?
     tblName:Identifier
-    LPAREN definitions:CreateDefinitionsList RPAREN
+    LPAREN
+    definitions:CreateDefinitionsList
+    RPAREN
     tableOptions:TableOptions? {
       // Turn the list-of-option-pairs into an object
-      const options = Object.assign({}, ...(tableOptions || []));
-      return {
-        type: 'CREATE TABLE',
-        tblName,
+      return ast.CreateTableStatement(
+        tblName.name,
         definitions,
-        options,
-        ifNotExists: !!ifNotExists,
-      }
+        tableOptions,
+        !!ifNotExists,
+      )
     }
 
 CreateTable3
-  = CREATE TABLE
+  = CREATE
+    TABLE
     ifNotExists:(IF NOT EXISTS)?
-    tblName:Identifier LIKE oldTblName:Identifier {
-    return {
-      type: 'CREATE TABLE LIKE', // Copy table
-      tblName,
-      oldTblName,
-      ifNotExists,
+    tblName:Identifier
+    LIKE
+    oldTblName:Identifier {
+      return ast.CreateTableLikeStatement(
+        tblName.name,
+        oldTblName.name,
+        ifNotExists,
+      )
     }
-  }
 
 CreateDefinitionsList
-  = first:CreateDefinition _ ',' _ rest:CreateDefinitionsList { return [first, ...rest] }
+  = first:CreateDefinition _ "," _ rest:CreateDefinitionsList {
+      return [first, ...rest]
+    }
   / only:CreateDefinition { return [only] }
 
 CreateDefinition
   = colName:Identifier _ columnDefinition:ColumnDefinition {
-      return {
-        type: 'COLUMN',
-        colName,
-        definition: columnDefinition,
-      }
+      return ast.Column(colName.name, columnDefinition)
     }
   // / [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (index_col_name, ...) [index_option] ...
   / PRIMARY KEY LPAREN indexColNames:IndexColNames RPAREN {
-    return {
-      type: 'PRIMARY KEY',
-      indexColNames,
+      return ast.PrimaryKey(indexColNames)
     }
-  }
   // / {INDEX|KEY} [index_name] [index_type] (index_col_name, ...)
-  / ( INDEX / KEY ) indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
-    return {
-      type: 'INDEX',
-      indexName,
-      indexColNames,
-    }
-  }
+  / (INDEX / KEY)
+    indexName:Identifier?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN { return ast.Index(indexName?.name ?? null, indexColNames) }
   // / [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (index_col_name, ...) [index_option] ...
-  / constraint:NamedConstraint?
-    UNIQUE (INDEX / KEY)? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'UNIQUE INDEX',
-        constraint,
-        indexName,
+  / constraintName:NamedConstraint?
+    UNIQUE
+    (INDEX / KEY)?
+    indexName:Identifier?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN {
+      return ast.UniqueIndex(
+        constraintName,
+        indexName?.name ?? null,
         indexColNames,
-      }
+      )
     }
-  / FULLTEXT (INDEX / KEY)? indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN {
-      return {
-        type: 'FULLTEXT INDEX',
-        indexName,
-        indexColNames,
-      }
-    }
-  / constraint:NamedConstraint?
-    FOREIGN KEY indexName:Identifier? LPAREN indexColNames:IndexColNames RPAREN reference:ReferenceDefinition {
-      return {
-        type: 'FOREIGN KEY',
-        constraint,
-        indexName,
+  / FULLTEXT
+    (INDEX / KEY)?
+    indexName:Identifier?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN { return ast.FullTextIndex(indexName?.name ?? null, indexColNames) }
+  / constraintName:NamedConstraint?
+    FOREIGN
+    KEY
+    indexName:Identifier?
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN
+    reference:ReferenceDefinition {
+      return ast.ForeignKey(
+        constraintName,
+        indexName?.name ?? null,
         indexColNames,
         reference,
-      }
+      )
     }
-  // / CHECK (expr)
 
+// / CHECK (expr)
 
-  // ALTER .... ... ....  COMMENT '123';
+// ALTER .... ... ....  COMMENT '123';
 
 ColumnDefinition
   = dataType:DataType
-    nullableClause:( NULL / NOT_NULL )?
-    defaultValue:( DEFAULT value:DefaultValueExpr { return value } )?
-    isPrimary1:( PRIMARY KEY )?
+    nullability1:Nullability?
+    defaultValue:(DEFAULT value:DefaultValue { return value })?
+    isPrimary1:(PRIMARY KEY)?
     autoIncrement:AUTO_INCREMENT?
-    isUnique:( UNIQUE KEY? )?
-    isPrimary2:( PRIMARY KEY )?
-    comment:( COMMENT value:StringLiteral { return value.value } )?
+    isUnique:(UNIQUE KEY?)?
+    isPrimary2:(PRIMARY KEY)?
+    comment:(COMMENT value:StringLiteral { return value.value })?
     reference:ReferenceDefinition?
-    onUpdate:( ON UPDATE expr:DefaultValueExpr { return expr } )?
-    generated:( ( GENERATED ALWAYS )? AS LPAREN expr:Expression RPAREN mode:( STORED / VIRTUAL )? { return generated(expr, mode || 'VIRTUAL') } )?
-    nullableClause2:( NULL / NOT_NULL )?
-    {
-      let nullable = null;
-      if (nullableClause === 'NULL' || nullableClause2 === 'NULL') {
-        nullable = true;
-      } else if (nullableClause === 'NOT NULL' || nullableClause2 === 'NOT NULL') {
-        nullable = false;
-      };
-
-      // Unpack the defaultValue / onUpdate AST nodes into a string version for
-      // now.  We changed the parser's output to produce better ASTs, but the
-      // internal simulator data structures aren't aware and capable of
-      // handling those yet.
-      defaultValue = defaultValue === null ? null : serializeDefaultValue_HACK(defaultValue)
-      onUpdate = onUpdate === null ? null : serializeDefaultValue_HACK(onUpdate)
-
-      return {
+    onUpdate:(ON UPDATE expr:CurrentTimestamp { return expr })?
+    generated:(
+      (GENERATED ALWAYS)?
+        AS
+        LPAREN
+        expr:Expression
+        RPAREN
+        mode:(STORED / VIRTUAL)? {
+          return ast.GeneratedDefinition(expr, mode || 'VIRTUAL')
+        }
+    )?
+    nullability2:Nullability? {
+      return ast.ColumnDefinition(
         dataType,
-        nullable,
+        nullability1 ?? nullability2,
         defaultValue,
         onUpdate,
-        isUnique: !!isUnique,
-        isPrimary: !!isPrimary1 || !!isPrimary2,
-        autoIncrement: !!autoIncrement,
+        !!isUnique,
+        !!isPrimary1 || !!isPrimary2,
+        !!autoIncrement,
         comment,
         reference,
         generated,
-      }
+      )
     }
 
+Len = LPAREN number:NumberLiteral RPAREN { return number.value }
 
-Len
-  = LPAREN number:NumberLiteral RPAREN { return number.value }
+Precision
+  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN {
+      return { length: length.value, decimals }
+    }
 
-PrecisionSpec
-  = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN { return [length.value, decimals.value] }
+Charset = CHARACTER SET name:CharsetName { return name }
 
-BoolTypeName
-  = BOOLEAN
+Collate = COLLATE name:CollationName { return name }
 
-IntTypeName
-  = BIGINT
-  / INTEGER
-  / INT
-  / MEDIUMINT
-  / SMALLINT
-  / TINYINT
-
-PrecisionTypeName
-  = REAL
-  / DOUBLE
-  / FLOAT
-  / DECIMAL
-  / NUMERIC
-
-DateTypeName
-  = type:TIMESTAMP precision:Len? { return precision ? `${type}(${precision})`:type }
-  / TIME
-  / type:DATETIME precision:Len? { return precision ? `${type}(${precision})`:type }
-  / DATE
-
-BoolDataType
-  = type:BoolTypeName len:Len? { return 'TINYINT(1)' }
-
-IntDataType
-  = type:IntTypeName len:Len? unsigned:UNSIGNED? {
-    len = len ? `(${len})` : '';
-    unsigned = unsigned || '';
-    return (type + len + ' ' + unsigned).trim()
-  }
-
-PrecisionDataType
-  = type:PrecisionTypeName _ prec:PrecisionSpec? _ unsigned:UNSIGNED? {
-    prec = prec ? `(${prec.join(',')})` : '';
-    unsigned = unsigned || '';
-    return (type + prec + ' ' + unsigned).trim()
-  }
-
-DateDataType
-  = type:DateTypeName { return type }
-
-TextDataType
-  = // Length required
-    type:( VARCHAR / VARBINARY ) len:Len { return `${type}(${len})` }
-  / // Length required
-    type:( CHAR / BINARY / TEXT / MEDIUMTEXT / LONGTEXT ) len:Len? { return len ? `${type}(${len})` : type }
+Encoding
+  = charset:Charset collate:Collate? {
+      return makeEncoding(charset, collate ?? undefined)
+    }
+  / collate:Collate { return makeEncoding(undefined, collate) }
 
 DataType
-  = IntDataType
-  / BoolDataType
-  / DateDataType
-  / PrecisionDataType
-  / type:TextDataType charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
-      return [
-        type,
-        charset ? 'CHARACTER SET ' + charset : null,
-        collate ? 'COLLATE ' + collate : null,
-      ].filter(Boolean).join(' ');
+  = (INTEGER / INT) len:Len? unsigned:UNSIGNED? {
+      return ast.Int((len ?? 11) - (unsigned ? 1 : 0), !!unsigned)
     }
-  / JSON
-  / ENUM LPAREN literals:StringLiteralList RPAREN charset:(CHARACTER SET x:CharsetName { return x })? collate:(COLLATE x:CollationName { return x })? {
-      return [
-        `ENUM(${literals.map(str => str.value).join(',')})`,
-        charset ? 'CHARACTER SET ' + charset : null,
-        collate ? 'COLLATE ' + collate : null,
-      ].filter(Boolean).join(' ');
+  / BIGINT len:Len? unsigned:UNSIGNED? {
+      return ast.BigInt((len ?? 20) - (unsigned ? 1 : 0), !!unsigned)
+    }
+  / MEDIUMINT len:Len? unsigned:UNSIGNED? {
+      return ast.MediumInt((len ?? 9) - (unsigned ? 1 : 0), !!unsigned)
+    }
+  / SMALLINT len:Len? unsigned:UNSIGNED? {
+      return ast.SmallInt((len ?? 6) - (unsigned ? 1 : 0), !!unsigned)
+    }
+  / TINYINT len:Len? unsigned:UNSIGNED? {
+      return ast.TinyInt((len ?? 4) - (unsigned ? 1 : 0), !!unsigned)
+    }
+  / BOOLEAN len:Len? { return ast.TinyInt(len ?? 1, false) }
+  / TIMESTAMP fsp:Len? { return ast.Timestamp(fsp) }
+  / TIME { return ast.Time() }
+  / DATETIME fsp:Len? { return ast.DateTime(fsp) }
+  / DATE { return ast.Date() }
+  / (REAL / DOUBLE) _ precision:Precision? _ unsigned:UNSIGNED? {
+      return ast.Double(precision, !!unsigned)
+    }
+  / FLOAT _ precision:Precision? _ unsigned:UNSIGNED? {
+      return ast.Double(precision, !!unsigned)
+    }
+  / (DECIMAL / NUMERIC) _ precision:Precision? _ unsigned:UNSIGNED? {
+      return ast.Decimal(precision, !!unsigned)
+    }
+
+  // Length required
+  / VARCHAR len:Len encoding:Encoding? { return ast.VarChar(len, encoding) }
+  / VARBINARY len:Len { return ast.VarBinary(len) }
+
+  // Length optional
+  / CHAR len:Len? encoding:Encoding? { return ast.Char(len ?? 1, encoding) }
+  / BINARY len:Len? { return ast.Binary(len) }
+
+  // Length forbidden
+  / TEXT encoding:Encoding? { return ast.Text(encoding) }
+  / MEDIUMTEXT encoding:Encoding? { return ast.MediumText(encoding) }
+  / LONGTEXT encoding:Encoding? { return ast.LongText(encoding) }
+  / JSON { return ast.Json() }
+  / ENUM LPAREN literals:StringLiteralList RPAREN encoding:Encoding? {
+      return ast.Enum(
+        literals.map((lit) => lit.value),
+        encoding,
+      )
     }
 
 IndexColNames
@@ -899,271 +749,455 @@ IndexColNames
   / only:IndexColName { return [only] }
 
 IndexColName
-  = colName:Identifier len:Len? direction:( ASC / DESC )? { return { colName, len, direction } }
+  = colName:Identifier len:Len? direction:(ASC / DESC)? {
+      return ast.IndexColName(colName.name, len, direction)
+    }
 
 ReferenceDefinition
-  = REFERENCES tblName:Identifier LPAREN indexColNames:IndexColNames RPAREN
-    matchMode:( MATCH ( FULL / PARTIAL / SIMPLE ) )?
-    onDelete:( ON DELETE x:ReferenceOption { return x } )?
-    onUpdate:( ON UPDATE x:ReferenceOption { return x } )? {
-      return {
-        tblName,
+  = REFERENCES
+    tblName:Identifier
+    LPAREN
+    indexColNames:IndexColNames
+    RPAREN
+    matchMode:(MATCH (FULL / PARTIAL / SIMPLE))?
+    onDelete:(ON DELETE x:ReferenceOption { return x })?
+    onUpdate:(ON UPDATE x:ReferenceOption { return x })? {
+      return ast.ReferenceDefinition(
+        tblName.name,
         indexColNames,
         matchMode,
-        onDelete: onDelete ?? 'RESTRICT',
+        onDelete ?? 'RESTRICT',
         onUpdate,
-      }
+      )
     }
 
 ReferenceOption
-  = RESTRICT    { return 'RESTRICT' }
-  / CASCADE     { return 'CASCADE' }
-  / SET NULL    { return 'SET NULL' }
-  / NO ACTION   { return 'NO ACTION' }
+  = RESTRICT { return 'RESTRICT' }
+  / CASCADE { return 'CASCADE' }
+  / SET NULL { return 'SET NULL' }
+  / NO ACTION { return 'NO ACTION' }
 
-  // NOTE: While the MySQL accepts "SET DEFAULT" as a valid option, it's
-  // rejected by InnoDB tables.
-  // / SET DEFAULT { return 'SET DEFAULT' }
+// NOTE: While the MySQL accepts "SET DEFAULT" as a valid option, it's
+// rejected by InnoDB tables.
+// / SET DEFAULT { return 'SET DEFAULT' }
+
+DatabaseOptions
+  = options:DatabaseOptionsList {
+      return ast.DatabaseOptions(
+        options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
+        options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
+      )
+    }
+
+DatabaseOptionsList
+  = first:DatabaseOption COMMA? rest:DatabaseOptionsList {
+      return [first, ...rest]
+    }
+  / only:DatabaseOption { return [only] }
+
+DatabaseOption
+  = DEFAULT? CHARACTER SET EQ? CHARSET:CharsetName { return { CHARSET } }
+  / DEFAULT? COLLATE EQ? COLLATE:CollationName { return { COLLATE } }
 
 TableOptions
-  = first:TableOption COMMA? rest:TableOptions { return [first, ...rest] }
+  = options:TableOptionsList {
+      return ast.TableOptions(
+        options.map((opt) => opt.AUTO_INCREMENT).find((x) => x) ?? null,
+        options.map((opt) => opt.ENGINE).find((x) => x) ?? null,
+        options.map((opt) => opt.CHARSET).find((x) => x) ?? null,
+        options.map((opt) => opt.COLLATE).find((x) => x) ?? null,
+      )
+    }
+
+TableOptionsList
+  = first:TableOption COMMA? rest:TableOptionsList { return [first, ...rest] }
   / only:TableOption { return [only] }
 
 TableOption
   = AUTO_INCREMENT EQ? AUTO_INCREMENT:Value { return { AUTO_INCREMENT } }
   / ENGINE EQ? ENGINE:EngineName { return { ENGINE } }
-  / DEFAULT? ( CHARSET / CHARACTER SET ) EQ? CHARSET:CharsetName { return { CHARSET } }
+  / DEFAULT? (CHARSET / CHARACTER SET) EQ? CHARSET:CharsetName {
+      return { CHARSET }
+    }
   / DEFAULT? COLLATE EQ? COLLATE:CollationName { return { COLLATE } }
 
-EngineName
-  = _ 'InnoDB'i !IdentifierStart _ { return 'InnoDB' }
+EngineName = _ "InnoDB"i !IdentifierStart _ { return 'InnoDB' }
 
 CharsetName "character set name"
-  = _ charset:(
-        'latin1'
-      / 'utf8mb4'
-      / 'utf8'
-    ) !IdentifierStart _ { return charset }
+  = _ charset:("latin1" / "utf8mb4" / "utf8") !IdentifierStart _ {
+      return charset
+    }
 
 CollationName "collation name"
-  = _ collation:(
-        'latin1_swedish_ci'
-      / 'latin1_spanish_ci'
-      / 'utf8mb4_general_ci'
-      / 'utf8mb4_unicode_ci'
-      / 'utf8_bin'
-      / 'utf8_general_ci'
-      / 'utf8_unicode_ci'
-    ) !IdentifierStart _ { return collation }
+  = _
+    collation:(
+      "latin1_swedish_ci"
+      / "latin1_spanish_ci"
+      / "utf8mb4_general_ci"
+      / "utf8mb4_unicode_ci"
+      / "utf8_bin"
+      / "utf8_general_ci"
+      / "utf8_unicode_ci"
+    )
+    !IdentifierStart
+    _ { return collation }
 
 ValueList
   = first:Value COMMA rest:ValueList { return [first, ...rest] }
   / only:Value { return [only] }
 
-Value
-  = lit:Literal { return lit.value }
+Value = lit:Literal { return lit.value }
 
 /* System functions */
 
-DefaultValueExpr
+DefaultValue
   = Literal
   / CurrentTimestamp
-  / NowCall
 
 CurrentTimestamp
-  = value:CURRENT_TIMESTAMP precision:( LPAREN n:NumberLiteral? RPAREN { return n } )? {
-    return callExpression(builtinFunction(value), precision ? [precision] : undefined)
-  }
+  // All of these are synonyms for CURRENT_TIMESTAMP: NOW(), LOCALTIME,
+  // LOCALTIME(), LOCALTIMESTAMP, LOCALTIMESTAMP(). Note that only `NOW` is
+  // a little bit different: it's the only one that cannot occur without
+  // parens!
+  = NOW LPAREN precision:NumberLiteral? RPAREN {
+      return ast.CurrentTimestamp(precision !== null ? precision.value : null)
+    }
+  / (CURRENT_TIMESTAMP / LOCALTIMESTAMP / LOCALTIME)
+    precision:(LPAREN n:NumberLiteral? RPAREN { return n })? {
+      return ast.CurrentTimestamp(precision !== null ? precision.value : null)
+    }
 
-NowCall
-  = NOW LPAREN RPAREN { return callExpression(builtinFunction('NOW'), []) }
+Nullability
+  = NULL { return true }
+  / NOT NULL { return false }
 
 // ====================================================
 // Util
 // ====================================================
 
 _ "whitespace" = Whitespace* { return null }
+
 Whitespace
   = [ \t\r\n]
   / Comment
 
-// TODO: Let this return identifier() nodes
 Identifier
   = QuotedIdentifier
   / NonQuotedIdentifier
 
 QuotedIdentifier
-  = _ '`' chars:[^`]+ '`' _ { return chars.join('') }
+  = _ "`" chars:[^`]+ "`" _ { return ast.Identifier(chars.join('')) }
 
 NonQuotedIdentifier
-  = _ !Keyword first:IdentifierStart rest:IdentifierChar* _ { return [first, ...rest].join('') }
+  = _ !Keyword first:IdentifierStart rest:IdentifierChar* _ {
+      return ast.Identifier([first, ...rest].join(''))
+    }
 
 // ====================================================
 // Keywords
 // ====================================================
 
 IdentifierStart = [a-zA-Z_]
+
 IdentifierChar = [a-zA-Z0-9_]
 
 Keyword
-  = FOREIGN / KEY / PRIMARY / UNIQUE
+  = FOREIGN
+  / KEY
+  / PRIMARY
+  / UNIQUE
 
-ACTION            = _ 'ACTION'i            !IdentifierChar _ { return 'ACTION' }
-ADD               = _ 'ADD'i               !IdentifierChar _ { return 'ADD' }
-AFTER             = _ 'AFTER'i             !IdentifierChar _ { return 'AFTER' }
-ALTER             = _ 'ALTER'i             !IdentifierChar _ { return 'ALTER' }
-ALWAYS            = _ 'ALWAYS'i            !IdentifierChar _ { return 'ALWAYS' }
-AND               = _ 'AND'i               !IdentifierChar _ { return 'AND' }
-AS                = _ 'AS'i                !IdentifierChar _ { return 'AS' }
-ASC               = _ 'ASC'i               !IdentifierChar _ { return 'ASC' }
-AUTO_INCREMENT    = _ 'AUTO_INCREMENT'i    !IdentifierChar _ { return 'AUTO_INCREMENT' }
-BEFORE            = _ 'BEFORE'i            !IdentifierChar _ { return 'BEFORE' }
-BEGIN             = _ 'BEGIN'i             !IdentifierChar _ { return 'BEGIN' }
-BIGINT            = _ 'BIGINT'i            !IdentifierChar _ { return 'BIGINT' }
-BINARY            = _ 'BINARY'i            !IdentifierChar _ { return 'BINARY' }
-BOOLEAN           = _ 'BOOLEAN'i           !IdentifierChar _ { return 'BOOLEAN' }
-BTREE             = _ 'BTREE'i             !IdentifierChar _ { return 'BTREE' }
-CASCADE           = _ 'CASCADE'i           !IdentifierChar _ { return 'CASCADE' }
-CHANGE            = _ 'CHANGE'i            !IdentifierChar _ { return 'CHANGE' }
-CHAR              = _ 'CHAR'i              !IdentifierChar _ { return 'CHAR' }
-CHARACTER         = _ 'CHARACTER'i         !IdentifierChar _ { return 'CHARACTER' }
-CHARSET           = _ 'CHARSET'i           !IdentifierChar _ { return 'CHARSET' }
-COLLATE           = _ 'COLLATE'i           !IdentifierChar _ { return 'COLLATE' }
-COLUMN            = _ 'COLUMN'i            !IdentifierChar _ { return 'COLUMN' }
-COMMENT           = _ 'COMMENT'i           !IdentifierChar _ { return 'COMMENT' }
-CONSTRAINT        = _ 'CONSTRAINT'i        !IdentifierChar _ { return 'CONSTRAINT' }
-CONVERT           = _ 'CONVERT'i           !IdentifierChar _ { return 'CONVERT' }
-CREATE            = _ 'CREATE'i            !IdentifierChar _ { return 'CREATE' }
-CURRENT_TIMESTAMP = _ 'CURRENT_TIMESTAMP'i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
-DATABASE          = _ 'DATABASE'i          !IdentifierChar _ { return 'DATABASE' }
-DATE              = _ 'DATE'i              !IdentifierChar _ { return 'DATE' }
-DATETIME          = _ 'DATETIME'i          !IdentifierChar _ { return 'DATETIME' }
-DECIMAL           = _ 'DECIMAL'i           !IdentifierChar _ { return 'DECIMAL' }
-DECLARE           = _ 'DECLARE'i           !IdentifierChar _ { return 'DECLARE' }
-DEFAULT           = _ 'DEFAULT'i           !IdentifierChar _ { return 'DEFAULT' }
-DELETE            = _ 'DELETE'i            !IdentifierChar _ { return 'DELETE' }
-DESC              = _ 'DESC'i              !IdentifierChar _ { return 'DESC' }
-DETERMINISTIC     = _ 'DETERMINISTIC'i     !IdentifierChar _ { return 'DETERMINISTIC' }
-DIV               = _ 'DIV'i               !IdentifierChar _ { return 'DIV' }
-DO                = _ 'DO'i                !IdentifierChar _ { return 'DO' }
-DOUBLE            = _ 'DOUBLE'i            !IdentifierChar _ { return 'DOUBLE' }
-DROP              = _ 'DROP'i              !IdentifierChar _ { return 'DROP' }
-EACH              = _ 'EACH'i              !IdentifierChar _ { return 'EACH' }
-ELSE              = _ 'ELSE'i              !IdentifierChar _ { return 'ELSE' }
-ELSEIF            = _ 'ELSEIF'i            !IdentifierChar _ { return 'ELSEIF' }
-END               = _ 'END'i               !IdentifierChar _ { return 'END' }
-ENGINE            = _ 'ENGINE'i            !IdentifierChar _ { return 'ENGINE' }
-ENUM              = _ 'ENUM'i              !IdentifierChar _ { return 'ENUM' }
-EXCLUSIVE         = _ 'EXCLUSIVE'i         !IdentifierChar _ { return 'EXCLUSIVE' }
-EXISTS            = _ 'EXISTS'i            !IdentifierChar _ { return 'EXISTS' }
-FALSE             = _ 'FALSE'i             !IdentifierChar _ { return 'FALSE' }
-FIRST             = _ 'FIRST'i             !IdentifierChar _ { return 'FIRST' }
-FLOAT             = _ 'FLOAT'i             !IdentifierChar _ { return 'FLOAT' }
-FOLLOWS           = _ 'FOLLOWS'i           !IdentifierChar _ { return 'FOLLOWS' }
-FOR               = _ 'FOR'i               !IdentifierChar _ { return 'FOR' }
-FOREIGN           = _ 'FOREIGN'i           !IdentifierChar _ { return 'FOREIGN' }
-FULL              = _ 'FULL'i              !IdentifierChar _ { return 'FULL' }
-FULLTEXT          = _ 'FULLTEXT'i          !IdentifierChar _ { return 'FULLTEXT' }
-FUNCTION          = _ 'FUNCTION'i          !IdentifierChar _ { return 'FUNCTION' }
-GENERATED         = _ 'GENERATED'i         !IdentifierChar _ { return 'GENERATED' }
-HASH              = _ 'HASH'i              !IdentifierChar _ { return 'HASH' }
-IF                = _ 'IF'i                !IdentifierChar _ { return 'IF' }
-INDEX             = _ 'INDEX'i             !IdentifierChar _ { return 'INDEX' }
-INSERT            = _ 'INSERT'i            !IdentifierChar _ { return 'INSERT' }
-INT               = _ 'INT'i               !IdentifierChar _ { return 'INT' }
-INTEGER           = _ 'INTEGER'i           !IdentifierChar _ { return 'INTEGER' }
-IS                = _ 'IS'i                !IdentifierChar _ { return 'IS' }
-JSON              = _ 'JSON'i              !IdentifierChar _ { return 'JSON' }
-KEY               = _ 'KEY'i               !IdentifierChar _ { return 'KEY' }
-LIKE              = _ 'LIKE'i              !IdentifierChar _ { return 'LIKE' }
-LOCK              = _ 'LOCK'i              !IdentifierChar _ { return 'LOCK' }
-LONGTEXT          = _ 'LONGTEXT'i          !IdentifierChar _ { return 'LONGTEXT' }
-MATCH             = _ 'MATCH'i             !IdentifierChar _ { return 'MATCH' }
-MEDIUMINT         = _ 'MEDIUMINT'i         !IdentifierChar _ { return 'MEDIUMINT' }
-MEDIUMTEXT        = _ 'MEDIUMTEXT'i        !IdentifierChar _ { return 'MEDIUMTEXT' }
-MOD               = _ 'MOD'i               !IdentifierChar _ { return 'MOD' }
-MODIFY            = _ 'MODIFY'i            !IdentifierChar _ { return 'MODIFY' }
-NEW               = _ 'NEW'i               !IdentifierChar _ { return 'NEW' }
-NO                = _ 'NO'i                !IdentifierChar _ { return 'NO' }
-NONE              = _ 'NONE'i              !IdentifierChar _ { return 'NONE' }
-NOT               = _ 'NOT'i               !IdentifierChar _ { return 'NOT' }
-NOW               = _ 'NOW'i               !IdentifierChar _ { return 'NOW' }
-NULL              = _ 'NULL'i              !IdentifierChar _ { return 'NULL' }
-NUMERIC           = _ 'NUMERIC'i           !IdentifierChar _ { return 'NUMERIC' }
-OLD               = _ 'OLD'i               !IdentifierChar _ { return 'OLD' }
-ON                = _ 'ON'i                !IdentifierChar _ { return 'ON' }
-OR                = _ 'OR'i                !IdentifierChar _ { return 'OR' }
-PARTIAL           = _ 'PARTIAL'i           !IdentifierChar _ { return 'PARTIAL' }
-PRECEDES          = _ 'PRECEDES'i          !IdentifierChar _ { return 'PRECEDES' }
-PRIMARY           = _ 'PRIMARY'i           !IdentifierChar _ { return 'PRIMARY' }
-REAL              = _ 'REAL'i              !IdentifierChar _ { return 'REAL' }
-REFERENCES        = _ 'REFERENCES'i        !IdentifierChar _ { return 'REFERENCES' }
-REGEXP            = _ 'REGEXP'i            !IdentifierChar _ { return 'REGEXP' }
-RENAME            = _ 'RENAME'i            !IdentifierChar _ { return 'RENAME' }
-RESTRICT          = _ 'RESTRICT'i          !IdentifierChar _ { return 'RESTRICT' }
-RETURN            = _ 'RETURN'i            !IdentifierChar _ { return 'RETURN' }
-RETURNS           = _ 'RETURNS'i           !IdentifierChar _ { return 'RETURNS' }
-RLIKE             = _ 'RLIKE'i             !IdentifierChar _ { return 'RLIKE' }
-ROW               = _ 'ROW'i               !IdentifierChar _ { return 'ROW' }
-SELECT            = _ 'SELECT'i            !IdentifierChar _ { return 'SELECT' }
-SET               = _ 'SET'i               !IdentifierChar _ { return 'SET' }
-SHARED            = _ 'SHARED'i            !IdentifierChar _ { return 'SHARED' }
-SIMPLE            = _ 'SIMPLE'i            !IdentifierChar _ { return 'SIMPLE' }
-SMALLINT          = _ 'SMALLINT'i          !IdentifierChar _ { return 'SMALLINT' }
-STORED            = _ 'STORED'i            !IdentifierChar _ { return 'STORED' }
-TABLE             = _ 'TABLE'i             !IdentifierChar _ { return 'TABLE' }
-TEXT              = _ 'TEXT'i              !IdentifierChar _ { return 'TEXT' }
-THEN              = _ 'THEN'i              !IdentifierChar _ { return 'THEN' }
-TIME              = _ 'TIME'i              !IdentifierChar _ { return 'TIME' }
-TIMESTAMP         = _ 'TIMESTAMP'i         !IdentifierChar _ { return 'TIMESTAMP' }
-TINYINT           = _ 'TINYINT'i           !IdentifierChar _ { return 'TINYINT' }
-TO                = _ 'TO'i                !IdentifierChar _ { return 'TO' }
-TRIGGER           = _ 'TRIGGER'i           !IdentifierChar _ { return 'TRIGGER' }
-TRUE              = _ 'TRUE'i              !IdentifierChar _ { return 'TRUE' }
-UNIQUE            = _ 'UNIQUE'i            !IdentifierChar _ { return 'UNIQUE' }
-UNLOCK            = _ 'UNLOCK'i            !IdentifierChar _ { return 'UNLOCK' }
-UNSIGNED          = _ 'UNSIGNED'i          !IdentifierChar _ { return 'UNSIGNED' }
-UPDATE            = _ 'UPDATE'i            !IdentifierChar _ { return 'UPDATE' }
-USING             = _ 'USING'i             !IdentifierChar _ { return 'USING' }
-VARBINARY         = _ 'VARBINARY'i         !IdentifierChar _ { return 'VARBINARY' }
-VARCHAR           = _ 'VARCHAR'i           !IdentifierChar _ { return 'VARCHAR' }
-VIRTUAL           = _ 'VIRTUAL'i           !IdentifierChar _ { return 'VIRTUAL' }
-WHILE             = _ 'WHILE'i             !IdentifierChar _ { return 'WHILE' }
-XOR               = _ 'XOR'i               !IdentifierChar _ { return 'XOR' }
+ACTION = _ "ACTION"i !IdentifierChar _ { return 'ACTION' }
 
-// Reserved built-in functions
-// TODO: Complete this list
-CHAR_LENGTH       = _ 'CHAR_LENGTH'i       !IdentifierChar _ { return 'CHAR_LENGTH' }
-CONCAT            = _ 'CONCAT'i            !IdentifierChar _ { return 'CONCAT' }
-CONV              = _ 'CONV'i              !IdentifierChar _ { return 'CONV' }
-HEX               = _ 'HEX'i               !IdentifierChar _ { return 'HEX' }
-SUBSTRING         = _ 'SUBSTRING'i         !IdentifierChar _ { return 'SUBSTRING' }
-UNHEX             = _ 'UNHEX'i             !IdentifierChar _ { return 'UNHEX' }
+ADD = _ "ADD"i !IdentifierChar _ { return 'ADD' }
 
-// Composite types
-NOT_NULL = NOT NULL { return 'NOT NULL' }
+AFTER = _ "AFTER"i !IdentifierChar _ { return 'AFTER' }
+
+ALTER = _ "ALTER"i !IdentifierChar _ { return 'ALTER' }
+
+ALWAYS = _ "ALWAYS"i !IdentifierChar _ { return 'ALWAYS' }
+
+AND = _ "AND"i !IdentifierChar _ { return 'AND' }
+
+AS = _ "AS"i !IdentifierChar _ { return 'AS' }
+
+ASC = _ "ASC"i !IdentifierChar _ { return 'ASC' }
+
+AUTO_INCREMENT
+  = _ "AUTO_INCREMENT"i !IdentifierChar _ { return 'AUTO_INCREMENT' }
+
+BEFORE = _ "BEFORE"i !IdentifierChar _ { return 'BEFORE' }
+
+BEGIN = _ "BEGIN"i !IdentifierChar _ { return 'BEGIN' }
+
+BIGINT = _ "BIGINT"i !IdentifierChar _ { return 'BIGINT' }
+
+BINARY = _ "BINARY"i !IdentifierChar _ { return 'BINARY' }
+
+BOOLEAN = _ "BOOLEAN"i !IdentifierChar _ { return 'BOOLEAN' }
+
+BTREE = _ "BTREE"i !IdentifierChar _ { return 'BTREE' }
+
+CASCADE = _ "CASCADE"i !IdentifierChar _ { return 'CASCADE' }
+
+CHANGE = _ "CHANGE"i !IdentifierChar _ { return 'CHANGE' }
+
+CHAR = _ "CHAR"i !IdentifierChar _ { return 'CHAR' }
+
+CHARACTER = _ "CHARACTER"i !IdentifierChar _ { return 'CHARACTER' }
+
+CHARSET = _ "CHARSET"i !IdentifierChar _ { return 'CHARSET' }
+
+COLLATE = _ "COLLATE"i !IdentifierChar _ { return 'COLLATE' }
+
+COLUMN = _ "COLUMN"i !IdentifierChar _ { return 'COLUMN' }
+
+COMMENT = _ "COMMENT"i !IdentifierChar _ { return 'COMMENT' }
+
+CONSTRAINT = _ "CONSTRAINT"i !IdentifierChar _ { return 'CONSTRAINT' }
+
+CONVERT = _ "CONVERT"i !IdentifierChar _ { return 'CONVERT' }
+
+CREATE = _ "CREATE"i !IdentifierChar _ { return 'CREATE' }
+
+CURRENT_TIMESTAMP
+  = _ "CURRENT_TIMESTAMP"i !IdentifierChar _ { return 'CURRENT_TIMESTAMP' }
+
+LOCALTIME = _ "LOCALTIME"i !IdentifierChar _ { return 'LOCALTIME' }
+
+LOCALTIMESTAMP
+  = _ "LOCALTIMESTAMP"i !IdentifierChar _ { return 'LOCALTIMESTAMP' }
+
+DATABASE = _ "DATABASE"i !IdentifierChar _ { return 'DATABASE' }
+
+DATE = _ "DATE"i !IdentifierChar _ { return 'DATE' }
+
+DATETIME = _ "DATETIME"i !IdentifierChar _ { return 'DATETIME' }
+
+DECIMAL = _ "DECIMAL"i !IdentifierChar _ { return 'DECIMAL' }
+
+DECLARE = _ "DECLARE"i !IdentifierChar _ { return 'DECLARE' }
+
+DEFAULT = _ "DEFAULT"i !IdentifierChar _ { return 'DEFAULT' }
+
+DELETE = _ "DELETE"i !IdentifierChar _ { return 'DELETE' }
+
+DESC = _ "DESC"i !IdentifierChar _ { return 'DESC' }
+
+DETERMINISTIC = _ "DETERMINISTIC"i !IdentifierChar _ { return 'DETERMINISTIC' }
+
+DIV = _ "DIV"i !IdentifierChar _ { return 'DIV' }
+
+DO = _ "DO"i !IdentifierChar _ { return 'DO' }
+
+DOUBLE = _ "DOUBLE"i !IdentifierChar _ { return 'DOUBLE' }
+
+DROP = _ "DROP"i !IdentifierChar _ { return 'DROP' }
+
+EACH = _ "EACH"i !IdentifierChar _ { return 'EACH' }
+
+ELSE = _ "ELSE"i !IdentifierChar _ { return 'ELSE' }
+
+ELSEIF = _ "ELSEIF"i !IdentifierChar _ { return 'ELSEIF' }
+
+END = _ "END"i !IdentifierChar _ { return 'END' }
+
+ENGINE = _ "ENGINE"i !IdentifierChar _ { return 'ENGINE' }
+
+ENUM = _ "ENUM"i !IdentifierChar _ { return 'ENUM' }
+
+EXCLUSIVE = _ "EXCLUSIVE"i !IdentifierChar _ { return 'EXCLUSIVE' }
+
+EXISTS = _ "EXISTS"i !IdentifierChar _ { return 'EXISTS' }
+
+FALSE = _ "FALSE"i !IdentifierChar _ { return 'FALSE' }
+
+FIRST = _ "FIRST"i !IdentifierChar _ { return 'FIRST' }
+
+FLOAT = _ "FLOAT"i !IdentifierChar _ { return 'FLOAT' }
+
+FOLLOWS = _ "FOLLOWS"i !IdentifierChar _ { return 'FOLLOWS' }
+
+FOR = _ "FOR"i !IdentifierChar _ { return 'FOR' }
+
+FOREIGN = _ "FOREIGN"i !IdentifierChar _ { return 'FOREIGN' }
+
+FULL = _ "FULL"i !IdentifierChar _ { return 'FULL' }
+
+FULLTEXT = _ "FULLTEXT"i !IdentifierChar _ { return 'FULLTEXT' }
+
+FUNCTION = _ "FUNCTION"i !IdentifierChar _ { return 'FUNCTION' }
+
+GENERATED = _ "GENERATED"i !IdentifierChar _ { return 'GENERATED' }
+
+HASH = _ "HASH"i !IdentifierChar _ { return 'HASH' }
+
+IF = _ "IF"i !IdentifierChar _ { return ast.BuiltInFunction('IF') }
+
+INDEX = _ "INDEX"i !IdentifierChar _ { return 'INDEX' }
+
+INSERT = _ "INSERT"i !IdentifierChar _ { return 'INSERT' }
+
+INT = _ "INT"i !IdentifierChar _ { return 'INT' }
+
+INTEGER = _ "INTEGER"i !IdentifierChar _ { return 'INTEGER' }
+
+IS = _ "IS"i !IdentifierChar _ { return 'IS' }
+
+JSON = _ "JSON"i !IdentifierChar _ { return 'JSON' }
+
+KEY = _ "KEY"i !IdentifierChar _ { return 'KEY' }
+
+LIKE = _ "LIKE"i !IdentifierChar _ { return 'LIKE' }
+
+LOCK = _ "LOCK"i !IdentifierChar _ { return 'LOCK' }
+
+LONGTEXT = _ "LONGTEXT"i !IdentifierChar _ { return 'LONGTEXT' }
+
+MATCH = _ "MATCH"i !IdentifierChar _ { return 'MATCH' }
+
+MEDIUMINT = _ "MEDIUMINT"i !IdentifierChar _ { return 'MEDIUMINT' }
+
+MEDIUMTEXT = _ "MEDIUMTEXT"i !IdentifierChar _ { return 'MEDIUMTEXT' }
+
+MOD = _ "MOD"i !IdentifierChar _ { return 'MOD' }
+
+MODIFY = _ "MODIFY"i !IdentifierChar _ { return 'MODIFY' }
+
+NEW = _ "NEW"i !IdentifierChar _ { return 'NEW' }
+
+NO = _ "NO"i !IdentifierChar _ { return 'NO' }
+
+NONE = _ "NONE"i !IdentifierChar _ { return 'NONE' }
+
+NOT = _ "NOT"i !IdentifierChar _ { return 'NOT' }
+
+NOW = _ "NOW"i !IdentifierChar _ { return ast.BuiltInFunction('NOW') }
+
+NULL = _ "NULL"i !IdentifierChar _ { return 'NULL' }
+
+NUMERIC = _ "NUMERIC"i !IdentifierChar _ { return 'NUMERIC' }
+
+OLD = _ "OLD"i !IdentifierChar _ { return 'OLD' }
+
+ON = _ "ON"i !IdentifierChar _ { return 'ON' }
+
+OR = _ "OR"i !IdentifierChar _ { return 'OR' }
+
+PARTIAL = _ "PARTIAL"i !IdentifierChar _ { return 'PARTIAL' }
+
+PRECEDES = _ "PRECEDES"i !IdentifierChar _ { return 'PRECEDES' }
+
+PRIMARY = _ "PRIMARY"i !IdentifierChar _ { return 'PRIMARY' }
+
+REAL = _ "REAL"i !IdentifierChar _ { return 'REAL' }
+
+REFERENCES = _ "REFERENCES"i !IdentifierChar _ { return 'REFERENCES' }
+
+REGEXP = _ "REGEXP"i !IdentifierChar _ { return 'REGEXP' }
+
+RENAME = _ "RENAME"i !IdentifierChar _ { return 'RENAME' }
+
+RESTRICT = _ "RESTRICT"i !IdentifierChar _ { return 'RESTRICT' }
+
+RETURN = _ "RETURN"i !IdentifierChar _ { return 'RETURN' }
+
+RETURNS = _ "RETURNS"i !IdentifierChar _ { return 'RETURNS' }
+
+RLIKE = _ "RLIKE"i !IdentifierChar _ { return 'RLIKE' }
+
+ROW = _ "ROW"i !IdentifierChar _ { return 'ROW' }
+
+SELECT = _ "SELECT"i !IdentifierChar _ { return 'SELECT' }
+
+SET = _ "SET"i !IdentifierChar _ { return 'SET' }
+
+SHARED = _ "SHARED"i !IdentifierChar _ { return 'SHARED' }
+
+SIMPLE = _ "SIMPLE"i !IdentifierChar _ { return 'SIMPLE' }
+
+SMALLINT = _ "SMALLINT"i !IdentifierChar _ { return 'SMALLINT' }
+
+STORED = _ "STORED"i !IdentifierChar _ { return 'STORED' }
+
+TABLE = _ "TABLE"i !IdentifierChar _ { return 'TABLE' }
+
+TEXT = _ "TEXT"i !IdentifierChar _ { return 'TEXT' }
+
+THEN = _ "THEN"i !IdentifierChar _ { return 'THEN' }
+
+TIME = _ "TIME"i !IdentifierChar _ { return 'TIME' }
+
+TIMESTAMP = _ "TIMESTAMP"i !IdentifierChar _ { return 'TIMESTAMP' }
+
+TINYINT = _ "TINYINT"i !IdentifierChar _ { return 'TINYINT' }
+
+TO = _ "TO"i !IdentifierChar _ { return 'TO' }
+
+TRIGGER = _ "TRIGGER"i !IdentifierChar _ { return 'TRIGGER' }
+
+TRUE = _ "TRUE"i !IdentifierChar _ { return 'TRUE' }
+
+UNIQUE = _ "UNIQUE"i !IdentifierChar _ { return 'UNIQUE' }
+
+UNLOCK = _ "UNLOCK"i !IdentifierChar _ { return 'UNLOCK' }
+
+UNSIGNED = _ "UNSIGNED"i !IdentifierChar _ { return 'UNSIGNED' }
+
+UPDATE = _ "UPDATE"i !IdentifierChar _ { return 'UPDATE' }
+
+USING = _ "USING"i !IdentifierChar _ { return 'USING' }
+
+VARBINARY = _ "VARBINARY"i !IdentifierChar _ { return 'VARBINARY' }
+
+VARCHAR = _ "VARCHAR"i !IdentifierChar _ { return 'VARCHAR' }
+
+VIRTUAL = _ "VIRTUAL"i !IdentifierChar _ { return 'VIRTUAL' }
+
+WHILE = _ "WHILE"i !IdentifierChar _ { return 'WHILE' }
+
+XOR = _ "XOR"i !IdentifierChar _ { return 'XOR' }
 
 // ====================================================
 // Tokens
 // ====================================================
 
-ARROW      = _ '->' _   { return '->' }
-ARROWW     = _ '->>' _  { return '->>' }
-BANG       = _ '!' _    { return '+' }
-COMMA      = _ ',' _    { return ',' }
-DIVIDE     = _ '/' _    { return '/' }
-EQ         = _ '=' _    { return '=' }
-GT         = _ '>' _    { return '>' }
-GTE        = _ '>=' _   { return '>=' }
-LPAREN     = _ '(' _    { return '(' }
-LT         = _ '<' _    { return '<' }
-LTE        = _ '<=' _   { return '<=' }
-MINUS      = _ '-' _    { return '-' }
-MULT       = _ '*' _    { return '*' }
-NE         = _ '<=>' _  { return '<=>' }
-NE1        = _ '<>' _   { return '<>' }
-NE2        = _ '!=' _   { return '<>' }
-PERCENTAGE = _ '%' _    { return '%' }
-PLUS       = _ '+' _    { return '+' }
-RPAREN     = _ ')' _    { return ')' }
-SEMICOLON  = _ ';' _    { return ';' }
+ARROW = _ "->" _ { return '->' }
+
+ARROWW = _ "->>" _ { return '->>' }
+
+BANG = _ "!" _ { return '+' }
+
+COMMA = _ "," _ { return ',' }
+
+DIVIDE = _ "/" _ { return '/' }
+
+EQ = _ "=" _ { return '=' }
+
+GT = _ ">" _ { return '>' }
+
+GTE = _ ">=" _ { return '>=' }
+
+LPAREN = _ "(" _ { return '(' }
+
+LT = _ "<" _ { return '<' }
+
+LTE = _ "<=" _ { return '<=' }
+
+MINUS = _ "-" _ { return '-' }
+
+MULT = _ "*" _ { return '*' }
+
+STRICT_EQ = _ "<=>" _ { return '<=>' }
+
+NE1 = _ "<>" _ { return '<>' }
+
+NE2 = _ "!=" _ { return '<>' }
+
+PERCENTAGE = _ "%" _ { return '%' }
+
+PLUS = _ "+" _ { return '+' }
+
+RPAREN = _ ")" _ { return ')' }
+
+SEMICOLON = _ ";" _ { return ';' }

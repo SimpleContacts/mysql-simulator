@@ -17,7 +17,6 @@ import type {
   AlterSpec,
   AlterTableStatement,
   ColumnDefinition,
-  ConstantExpr,
   CreateIndexStatement,
   CreateTableDefinition,
   CreateTableLikeStatement,
@@ -25,16 +24,14 @@ import type {
   CreateTriggerStatement,
   DropIndexStatement,
   DropTableStatement,
-  Identifier,
   IndexColName,
   IndexType,
-  NamedConstraint,
   ReferenceDefinition,
   ReferenceOption,
   RenameTableStatement,
   Statement,
   TableOptions,
-} from './ast';
+} from '../ast';
 // $FlowFixMe[untyped-import] - the parser isn't type-annotated
 import { parse as rawParseSql } from './mysql';
 
@@ -107,7 +104,6 @@ export type {
   AlterSpec,
   AlterTableStatement,
   ColumnDefinition,
-  ConstantExpr,
   CreateIndexStatement,
   CreateTableDefinition,
   CreateTableLikeStatement,
@@ -115,10 +111,8 @@ export type {
   CreateTriggerStatement,
   DropIndexStatement,
   DropTableStatement,
-  Identifier,
   IndexColName,
   IndexType,
-  NamedConstraint,
   ReferenceDefinition,
   ReferenceOption,
   RenameTableStatement,

@@ -32,5 +32,6 @@ CREATE TABLE t2 (
     x6 BOOLEAN AS (c1 ->> '$.type' = 'CONTACTS'),
 
     y1 VARCHAR(12) AS (IF(c1 IS NOT NULL, 'foo', 'bar')),
-    y2 VARCHAR(12) AS (IF(c1, NULL, 'bar'))
+    y2 VARCHAR(12) AS (IF(c1, NULL, 'bar')),
+    y3 VARCHAR(64) AS (concat_ws(' ',trim(`x1`),trim(`x2`)))
 );
