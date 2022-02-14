@@ -680,7 +680,7 @@ Len = LPAREN number:NumberLiteral RPAREN { return number.value }
 
 Precision
   = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN {
-      return { length: length.value, decimals }
+      return { length: length.value, decimals: decimals.value }
     }
 
 Charset = CHARACTER SET name:CharsetName { return name }

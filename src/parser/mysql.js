@@ -434,7 +434,7 @@ function peg$parse(input, options) {
           },
       peg$c119 = function(number) { return number.value },
       peg$c120 = function(length, decimals) {
-            return { length: length.value, decimals }
+            return { length: length.value, decimals: decimals.value }
           },
       peg$c121 = function(name) { return name },
       peg$c122 = function(charset, collate) {
