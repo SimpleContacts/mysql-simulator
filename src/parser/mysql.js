@@ -465,7 +465,8 @@ function peg$parse(input, options) {
             return ast.Double(precision, !!unsigned)
           },
       peg$c135 = function(precision, unsigned) {
-            return ast.Decimal(precision, !!unsigned)
+            const DEFAULT_PRECISION = { length: 10, decimals: 0 }
+            return ast.Decimal(precision ?? DEFAULT_PRECISION, !!unsigned)
           },
       peg$c136 = function(len, encoding) { return ast.VarChar(len, encoding) },
       peg$c137 = function(len) { return ast.VarBinary(len) },

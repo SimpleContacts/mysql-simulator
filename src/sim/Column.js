@@ -89,10 +89,20 @@ export default class Column {
     function formatDefaultValue(node: DefaultValue): string {
       if (node._kind === 'Literal') {
         let value = node.value;
+        if (value === null) {
+          return 'NULL';
+        }
+
         if (value === true) {
           value = 1;
         } else if (value === false) {
           value = 0;
+        }
+
+        // DECIMAL fields explicitly output a fixed-digit number according to
+        // their precision
+        if (dataType._kind === 'Decimal') {
+          return serializeExpression(ast.Literal(Number(value).toFixed(dataType.precision.decimals)));
         }
 
         if (typeof value === 'string') {
@@ -100,15 +110,7 @@ export default class Column {
         } else if (typeof value === 'number') {
           // MySQL outputs number constants as strings. No idea why that would
           // make sense, but let's just replicate its behaviour... ¯\_(ツ)_/¯
-          let node2 = node;
-          if (dataType._kind === 'Decimal') {
-            node2 = ast.Literal(value.toFixed(dataType.precision?.decimals ?? 2));
-          } else {
-            node2 = ast.Literal(String(value));
-          }
-          return serializeExpression(node2);
-        } else if (value === null) {
-          return 'NULL';
+          return serializeExpression(ast.Literal(String(value)));
         }
       } else if (node._kind === 'CurrentTimestamp') {
         return serializeCurrentTimestamp(node);
