@@ -582,7 +582,7 @@ export type DateTime = {|
 
 export type Decimal = {|
   _kind: 'Decimal',
-  precision: Precision | null,
+  precision: Precision,
   unsigned: boolean,
 |};
 
@@ -1625,7 +1625,7 @@ export default {
     };
   },
 
-  Decimal(precision: Precision | null, unsigned: boolean): Decimal {
+  Decimal(precision: Precision, unsigned: boolean): Decimal {
     invariant(
       typeof unsigned === 'boolean',
       `Invalid value for "unsigned" arg in "Decimal" call.\nExpected: boolean\nGot:      ${JSON.stringify(unsigned)}`,
