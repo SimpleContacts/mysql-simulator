@@ -3,6 +3,7 @@
 import invariant from 'invariant';
 
 import { escape } from '../printer';
+import type { MySQLVersion } from '../printer/utils';
 
 export type ReferenceOption =
   | 'RESTRICT' // The default
@@ -14,7 +15,7 @@ export type ReferenceOption =
 type Reference = {|
   +table: string,
   +columns: $ReadOnlyArray<string>,
-  +onDelete: ReferenceOption,
+  +onDelete: ReferenceOption | null,
 |};
 
 export default class ForeignKey {
@@ -43,12 +44,25 @@ export default class ForeignKey {
     );
   }
 
-  toString(): string {
+  toString(target: MySQLVersion): string {
+    let onDeleteClause;
+
+    if (target === '5.7') {
+      // MySQL 5.7 will never show RESTRICT, even if it's set explicitly
+      onDeleteClause =
+        this.reference.onDelete !== null && this.reference.onDelete !== 'RESTRICT'
+          ? `ON DELETE ${this.reference.onDelete}`
+          : null;
+    } else {
+      // MySQL 8.0 will output it when it's set explicitly
+      onDeleteClause = this.reference.onDelete !== null ? `ON DELETE ${this.reference.onDelete}` : null;
+    }
+
     return [
       `CONSTRAINT ${escape(this.name)}`,
       `FOREIGN KEY (${this.columns.map(escape).join(', ')})`,
       `REFERENCES ${escape(this.reference.table)} (${this.reference.columns.map(escape).join(', ')})`,
-      this.reference.onDelete !== 'RESTRICT' ? `ON DELETE ${this.reference.onDelete}` : null,
+      onDeleteClause,
     ]
       .filter(Boolean)
       .join(' ');

@@ -142,7 +142,7 @@ ReferenceDefinition:
   tblName        string
   indexColNames  IndexColName+
   matchMode      MatchMode?
-  onDelete       ReferenceOption
+  onDelete       ReferenceOption?
   onUpdate       ReferenceOption?
 
 GeneratedDefinition:

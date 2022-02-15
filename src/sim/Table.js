@@ -551,7 +551,7 @@ export default class Table {
     localColumns: Array<string>,
     targetTblName: string,
     targetColumns: Array<string>,
-    onDelete: ReferenceOption,
+    onDelete: ReferenceOption | null,
   ): Table {
     // TODO: Assert local columns exist
     // TODO: Assert target columns exist
@@ -801,7 +801,7 @@ export default class Table {
       ...this.getUniqueIndexes().map((index) => index.toString()),
       ...this.getNormalIndexes().map((index) => index.toString()),
       ...this.getFullTextIndexes().map((index) => index.toString()),
-      ...(includeFKs ? this.getForeignKeys().map((fk) => fk.toString()) : []),
+      ...(includeFKs ? this.getForeignKeys().map((fk) => fk.toString(printOptions.target)) : []),
     ];
   }
 
@@ -821,7 +821,7 @@ export default class Table {
     return t.Record(record, this.name);
   }
 
-  printFKs(): string | null {
+  printFKs(target: MySQLVersion): string | null {
     const fks = this.getForeignKeys();
     if (fks.length === 0) {
       return null;
@@ -831,7 +831,7 @@ export default class Table {
       [
         `ALTER TABLE \`${this.name}\``,
         fks
-          .map((fk) => 'ADD ' + fk.toString())
+          .map((fk) => 'ADD ' + fk.toString(target))
           .map(indent)
           .join(',\n'),
       ].join('\n') + ';'

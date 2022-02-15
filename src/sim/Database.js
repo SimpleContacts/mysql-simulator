@@ -239,7 +239,7 @@ export default class Database {
     localColumns: Array<string>,
     targetTblName: string,
     targetColumns: Array<string>,
-    onDelete: ReferenceOption,
+    onDelete: ReferenceOption | null,
   ): Database {
     // Makes sure the tables exist
     const localTable = this.getTable(tblName);
@@ -338,7 +338,7 @@ export default class Database {
       const table = this.getTable(tableName);
       if (options.foreignKeysLast) {
         dumps.push(table.toString({ includeForeignKeys: false, target }));
-        const fks = table.printFKs();
+        const fks = table.printFKs(target);
         if (fks) {
           footer.push(fks);
           footer.push('');

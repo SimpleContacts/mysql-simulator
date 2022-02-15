@@ -704,7 +704,7 @@ export type ReferenceDefinition = {|
   tblName: string,
   indexColNames: Array<IndexColName>,
   matchMode: MatchMode | null,
-  onDelete: ReferenceOption,
+  onDelete: ReferenceOption | null,
   onUpdate: ReferenceOption | null,
 |};
 
@@ -1953,8 +1953,8 @@ export default {
   ReferenceDefinition(
     tblName: string,
     indexColNames: Array<IndexColName>,
-    matchMode: MatchMode | null,
-    onDelete: ReferenceOption,
+    matchMode: MatchMode | null = null,
+    onDelete: ReferenceOption | null = null,
     onUpdate: ReferenceOption | null = null,
   ): ReferenceDefinition {
     invariant(

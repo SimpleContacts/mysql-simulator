@@ -783,7 +783,7 @@ ReferenceDefinition
         tblName.name,
         indexColNames,
         matchMode,
-        onDelete ?? 'RESTRICT',
+        onDelete,
         onUpdate,
       )
     }

@@ -497,7 +497,7 @@ function peg$parse(input, options) {
               tblName.name,
               indexColNames,
               matchMode,
-              onDelete ?? 'RESTRICT',
+              onDelete,
               onUpdate,
             )
           },
