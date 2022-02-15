@@ -25,6 +25,7 @@ const DEFAULT_COLLATIONS: { [MySQLVersion]: { [Charset]: Collation } } = {
   '8.0': {
     latin1: 'latin1_swedish_ci',
     utf8: 'utf8_general_ci',
+    utf8mb3: 'utf8mb3_general_ci',
     utf8mb4: 'utf8mb4_0900_ai_ci',
   },
 };

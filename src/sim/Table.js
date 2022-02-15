@@ -720,15 +720,17 @@ export default class Table {
   }
 
   toString(printOptions: {| includeForeignKeys?: boolean, target: MySQLVersion |}): string {
+    const target = printOptions.target;
     const indent = (line: string) => `  ${line}`;
+
     const options = [
       'ENGINE=InnoDB',
-      `DEFAULT CHARSET=${dealiasCharset(this.defaultEncoding.charset)}`,
+      `DEFAULT CHARSET=${dealiasCharset(target, this.defaultEncoding.charset)}`,
 
       // MySQL only outputs it if it's explicitly different from what it would
       // use as a default collation for this charset
       this.defaultEncoding.collate !== getDefaultCollationForCharset(printOptions.target, this.defaultEncoding.charset)
-        ? `COLLATE=${dealiasCollate(this.defaultEncoding.collate)}`
+        ? `COLLATE=${dealiasCollate(target, this.defaultEncoding.collate)}`
         : null,
     ];
     return [

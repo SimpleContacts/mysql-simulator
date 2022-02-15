@@ -64,32 +64,45 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
   }
 }
 
-export function dealiasCharset(charset: Charset): Charset {
-  return charset === 'utf8mb3' ? 'utf8' : charset;
+export function dealiasCharset(target: MySQLVersion, charset: Charset): Charset {
+  // NOTE: Historically, utf8 and utf8mb3 are aliases. Starting from MySQL
+  // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
+  if (target !== '5.7') {
+    return charset === 'utf8' ? 'utf8mb3' : charset;
+  } else {
+    return charset === 'utf8mb3' ? 'utf8' : charset;
+  }
 }
 
-export function dealiasCollate(collate: Collation): Collation {
-  const prefix = 'utf8mb3_';
-  return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
+export function dealiasCollate(target: MySQLVersion, collate: Collation): Collation {
+  // NOTE: Historically, utf8 and utf8mb3 are aliases. Starting from MySQL
+  // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
+  if (target !== '5.7') {
+    const prefix = 'utf8_';
+    return collate.startsWith(prefix) ? `utf8mb3_${collate.substring(prefix.length)}` : collate;
+  } else {
+    const prefix = 'utf8mb3_';
+    return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
+  }
 }
 
-function isEqualCollate(collate1: Collation, collate2: Collation): boolean {
-  return dealiasCollate(collate1) === dealiasCollate(collate2);
+function isEqualCollate(target: MySQLVersion, collate1: Collation, collate2: Collation): boolean {
+  return dealiasCollate(target, collate1) === dealiasCollate(target, collate2);
 }
 
 function formatEncoding(target: MySQLVersion, tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
-  let outputCharset = !tableEncoding || !isEqualCollate(columnEncoding.collate, tableEncoding.collate);
+  let outputCharset = !tableEncoding || !isEqualCollate(target, columnEncoding.collate, tableEncoding.collate);
   let outputCollation =
     !tableEncoding ||
-    !isEqualCollate(columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
+    !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
 
   return outputCharset || outputCollation
     ? [
-        outputCharset ? `CHARACTER SET ${dealiasCharset(columnEncoding.charset)}` : null,
-        outputCollation ? `COLLATE ${dealiasCollate(columnEncoding.collate)}` : null,
+        outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset)}` : null,
+        outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate)}` : null,
       ]
         .filter(Boolean)
         .join(' ')
