@@ -283,7 +283,7 @@ BigInt:
   unsigned  boolean
 
 Decimal:
-  precision  Precision?
+  precision  Precision
   unsigned   boolean
 
 Float:

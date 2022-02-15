@@ -680,7 +680,7 @@ Len = LPAREN number:NumberLiteral RPAREN { return number.value }
 
 Precision
   = LPAREN length:NumberLiteral COMMA decimals:NumberLiteral RPAREN {
-      return { length: length.value, decimals }
+      return { length: length.value, decimals: decimals.value }
     }
 
 Charset = CHARACTER SET name:CharsetName { return name }
@@ -721,7 +721,8 @@ DataType
       return ast.Double(precision, !!unsigned)
     }
   / (DECIMAL / NUMERIC) _ precision:Precision? _ unsigned:UNSIGNED? {
-      return ast.Decimal(precision, !!unsigned)
+      const DEFAULT_PRECISION = { length: 10, decimals: 0 }
+      return ast.Decimal(precision ?? DEFAULT_PRECISION, !!unsigned)
     }
 
   // Length required
