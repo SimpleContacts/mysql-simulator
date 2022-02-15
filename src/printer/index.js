@@ -139,7 +139,7 @@ export function serializeExpression(node: Expression, options: FormattingOptions
       }
 
       // #lolmysql-8.0 - wtf? for boolean operators, the operands are "truth"ed by comparing them against 0?
-      if (takesBooleanOperands(op)) {
+      if (target !== '5.7' && takesBooleanOperands(op)) {
         return `(${serializeTruthExpr(node.expr1, options)} ${op} ${serializeTruthExpr(node.expr2, options)})`;
       } else {
         return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
