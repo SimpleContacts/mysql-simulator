@@ -4,7 +4,7 @@ import invariant from 'invariant';
 
 import type { DataType, Textual, TextualOrEnum } from '../ast';
 import ast from '../ast';
-import type { Encoding } from '../ast/encodings';
+import type { Charset, Collation, Encoding } from '../ast/encodings';
 import { getDefaultCollationForCharset } from '../ast/encodings';
 import { isWider } from '../ast/encodings';
 import { quote } from '../printer';
@@ -63,6 +63,15 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
   }
 }
 
+function dealiasCharset(charset: Charset): Charset {
+  return charset === 'utf8mb3' ? 'utf8' : charset;
+}
+
+function dealiasCollate(collate: Collation): Collation {
+  const prefix = 'utf8mb3_';
+  return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
+}
+
 function formatEncoding(tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
@@ -73,8 +82,8 @@ function formatEncoding(tableEncoding: Encoding | void, columnEncoding: Encoding
 
   return outputCharset || outputCollation
     ? [
-        outputCharset ? `CHARACTER SET ${columnEncoding.charset}` : null,
-        outputCollation ? `COLLATE ${columnEncoding.collate}` : null,
+        outputCharset ? `CHARACTER SET ${dealiasCharset(columnEncoding.charset)}` : null,
+        outputCollation ? `COLLATE ${dealiasCollate(columnEncoding.collate)}` : null,
       ]
         .filter(Boolean)
         .join(' ')

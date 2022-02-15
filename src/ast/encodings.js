@@ -2,8 +2,8 @@
 
 import invariant from 'invariant';
 
-type Charset = string;
-type Collation = string;
+export type Charset = string;
+export type Collation = string;
 
 type EncodingPair = {|
   +charset: Charset,
