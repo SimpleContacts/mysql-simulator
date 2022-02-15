@@ -825,7 +825,7 @@ TableOption
 EngineName = _ "InnoDB"i !IdentifierStart _ { return 'InnoDB' }
 
 CharsetName "character set name"
-  = _ charset:("latin1" / "utf8mb4" / "utf8") !IdentifierStart _ {
+  = _ charset:("latin1" / "utf8mb3" / "utf8mb4" / "utf8") !IdentifierStart _ {
       return charset
     }
 
@@ -834,6 +834,8 @@ CollationName "collation name"
     collation:(
       "latin1_swedish_ci"
       / "latin1_spanish_ci"
+      / "utf8mb3_general_ci"
+      / "utf8mb3_unicode_ci"
       / "utf8mb4_general_ci"
       / "utf8mb4_unicode_ci"
       / "utf8_bin"
