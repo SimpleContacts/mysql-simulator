@@ -62,11 +62,11 @@ export function getDefaultCollationForCharset(charset: Charset): Collation {
   return collation;
 }
 
-const CHARSET_WIDTHS = ['latin1', 'utf8', 'utf8mb4'];
+const CHARSET_WIDTHS = [['latin1'], ['utf8', 'utf8mb3'], ['utf8mb4']];
 
 export function isWider(charset1: Charset, charset2: Charset): boolean {
-  const index1 = CHARSET_WIDTHS.indexOf(charset1);
-  const index2 = CHARSET_WIDTHS.indexOf(charset2);
+  const index1 = CHARSET_WIDTHS.findIndex((g) => g.includes(charset1));
+  const index2 = CHARSET_WIDTHS.findIndex((g) => g.includes(charset2));
   invariant(index1 >= 0, 'Unknown charset: ' + charset1);
   invariant(index2 >= 0, 'Unknown charset: ' + charset2);
   return index1 > index2;
