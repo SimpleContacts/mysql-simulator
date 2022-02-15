@@ -1,3 +1,7 @@
+# v1.10.0
+
+- MySQL 8.0 support
+
 # v1.9.3
 
 - Fix bug regarding default column sizes for int columns
