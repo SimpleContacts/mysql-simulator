@@ -7,11 +7,19 @@ output_dir=tests/real
 
 # Unless explicitly set on the command line, use the server's default values
 # (differ per MySQL version, so watch out!)
+mysql_version=
 charset=
 collate=
 
-while getopts s:c: flag; do
+while getopts v:s:c: flag; do
   case "$flag" in
+    v)
+      # NOTE: We'll assign it the passed-in version, so it can be invoked with
+      # the same command line arguments as run-simulation.sh, but please do
+      # realize that this will NOT affect the actual version of MySQL that will
+      # be used! This script will always use whatever the MySQL version happens
+      # to be. It just runs `mysqldump` from the $PATH.
+      mysql_version=$OPTARG ;;
     s) charset=$OPTARG ;;
     c) collate=$OPTARG ;;
     *) exit 2 ;;

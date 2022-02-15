@@ -51,7 +51,7 @@ jobs:
         run: yarn build
 
       - name: Run tests
-        run: ./test.sh ${{ matrix.mysql }}
+        run: ./test.sh -v ${{ matrix.mysql }}
 
       - name: Flow
         run: yarn run -s flow
