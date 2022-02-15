@@ -110,8 +110,7 @@ export function formatDataType(dataType: DataType, tableEncoding?: Encoding): st
       // NOTE: This is some weird MySQL quirk... if an encoding is set
       // explicitly, then the *collate* defines what gets displayed, otherwise
       // the *charset* difference will determine it
-      let outputCharset =
-        !tableEncoding || (dataType.encoding !== null && dataType.encoding.collate !== tableEncoding.collate);
+      let outputCharset = !tableEncoding || encoding.collate !== tableEncoding.collate;
       let outputCollation = !tableEncoding || encoding.collate !== getDefaultCollationForCharset(encoding.charset);
 
       options = [
