@@ -47,7 +47,7 @@ export default class Database {
 
   constructor(options: Options, _tables: LUT<Table> = {}) {
     this.options = options;
-    if (this.options.mysqlVersion !== '5.7' && this.options.mysqlVersion !== '8.x') {
+    if (this.options.mysqlVersion !== '5.7' && this.options.mysqlVersion !== '8.0') {
       throw new Error('Unrecognized MySQL version: ' + this.options.mysqlVersion);
     }
     this._tables = _tables;
