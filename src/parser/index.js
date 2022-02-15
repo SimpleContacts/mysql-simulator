@@ -78,9 +78,13 @@ const printErr = (filename, input, e: Error) => {
  * with much better error reporting, showing source line position where it
  * failed.
  */
-export default function parse(inputSql: string, filename: string = ''): Array<Statement> {
+export default function parse(
+  inputSql: string,
+  filename: string = '',
+  options?: { +[string]: mixed },
+): Array<Statement> {
   try {
-    return rawParseSql(inputSql);
+    return rawParseSql(inputSql, options);
   } catch (e) {
     printErr(filename, inputSql, e);
     throw e;

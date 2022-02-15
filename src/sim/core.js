@@ -414,7 +414,7 @@ function applySqlStatements(db_: Database, statements: Array<Statement>): Databa
  * Does not modify the original input DB state.
  */
 export function applySql(db: Database, sql: string, srcFile: string): Database {
-  const ast: Array<Statement> = parseSql(sql, srcFile);
+  const ast: Array<Statement> = parseSql(sql, srcFile, { mysqlVersion: db.options.mysqlVersion });
   return applySqlStatements(db, ast);
 }
 

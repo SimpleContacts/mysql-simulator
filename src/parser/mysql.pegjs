@@ -1,10 +1,21 @@
 {
+  const globalParserOptions = options
+
   /**
    * Helper functions to more succinctly produce nodes
    */
   const invariant = require('invariant')
   const ast = require('../ast').default
-  const { makeEncoding } = require('../ast/encodings.js')
+  const { makeEncoding: _makeEncoding } = require('../ast/encodings.js')
+
+  function makeEncoding(charset, collate) {
+    const mysqlVersion = globalParserOptions.mysqlVersion
+    invariant(
+      mysqlVersion,
+      'Please provide `mysqlVersion` option to the parser',
+    )
+    return _makeEncoding(mysqlVersion, charset, collate)
+  }
 
   function unquote(quoted) {
     return quoted.replace("''", "'")
