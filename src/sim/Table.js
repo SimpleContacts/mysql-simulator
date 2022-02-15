@@ -23,6 +23,7 @@ function indent(line: string) {
 
 export default class Table {
   +name: string;
+  +mysqlVersion: MySQLVersion;
   +defaultEncoding: Encoding;
   +columns: $ReadOnlyArray<Column>;
   +primaryKey: $ReadOnlyArray<string> | null;
@@ -31,6 +32,7 @@ export default class Table {
 
   constructor(
     name: string,
+    mysqlVersion: MySQLVersion,
     defaultEncoding: Encoding,
     columns: $ReadOnlyArray<Column> = [],
     primaryKey: $ReadOnlyArray<string> | null = null,
@@ -38,6 +40,7 @@ export default class Table {
     foreignKeys: $ReadOnlyArray<ForeignKey> = [],
   ) {
     this.name = name;
+    this.mysqlVersion = mysqlVersion;
     this.defaultEncoding = defaultEncoding;
     this.columns = columns;
     this.primaryKey = primaryKey;
@@ -51,7 +54,15 @@ export default class Table {
     // happening by changing the encoding. However, any columns that don't have
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
-    return new Table(this.name, newEncoding, this.columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      newEncoding,
+      this.columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
   }
 
   convertToEncoding(newEncoding: Encoding): Table {
@@ -101,7 +112,15 @@ export default class Table {
       }
     });
 
-    return new Table(this.name, newEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      newEncoding,
+      columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
   }
 
   /**
@@ -168,7 +187,7 @@ export default class Table {
    * keys emptied.
    */
   cloneTo(name: string): Table {
-    return new Table(name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, []);
+    return new Table(name, this.mysqlVersion, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, []);
   }
 
   /**
@@ -189,7 +208,15 @@ export default class Table {
       });
     });
 
-    return new Table(newName, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(
+      newName,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      this.indexes,
+      foreignKeys,
+    );
   }
 
   /**
@@ -210,7 +237,15 @@ export default class Table {
       return fk.patch({ reference });
     });
 
-    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      this.indexes,
+      foreignKeys,
+    );
   }
 
   /**
@@ -220,7 +255,15 @@ export default class Table {
     this.assertColumnDoesNotExist(column.name);
 
     const columns = [...this.columns, column];
-    let table = new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    let table = new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
     if (position) {
       table = table.moveColumn(column.name, position);
     }
@@ -243,7 +286,15 @@ export default class Table {
       throw new Error(`Unknown position qualifier: ${position}`);
     }
 
-    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
   }
 
   /**
@@ -277,7 +328,7 @@ export default class Table {
       }),
     );
 
-    return new Table(this.name, this.defaultEncoding, columns, primaryKey, indexes, foreignKeys);
+    return new Table(this.name, this.mysqlVersion, this.defaultEncoding, columns, primaryKey, indexes, foreignKeys);
   }
 
   /**
@@ -290,7 +341,15 @@ export default class Table {
       throw new Error('Table.swapColumn() cannot be used to change the name of the column.');
     }
     const columns = this.columns.map((column) => (column.name === colName ? newColumn : column));
-    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
   }
 
   replaceColumn(oldColName: string, newColumn: Column, position: string | null, target: MySQLVersion): Table {
@@ -360,7 +419,15 @@ export default class Table {
     const column = this.getColumn(colName);
     const newColumn = column.patch({ defaultValue: null });
     const columns = this.columns.map((c) => (c.name === colName ? newColumn : c));
-    return new Table(this.name, this.defaultEncoding, columns, this.primaryKey, this.indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      columns,
+      this.primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
   }
 
   /**
@@ -397,7 +464,15 @@ export default class Table {
       primaryKey = primaryKey.length > 0 ? primaryKey : null;
     }
 
-    return new Table(this.name, this.defaultEncoding, columns, primaryKey, indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      columns,
+      primaryKey,
+      indexes,
+      this.foreignKeys,
+    );
   }
 
   /**
@@ -421,6 +496,7 @@ export default class Table {
 
     return new Table(
       this.name,
+      this.mysqlVersion,
       this.defaultEncoding,
       newColumns,
       columnNames, // primaryKey
@@ -438,7 +514,15 @@ export default class Table {
     }
 
     const primaryKey = null;
-    return new Table(this.name, this.defaultEncoding, this.columns, primaryKey, this.indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      this.columns,
+      primaryKey,
+      this.indexes,
+      this.foreignKeys,
+    );
   }
 
   /**
@@ -496,6 +580,7 @@ export default class Table {
         ];
         table = new Table(
           table.name,
+          this.mysqlVersion,
           this.defaultEncoding,
           table.columns,
           table.primaryKey,
@@ -521,7 +606,15 @@ export default class Table {
     });
     const foreignKeys = [...table.foreignKeys, fk];
 
-    return new Table(table.name, this.defaultEncoding, table.columns, table.primaryKey, table.indexes, foreignKeys);
+    return new Table(
+      table.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      table.columns,
+      table.primaryKey,
+      table.indexes,
+      foreignKeys,
+    );
   }
 
   /**
@@ -537,12 +630,21 @@ export default class Table {
     }
 
     const foreignKeys = this.foreignKeys.filter((fk) => fk.name !== symbol);
-    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, this.indexes, foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      this.indexes,
+      foreignKeys,
+    );
   }
 
   mapForeignKeys(mapper: (ForeignKey) => ForeignKey): Table {
     return new Table(
       this.name,
+      this.mysqlVersion,
       this.defaultEncoding,
       this.columns,
       this.primaryKey,
@@ -599,7 +701,15 @@ export default class Table {
       indexes = [...indexes, index];
     }
 
-    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      indexes,
+      this.foreignKeys,
+    );
   }
 
   dropIndex(indexName: string): Table {
@@ -617,7 +727,15 @@ export default class Table {
     }
 
     const indexes = this.indexes.filter((index) => index.name !== indexName);
-    return new Table(this.name, this.defaultEncoding, this.columns, this.primaryKey, indexes, this.foreignKeys);
+    return new Table(
+      this.name,
+      this.mysqlVersion,
+      this.defaultEncoding,
+      this.columns,
+      this.primaryKey,
+      indexes,
+      this.foreignKeys,
+    );
   }
 
   renameIndex(oldIndexName: string, newIndexName: string): Table {
@@ -638,6 +756,7 @@ export default class Table {
 
     return new Table(
       this.name,
+      this.mysqlVersion,
       this.defaultEncoding,
       this.columns,
       this.primaryKey,

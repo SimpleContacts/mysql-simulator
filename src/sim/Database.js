@@ -81,7 +81,7 @@ export default class Database {
   }
 
   createTable(name: string, defaultEncoding: Encoding): Database {
-    return this.addTable(new Table(name, defaultEncoding));
+    return this.addTable(new Table(name, this.options.mysqlVersion, defaultEncoding));
   }
 
   cloneTable(tblName: string, newTblName: string): Database {
