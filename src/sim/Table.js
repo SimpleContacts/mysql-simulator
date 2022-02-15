@@ -727,7 +727,7 @@ export default class Table {
 
       // MySQL only outputs it if it's explicitly different from what it would
       // use as a default collation for this charset
-      this.defaultEncoding.collate !== getDefaultCollationForCharset(this.defaultEncoding.charset)
+      this.defaultEncoding.collate !== getDefaultCollationForCharset(printOptions.target, this.defaultEncoding.charset)
         ? `COLLATE=${dealiasCollate(this.defaultEncoding.collate)}`
         : null,
     ];

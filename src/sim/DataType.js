@@ -77,13 +77,14 @@ function isEqualCollate(collate1: Collation, collate2: Collation): boolean {
   return dealiasCollate(collate1) === dealiasCollate(collate2);
 }
 
-function formatEncoding(tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
+function formatEncoding(target: MySQLVersion, tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
   let outputCharset = !tableEncoding || !isEqualCollate(columnEncoding.collate, tableEncoding.collate);
   let outputCollation =
-    !tableEncoding || !isEqualCollate(columnEncoding.collate, getDefaultCollationForCharset(columnEncoding.charset));
+    !tableEncoding ||
+    !isEqualCollate(columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
 
   return outputCharset || outputCollation
     ? [
@@ -138,7 +139,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
 
       const encoding = dataType.encoding;
       invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
-      options = formatEncoding(tableEncoding, encoding);
+      options = formatEncoding(target, tableEncoding, encoding);
       break;
     }
 
@@ -149,7 +150,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
 
       const encoding = dataType.encoding;
       invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
-      options = formatEncoding(tableEncoding, encoding);
+      options = formatEncoding(target, tableEncoding, encoding);
       break;
     }
 
@@ -164,7 +165,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
 
       const encoding = dataType.encoding;
       invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
-      options = formatEncoding(tableEncoding, encoding);
+      options = formatEncoding(target, tableEncoding, encoding);
       break;
     }
 

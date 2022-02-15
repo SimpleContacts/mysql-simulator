@@ -2,6 +2,8 @@
 
 import invariant from 'invariant';
 
+import type { MySQLVersion } from '../printer/utils';
+
 export type Charset = string;
 export type Collation = string;
 
@@ -12,33 +14,30 @@ type EncodingPair = {|
 
 export opaque type Encoding: EncodingPair = EncodingPair;
 
-const MYSQL_57_DEFAULT_COLLATIONS: { [Charset]: Collation } = {
-  latin1: 'latin1_swedish_ci',
-  utf8: 'utf8_general_ci',
-  utf8mb3: 'utf8mb3_general_ci',
-  utf8mb4: 'utf8mb4_general_ci',
+const DEFAULT_COLLATIONS: { [MySQLVersion]: { [Charset]: Collation } } = {
+  '5.7': {
+    latin1: 'latin1_swedish_ci',
+    utf8: 'utf8_general_ci',
+    utf8mb3: 'utf8mb3_general_ci',
+    utf8mb4: 'utf8mb4_general_ci',
+  },
+
+  '8.0': {
+    latin1: 'latin1_swedish_ci',
+    utf8: 'utf8_general_ci',
+    utf8mb4: 'utf8mb4_0900_ai_ci',
+  },
 };
 
-export const MYSQL_57_DEFAULTS: Encoding = {
-  charset: 'latin1',
-  collate: 'latin1_swedish_ci',
+const DEFAULT_CHARSETS: { [MySQLVersion]: Charset } = {
+  '5.7': 'latin1',
+  '8.0': 'utf8mb4',
 };
 
-// const MYSQL_80_DEFAULTS: Defaults = {
-//   charset: 'utf8mb4',
-//   collate: 'utf8mb4_0900_ai_ci',
-// };
-
-// const MYSQL_80_DEFAULT_COLLATIONS = {
-//   latin1: 'latin1_swedish_ci',
-//   utf8: 'utf8_general_ci',
-//   utf8mb4: 'utf8mb4_0900_ai_ci',
-// };
-
-export function makeEncoding(charset?: Charset, collate?: Collation): Encoding {
+export function makeEncoding(target: MySQLVersion, charset?: Charset, collate?: Collation): Encoding {
   // Only charset is provided, the other will get derived
   if (charset && !collate) {
-    const newCollate = getDefaultCollationForCharset(charset);
+    const newCollate = getDefaultCollationForCharset(target, charset);
     return { charset, collate: newCollate };
   }
 
@@ -53,13 +52,17 @@ export function makeEncoding(charset?: Charset, collate?: Collation): Encoding {
     invariant(collate.startsWith(charset), 'Illegal combination: ' + charset + ' is incompatible with ' + collate);
     return { charset, collate };
   } else {
-    return MYSQL_57_DEFAULTS;
+    // Get the default encoding settings for this MySQL version
+    const charset = DEFAULT_CHARSETS[target];
+    const collate = DEFAULT_COLLATIONS[target][charset];
+    invariant(charset && collate, `Wasn't able to look up default charset and collation for MySQL version ${target}`);
+    return { charset, collate };
   }
 }
 
-export function getDefaultCollationForCharset(charset: Charset): Collation {
-  const collation = MYSQL_57_DEFAULT_COLLATIONS[charset];
-  invariant(collation, 'Unknown default collatino for charset: ' + charset);
+export function getDefaultCollationForCharset(target: MySQLVersion, charset: Charset): Collation {
+  const collation = (DEFAULT_COLLATIONS[target] ?? {})[charset];
+  invariant(collation, 'Unknown default collation for charset: ' + charset);
   return collation;
 }
 

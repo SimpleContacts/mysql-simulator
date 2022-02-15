@@ -8,18 +8,20 @@ import { maxBy, minBy, sortBy } from 'lodash';
 
 import ast from '../ast';
 import type { DataType } from '../ast';
-import { MYSQL_57_DEFAULTS, makeEncoding } from '../ast/encodings';
 import type { Encoding } from '../ast/encodings';
+import { makeEncoding } from '../ast/encodings';
 import parseSql from '../parser';
 import type { AlterSpec, AlterTableStatement, ColumnDefinition, CreateTableStatement, Statement } from '../parser';
+import type { MySQLVersion } from '../printer/utils';
 import Column from './Column';
 import Database from './Database';
 import type { Options } from './Database';
 import { setEncoding } from './DataType';
 
+const DEFAULT_VERSION: MySQLVersion = '5.7';
 const DEFAULT_OPTIONS = {
-  defaultEncoding: MYSQL_57_DEFAULTS,
-  mysqlVersion: '5.7',
+  mysqlVersion: DEFAULT_VERSION,
+  defaultEncoding: makeEncoding(DEFAULT_VERSION, undefined, undefined),
 };
 
 function setEncodingIfNull<T: DataType>(dataType: T, encoding: Encoding): T {
@@ -130,11 +132,11 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   );
 }
 
-function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
+function handleCreateTable(db_: Database, stm: CreateTableStatement, target: MySQLVersion): Database {
   const tblName = stm.tblName;
   let encoding;
   if (stm.options?.CHARSET || stm.options?.COLLATE) {
-    encoding = makeEncoding(stm.options.CHARSET ?? undefined, stm.options.COLLATE ?? undefined);
+    encoding = makeEncoding(target, stm.options.CHARSET ?? undefined, stm.options.COLLATE ?? undefined);
   } else {
     encoding = db_.options.defaultEncoding;
   }
@@ -210,6 +212,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
 }
 
 function applyAlterStatement(db: Database, statement: AlterTableStatement, change: AlterSpec): Database {
+  const target = db.options.mysqlVersion;
   switch (change._kind) {
     case 'AlterRenameTable':
       return db.renameTable(statement.tblName, change.newTblName);
@@ -308,7 +311,7 @@ function applyAlterStatement(db: Database, statement: AlterTableStatement, chang
       const charset = change.options.CHARSET ?? undefined;
       const collate = change.options.COLLATE ?? undefined;
       if (charset || collate) {
-        return db.setDefaultTableEncoding(statement.tblName, charset, collate);
+        return db.setDefaultTableEncoding(statement.tblName, charset, collate, target);
       } else {
         return db;
       }
@@ -317,7 +320,7 @@ function applyAlterStatement(db: Database, statement: AlterTableStatement, chang
     case 'AlterConvertTo': {
       const charset = change.charset;
       const collate = change.collate ?? undefined;
-      return db.convertToEncoding(statement.tblName, charset, collate);
+      return db.convertToEncoding(statement.tblName, charset, collate, target);
     }
 
     default: {
@@ -332,9 +335,10 @@ function applyAlterStatement(db: Database, statement: AlterTableStatement, chang
 }
 
 function applyStatement(db: Database, statement: Statement): Database {
+  const target = db.options.mysqlVersion;
   switch (statement._kind) {
     case 'CreateTableStatement':
-      return handleCreateTable(db, statement);
+      return handleCreateTable(db, statement, target);
 
     case 'CreateTableLikeStatement':
       return db.cloneTable(statement.oldTblName, statement.tblName);
@@ -345,7 +349,7 @@ function applyStatement(db: Database, statement: Statement): Database {
     case 'AlterDatabaseStatement': {
       const charset = statement.options.CHARSET ?? undefined;
       const collate = statement.options.COLLATE ?? undefined;
-      const encoding = charset || collate ? makeEncoding(charset, collate) : db.options.defaultEncoding;
+      const encoding = charset || collate ? makeEncoding(target, charset, collate) : db.options.defaultEncoding;
       return db.setEncoding(encoding);
     }
 
@@ -500,7 +504,7 @@ export function applySqlFiles(db_: Database, ...paths: Array<string>): Database 
  * a collection of file or directory names.  For every directory given, it will
  * collect a naturally-sorted list of *.sql files.
  */
-export function simulate(pathOrPaths: string | Array<string>, options: Options = DEFAULT_OPTIONS): Database {
+export function simulate(pathOrPaths: string | Array<string>, options?: Options): Database {
   const paths = typeof pathOrPaths === 'string' ? [pathOrPaths] : pathOrPaths;
-  return applySqlFiles(new Database(options), ...paths);
+  return applySqlFiles(new Database(options ?? DEFAULT_OPTIONS), ...paths);
 }

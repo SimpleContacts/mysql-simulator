@@ -296,13 +296,13 @@ export default class Database {
     return this.swapTable(tblName, (table) => table.renameIndex(oldIndexName, newIndexName));
   }
 
-  setDefaultTableEncoding(tblName: string, charset?: string, collate?: string): Database {
-    const encoding = makeEncoding(charset, collate);
+  setDefaultTableEncoding(tblName: string, charset?: string, collate?: string, target: MySQLVersion): Database {
+    const encoding = makeEncoding(target, charset, collate);
     return this.swapTable(tblName, (table) => table.setDefaultEncoding(encoding));
   }
 
-  convertToEncoding(tblName: string, charset?: string, collate?: string): Database {
-    const encoding = makeEncoding(charset, collate);
+  convertToEncoding(tblName: string, charset?: string, collate?: string, target: MySQLVersion): Database {
+    const encoding = makeEncoding(target, charset, collate);
     return this.swapTable(tblName, (table) => table.convertToEncoding(encoding));
   }
 

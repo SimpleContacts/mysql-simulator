@@ -28,10 +28,11 @@ type Options = {
 };
 
 function runWithOptions(options: Options) {
-  const defaultEncoding = makeEncoding(options.charset, options.collate);
+  const mysqlVersion = options.mysqlVersion ?? DEFAULT_MYSQL_VERSION;
+  const defaultEncoding = makeEncoding(mysqlVersion, options.charset, options.collate);
   const dbOptions = {
     defaultEncoding,
-    mysqlVersion: options.mysqlVersion ?? DEFAULT_MYSQL_VERSION,
+    mysqlVersion,
   };
   let db: Database = new Database(dbOptions);
   let files = Array.from(expandInputFiles(options.args));
