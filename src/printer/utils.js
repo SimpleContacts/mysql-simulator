@@ -1,5 +1,6 @@
 // @flow strict
 
+import type { Charset } from '../ast/encodings';
 export type MySQLVersion = '5.7' | '8.0';
 
 export function escape(s: string): string {
@@ -27,9 +28,9 @@ export function quote(s: string): string {
  * ...and of course MySQL has another quoting strategy when in an expression
  * context.  Le sigh.
  */
-export function quoteInExpressionContext(s: string, target: MySQLVersion): string {
+export function quoteInExpressionContext(s: string, charset: Charset, target: MySQLVersion): string {
   if (target >= '8.0') {
-    return `_utf8mb3'${s.replace("'", "\\'")}'`;
+    return `_${charset}'${s.replace("'", "\\'")}'`;
   } else {
     return `'${s.replace("'", "\\'")}'`;
   }

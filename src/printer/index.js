@@ -3,6 +3,7 @@
 import invariant from 'invariant';
 
 import type { CurrentTimestamp, Expression } from '../ast';
+import type { Charset } from '../ast/encodings';
 import { escape, insert, quote, quoteInExpressionContext } from './utils';
 import type { MySQLVersion } from './utils';
 
@@ -20,6 +21,7 @@ import type { MySQLVersion } from './utils';
 // Absolutely no clue why.
 //
 type FormattingOptions = {|
+  charset: Charset,
   context?: 'EXPRESSION' | 'DEFAULT',
   target: MySQLVersion,
 |};
@@ -75,7 +77,8 @@ export function serializeExpression(node: Expression, options: FormattingOptions
   const TRUE = target >= '8.0' ? 'true' : 'TRUE';
   const FALSE = target >= '8.0' ? 'false' : 'FALSE';
 
-  const serializeString = options.context === 'EXPRESSION' ? (s) => quoteInExpressionContext(s, target) : quote;
+  const serializeString =
+    options.context === 'EXPRESSION' ? (s) => quoteInExpressionContext(s, options.charset, target) : quote;
 
   switch (node._kind) {
     case 'CallExpression': {
