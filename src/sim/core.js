@@ -124,7 +124,7 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding, tar
 
   return new Column(
     colName,
-    setEncodingIfNull(def.dataType, tableEncoding),
+    target === '5.7' ? setEncodingIfNull(def.dataType, tableEncoding) : def.dataType,
     nullable,
     defaultValue,
     onUpdate,

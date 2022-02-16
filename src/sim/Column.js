@@ -1,6 +1,5 @@
 // @flow strict
 
-import invariant from 'invariant';
 import t from 'rule-of-law/types';
 import type { TypeInfo as ROLTypeInfo } from 'rule-of-law/types';
 
@@ -31,7 +30,17 @@ export default class Column {
     comment: null | string,
     generated: null | GeneratedDefinition,
   ) {
-    invariant(!ast.isTextual(dataType) || dataType.encoding, 'Encoding must be explicitly set for textual columns');
+    //
+    // NOTE: The following requirement is only true for MySQL 5.7 - this will
+    // no longer be a requirement for MySQL 8.0, where text columns can have no
+    // explicit encoding assigned upon creation (and they will fall back to the
+    // default encoding of the table automatically)
+    //
+    // NOTE: This invariant check _may_ be restored, but only when we also
+    // check if target === '5.7' explicitly!
+    //
+    // invariant(!ast.isTextual(dataType) || dataType.encoding, 'Encoding must be explicitly set for textual columns');
+    //
     this.name = name;
     this.dataType = dataType;
     this.nullable = nullable;

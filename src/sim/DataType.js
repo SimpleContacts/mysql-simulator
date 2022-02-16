@@ -141,16 +141,29 @@ function formatEncoding_v80(
   columnEncoding: Encoding | null,
 ): string | null {
   if (!columnEncoding) {
+    if (tableEncoding && tableEncoding.collate !== getDefaultCollationForCharset(target, tableEncoding.charset)) {
+      return `COLLATE ${dealiasCollate(target, tableEncoding.collate, 'COLUMN')}`;
+    }
+
     return null;
   }
 
+  // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+  //
+  //    CLEAN UP
+  //
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
-  let outputCharset = !tableEncoding || !isEqualCollate(target, columnEncoding.collate, tableEncoding.collate);
-  let outputCollation =
-    !tableEncoding ||
-    !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
+  let outputCharset = true;
+  // !tableEncoding || !isEqualCollate(target, columnEncoding.collate, tableEncoding.collate);
+  let outputCollation = true;
+  // !tableEncoding ||
+  // !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
+  //
+  //    CLEAN UP
+  //
+  // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
   return outputCharset || outputCollation
     ? [
