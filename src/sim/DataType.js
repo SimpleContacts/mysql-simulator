@@ -63,22 +63,26 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
   }
 }
 
-function dealiasCharset(charset: Charset): Charset {
+export function dealiasCharset(charset: Charset): Charset {
   return charset === 'utf8mb3' ? 'utf8' : charset;
 }
 
-function dealiasCollate(collate: Collation): Collation {
+export function dealiasCollate(collate: Collation): Collation {
   const prefix = 'utf8mb3_';
   return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
+}
+
+function isEqualCollate(collate1: Collation, collate2: Collation): boolean {
+  return dealiasCollate(collate1) === dealiasCollate(collate2);
 }
 
 function formatEncoding(tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
-  let outputCharset = !tableEncoding || columnEncoding.collate !== tableEncoding.collate;
+  let outputCharset = !tableEncoding || !isEqualCollate(columnEncoding.collate, tableEncoding.collate);
   let outputCollation =
-    !tableEncoding || columnEncoding.collate !== getDefaultCollationForCharset(columnEncoding.charset);
+    !tableEncoding || !isEqualCollate(columnEncoding.collate, getDefaultCollationForCharset(columnEncoding.charset));
 
   return outputCharset || outputCollation
     ? [

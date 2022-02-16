@@ -10,7 +10,7 @@ import { getDefaultCollationForCharset } from '../ast/encodings';
 import { escape, insert } from '../printer';
 import Column from './Column';
 import Database from './Database';
-import { convertToEncoding, setEncoding } from './DataType';
+import { convertToEncoding, dealiasCharset, dealiasCollate, setEncoding } from './DataType';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
@@ -721,12 +721,12 @@ export default class Table {
   toString(printOptions?: {| includeForeignKeys?: boolean |}): string {
     const options = [
       'ENGINE=InnoDB',
-      `DEFAULT CHARSET=${this.defaultEncoding.charset}`,
+      `DEFAULT CHARSET=${dealiasCharset(this.defaultEncoding.charset)}`,
 
       // MySQL only outputs it if it's explicitly different from what it would
       // use as a default collation for this charset
       this.defaultEncoding.collate !== getDefaultCollationForCharset(this.defaultEncoding.charset)
-        ? `COLLATE=${this.defaultEncoding.collate}`
+        ? `COLLATE=${dealiasCollate(this.defaultEncoding.collate)}`
         : null,
     ];
     return [
