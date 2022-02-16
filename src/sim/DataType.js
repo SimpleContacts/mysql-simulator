@@ -99,7 +99,51 @@ export function isEqualCollate(target: MySQLVersion, collate1: Collation, collat
   return dealiasCollate(target, collate1, 'COLUMN') === dealiasCollate(target, collate2, 'COLUMN');
 }
 
-function formatEncoding(target: MySQLVersion, tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
+function formatEncoding(
+  target: MySQLVersion,
+  tableEncoding: Encoding | void,
+  columnEncoding: Encoding | null,
+): string | null {
+  if (target === '5.7') {
+    invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
+    return formatEncoding_v57(target, tableEncoding, columnEncoding);
+  } else {
+    return formatEncoding_v80(target, tableEncoding, columnEncoding);
+  }
+}
+
+function formatEncoding_v57(
+  target: MySQLVersion,
+  tableEncoding: Encoding | void,
+  columnEncoding: Encoding,
+): string | null {
+  // NOTE: This is some weird MySQL quirk... if an encoding is set
+  // explicitly, then the *collate* defines what gets displayed, otherwise
+  // the *charset* difference will determine it
+  let outputCharset = !tableEncoding || !isEqualCollate(target, columnEncoding.collate, tableEncoding.collate);
+  let outputCollation =
+    !tableEncoding ||
+    !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
+
+  return outputCharset || outputCollation
+    ? [
+        outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
+        outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
+      ]
+        .filter(Boolean)
+        .join(' ')
+    : null;
+}
+
+function formatEncoding_v80(
+  target: MySQLVersion,
+  tableEncoding: Encoding | void,
+  columnEncoding: Encoding | null,
+): string | null {
+  if (!columnEncoding) {
+    return null;
+  }
+
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
@@ -158,10 +202,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
     case 'Char':
     case 'VarChar': {
       params = dataType.length || '';
-
-      const encoding = dataType.encoding;
-      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
-      options = formatEncoding(target, tableEncoding, encoding);
+      options = formatEncoding(target, tableEncoding, dataType.encoding);
       break;
     }
 
@@ -169,10 +210,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
     case 'MediumText':
     case 'LongText': {
       params = '';
-
-      const encoding = dataType.encoding;
-      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
-      options = formatEncoding(target, tableEncoding, encoding);
+      options = formatEncoding(target, tableEncoding, dataType.encoding);
       break;
     }
 
@@ -184,10 +222,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
 
     case 'Enum': {
       params = dataType.values.map(quote).join(',');
-
-      const encoding = dataType.encoding;
-      invariant(encoding, 'Expected encoding to be set, but found: ' + JSON.stringify({ dataType }, null, 2));
-      options = formatEncoding(target, tableEncoding, encoding);
+      options = formatEncoding(target, tableEncoding, dataType.encoding);
       break;
     }
 
