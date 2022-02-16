@@ -54,11 +54,36 @@ export default class Table {
     // happening by changing the encoding. However, any columns that don't have
     // an explicit encoding set should be updated to the old/current encoding
     // explicitly
+    const columns = this.columns.map((column) => {
+      const dataType = column.dataType;
+      if (
+        // TODO: Ideally, just use `isTextualOrEnum()` here, but Flow's %checks
+        // predicates don't work across module boundaries :(
+        !(
+          dataType._kind === 'Char' ||
+          dataType._kind === 'VarChar' ||
+          dataType._kind === 'Text' ||
+          dataType._kind === 'MediumText' ||
+          dataType._kind === 'LongText' ||
+          dataType._kind === 'Enum'
+        )
+      ) {
+        return column;
+      }
+
+      if (dataType.encoding === null) {
+        return column.patch({ dataType: setEncoding(dataType, this.defaultEncoding) });
+      }
+
+      // Don't convert any explicit encodings
+      return column;
+    });
+
     return new Table(
       this.name,
       this.mysqlVersion,
       newEncoding,
-      this.columns,
+      columns,
       this.primaryKey,
       this.indexes,
       this.foreignKeys,
@@ -83,10 +108,12 @@ export default class Table {
         return column;
       }
 
-      invariant(
-        dataType.encoding !== null,
-        'Encoding must be set by now, but found: ' + JSON.stringify({ dataType }, null, 2),
-      );
+      // This condition will never be true under MySQL 5.7! All text columns
+      // have an explicit encoding in MySQL 5.7, but in MySQL 8.0 these can be
+      // implicit (in which case they inherit the table's encoding).
+      if (dataType.encoding === null) {
+        return column.patch({ dataType: setEncoding(dataType, this.defaultEncoding) });
+      }
 
       // NOTE: The implementation below is correct, and 100% matches MySQL's
       // behavior. Still...
