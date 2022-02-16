@@ -67,7 +67,7 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
 export function dealiasCharset(target: MySQLVersion, charset: Charset): Charset {
   // NOTE: Historically, utf8 and utf8mb3 are aliases. Starting from MySQL
   // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
-  if (target !== '5.7') {
+  if (target >= '8.0') {
     return charset === 'utf8' ? 'utf8mb3' : charset;
   } else {
     return charset === 'utf8mb3' ? 'utf8' : charset;
@@ -77,7 +77,7 @@ export function dealiasCharset(target: MySQLVersion, charset: Charset): Charset 
 export function dealiasCollate(target: MySQLVersion, collate: Collation): Collation {
   // NOTE: Historically, utf8 and utf8mb3 are aliases. Starting from MySQL
   // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
-  if (target !== '5.7') {
+  if (target >= '8.0') {
     const prefix = 'utf8_';
     return collate.startsWith(prefix) ? `utf8mb3_${collate.substring(prefix.length)}` : collate;
   } else {

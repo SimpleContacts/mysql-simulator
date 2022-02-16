@@ -28,9 +28,9 @@ export function quote(s: string): string {
  * context.  Le sigh.
  */
 export function quoteInExpressionContext(s: string, target: MySQLVersion): string {
-  if (target === '5.7') {
-    return `'${s.replace("'", "\\'")}'`;
-  } else {
+  if (target >= '8.0') {
     return `_utf8mb3'${s.replace("'", "\\'")}'`;
+  } else {
+    return `'${s.replace("'", "\\'")}'`;
   }
 }

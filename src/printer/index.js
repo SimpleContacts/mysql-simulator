@@ -72,8 +72,8 @@ export function serializeExpression(node: Expression, options: FormattingOptions
   }
 
   const target = options.target;
-  const TRUE = target === '5.7' ? 'TRUE' : 'true';
-  const FALSE = target === '5.7' ? 'FALSE' : 'false';
+  const TRUE = target >= '8.0' ? 'true' : 'TRUE';
+  const FALSE = target >= '8.0' ? 'false' : 'FALSE';
 
   const serializeString = options.context === 'EXPRESSION' ? (s) => quoteInExpressionContext(s, target) : quote;
 
@@ -106,20 +106,20 @@ export function serializeExpression(node: Expression, options: FormattingOptions
 
     case 'UnaryExpression':
       if (node.op === 'is null') {
-        if (target === '5.7') {
+        if (target >= '8.0') {
+          return `(${recurse(node.expr)} is null)`;
+        } else {
           // #lolmysql-5.7, go home
           return `isnull(${recurse(node.expr)})`;
-        } else {
-          return `(${recurse(node.expr)} is null)`;
         }
       } else if (node.op === 'is not null') {
         return `(${recurse(node.expr)} is not null)`;
       } else if (node.op === '!') {
-        if (target === '5.7') {
+        if (target >= '8.0') {
+          return `(0 = ${recurse(node.expr)})`;
+        } else {
           // #lolmysql, extra wrapping in parens
           return `(not(${recurse(node.expr)}))`;
-        } else {
-          return `(0 = ${recurse(node.expr)})`;
         }
       } else if (node.op === '+') {
         // #lolmysql, explicitly stripping the wrapping
@@ -139,7 +139,7 @@ export function serializeExpression(node: Expression, options: FormattingOptions
       }
 
       // #lolmysql-8.0 - wtf? for boolean operators, the operands are "truth"ed by comparing them against 0?
-      if (target !== '5.7' && takesBooleanOperands(op)) {
+      if (target >= '8.0' && takesBooleanOperands(op)) {
         return `(${serializeTruthExpr(node.expr1, options)} ${op} ${serializeTruthExpr(node.expr2, options)})`;
       } else {
         return `(${recurse(node.expr1)} ${op} ${recurse(node.expr2)})`;
