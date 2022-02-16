@@ -83,8 +83,8 @@ export function dealiasCollate(target: MySQLVersion, collate: Collation, context
   // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
   if (target >= '8.0') {
     if (context === 'TABLE') {
-      const prefix = 'utf8_';
-      return collate.startsWith(prefix) ? `utf8mb3_${collate.substring(prefix.length)}` : collate;
+      const prefix = 'utf8mb3_';
+      return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
     } else {
       const prefix = 'utf8mb3_';
       return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
