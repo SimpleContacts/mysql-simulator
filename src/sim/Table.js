@@ -11,7 +11,7 @@ import { escape, insert } from '../printer';
 import type { MySQLVersion } from '../printer/utils';
 import Column from './Column';
 import Database from './Database';
-import { convertToEncoding, dealiasCharset, dealiasCollate, setEncoding } from './DataType';
+import { convertToEncoding, dealiasCharset, dealiasCollate, isEqualCollate, setEncoding } from './DataType';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
@@ -839,17 +839,20 @@ export default class Table {
   }
 
   toString(printOptions: {| includeForeignKeys?: boolean, target: MySQLVersion |}): string {
-    const target = printOptions.target;
+    const { target } = printOptions;
     const indent = (line: string) => `  ${line}`;
 
+    const { charset, collate } = this.defaultEncoding;
     const options = [
       'ENGINE=InnoDB',
-      `DEFAULT CHARSET=${dealiasCharset(target, this.defaultEncoding.charset)}`,
+      `DEFAULT CHARSET=${dealiasCharset(target, charset)}`,
 
       // MySQL only outputs it if it's explicitly different from what it would
       // use as a default collation for this charset
-      this.defaultEncoding.collate !== getDefaultCollationForCharset(printOptions.target, this.defaultEncoding.charset)
-        ? `COLLATE=${dealiasCollate(target, this.defaultEncoding.collate)}`
+      !isEqualCollate(target, collate, getDefaultCollationForCharset(target, charset)) ||
+      // ...or this is MySQL 8, which will always display collates for utf8mb4 explicitly, unlike all other charsets
+      (target >= '8.0' && charset === 'utf8mb4')
+        ? `COLLATE=${dealiasCollate(target, collate)}`
         : null,
     ];
     return [

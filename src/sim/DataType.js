@@ -86,7 +86,7 @@ export function dealiasCollate(target: MySQLVersion, collate: Collation): Collat
   }
 }
 
-function isEqualCollate(target: MySQLVersion, collate1: Collation, collate2: Collation): boolean {
+export function isEqualCollate(target: MySQLVersion, collate1: Collation, collate2: Collation): boolean {
   return dealiasCollate(target, collate1) === dealiasCollate(target, collate2);
 }
 
