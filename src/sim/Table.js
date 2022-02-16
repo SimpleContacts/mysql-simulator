@@ -845,14 +845,14 @@ export default class Table {
     const { charset, collate } = this.defaultEncoding;
     const options = [
       'ENGINE=InnoDB',
-      `DEFAULT CHARSET=${dealiasCharset(target, charset)}`,
+      `DEFAULT CHARSET=${dealiasCharset(target, charset, 'TABLE')}`,
 
       // MySQL only outputs it if it's explicitly different from what it would
       // use as a default collation for this charset
       !isEqualCollate(target, collate, getDefaultCollationForCharset(target, charset)) ||
       // ...or this is MySQL 8, which will always display collates for utf8mb4 explicitly, unlike all other charsets
       (target >= '8.0' && charset === 'utf8mb4')
-        ? `COLLATE=${dealiasCollate(target, collate)}`
+        ? `COLLATE=${dealiasCollate(target, collate, 'TABLE')}`
         : null,
     ];
     return [

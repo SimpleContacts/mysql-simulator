@@ -64,22 +64,31 @@ export function convertToEncoding(dataType: Textual, newEncoding: Encoding): Tex
   }
 }
 
-export function dealiasCharset(target: MySQLVersion, charset: Charset): Charset {
+export function dealiasCharset(target: MySQLVersion, charset: Charset, context: 'TABLE' | 'COLUMN'): Charset {
   // NOTE: Historically, utf8 and utf8mb3 are aliases. Starting from MySQL
   // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
   if (target >= '8.0') {
-    return charset === 'utf8' ? 'utf8mb3' : charset;
+    if (context === 'TABLE') {
+      return charset === 'utf8' ? 'utf8mb3' : charset;
+    } else {
+      return charset === 'utf8mb3' ? 'utf8' : charset;
+    }
   } else {
     return charset === 'utf8mb3' ? 'utf8' : charset;
   }
 }
 
-export function dealiasCollate(target: MySQLVersion, collate: Collation): Collation {
+export function dealiasCollate(target: MySQLVersion, collate: Collation, context: 'TABLE' | 'COLUMN'): Collation {
   // NOTE: Historically, utf8 and utf8mb3 are aliases. Starting from MySQL
   // 8.0.28, utf8mb3 is used exclusively in in the output of SHOW statements.
   if (target >= '8.0') {
-    const prefix = 'utf8_';
-    return collate.startsWith(prefix) ? `utf8mb3_${collate.substring(prefix.length)}` : collate;
+    if (context === 'TABLE') {
+      const prefix = 'utf8_';
+      return collate.startsWith(prefix) ? `utf8mb3_${collate.substring(prefix.length)}` : collate;
+    } else {
+      const prefix = 'utf8mb3_';
+      return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
+    }
   } else {
     const prefix = 'utf8mb3_';
     return collate.startsWith(prefix) ? `utf8_${collate.substring(prefix.length)}` : collate;
@@ -87,7 +96,7 @@ export function dealiasCollate(target: MySQLVersion, collate: Collation): Collat
 }
 
 export function isEqualCollate(target: MySQLVersion, collate1: Collation, collate2: Collation): boolean {
-  return dealiasCollate(target, collate1) === dealiasCollate(target, collate2);
+  return dealiasCollate(target, collate1, 'COLUMN') === dealiasCollate(target, collate2, 'COLUMN');
 }
 
 function formatEncoding(target: MySQLVersion, tableEncoding: Encoding | void, columnEncoding: Encoding): string | null {
@@ -101,8 +110,8 @@ function formatEncoding(target: MySQLVersion, tableEncoding: Encoding | void, co
 
   return outputCharset || outputCollation
     ? [
-        outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset)}` : null,
-        outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate)}` : null,
+        outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
+        outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
       ]
         .filter(Boolean)
         .join(' ')
