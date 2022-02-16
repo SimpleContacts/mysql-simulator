@@ -99,17 +99,19 @@ export function getMigrations(dirpath: string): Array<MigrationInfo> {
 
 const error = console.error;
 
-function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Column {
+function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding, target: MySQLVersion): Column {
   const dataType = def.dataType;
   let defaultValue = def.defaultValue;
   let onUpdate = def.onUpdate;
 
   // Whether a definition is "NOT NULL" or "NULL" by default, depends on the
-  // data type.  MySQL's TIMESTAMP columns are NOT NULL unless explicitly
-  // specified.  All other types are NULL unless explicitly specified.
+  // data type. In MySQL 5.7, TIMESTAMP columns are NOT NULL unless explicitly
+  // specified. All other types are NULL unless explicitly specified. In MySQL
+  // 8.0, this is more consistent and TIMESTAMP columns are no longer an
+  // exception.
   let nullable = def.nullable;
   if (nullable === null) {
-    nullable = dataType._kind !== 'Timestamp'; // Could also be "timestamp(6)"
+    nullable = target !== '5.7' || dataType._kind !== 'Timestamp'; // Could also be "timestamp(6)"
   }
 
   if (dataType._kind === 'Timestamp') {
@@ -132,7 +134,8 @@ function makeColumn(colName, def: ColumnDefinition, tableEncoding: Encoding): Co
   );
 }
 
-function handleCreateTable(db_: Database, stm: CreateTableStatement, target: MySQLVersion): Database {
+function handleCreateTable(db_: Database, stm: CreateTableStatement): Database {
+  const target = db_.options.mysqlVersion;
   const tblName = stm.tblName;
   let encoding;
   if (stm.options?.CHARSET || stm.options?.COLLATE) {
@@ -147,7 +150,7 @@ function handleCreateTable(db_: Database, stm: CreateTableStatement, target: MyS
   const columns = stm.definitions.map((def) => (def._kind === 'Column' ? def : null)).filter(Boolean);
   for (const coldef of columns) {
     const table = db.getTable(tblName);
-    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaultEncoding), null);
+    db = db.addColumn(tblName, makeColumn(coldef.colName, coldef.definition, table.defaultEncoding, target), null);
   }
 
   // Add a primary key, if any. A primary key can be added explicitly (1), or
@@ -219,7 +222,7 @@ function applyAlterStatement(db: Database, statement: AlterTableStatement, chang
 
     case 'AlterAddColumn': {
       const table = db.getTable(statement.tblName);
-      const column = makeColumn(change.colName, change.definition, table.defaultEncoding);
+      const column = makeColumn(change.colName, change.definition, table.defaultEncoding, target);
       let newDb = db.addColumn(statement.tblName, column, change.position);
       if (change.definition.isPrimary) {
         return newDb.addPrimaryKey(statement.tblName, [change.colName]);
@@ -232,7 +235,7 @@ function applyAlterStatement(db: Database, statement: AlterTableStatement, chang
 
     case 'AlterChangeColumn': {
       const table = db.getTable(statement.tblName);
-      const column = makeColumn(change.newColName, change.definition, table.defaultEncoding);
+      const column = makeColumn(change.newColName, change.definition, table.defaultEncoding, target);
       let newDb = db.replaceColumn(statement.tblName, change.oldColName, column, change.position);
       if (change.definition.isUnique) {
         return newDb.addIndex(statement.tblName, null, 'UNIQUE', [change.newColName], true);
@@ -338,7 +341,7 @@ function applyStatement(db: Database, statement: Statement): Database {
   const target = db.options.mysqlVersion;
   switch (statement._kind) {
     case 'CreateTableStatement':
-      return handleCreateTable(db, statement, target);
+      return handleCreateTable(db, statement);
 
     case 'CreateTableLikeStatement':
       return db.cloneTable(statement.oldTblName, statement.tblName);
