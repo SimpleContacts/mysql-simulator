@@ -20,3 +20,10 @@ CREATE TABLE ddd (
   CONSTRAINT ddd_a_fk FOREIGN KEY (a) REFERENCES aaa (id) ON DELETE RESTRICT
   --                                                      ^^^^^^^^^^^^^^^^^^
 );
+
+CREATE TABLE eee (
+  id INT PRIMARY KEY,
+  a INT NULL,
+  CONSTRAINT eee_a_fk FOREIGN KEY (a) REFERENCES aaa (id) -- no ON DELETE clause
+  --                                                         ^^^^^^^^^^^^^^^^^^^
+);
