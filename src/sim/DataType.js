@@ -107,8 +107,8 @@ function formatCollate(encoding: Encoding): string {
   return `COLLATE ${encoding.collate}`;
 }
 
-function formatEncoding_raw(encoding: Encoding): string {
-  return `${formatCharset(encoding)} ${formatCollate(encoding)}`;
+function formatEncoding_pair(encoding: Encoding): [string, string] {
+  return [formatCharset(encoding), formatCollate(encoding)];
 }
 
 function formatEncoding(
@@ -116,7 +116,7 @@ function formatEncoding(
   tableEncoding: Encoding,
   columnEncoding: Encoding | null,
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
-): string | null {
+): [string | null, string | null] {
   if (target === '5.7') {
     invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
     return formatEncoding_v57(target, tableEncoding, columnEncoding, xxxxxxxxx_PRINTSHITALWAYS);
@@ -130,7 +130,7 @@ function formatEncoding_v57(
   tableEncoding: Encoding,
   columnEncoding: Encoding,
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
-): string | null {
+): [string | null, string | null] {
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
@@ -139,18 +139,14 @@ function formatEncoding_v57(
     !tableEncoding ||
     !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
 
-  return (
-    [
-      xxxxxxxxx_PRINTSHITALWAYS || outputCharset
-        ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
-        : null,
-      xxxxxxxxx_PRINTSHITALWAYS || outputCollation
-        ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || null
-  );
+  return [
+    xxxxxxxxx_PRINTSHITALWAYS || outputCharset
+      ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
+      : null,
+    xxxxxxxxx_PRINTSHITALWAYS || outputCollation
+      ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
+      : null,
+  ];
 }
 
 function formatEncoding_v80(
@@ -158,17 +154,17 @@ function formatEncoding_v80(
   tableEncoding: Encoding,
   columnEncoding: Encoding | null,
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
-): string | null {
+): [string | null, string | null] {
   if (!columnEncoding) {
     if (xxxxxxxxx_PRINTSHITALWAYS) {
-      return formatEncoding_raw(tableEncoding);
+      return [...formatEncoding_pair(tableEncoding)];
     }
 
     if (tableEncoding && tableEncoding.collate !== getDefaultCollationForCharset(target, tableEncoding.charset)) {
-      return `COLLATE ${dealiasCollate(target, tableEncoding.collate, 'COLUMN')}`;
+      return [null, `COLLATE ${dealiasCollate(target, tableEncoding.collate, 'COLUMN')}`];
     }
 
-    return null;
+    return [null, null];
   }
 
   // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -188,18 +184,14 @@ function formatEncoding_v80(
   //
   // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
-  return (
-    [
-      xxxxxxxxx_PRINTSHITALWAYS || outputCharset
-        ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
-        : null,
-      xxxxxxxxx_PRINTSHITALWAYS || outputCollation
-        ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || null
-  );
+  return [
+    xxxxxxxxx_PRINTSHITALWAYS || outputCharset
+      ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
+      : null,
+    xxxxxxxxx_PRINTSHITALWAYS || outputCollation
+      ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
+      : null,
+  ];
 }
 
 /**
@@ -249,7 +241,9 @@ export function getDataTypeInfo(
     case 'Char':
     case 'VarChar': {
       params = dataType.length || null;
-      options = formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS);
+      options =
+        formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS).filter(Boolean).join(' ') ||
+        null;
       break;
     }
 
@@ -257,7 +251,9 @@ export function getDataTypeInfo(
     case 'MediumText':
     case 'LongText': {
       params = null;
-      options = formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS);
+      options =
+        formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS).filter(Boolean).join(' ') ||
+        null;
       break;
     }
 
@@ -269,7 +265,9 @@ export function getDataTypeInfo(
 
     case 'Enum': {
       params = dataType.values.map(quote).join(',');
-      options = formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS);
+      options =
+        formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS).filter(Boolean).join(' ') ||
+        null;
       break;
     }
 
