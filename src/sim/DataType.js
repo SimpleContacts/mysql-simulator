@@ -128,42 +128,6 @@ function formatEncoding(
   columnEncoding: Encoding | null,
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): [string | null, string | null] {
-  if (target === '5.7') {
-    invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
-    return formatEncoding_v57(target, tableEncoding, columnEncoding, xxxxxxxxx_PRINTSHITALWAYS);
-  } else {
-    return formatEncoding_v80(target, tableEncoding, columnEncoding, xxxxxxxxx_PRINTSHITALWAYS);
-  }
-}
-
-function formatEncoding_v57(
-  target: MySQLVersion,
-  tableEncoding: Encoding,
-  columnEncoding: Encoding,
-  xxxxxxxxx_PRINTSHITALWAYS: boolean,
-): [string | null, string | null] {
-  // NOTE: This is some weird MySQL quirk... if an encoding is set
-  // explicitly, then the *collate* defines what gets displayed, otherwise
-  // the *charset* difference will determine it
-  let outputCharset = shouldShowCharset(target, tableEncoding, columnEncoding);
-  let outputCollation = shouldShowCollate(target, tableEncoding, columnEncoding);
-
-  return [
-    xxxxxxxxx_PRINTSHITALWAYS || outputCharset
-      ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
-      : null,
-    xxxxxxxxx_PRINTSHITALWAYS || outputCollation
-      ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
-      : null,
-  ];
-}
-
-function formatEncoding_v80(
-  target: MySQLVersion,
-  tableEncoding: Encoding,
-  columnEncoding: Encoding | null,
-  xxxxxxxxx_PRINTSHITALWAYS: boolean,
-): [string | null, string | null] {
   let outputCharset = shouldShowCharset(target, tableEncoding, columnEncoding);
   let outputCollation = shouldShowCollate(target, tableEncoding, columnEncoding);
 
