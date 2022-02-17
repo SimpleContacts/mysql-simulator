@@ -101,7 +101,7 @@ export function isEqualCollate(target: MySQLVersion, collate1: Collation, collat
 
 function shouldShowCharset(target: MySQLVersion, tableEncoding: Encoding, columnEncoding: Encoding | null): boolean {
   if (target >= '8.0') {
-    return true;
+    return columnEncoding !== null;
   } else {
     invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
     return !tableEncoding || !isEqualCollate(target, columnEncoding.collate, tableEncoding.collate);
@@ -110,7 +110,9 @@ function shouldShowCharset(target: MySQLVersion, tableEncoding: Encoding, column
 
 function shouldShowCollate(target: MySQLVersion, tableEncoding: Encoding, columnEncoding: Encoding | null): boolean {
   if (target >= '8.0') {
-    return true;
+    return (
+      columnEncoding !== null || tableEncoding.collate !== getDefaultCollationForCharset(target, tableEncoding.charset)
+    );
   } else {
     invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
     return (
@@ -162,12 +164,10 @@ function formatEncoding_v80(
   columnEncoding: Encoding | null,
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): [string | null, string | null] {
+  let outputCharset = shouldShowCharset(target, tableEncoding, columnEncoding);
+  let outputCollation = shouldShowCollate(target, tableEncoding, columnEncoding);
+
   const encoding = columnEncoding ?? tableEncoding;
-
-  let outputCharset = !!columnEncoding;
-  let outputCollation =
-    !!columnEncoding || encoding.collate !== getDefaultCollationForCharset(target, encoding.charset);
-
   return [
     xxxxxxxxx_PRINTSHITALWAYS || outputCharset
       ? `CHARACTER SET ${dealiasCharset(target, encoding.charset, 'COLUMN')}`
