@@ -99,18 +99,6 @@ export function isEqualCollate(target: MySQLVersion, collate1: Collation, collat
   return dealiasCollate(target, collate1, 'COLUMN') === dealiasCollate(target, collate2, 'COLUMN');
 }
 
-function formatCharset(encoding: Encoding): string {
-  return `CHARACTER SET ${encoding.charset}`;
-}
-
-function formatCollate(encoding: Encoding): string {
-  return `COLLATE ${encoding.collate}`;
-}
-
-function formatEncoding_pair(encoding: Encoding): [string, string] {
-  return [formatCharset(encoding), formatCollate(encoding)];
-}
-
 function shouldShowCharset(target: MySQLVersion, tableEncoding: Encoding, columnEncoding: Encoding | null): boolean {
   if (target >= '8.0') {
     return true;
@@ -174,16 +162,23 @@ function formatEncoding_v80(
   columnEncoding: Encoding | null,
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): [string | null, string | null] {
-  if (!columnEncoding) {
+  const encoding = columnEncoding ?? tableEncoding;
+  const noExplicitColumnEncoding = !columnEncoding;
+
+  let outputCharset = true;
+  let outputCollation = true;
+
+  if (noExplicitColumnEncoding) {
     if (xxxxxxxxx_PRINTSHITALWAYS) {
-      return [...formatEncoding_pair(tableEncoding)];
+      outputCharset = true;
+      outputCollation = true;
+    } else if (encoding.collate !== getDefaultCollationForCharset(target, encoding.charset)) {
+      outputCharset = false;
+      outputCollation = true;
+    } else {
+      outputCharset = false;
+      outputCollation = false;
     }
-
-    if (tableEncoding && tableEncoding.collate !== getDefaultCollationForCharset(target, tableEncoding.charset)) {
-      return [null, `COLLATE ${dealiasCollate(target, tableEncoding.collate, 'COLUMN')}`];
-    }
-
-    return [null, null];
   }
 
   // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -193,11 +188,9 @@ function formatEncoding_v80(
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
   // the *charset* difference will determine it
-  let outputCharset = true;
-  // !tableEncoding || !isEqualCollate(target, columnEncoding.collate, tableEncoding.collate);
-  let outputCollation = true;
+  // !tableEncoding || !isEqualCollate(target, encoding.collate, tableEncoding.collate);
   // !tableEncoding ||
-  // !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
+  // !isEqualCollate(target, encoding.collate, getDefaultCollationForCharset(target, encoding.charset));
   //
   //    CLEAN UP
   //
@@ -205,10 +198,10 @@ function formatEncoding_v80(
 
   return [
     xxxxxxxxx_PRINTSHITALWAYS || outputCharset
-      ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
+      ? `CHARACTER SET ${dealiasCharset(target, encoding.charset, 'COLUMN')}`
       : null,
     xxxxxxxxx_PRINTSHITALWAYS || outputCollation
-      ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
+      ? `COLLATE ${dealiasCollate(target, encoding.collate, 'COLUMN')}`
       : null,
   ];
 }
