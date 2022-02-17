@@ -163,38 +163,10 @@ function formatEncoding_v80(
   xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): [string | null, string | null] {
   const encoding = columnEncoding ?? tableEncoding;
-  const noExplicitColumnEncoding = !columnEncoding;
 
-  let outputCharset = true;
-  let outputCollation = true;
-
-  if (noExplicitColumnEncoding) {
-    if (xxxxxxxxx_PRINTSHITALWAYS) {
-      outputCharset = true;
-      outputCollation = true;
-    } else if (encoding.collate !== getDefaultCollationForCharset(target, encoding.charset)) {
-      outputCharset = false;
-      outputCollation = true;
-    } else {
-      outputCharset = false;
-      outputCollation = false;
-    }
-  }
-
-  // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-  //
-  //    CLEAN UP
-  //
-  // NOTE: This is some weird MySQL quirk... if an encoding is set
-  // explicitly, then the *collate* defines what gets displayed, otherwise
-  // the *charset* difference will determine it
-  // !tableEncoding || !isEqualCollate(target, encoding.collate, tableEncoding.collate);
-  // !tableEncoding ||
-  // !isEqualCollate(target, encoding.collate, getDefaultCollationForCharset(target, encoding.charset));
-  //
-  //    CLEAN UP
-  //
-  // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+  let outputCharset = !!columnEncoding;
+  let outputCollation =
+    !!columnEncoding || encoding.collate !== getDefaultCollationForCharset(target, encoding.charset);
 
   return [
     xxxxxxxxx_PRINTSHITALWAYS || outputCharset
