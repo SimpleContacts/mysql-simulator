@@ -11,7 +11,14 @@ import { escape, insert } from '../printer';
 import type { MySQLVersion } from '../printer/utils';
 import Column from './Column';
 import Database from './Database';
-import { convertToEncoding, dealiasCharset, dealiasCollate, isEqualCollate, setEncoding } from './DataType';
+import {
+  convertToEncoding,
+  dealiasCharset,
+  dealiasCollate,
+  isEqualCollate,
+  resolveDataType,
+  setEncoding,
+} from './DataType';
 import ForeignKey from './ForeignKey';
 import type { ReferenceOption } from './ForeignKey';
 import type { IndexType } from './Index';
@@ -188,6 +195,16 @@ export default class Table {
       throw new Error(`Column "${colName}" does not exist in table "${this.name}"`);
     }
     return index;
+  }
+
+  /**
+   * Get the normalized data type for the column. e.g. returns "int(11)" or
+   * "varchar(16) CHARACTER SET utf8". This is a method on Table, because in
+   * order to obtain the full data type for text columns, the full data type
+   * may depend on the table's default encoding.
+   */
+  getColumnType(column: Column, target: MySQLVersion): string {
+    return resolveDataType(column.dataType, target, this.defaultEncoding);
   }
 
   /**

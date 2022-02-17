@@ -78,14 +78,6 @@ export default class Column {
   }
 
   /**
-   * Get the normalized type, not the raw type for this column.
-   * e.g. returns "int(11)" or "varchar(16) CHARACTER SET utf8"
-   */
-  getType(target: MySQLVersion): string {
-    return formatDataType(this.dataType, target);
-  }
-
-  /**
    * Get the full-blown column definition, without the name. When the table's
    * default encoding value is passed, it will conditionally format the
    * encodings of text columns, based on whether they differ from the table or

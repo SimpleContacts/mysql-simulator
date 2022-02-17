@@ -99,11 +99,7 @@ export function isEqualCollate(target: MySQLVersion, collate1: Collation, collat
   return dealiasCollate(target, collate1, 'COLUMN') === dealiasCollate(target, collate2, 'COLUMN');
 }
 
-function formatEncoding(
-  target: MySQLVersion,
-  tableEncoding: Encoding | void,
-  columnEncoding: Encoding | null,
-): string | null {
+function formatEncoding(target: MySQLVersion, tableEncoding: Encoding, columnEncoding: Encoding | null): string | null {
   if (target === '5.7') {
     invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
     return formatEncoding_v57(target, tableEncoding, columnEncoding);
@@ -176,14 +172,20 @@ function formatEncoding_v80(
 }
 
 /**
- * Format type information back to a printable string. When tableEncoding is
- * provided, it will conditionally output the encoding information, like MySQL
- * does, depending on whether it's equal to the table default encoding or not.
+ * Returns a helper structure to help format the data type for display.
  */
-export function formatDataType(dataType: DataType, target: MySQLVersion, tableEncoding?: Encoding): string {
+export function getDataTypeInfo(
+  dataType: DataType,
+  target: MySQLVersion,
+  tableEncoding: Encoding,
+): {|
+  baseType: string,
+  params: string | number | null,
+  options: string | null,
+|} {
   const baseType = dataType._kind.toLowerCase();
-  let params = '';
-  let options = '';
+  let params = null;
+  let options = null;
 
   // Dispatch based on the type
   switch (dataType._kind) {
@@ -209,12 +211,12 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
     case 'Time':
     case 'Timestamp':
     case 'DateTime':
-      params = dataType.fsp || '';
+      params = dataType.fsp || null;
       break;
 
     case 'Char':
     case 'VarChar': {
-      params = dataType.length || '';
+      params = dataType.length || null;
       options = formatEncoding(target, tableEncoding, dataType.encoding);
       break;
     }
@@ -222,7 +224,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
     case 'Text':
     case 'MediumText':
     case 'LongText': {
-      params = '';
+      params = null;
       options = formatEncoding(target, tableEncoding, dataType.encoding);
       break;
     }
@@ -230,7 +232,7 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
     case 'Binary':
     case 'VarBinary':
     case 'Blob':
-      params = dataType.length || '';
+      params = dataType.length || null;
       break;
 
     case 'Enum': {
@@ -244,7 +246,6 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
       break;
   }
 
-  params = params ? `(${params})` : '';
   if (target >= '8.0') {
     // Under MySQL 8.0, default lengths for specific column types are no longer
     // emitted as part of the output
@@ -258,9 +259,37 @@ export function formatDataType(dataType: DataType, target: MySQLVersion, tableEn
     const stdLength = DEFAULT_INT_LENGTHS[baseType];
     const length = typeof dataType.length === 'number' ? dataType.length : null;
     if (stdLength !== undefined && length !== null && stdLength === length + (dataType.unsigned ? 1 : 0)) {
-      params = '';
+      params = null;
     }
   }
+
+  return { baseType, params, options };
+}
+
+/**
+ * Print the fully resolved data type for this column. This may include
+ * encoding options that will not get printed by default if they match the
+ * table's default encoding.
+ *
+ * Use this if you want to compare data types between columns (for example to
+ * check if they are compatible for setting up an FK relationship).
+ */
+export function resolveDataType(dataType: DataType, target: MySQLVersion, tableEncoding: Encoding): string {
+  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding);
+  params = params ? `(${params})` : '';
+  options = options ? ` ${options}` : '';
+  return `${baseType}${params}${options}`;
+}
+
+/**
+ * Format type information back to a printable string for use in table
+ * definitions. When tableEncoding is provided, it will conditionally output
+ * the encoding information, like MySQL does, depending on whether it's equal
+ * to the table default encoding or not.
+ */
+export function formatDataType(dataType: DataType, target: MySQLVersion, tableEncoding: Encoding): string {
+  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding);
+  params = params ? `(${params})` : '';
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
 }

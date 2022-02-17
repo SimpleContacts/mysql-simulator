@@ -255,8 +255,8 @@ export default class Database {
       const localColumn = localTable.getColumn(localColName);
       const foreignColumn = foreignTable.getColumn(foreignColName);
 
-      const ltype = localColumn.getType(this.options.mysqlVersion);
-      const ftype = foreignColumn.getType(this.options.mysqlVersion);
+      const ltype = localTable.getColumnType(localColumn, this.options.mysqlVersion);
+      const ftype = foreignTable.getColumnType(foreignColumn, this.options.mysqlVersion);
       if (ltype !== ftype) {
         const lname = `${localTable.name}.${localColumn.name}`;
         const fname = `${foreignTable.name}.${foreignColumn.name}`;
