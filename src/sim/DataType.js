@@ -139,22 +139,18 @@ function formatEncoding_v57(
     !tableEncoding ||
     !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
 
-  if (xxxxxxxxx_PRINTSHITALWAYS) {
-    return `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')} COLLATE ${dealiasCollate(
-      target,
-      columnEncoding.collate,
-      'COLUMN',
-    )}`;
-  } else {
-    return outputCharset || outputCollation
-      ? [
-          outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
-          outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
-        ]
-          .filter(Boolean)
-          .join(' ')
-      : null;
-  }
+  return (
+    [
+      xxxxxxxxx_PRINTSHITALWAYS || outputCharset
+        ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
+        : null,
+      xxxxxxxxx_PRINTSHITALWAYS || outputCollation
+        ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(' ') || null
+  );
 }
 
 function formatEncoding_v80(
@@ -192,22 +188,18 @@ function formatEncoding_v80(
   //
   // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
-  if (xxxxxxxxx_PRINTSHITALWAYS) {
-    return `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')} COLLATE ${dealiasCollate(
-      target,
-      columnEncoding.collate,
-      'COLUMN',
-    )}`;
-  } else {
-    return outputCharset || outputCollation
-      ? [
-          outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
-          outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
-        ]
-          .filter(Boolean)
-          .join(' ')
-      : null;
-  }
+  return (
+    [
+      xxxxxxxxx_PRINTSHITALWAYS || outputCharset
+        ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}`
+        : null,
+      xxxxxxxxx_PRINTSHITALWAYS || outputCollation
+        ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(' ') || null
+  );
 }
 
 /**
