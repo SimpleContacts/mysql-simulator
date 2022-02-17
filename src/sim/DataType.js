@@ -126,19 +126,15 @@ function formatEncoding(
   target: MySQLVersion,
   tableEncoding: Encoding,
   columnEncoding: Encoding | null,
-  xxxxxxxxx_PRINTSHITALWAYS: boolean,
+  force: boolean,
 ): [string | null, string | null] {
-  let outputCharset = shouldShowCharset(target, tableEncoding, columnEncoding);
-  let outputCollation = shouldShowCollate(target, tableEncoding, columnEncoding);
+  let outputCharset = force || shouldShowCharset(target, tableEncoding, columnEncoding);
+  let outputCollation = force || shouldShowCollate(target, tableEncoding, columnEncoding);
 
   const encoding = columnEncoding ?? tableEncoding;
   return [
-    xxxxxxxxx_PRINTSHITALWAYS || outputCharset
-      ? `CHARACTER SET ${dealiasCharset(target, encoding.charset, 'COLUMN')}`
-      : null,
-    xxxxxxxxx_PRINTSHITALWAYS || outputCollation
-      ? `COLLATE ${dealiasCollate(target, encoding.collate, 'COLUMN')}`
-      : null,
+    outputCharset ? `CHARACTER SET ${dealiasCharset(target, encoding.charset, 'COLUMN')}` : null,
+    outputCollation ? `COLLATE ${dealiasCollate(target, encoding.collate, 'COLUMN')}` : null,
   ];
 }
 
@@ -149,7 +145,7 @@ export function getDataTypeInfo(
   dataType: DataType,
   target: MySQLVersion,
   tableEncoding: Encoding,
-  xxxxxxxxx_PRINTSHITALWAYS: boolean,
+  force: boolean,
 ): {|
   baseType: string,
   params: string | number | null,
@@ -189,9 +185,7 @@ export function getDataTypeInfo(
     case 'Char':
     case 'VarChar': {
       params = dataType.length || null;
-      options =
-        formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS).filter(Boolean).join(' ') ||
-        null;
+      options = formatEncoding(target, tableEncoding, dataType.encoding, force).filter(Boolean).join(' ') || null;
       break;
     }
 
@@ -199,9 +193,7 @@ export function getDataTypeInfo(
     case 'MediumText':
     case 'LongText': {
       params = null;
-      options =
-        formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS).filter(Boolean).join(' ') ||
-        null;
+      options = formatEncoding(target, tableEncoding, dataType.encoding, force).filter(Boolean).join(' ') || null;
       break;
     }
 
@@ -213,9 +205,7 @@ export function getDataTypeInfo(
 
     case 'Enum': {
       params = dataType.values.map(quote).join(',');
-      options =
-        formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS).filter(Boolean).join(' ') ||
-        null;
+      options = formatEncoding(target, tableEncoding, dataType.encoding, force).filter(Boolean).join(' ') || null;
       break;
     }
 
@@ -253,8 +243,8 @@ export function getDataTypeInfo(
  * check if they are compatible for setting up an FK relationship).
  */
 export function resolveDataType(dataType: DataType, target: MySQLVersion, tableEncoding: Encoding): string {
-  const xxxxxxxxx_PRINTSHITALWAYS = true;
-  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding, xxxxxxxxx_PRINTSHITALWAYS);
+  const force = true;
+  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding, force);
   params = params ? `(${params})` : '';
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
@@ -267,8 +257,8 @@ export function resolveDataType(dataType: DataType, target: MySQLVersion, tableE
  * to the table default encoding or not.
  */
 export function formatDataType(dataType: DataType, target: MySQLVersion, tableEncoding: Encoding): string {
-  const xxxxxxxxx_PRINTSHITALWAYS = false;
-  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding, xxxxxxxxx_PRINTSHITALWAYS);
+  const force = false;
+  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding, force);
   params = params ? `(${params})` : '';
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
