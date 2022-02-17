@@ -99,19 +99,37 @@ export function isEqualCollate(target: MySQLVersion, collate1: Collation, collat
   return dealiasCollate(target, collate1, 'COLUMN') === dealiasCollate(target, collate2, 'COLUMN');
 }
 
-function formatEncoding(target: MySQLVersion, tableEncoding: Encoding, columnEncoding: Encoding | null): string | null {
+function formatCharset(encoding: Encoding): string {
+  return `CHARACTER SET ${encoding.charset}`;
+}
+
+function formatCollate(encoding: Encoding): string {
+  return `COLLATE ${encoding.collate}`;
+}
+
+function formatEncoding_raw(encoding: Encoding): string {
+  return `${formatCharset(encoding)} ${formatCollate(encoding)}`;
+}
+
+function formatEncoding(
+  target: MySQLVersion,
+  tableEncoding: Encoding,
+  columnEncoding: Encoding | null,
+  xxxxxxxxx_PRINTSHITALWAYS: boolean,
+): string | null {
   if (target === '5.7') {
     invariant(columnEncoding, 'Expected encoding to be set, but found: ' + JSON.stringify(columnEncoding));
-    return formatEncoding_v57(target, tableEncoding, columnEncoding);
+    return formatEncoding_v57(target, tableEncoding, columnEncoding, xxxxxxxxx_PRINTSHITALWAYS);
   } else {
-    return formatEncoding_v80(target, tableEncoding, columnEncoding);
+    return formatEncoding_v80(target, tableEncoding, columnEncoding, xxxxxxxxx_PRINTSHITALWAYS);
   }
 }
 
 function formatEncoding_v57(
   target: MySQLVersion,
-  tableEncoding: Encoding | void,
+  tableEncoding: Encoding,
   columnEncoding: Encoding,
+  xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): string | null {
   // NOTE: This is some weird MySQL quirk... if an encoding is set
   // explicitly, then the *collate* defines what gets displayed, otherwise
@@ -121,22 +139,35 @@ function formatEncoding_v57(
     !tableEncoding ||
     !isEqualCollate(target, columnEncoding.collate, getDefaultCollationForCharset(target, columnEncoding.charset));
 
-  return outputCharset || outputCollation
-    ? [
-        outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
-        outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
-      ]
-        .filter(Boolean)
-        .join(' ')
-    : null;
+  if (xxxxxxxxx_PRINTSHITALWAYS) {
+    return `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')} COLLATE ${dealiasCollate(
+      target,
+      columnEncoding.collate,
+      'COLUMN',
+    )}`;
+  } else {
+    return outputCharset || outputCollation
+      ? [
+          outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
+          outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
+        ]
+          .filter(Boolean)
+          .join(' ')
+      : null;
+  }
 }
 
 function formatEncoding_v80(
   target: MySQLVersion,
-  tableEncoding: Encoding | void,
+  tableEncoding: Encoding,
   columnEncoding: Encoding | null,
+  xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): string | null {
   if (!columnEncoding) {
+    if (xxxxxxxxx_PRINTSHITALWAYS) {
+      return formatEncoding_raw(tableEncoding);
+    }
+
     if (tableEncoding && tableEncoding.collate !== getDefaultCollationForCharset(target, tableEncoding.charset)) {
       return `COLLATE ${dealiasCollate(target, tableEncoding.collate, 'COLUMN')}`;
     }
@@ -161,14 +192,22 @@ function formatEncoding_v80(
   //
   // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
-  return outputCharset || outputCollation
-    ? [
-        outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
-        outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
-      ]
-        .filter(Boolean)
-        .join(' ')
-    : null;
+  if (xxxxxxxxx_PRINTSHITALWAYS) {
+    return `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')} COLLATE ${dealiasCollate(
+      target,
+      columnEncoding.collate,
+      'COLUMN',
+    )}`;
+  } else {
+    return outputCharset || outputCollation
+      ? [
+          outputCharset ? `CHARACTER SET ${dealiasCharset(target, columnEncoding.charset, 'COLUMN')}` : null,
+          outputCollation ? `COLLATE ${dealiasCollate(target, columnEncoding.collate, 'COLUMN')}` : null,
+        ]
+          .filter(Boolean)
+          .join(' ')
+      : null;
+  }
 }
 
 /**
@@ -178,6 +217,7 @@ export function getDataTypeInfo(
   dataType: DataType,
   target: MySQLVersion,
   tableEncoding: Encoding,
+  xxxxxxxxx_PRINTSHITALWAYS: boolean,
 ): {|
   baseType: string,
   params: string | number | null,
@@ -217,7 +257,7 @@ export function getDataTypeInfo(
     case 'Char':
     case 'VarChar': {
       params = dataType.length || null;
-      options = formatEncoding(target, tableEncoding, dataType.encoding);
+      options = formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS);
       break;
     }
 
@@ -225,7 +265,7 @@ export function getDataTypeInfo(
     case 'MediumText':
     case 'LongText': {
       params = null;
-      options = formatEncoding(target, tableEncoding, dataType.encoding);
+      options = formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS);
       break;
     }
 
@@ -237,7 +277,7 @@ export function getDataTypeInfo(
 
     case 'Enum': {
       params = dataType.values.map(quote).join(',');
-      options = formatEncoding(target, tableEncoding, dataType.encoding);
+      options = formatEncoding(target, tableEncoding, dataType.encoding, xxxxxxxxx_PRINTSHITALWAYS);
       break;
     }
 
@@ -275,7 +315,8 @@ export function getDataTypeInfo(
  * check if they are compatible for setting up an FK relationship).
  */
 export function resolveDataType(dataType: DataType, target: MySQLVersion, tableEncoding: Encoding): string {
-  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding);
+  const xxxxxxxxx_PRINTSHITALWAYS = true;
+  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding, xxxxxxxxx_PRINTSHITALWAYS);
   params = params ? `(${params})` : '';
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
@@ -288,7 +329,8 @@ export function resolveDataType(dataType: DataType, target: MySQLVersion, tableE
  * to the table default encoding or not.
  */
 export function formatDataType(dataType: DataType, target: MySQLVersion, tableEncoding: Encoding): string {
-  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding);
+  const xxxxxxxxx_PRINTSHITALWAYS = false;
+  let { baseType, params, options } = getDataTypeInfo(dataType, target, tableEncoding, xxxxxxxxx_PRINTSHITALWAYS);
   params = params ? `(${params})` : '';
   options = options ? ` ${options}` : '';
   return `${baseType}${params}${options}`;
