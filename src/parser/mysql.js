@@ -442,19 +442,24 @@ function peg$parse(input, options) {
           },
       peg$c123 = function(collate) { return makeEncoding(undefined, collate) },
       peg$c124 = function(len, unsigned) {
-            return ast.Int((len ?? 11) - (unsigned ? 1 : 0), !!unsigned)
+            return ast.Int(len ?? (unsigned ? 10 : 11), !!unsigned)
           },
       peg$c125 = function(len, unsigned) {
-            return ast.BigInt((len ?? 20) - (unsigned ? 1 : 0), !!unsigned)
+            return ast.BigInt(
+              len ??
+                // NOTE: Both signed and unsigned are 20 in the case of BIGINT!
+                (unsigned ? 20 : 20),
+              !!unsigned,
+            )
           },
       peg$c126 = function(len, unsigned) {
-            return ast.MediumInt((len ?? 9) - (unsigned ? 1 : 0), !!unsigned)
+            return ast.MediumInt(len ?? (unsigned ? 8 : 9), !!unsigned)
           },
       peg$c127 = function(len, unsigned) {
-            return ast.SmallInt((len ?? 6) - (unsigned ? 1 : 0), !!unsigned)
+            return ast.SmallInt(len ?? (unsigned ? 5 : 6), !!unsigned)
           },
       peg$c128 = function(len, unsigned) {
-            return ast.TinyInt((len ?? 4) - (unsigned ? 1 : 0), !!unsigned)
+            return ast.TinyInt(len ?? (unsigned ? 3 : 4), !!unsigned)
           },
       peg$c129 = function(len) { return ast.TinyInt(len ?? 1, false) },
       peg$c130 = function(fsp) { return ast.Timestamp(fsp) },
