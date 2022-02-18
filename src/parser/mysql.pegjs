@@ -695,19 +695,24 @@ Encoding
 
 DataType
   = (INTEGER / INT) len:Len? unsigned:UNSIGNED? {
-      return ast.Int((len ?? 11) - (unsigned ? 1 : 0), !!unsigned)
+      return ast.Int(len ?? (unsigned ? 10 : 11), !!unsigned)
     }
   / BIGINT len:Len? unsigned:UNSIGNED? {
-      return ast.BigInt((len ?? 20) - (unsigned ? 1 : 0), !!unsigned)
+      return ast.BigInt(
+        len ??
+          // NOTE: Both signed and unsigned are 20 in the case of BIGINT!
+          (unsigned ? 20 : 20),
+        !!unsigned,
+      )
     }
   / MEDIUMINT len:Len? unsigned:UNSIGNED? {
-      return ast.MediumInt((len ?? 9) - (unsigned ? 1 : 0), !!unsigned)
+      return ast.MediumInt(len ?? (unsigned ? 8 : 9), !!unsigned)
     }
   / SMALLINT len:Len? unsigned:UNSIGNED? {
-      return ast.SmallInt((len ?? 6) - (unsigned ? 1 : 0), !!unsigned)
+      return ast.SmallInt(len ?? (unsigned ? 5 : 6), !!unsigned)
     }
   / TINYINT len:Len? unsigned:UNSIGNED? {
-      return ast.TinyInt((len ?? 4) - (unsigned ? 1 : 0), !!unsigned)
+      return ast.TinyInt(len ?? (unsigned ? 3 : 4), !!unsigned)
     }
   / BOOLEAN len:Len? { return ast.TinyInt(len ?? 1, false) }
   / TIMESTAMP fsp:Len? { return ast.Timestamp(fsp) }
