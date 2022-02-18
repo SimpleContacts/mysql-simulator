@@ -158,11 +158,15 @@ export function getDataTypeInfo(
   // Dispatch based on the type
   switch (dataType._kind) {
     case 'TinyInt':
+      params = (!dataType.unsigned && dataType.length === 1) || target === '5.7' ? dataType.length : null;
+      options = [dataType.unsigned ? 'unsigned' : ''].filter(Boolean).join(' ');
+      break;
+
     case 'SmallInt':
     case 'MediumInt':
     case 'Int':
     case 'BigInt':
-      params = dataType.length;
+      params = target >= '8.0' ? null : dataType.length;
       options = [dataType.unsigned ? 'unsigned' : ''].filter(Boolean).join(' ');
       break;
 
