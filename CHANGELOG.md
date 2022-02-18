@@ -1,3 +1,7 @@
+# v1.9.3
+
+- Fix bug regarding default column sizes for int columns
+
 # v1.9.0
 
 - **Breaking API changes:**
